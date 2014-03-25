@@ -199,13 +199,13 @@ class ModStart():
                 " reST file     :  {}\n" +
                 " tex file      :  {}\n" +
                 " PDF file      :  {}\n").format(self.calcf, self.pyf,
-                                self.sumf, rstfile, texfile, pdffile))
+                                                 self.sumf, rstfile,
+                                                 texfile, pdffile))
 
         print("< calculation completed >")
 
         # write output if -e or -b option is given on command line
         self.out_term()
-        self.out_browser()
 
     def check_mod(self):
         """validate model file - check for syntax errors"""
@@ -282,40 +282,34 @@ class ModStart():
                         'Units'], tablefmt='rst', floatfmt=".4f"))
 
     def out_term(self):
-        """check for -e flag and echo calculation to terminal"""
+        """check -e or -b flag and echo calc to console or browser"""
         # onceweb modified
-        try:
-            if self.sysargv[2].strip() == '-e':
-                print()
-                print("|||||||||||||||||||||||||||||||||  "
-                      "echo calc file ||||||||||||||||||"
-                      "|||||||||||||||||")
-                print()
+        if len(self.sysargv) > 2 and self.sysargv[2].strip() == '-e':
+            print()
+            print("|||||||||||||||||||||||||||||||||  "
+                  "echo calc file ||||||||||||||||||"
+                  "|||||||||||||||||")
+            print()
+            try:
                 mod1 = open(self.calcf, 'r')
                 _r = mod1.readlines()
                 mod1.close()
                 for _i in _r:
                     print(_i)
-        except:
-            pass
-
-    def out_browser(self):
-        """check for -b flag and open calculation in Windows browser"""
-        try:
-            if self.sysargv[2].strip() == '-b':
+            except:
+                pass
+        elif len(self.sysargv) > 2 and self.sysargv[2].strip() == '-b':
+            try:
+                os.system("start chrome " + self.calcf)
+            except:
                 try:
-                    os.system("start chrome " + self.mfile)
+                    os.system("start firefox " + self.calcf)
                 except:
                     try:
-                        os.system("start firefox " + self.mfile)
+                        os.system("start iexplore file:///%CD%/" +
+                                  self.calcf)
                     except:
-                        try:
-                            os.system("start explore file:///%CD%/" +
-                                      self.mfile)
-                        except:
-                            pass
-        except:
-            pass
+                        pass
 
     def mod_tex(self, tfile):
         """modify tex file"""

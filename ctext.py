@@ -103,8 +103,10 @@ class CalcText(object):
 
         """
         # Unum settings
-        Unum.VALUE_FORMAT = "%.2f"
+        Unum.VALUE_FORMAT = "%.3f"
         Unum.UNIT_INDENT = ""
+        Unum.UNIT_HIDE_EMPTY = True
+
         set_printoptions(precision=3)
 
         # print summary if code = 1
@@ -123,7 +125,7 @@ class CalcText(object):
 
         # print reference line
         strend = eq[3].strip()
-        self._prt_both(self.width_calc * '_', 0)
+        #self._prt_both(self.width_calc * '_', 0)
         self._prt_both((var3 + " =").ljust(self.width_calc -
                         len(strend)) + strend, 1)
         self._prt_both(" ", 1)
@@ -172,7 +174,7 @@ class CalcText(object):
             self._prt_both(var + " = " +
                           str(eval(var).asUnit(eval(cunit))), 1)
         self._prt_both(self.width_calc * '_', 0)
-        self._prt_both(self.width_calc * '.', 0)
+        #self._prt_both(self.width_calc * '.', 0)
         self._prt_both(" ", 0)
 
     def _prt_array(self, mstrng):
@@ -183,6 +185,9 @@ class CalcText(object):
         ref, decimals, unit1, unit2]
 
         """
+        Unum.VALUE_FORMAT = "%.3f"
+        Unum.UNIT_INDENT = ""
+        Unum.UNIT_HIDE_EMPTY = True
         # strip units from equations and process
         for _j in self.odict:
             try:
@@ -349,17 +354,18 @@ class CalcText(object):
 
         # clean output
         out2p = pretty((symeq1, '  ', out2, '=', out3, comment))
-        repc = [(',', ' '), ('(', ' '), (')', ' ')]
+        repc = [(',', ' '), ('(', ' '), (')', ' '),
+                (']', ' '), ('[', ' ')]
         out2a = out2p
         for _k in repc:
             out2a = out2a.replace(_k[0],_k[1])
         strend = ratio[3].strip()
-        self._prt_both(self.width_calc * '_', 0)
+        #self._prt_both(self.width_calc * '_', 0)
         self._prt_both(strend.rjust(self.width_calc), 1)
         self._prt_both(out2a, 1)
         self._prt_both(" ", 0)
         self._prt_both(self.width_calc * '_', 0)
-        self._prt_both(self.width_calc * '.', 0)
+        #self._prt_both(self.width_calc * '.', 0)
         self._prt_both(" ", 0)
 
     def _prt_term(self, par):
@@ -370,7 +376,7 @@ class CalcText(object):
 
         """
         strend = par[3].strip() + ' '*10
-        param = ' '*4 + '| ' + par[1].strip()
+        param = ' '*5 + par[1].strip()
         self._prt_both(param.ljust(self.width_calc-len(strend))
                       + strend, 1)
 
