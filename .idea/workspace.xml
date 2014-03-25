@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cd900fa4-848d-455c-af1a-6b8f28173b49" name="Default" comment="" />
+    <list default="true" id="cd900fa4-848d-455c-af1a-6b8f28173b49" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cstart.py" afterPath="$PROJECT_DIR$/cstart.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ctext.py" afterPath="$PROJECT_DIR$/ctext.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    </list>
     <ignored path="oncemod.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -23,13 +27,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="__main__.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="__main__.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/__main__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="30" column="40" selection-start="704" selection-end="704" vertical-scroll-proportion="0.58201057" vertical-offset="0" max-vertical-offset="1134">
-              <folding>
-                <element signature="e#0#10#0" expanded="true" />
-              </folding>
+            <state line="30" column="40" selection-start="704" selection-end="704" vertical-scroll-proportion="0.0" vertical-offset="660" max-vertical-offset="1012">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -37,11 +39,8 @@
       <file leaf-file-name="cstart.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cstart.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="30" selection-start="323" selection-end="323" vertical-scroll-proportion="0.0" vertical-offset="352" max-vertical-offset="8866">
-              <folding>
-                <marker date="1395197578730" expanded="true" signature="292:13097" placeholder="..." />
-                <marker date="1395197578730" expanded="true" signature="10333:10770" placeholder="..." />
-              </folding>
+            <state line="302" column="13" selection-start="9832" selection-end="9832" vertical-scroll-proportion="0.0" vertical-offset="6644" max-vertical-offset="8734">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -55,10 +54,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ctext.py" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="config.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/config.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="8" column="22" selection-start="128" selection-end="128" vertical-scroll-proportion="0.0" vertical-offset="176" max-vertical-offset="308">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ctext.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ctext.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="332" column="9" selection-start="10188" selection-end="10188" vertical-scroll-proportion="0.0" vertical-offset="6975" max-vertical-offset="10252">
+            <state line="360" column="46" selection-start="11214" selection-end="11214" vertical-scroll-proportion="0.48793104" vertical-offset="7134" max-vertical-offset="10164">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LICENSE.txt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/LICENSE.txt">
+          <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
+            <state />
+          </provider>
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="24" column="27" selection-start="1184" selection-end="1184" vertical-scroll-proportion="0.0" vertical-offset="528" max-vertical-offset="660">
               <folding />
             </state>
           </provider>
@@ -77,6 +97,15 @@
         <entry file="file://$PROJECT_DIR$/cpdf.py">
           <provider selected="true" editor-type-id="text-editor">
             <state line="66" column="38" selection-start="1557" selection-end="1558" vertical-scroll-proportion="0.0" vertical-offset="1452" max-vertical-offset="10472">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cset.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cset.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="33" column="28" selection-start="785" selection-end="785" vertical-scroll-proportion="0.0" vertical-offset="726" max-vertical-offset="2332">
               <folding />
             </state>
           </provider>
@@ -122,17 +151,17 @@
         <option value="$PROJECT_DIR$/cdict.py" />
         <option value="$PROJECT_DIR$/__init__.py" />
         <option value="$PROJECT_DIR$/__main__.py" />
-        <option value="$PROJECT_DIR$/ctext.py" />
-        <option value="$PROJECT_DIR$/cstart.py" />
         <option value="$PROJECT_DIR$/ccheck.py" />
+        <option value="$PROJECT_DIR$/cstart.py" />
+        <option value="$PROJECT_DIR$/ctext.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="1927" />
-    <option name="y" value="-248" />
+    <option name="y" value="-308" />
     <option name="width" value="1063" />
-    <option name="height" value="1316" />
+    <option name="height" value="1376" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -160,6 +189,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -180,7 +210,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -195,7 +224,7 @@
     <property name="options.lastSelected" value="settings.github" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
-    <property name="last_opened_file_path" value="C:/github/oncemod" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="41" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="354" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="354" />
@@ -444,19 +473,19 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1927" y="-248" width="1063" height="1316" extended-state="0" />
-    <editor active="false" />
+    <frame x="1927" y="-308" width="1063" height="1376" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20567986" sideWeight="0.49950445" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20540099" sideWeight="0.49950445" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.16253717" sideWeight="0.79432017" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16650149" sideWeight="0.67039585" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18731417" sideWeight="0.6710311" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.50049555" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32937366" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3289689" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -545,14 +574,6 @@
         <state line="539" column="12" selection-start="18404" selection-end="18412" vertical-scroll-proportion="12.8824215" vertical-offset="704" max-vertical-offset="18722" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LICENSE.txt">
-      <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="27" selection-start="1184" selection-end="1184" vertical-scroll-proportion="0.49207827" vertical-offset="0" max-vertical-offset="1073" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/calcunits.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="7" column="22" selection-start="232" selection-end="232" vertical-scroll-proportion="0.13861386" vertical-offset="0" max-vertical-offset="1716" />
@@ -563,33 +584,9 @@
         <state line="1" column="0" selection-start="22" selection-end="22" vertical-scroll-proportion="0.019400353" vertical-offset="0" max-vertical-offset="1134" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cpdf.py">
+    <entry file="file://$PROJECT_DIR$/__main__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="38" selection-start="1557" selection-end="1558" vertical-scroll-proportion="0.0" vertical-offset="5544" max-vertical-offset="10274">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="22" selection-start="128" selection-end="128" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="308" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="30" selection-start="190" selection-end="190" vertical-scroll-proportion="-0.05820106" vertical-offset="176" max-vertical-offset="2266" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cdict.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="84" column="35" selection-start="1960" selection-end="1960" vertical-scroll-proportion="0.0" vertical-offset="3080" max-vertical-offset="8272">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ctext.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="332" column="9" selection-start="10188" selection-end="10188" vertical-scroll-proportion="0.0" vertical-offset="6975" max-vertical-offset="10252">
+        <state line="30" column="40" selection-start="704" selection-end="704" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1012">
           <folding />
         </state>
       </provider>
@@ -601,22 +598,55 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cstart.py">
+    <entry file="file://$PROJECT_DIR$/cdict.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="30" selection-start="323" selection-end="323" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8866">
-          <folding>
-            <marker date="1395197578730" expanded="true" signature="292:13097" placeholder="..." />
-            <marker date="1395197578730" expanded="true" signature="10333:10770" placeholder="..." />
-          </folding>
+        <state line="84" column="35" selection-start="1960" selection-end="1960" vertical-scroll-proportion="0.0" vertical-offset="3080" max-vertical-offset="8272">
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/__main__.py">
+    <entry file="file://$PROJECT_DIR$/config.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="40" selection-start="704" selection-end="704" vertical-scroll-proportion="0.58201057" vertical-offset="0" max-vertical-offset="1134">
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
+        <state line="8" column="22" selection-start="128" selection-end="128" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="308">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpdf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="38" selection-start="1557" selection-end="1558" vertical-scroll-proportion="0.0" vertical-offset="5544" max-vertical-offset="10274">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LICENSE.txt">
+      <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="27" selection-start="1184" selection-end="1184" vertical-scroll-proportion="0.0" vertical-offset="528" max-vertical-offset="660">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="28" selection-start="785" selection-end="785" vertical-scroll-proportion="0.0" vertical-offset="616" max-vertical-offset="2266">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cstart.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="302" column="13" selection-start="9832" selection-end="9832" vertical-scroll-proportion="0.0" vertical-offset="4736" max-vertical-offset="8558">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ctext.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="360" column="46" selection-start="11214" selection-end="11214" vertical-scroll-proportion="0.48793104" vertical-offset="7134" max-vertical-offset="10164">
+          <folding />
         </state>
       </provider>
     </entry>
