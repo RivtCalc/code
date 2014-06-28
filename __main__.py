@@ -1,40 +1,82 @@
+""" This module turns the oncepy package into a program module
+
+The module also determines whether the file is a model or
+project file and sets the working directory.
+
+Start program with python -m oncepy modelname
+"""
+
+import os
 import sys
-from oncemod import cstart
-import oncemod.config as om
-try:
-    from unitc import *
-except:
-    from oncemod.calcunits import *
+from oncepy import cstart
+from oncepy import cproj
+import oncepy.oconfig as cfg
 
 
-__all__ = ["cstart", "ccheck", "cdict", "ctext", "cpdf", "cset"]
-__version__ = "0.3.2"
-__author__ = 'rhh'
-
+__all__ = ["cstart", "ccheck", "cdict", "ctext", "cpdf", "cproj"]
+__version__ = "0.4.0"
+__author__ = 'rholland'
 
 if __name__ == '__main__':
-
     #print(sys.argv)
-    # check if command line is valid
     sysargv = sys.argv
-    cstartmod = cstart.ModStart
+    cfg.sysargv = sys.argv
+    startmod = cstart.ModStart
+    startproj = cproj.ProjStart
+
+    # check if command line is valid
     if len(sysargv) < 2:
-        cstartmod.cmdline()
+        startmod._cmdline()
     elif sysargv[1] == '-h':
-        cstartmod.cmdline()
-    # initialize file and paths
-    cstartmod.gen_paths()
-    # find location of units file
-    om.impcheck = 'built-in units'
+        startmod._cmdline()
+
+    # set unit file source
+    mfile = os.getcwdb()
     try:
         from unitc import *
-        om.impcheck = 'units in model directory'
-    except:
+        cfg.unitfile = 'model folder'
+    except ImportError:
         try:
-            sys.path.append(om.projdir)
+            os.chdir(os.pardir)
             from unitc import *
-            om.impcheck = 'units in project directory'
-        except:
-            from oncemod.calcunits import *
+            cfg.unitfile = 'project folder'
+            os.chdir(mfile)
+        except ImportError:
+            from oncepy.unitc import *
+            cfg.unitfile = 'built-in'
 
-    result = cstart.ModStart(sys.argv)
+    # set PDF style file source
+    try:
+        f1 = open('once.sty')
+        cfg.stylefile = 'model folder'
+    except IOError:
+        try:
+            os.chdir(os.pardir)
+            f1 = open('once.sty')
+            cfg.stylefile = 'project folder'
+            os.chdir(mfile)
+        except IOError:
+            f1 = open('once.sty')
+            cfg.unitfile = 'built-in'
+
+    # check if the file is a model or project file
+    mfile = ''
+    pfile = ''
+    f1 = open(sysargv[1], 'r')
+    readlines1 = f1.readlines()
+    f1.close()
+    for i1 in readlines1:
+        # check for [p] tag
+        if len(i1.strip()) > 0:
+            #print(i1)
+            if i1.split()[0].strip()[0:3] == '[p]':
+                cfg.pfile = sysargv[1]
+                cfg.ppath = os.getcwd()
+                print("project operations not complete")
+                #startproj()
+                continue
+
+    # if no [p] tag then run model
+    cfg.mfile = sysargv[1]
+    cfg.mpath = os.getcwd()
+    startmod()

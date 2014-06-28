@@ -1,4 +1,4 @@
-# Licence for oncemod
+# Licence for oncepy
 # ===================
 # Author: Rodney Holland
 # Author-email: rholland@structurelabs.com

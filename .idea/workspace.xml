@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cd900fa4-848d-455c-af1a-6b8f28173b49" name="Default" comment="">
+    <list default="true" id="3c5cf16c-d76b-437f-ba39-6bc2c0d88445" name="Default" comment="0.4.0&#10;updating">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/oncepy.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/.name" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/cproj.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/crst.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/files.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/oconfig.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ofiles.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/once.sty" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/unitc.py" />
+      <change type="DELETED" beforePath="C:\Miniconda3\Lib\site-packages\oncepy\.idea\oncemod.iml" afterPath="" />
+      <change type="DELETED" beforePath="C:\Miniconda3\Lib\site-packages\oncepy\.idea\vagrant.xml" afterPath="" />
+      <change type="DELETED" beforePath="C:\Miniconda3\Lib\site-packages\oncepy\calcunits.py" afterPath="" />
+      <change type="DELETED" beforePath="C:\Miniconda3\Lib\site-packages\oncepy\config.py" afterPath="" />
+      <change type="DELETED" beforePath="C:\Miniconda3\Lib\site-packages\oncepy\cset.py" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE.txt" afterPath="$PROJECT_DIR$/LICENSE.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/__init__.py" afterPath="$PROJECT_DIR$/__init__.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/__main__.py" afterPath="$PROJECT_DIR$/__main__.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ccheck.py" afterPath="$PROJECT_DIR$/ccheck.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cdict.py" afterPath="$PROJECT_DIR$/cdict.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cpdf.py" afterPath="$PROJECT_DIR$/cpdf.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cstart.py" afterPath="$PROJECT_DIR$/cstart.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ctext.py" afterPath="$PROJECT_DIR$/ctext.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/rhh.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/rhh.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
-    <ignored path="oncemod.iws" />
+    <ignored path="oncepy.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,63 +47,26 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
-    <favorites_list name="oncemod" />
+    <favorites_list name="oncepy" />
   </component>
   <component name="FileEditorManager">
     <leaf>
+      <file leaf-file-name="oconfig.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/oconfig.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="11" column="10" selection-start="201" selection-end="201" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="792">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="__main__.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/__main__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="30" column="40" selection-start="704" selection-end="704" vertical-scroll-proportion="0.0" vertical-offset="660" max-vertical-offset="1012">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="cstart.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/cstart.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="302" column="13" selection-start="9832" selection-end="9832" vertical-scroll-proportion="0.0" vertical-offset="6644" max-vertical-offset="8734">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="cdict.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/cdict.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="84" column="35" selection-start="1960" selection-end="1960" vertical-scroll-proportion="0.0" vertical-offset="1848" max-vertical-offset="8382">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="config.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="8" column="22" selection-start="128" selection-end="128" vertical-scroll-proportion="0.0" vertical-offset="176" max-vertical-offset="308">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ctext.py" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ctext.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="360" column="46" selection-start="11214" selection-end="11214" vertical-scroll-proportion="0.48793104" vertical-offset="7134" max-vertical-offset="10164">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LICENSE.txt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/LICENSE.txt">
-          <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="27" selection-start="1184" selection-end="1184" vertical-scroll-proportion="0.0" vertical-offset="528" max-vertical-offset="660">
-              <folding />
+            <state line="17" column="23" selection-start="433" selection-end="433" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1936">
+              <folding>
+                <element signature="e#219#228#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -87,8 +74,54 @@
       <file leaf-file-name="ccheck.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ccheck.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="11" column="8" selection-start="195" selection-end="195" vertical-scroll-proportion="0.0" vertical-offset="242" max-vertical-offset="374">
-              <folding />
+            <state line="12" column="0" selection-start="325" selection-end="325" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="858">
+              <folding>
+                <element signature="e#0#37#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cdict.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cdict.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="436" column="20" selection-start="13376" selection-end="13377" vertical-scroll-proportion="-14.807693" vertical-offset="9207" max-vertical-offset="11902">
+              <folding>
+                <element signature="e#0#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ctext.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ctext.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="627" column="0" selection-start="19624" selection-end="19624" vertical-scroll-proportion="0.0" vertical-offset="13004" max-vertical-offset="19250">
+              <folding>
+                <element signature="e#0#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cstart.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cstart.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="25" column="34" selection-start="587" selection-end="587" vertical-scroll-proportion="0.0" vertical-offset="244" max-vertical-offset="8514">
+              <folding>
+                <element signature="e#0#37#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="crst.py" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/crst.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="18" column="6" selection-start="430" selection-end="430" vertical-scroll-proportion="0.33333334" vertical-offset="2" max-vertical-offset="16764">
+              <folding>
+                <element signature="e#0#31#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -96,16 +129,7 @@
       <file leaf-file-name="cpdf.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cpdf.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="66" column="38" selection-start="1557" selection-end="1558" vertical-scroll-proportion="0.0" vertical-offset="1452" max-vertical-offset="10472">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="cset.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/cset.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="33" column="28" selection-start="785" selection-end="785" vertical-scroll-proportion="0.0" vertical-offset="726" max-vertical-offset="2332">
+            <state line="6" column="0" selection-start="51" selection-end="51" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1496">
               <folding />
             </state>
           </provider>
@@ -124,13 +148,9 @@
         <option value="rholland" />
       </list>
     </option>
-    <option name="UPDATE_TYPE" value="MERGE" />
-    <option name="PUSH_AUTO_UPDATE" value="true" />
-    <option name="SYNC_SETTING" value="DONT" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitLogSettings">
-    <option name="myStructureFilterPaths" />
     <option name="myDateState">
       <MyDateState />
     </option>
@@ -138,32 +158,28 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/check.py" />
-        <option value="$PROJECT_DIR$/docs/cpdf.py" />
-        <option value="$PROJECT_DIR$/LICENSE.txt" />
-        <option value="$PROJECT_DIR$/sumtable.py" />
-        <option value="$PROJECT_DIR$/summtable.py" />
-        <option value="$PROJECT_DIR$/sdict.py" />
-        <option value="$PROJECT_DIR$/cascii.py" />
-        <option value="$PROJECT_DIR$/cset.py" />
-        <option value="$PROJECT_DIR$/config.py" />
-        <option value="$PROJECT_DIR$/cpdf.py" />
-        <option value="$PROJECT_DIR$/cdict.py" />
+        <option value="$PROJECT_DIR$/cproject.py" />
         <option value="$PROJECT_DIR$/__init__.py" />
+        <option value="$PROJECT_DIR$/unitc.py" />
         <option value="$PROJECT_DIR$/__main__.py" />
         <option value="$PROJECT_DIR$/ccheck.py" />
-        <option value="$PROJECT_DIR$/cstart.py" />
+        <option value="$PROJECT_DIR$/oconfig.py" />
+        <option value="$PROJECT_DIR$/cproj.py" />
+        <option value="$PROJECT_DIR$/cdict.py" />
         <option value="$PROJECT_DIR$/ctext.py" />
+        <option value="$PROJECT_DIR$/crst.py" />
+        <option value="$PROJECT_DIR$/cpdf.py" />
+        <option value="$PROJECT_DIR$/cstart.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="1927" />
     <option name="y" value="-308" />
-    <option name="width" value="1063" />
+    <option name="width" value="1079" />
     <option name="height" value="1376" />
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
     <OptionsSetting value="true" id="Remove" />
     <OptionsSetting value="true" id="Checkout" />
@@ -189,68 +205,41 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="oncemod" />
+              <option name="myItemId" value="oncepy" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="oncemod" />
+              <option name="myItemId" value="oncepy" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="oncemod" />
+              <option name="myItemId" value="oncepy" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="39" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="39" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="39" />
-    <property name="options.lastSelected" value="settings.github" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="41" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="354" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="354" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="41" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="39" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
-    <property name="FullScreen" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.lastSelected" value="reference.settingsdialog.IDE.editor.colors.General" />
+    <property name="last_opened_file_path" value="C:/github/onceutf" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings />
     </option>
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Miniconda3\Lib\site-packages\oncemod" />
-      <recent name="C:\Anaconda\Lib\site-packages\oncemod" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Anaconda\Lib\site-packages\oncemod" />
-      <recent name="C:\Anaconda\Lib\site-packages\oncemod\docs" />
-    </key>
   </component>
   <component name="RunManager">
     <configuration default="true" type="DjangoTestsConfigurationType" factoryName="Django tests">
@@ -264,7 +253,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="oncemod" />
+      <module name="oncepy" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="TARGET" value="" />
       <option name="SETTINGS_FILE" value="" />
@@ -282,7 +271,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="oncemod" />
+      <module name="oncepy" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="" />
       <option name="CLASS_NAME" value="" />
@@ -307,7 +296,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="oncemod" />
+      <module name="oncepy" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="" />
       <option name="CLASS_NAME" value="" />
@@ -331,7 +320,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="oncemod" />
+      <module name="oncepy" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="" />
       <option name="PARAMETERS" value="" />
@@ -346,7 +335,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="oncemod" />
+      <module name="oncepy" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="" />
       <option name="CLASS_NAME" value="" />
@@ -372,7 +361,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="oncemod" />
+      <module name="oncepy" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="" />
       <option name="CLASS_NAME" value="" />
@@ -392,7 +381,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="oncemod" />
+      <module name="oncepy" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="" />
       <option name="CLASS_NAME" value="" />
@@ -406,6 +395,9 @@
     <list size="0" />
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="StructureViewFactory">
+    <option name="AUTOSCROLL_FROM_SOURCE" value="true" />
+  </component>
   <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="all">
     <option name="USER" value="" />
     <option name="PASSWORD" value="" />
@@ -425,98 +417,35 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="cd900fa4-848d-455c-af1a-6b8f28173b49" name="Default" comment="" />
-      <created>1391085512599</created>
-      <updated>1391085512599</updated>
+      <changelist id="3c5cf16c-d76b-437f-ba39-6bc2c0d88445" name="Default" comment="" />
+      <created>1403542536001</created>
+      <updated>1403542536001</updated>
     </task>
-    <task id="LOCAL-00001" summary="changed from rst2pdf to Tex Live&#10;added open in browser command line option for Windows&#10;refactored some methods">
-      <created>1395169579579</created>
-      <updated>1395169579579</updated>
-    </task>
-    <task id="LOCAL-00002" summary="changed from rst2pdf to Tex Live&#10;added open in browser command line option for Windows&#10;refactored some methods">
-      <created>1395169620811</created>
-      <updated>1395169620811</updated>
-    </task>
-    <task id="LOCAL-00003" summary="changed from rst2pdf to Tex Live&#10;added open in browser command line option for Windows&#10;refactored some methods">
-      <created>1395169969907</created>
-      <updated>1395169969907</updated>
-    </task>
-    <task id="LOCAL-00004" summary="changed from rst2pdf to Tex Live&#10;added open in browser command line option for Windows&#10;refactored some methods">
-      <created>1395171324620</created>
-      <updated>1395171324620</updated>
-    </task>
-    <task id="LOCAL-00005" summary="changed from rst2pdf to Tex Live&#10;added open in browser command line option for Windows&#10;refactored some methods">
-      <created>1395201516424</created>
-      <updated>1395201516424</updated>
-    </task>
-    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
-  <component name="TodoView" selected-index="0">
-    <todo-panel id="selected-file">
-      <are-packages-shown value="false" />
-      <are-modules-shown value="false" />
-      <flatten-packages value="false" />
-      <is-autoscroll-to-source value="false" />
-    </todo-panel>
-    <todo-panel id="all">
-      <are-packages-shown value="false" />
-      <are-modules-shown value="false" />
-      <flatten-packages value="false" />
-      <is-autoscroll-to-source value="false" />
-    </todo-panel>
-    <todo-panel id="default-changelist">
-      <are-packages-shown value="false" />
-      <are-modules-shown value="false" />
-      <flatten-packages value="false" />
-      <is-autoscroll-to-source value="false" />
-    </todo-panel>
-  </component>
   <component name="ToolWindowManager">
-    <frame x="1927" y="-308" width="1063" height="1376" extended-state="0" />
-    <editor active="true" />
+    <frame x="1927" y="-308" width="1079" height="1376" extended-state="0" />
+    <editor active="false" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20540099" sideWeight="0.49950445" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32923833" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.16253717" sideWeight="0.79432017" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18731417" sideWeight="0.6710311" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17797443" sideWeight="0.67076164" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17600787" sideWeight="0.67076164" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.50049555" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3289689" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32951757" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
-    <layout-to-restore>
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20567986" sideWeight="0.49950445" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20567986" sideWeight="0.50049555" order="9" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960412" sideWeight="0.49950445" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.16253717" sideWeight="0.79432017" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16352825" sideWeight="0.79432017" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32937366" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-    </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -525,128 +454,138 @@
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
-    <MESSAGE value="changed from rst2pdf to Tex Live&#10;added open in browser command line option for Windows&#10;refactored some methods" />
-    <option name="LAST_COMMIT_MESSAGE" value="changed from rst2pdf to Tex Live&#10;added open in browser command line option for Windows&#10;refactored some methods" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/cdict.py</url>
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/ccheck.py</url>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="5" />
-    </breakpoint-manager>
+    <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/cpdf.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="31" selection-start="214" selection-end="214" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10450">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cpdf.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="31" selection-start="214" selection-end="214" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10450">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/__main__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="8" selection-start="416" selection-end="416" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1122" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cdict.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="0" selection-start="476" selection-end="476" vertical-scroll-proportion="0.0" vertical-offset="396" max-vertical-offset="3916">
-          <folding />
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8602">
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../tabulate.py">
+    <entry file="file://$PROJECT_DIR$/ctext.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="539" column="12" selection-start="18404" selection-end="18412" vertical-scroll-proportion="12.8824215" vertical-offset="704" max-vertical-offset="18722" />
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10384">
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/calcunits.py">
+    <entry file="file://$PROJECT_DIR$/once.sty">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="22" selection-start="232" selection-end="232" vertical-scroll-proportion="0.13861386" vertical-offset="0" max-vertical-offset="1716" />
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1197">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="0" selection-start="22" selection-end="22" vertical-scroll-proportion="0.019400353" vertical-offset="0" max-vertical-offset="1134" />
+        <state line="1" column="32" selection-start="54" selection-end="54" vertical-scroll-proportion="0.018739352" vertical-offset="0" max-vertical-offset="1174">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ofiles.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1174">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="22" selection-start="420" selection-end="420" vertical-scroll-proportion="0.24465355" vertical-offset="0" max-vertical-offset="1540">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../onceutf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="72248">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/oconfig.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="10" selection-start="201" selection-end="201" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="792">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cproj.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="19" selection-start="330" selection-end="330" vertical-scroll-proportion="0.23933055" vertical-offset="0" max-vertical-offset="1518">
+          <folding>
+            <element signature="e#0#31#0" expanded="false" />
+          </folding>
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/__main__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="40" selection-start="704" selection-end="704" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1012">
-          <folding />
+        <state line="17" column="23" selection-start="433" selection-end="433" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1936">
+          <folding>
+            <element signature="e#219#228#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cdict.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="436" column="20" selection-start="13376" selection-end="13377" vertical-scroll-proportion="-14.807693" vertical-offset="9207" max-vertical-offset="11902">
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ccheck.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="8" selection-start="195" selection-end="195" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="374">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cdict.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="84" column="35" selection-start="1960" selection-end="1960" vertical-scroll-proportion="0.0" vertical-offset="3080" max-vertical-offset="8272">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="22" selection-start="128" selection-end="128" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="308">
-          <folding />
+        <state line="12" column="0" selection-start="325" selection-end="325" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="858">
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cpdf.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="38" selection-start="1557" selection-end="1558" vertical-scroll-proportion="0.0" vertical-offset="5544" max-vertical-offset="10274">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LICENSE.txt">
-      <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="27" selection-start="1184" selection-end="1184" vertical-scroll-proportion="0.0" vertical-offset="528" max-vertical-offset="660">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="28" selection-start="785" selection-end="785" vertical-scroll-proportion="0.0" vertical-offset="616" max-vertical-offset="2266">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cstart.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="302" column="13" selection-start="9832" selection-end="9832" vertical-scroll-proportion="0.0" vertical-offset="4736" max-vertical-offset="8558">
+        <state line="6" column="0" selection-start="51" selection-end="51" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1496">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ctext.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="360" column="46" selection-start="11214" selection-end="11214" vertical-scroll-proportion="0.48793104" vertical-offset="7134" max-vertical-offset="10164">
-          <folding />
+        <state line="627" column="0" selection-start="19624" selection-end="19624" vertical-scroll-proportion="0.0" vertical-offset="13004" max-vertical-offset="19250">
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cstart.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="34" selection-start="587" selection-end="587" vertical-scroll-proportion="0.0" vertical-offset="244" max-vertical-offset="8514">
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/crst.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="6" selection-start="430" selection-end="430" vertical-scroll-proportion="0.33333334" vertical-offset="2" max-vertical-offset="16764">
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

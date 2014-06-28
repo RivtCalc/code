@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/oncemod.iml" filepath="$PROJECT_DIR$/.idea/oncemod.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/oncepy.iml" filepath="$PROJECT_DIR$/.idea/oncepy.iml" />
     </modules>
   </component>
 </project>

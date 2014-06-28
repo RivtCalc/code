@@ -1,21 +1,20 @@
 <component name="ProjectDictionaryState">
   <dictionary name="rhh">
     <words>
-      <w>ccheck</w>
-      <w>cdict</w>
-      <w>cpdf</w>
-      <w>cset</w>
-      <w>cstart</w>
-      <w>cstartmod</w>
-      <w>ctext</w>
-      <w>expres</w>
-      <w>mfile</w>
-      <w>mlist</w>
-      <w>mtype</w>
-      <w>projfolder</w>
-      <w>projpath</w>
-      <w>setname</w>
-      <w>sysargv</w>
+      <w>caltype</w>
+      <w>cproj</w>
+      <w>mainflag</w>
+      <w>oncepy</w>
+      <w>pdfout</w>
+      <w>pfile</w>
+      <w>ppath</w>
+      <w>rfile</w>
+      <w>rfilename</w>
+      <w>rholland</w>
+      <w>stylefile</w>
+      <w>stylepath</w>
+      <w>unitfile</w>
+      <w>xtraline</w>
     </words>
   </dictionary>
 </component>
