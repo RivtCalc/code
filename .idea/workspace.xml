@@ -1,33 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3c5cf16c-d76b-437f-ba39-6bc2c0d88445" name="Default" comment="0.4.0&#10;updating">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/oncepy.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/.name" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/cproj.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/crst.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/files.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/oconfig.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ofiles.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/once.sty" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/unitc.py" />
-      <change type="DELETED" beforePath="C:\Miniconda3\Lib\site-packages\oncepy\.idea\oncemod.iml" afterPath="" />
-      <change type="DELETED" beforePath="C:\Miniconda3\Lib\site-packages\oncepy\.idea\vagrant.xml" afterPath="" />
-      <change type="DELETED" beforePath="C:\Miniconda3\Lib\site-packages\oncepy\calcunits.py" afterPath="" />
-      <change type="DELETED" beforePath="C:\Miniconda3\Lib\site-packages\oncepy\config.py" afterPath="" />
-      <change type="DELETED" beforePath="C:\Miniconda3\Lib\site-packages\oncepy\cset.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE.txt" afterPath="$PROJECT_DIR$/LICENSE.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/__init__.py" afterPath="$PROJECT_DIR$/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/__main__.py" afterPath="$PROJECT_DIR$/__main__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ccheck.py" afterPath="$PROJECT_DIR$/ccheck.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cdict.py" afterPath="$PROJECT_DIR$/cdict.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cpdf.py" afterPath="$PROJECT_DIR$/cpdf.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cstart.py" afterPath="$PROJECT_DIR$/cstart.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ctext.py" afterPath="$PROJECT_DIR$/ctext.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/rhh.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/rhh.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+    <list default="true" id="3c5cf16c-d76b-437f-ba39-6bc2c0d88445" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="oncepy.iws" />
@@ -421,24 +395,30 @@
       <created>1403542536001</created>
       <updated>1403542536001</updated>
     </task>
+    <task id="LOCAL-00001" summary="0.4.0&#10;update">
+      <created>1403924397069</created>
+      <updated>1403924397069</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="1927" y="-308" width="1079" height="1376" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32923833" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32923833" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17797443" sideWeight="0.67076164" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17600787" sideWeight="0.67076164" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17600787" sideWeight="0.67076164" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32951757" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32923833" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -451,9 +431,12 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_NEW_TODO" value="false" />
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
+    <MESSAGE value="0.4.0&#10;update" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.4.0&#10;update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
