@@ -2,63 +2,55 @@ from __future__ import division
 from __future__ import print_function
 from collections import OrderedDict
 import os
+from numpy import *
 from oncepy import ccheck
 import oncepy.oconfig as cfg
 
+
 class ModDict(object):
-    """Return an ordered dictionary of model operations.
+    """Return dictionaries of model operations and formats
 
-    Arguments:
-    mfile -- model file name
-    mpath -- model file path
-
-    Methods:
-    build_fdict()
-    build_mdict()
+    Attributes:
+        build_fdict(str list): format dictionary
+        build_mdict(str list): ordered dictionary of operations
 
     """
-
-    def __init__(self, mfile, mpath):
-        """Return an ordered dictionary of model operations.
-
-        Arguments:
-        mfile -- main model file name
-        mpath -- main model file path
+    def __init__(self):
+        """Assemble dictionaries from models and comodels
 
         """
 
         # execution log
         self.ew = ccheck.ModCheck()
 
-        # make list of all model paths and model file contents
+        # list of all model paths and model contents
         #print(os.path.join(mpath, mfile))
-        self.widthclc = 90
-        mpathfile = os.path.join(mpath, mfile)
+        mpathfile = os.path.join(cfg.mpath, cfg.mfile)
         mofile = open(mpathfile, 'r')
         self.mstr = mofile.readlines()
         mofile.close()
 
         # read format defaults from main file
+        self.widthc = 90
         for _i in self.mstr:
             mtag = _i[0:10]
             if mtag == "[#] format":
                 ilist = _i[3:].split('|')
-                self.caltype = ilist[2].strip()
-                cfg.caltype = self.caltype
-                self.dec1 = ilist[1].strip
-                cfg.defaultdec = self.dec1
+                caltype = ilist[2].strip()
+                cfg.caltype = caltype
+                dec1 = ilist[1].strip
+                cfg.defaultdec = dec1
 
+        # list of model and comodel files with all lines
         self.mstrlist = []
-
         mainmod1 = []
         for lines in self.mstr:
             parseline = lines[3:].split('|')
             if lines[0:3] == '[d]' and parseline[1].strip() == 'i':
-                # write initial main model segment to list and clear
-                link1 = "< inserted model from file: " + \
+                link1 = "< inserted comodel from: " + \
                         parseline[0].strip() + " >"
-                self.ewrite = ccheck.ModCheck()
-                self.ewrite.ewrite2(link1)
+                self.ew.ewrite2(link1)
+                # write main model segments to list and clear
                 if len(mainmod1) > 0:
                     moddata = []
                     moddata.append(mpathfile)
@@ -66,44 +58,36 @@ class ModDict(object):
                     self.mstrlist.append(moddata)
                     mainmod1 = []
 
-                # write imported segment to model list
+                # write any comodels
                 moddata = []
                 os.chdir(os.pardir)
                 mofileimp = os.path.abspath(parseline[0].strip())
-                f = open(mofileimp, 'r')
-                moreadimp = f.readlines()
+                f1 = open(mofileimp, 'r')
+                moreadimp = f1.readlines()
                 moddata.append(mofileimp)
                 moddata.append(moreadimp)
                 self.mstrlist.append(moddata)
-                f.close()
-                os.chdir(mpath)
+                f1.close()
+                os.chdir(cfg.mpath)
                 continue
             mainmod1.append(lines)
-        # write additional main model segments
+
+        # write remaining main model segments
         moddata = []
         moddata.append(mpathfile)
         moddata.append(mainmod1)
         self.mstrlist.append(moddata)
 
-        # defaults
-        self.caltype = 'txt'
-        self.cfolder = mpath
+        # initialize section and equation labels
+        self.midx = 1
+        self.snum = self.snumchk = self.enum = 0
+        self.dec1 = 2
 
-        # counters
-        self.midx = self.snum = self.snumchk = self.enum = 1
-
-        # initial values
-        self.mnum = 1
         try:
-            self.mnum = (mfile.split('.')[-2])
+            self.mnum = (self.mfile.split('.')[0])
             self.modelnum = str(int(self.mnum))
         except:
-            self.mnum = 1
-
-        self.dec1 = 2
-        self.snum = 0
-        self.snumchk = 0
-        self.enum = 0
+            self.mnum = '0001'
 
         # dictionaries and lists
         self.mdict = OrderedDict()
@@ -117,29 +101,26 @@ class ModDict(object):
         self.mtags = mlist
 
         # build dicts
-        mainflag = -1
+        dflag = 0
         #print(self.mstrlist)
         for curmod in self.mstrlist:
-            mainflag += 1
-            self.build_fdict(curmod, mainflag)  # format dictionary
-        self.ew.ewrite2("< format dictionary built > \n")
+            dflag += 1
+            self.build_fdict(curmod)  # format dictionary
+        self.ew.ewrite2("< built format dictionary " +
+                        str(dflag) + " >\n")
 
         for curmod in self.mstrlist:
             self.mfile1 = os.path.split(curmod[0])[-1].strip()
             self.build_mdict(curmod)  # model dictionary
-        self.ew.ewrite2("< model dictionary built > \n")
+        self.ew.ewrite2("< built model dictionary > \n")
 
-
-    def build_fdict(self, curmod, mainflag):
+    def build_fdict(self, curmod):
         """Return format dictionary from format op tag
 
         Dictionary:
         fdict[refnumber] = [decimals, units, units]
 
         """
-
-        # set defaults
-
         # set reference values
         pendf = False
         for _i in curmod[1]:
@@ -152,18 +133,17 @@ class ModDict(object):
                     break
                 else:
                     fnum, dec2, unts, opt = _i.split('|')
-                    self.fdict[int(fnum)] = [dec2.strip(), unts.strip(),
-                                             opt.strip()]
+                    self.fdict[int(fnum)] = [dec2.strip(),
+                                unts.strip(), opt.strip()]
 
     def build_mdict(self, curmod):
         """Return model dictionary.
 
         Keys for equations and terms are the dependent
-        variable. Keys for functions are the function name.
-        Keys for other operations are generated by a
+        variable. Keys for other operations are generated by a
         line counter.
 
-        For text the dictionary key is:
+        For non-equation entries the dictionary key is:
         _x + incremented number - pass-through text
         _o + incremented number - symbolic representation
         _s + incremented number - sections
@@ -175,7 +155,7 @@ class ModDict(object):
         _d + incremented number - disk operation
         _f + incremented number - function
 
-        the dictionary structure is:
+        Operation dictionary structure:
 
         single line inputs:
         disk:     [[d], filename, parameter, var]
@@ -190,21 +170,15 @@ class ModDict(object):
         sections: [[s], left string, notes]
 
         """
-
-        #Unum.VALUE_FORMAT = "%.2f"
-        #Unum.UNIT_INDENT = ""
-        pend = ' '
-
         # populate list mstrx with lines that generate printed text
         self.mstr = curmod[1]
-        #self.mpath1 = curmod[0].strip()
         #print(curmod[0])
-        #print(self.mfile1)
         self.mstrx = []
         self._model_clean()
 
         # build ordered dictionary mdict of models
         ip = ''  # accumulator for multiline operations
+        pend = ' '
 
         # write model directory
         self.midx += 1
@@ -226,8 +200,8 @@ class ModDict(object):
                     mtag = '[x]'
             #print('tag ', mtag)
 
-            # pending blocks
-            pendlist = ['c', 'a', 'f', 'e', 's', 'o', 'd']
+            # pending multiline blocks
+            pendlist = ['d', 'o', 'c', 'a', 'f', 'e', 's']
             if pend in pendlist and mtag != '[~]':
                 ip += _i
                 continue
@@ -255,7 +229,18 @@ class ModDict(object):
 
             # select tag
             if mtag in self.mtags:
-                if mtag == '[c]':
+                if mtag == '[d]':
+                    if _i.split('|')[1].strip() == 'e':
+                        ip += _i
+                        pend = 'd'
+                    else:
+                        self._tag_d(_i)
+                elif mtag == '[o]':
+                    ip += _i
+                    pend = 'o'
+                elif mtag == '[t]':
+                    self._tag_t(_i)
+                elif mtag == '[c]':
                     ip += _i
                     pend = 'c'
                 elif mtag == '[a]':
@@ -270,17 +255,6 @@ class ModDict(object):
                 elif mtag == '[s]':
                     ip += _i
                     pend = 's'
-                elif mtag == '[d]':
-                    if _i.split('|')[1].strip() == 'e':
-                        ip += _i
-                        pend = 'd'
-                    else:
-                        self._tag_d(_i)
-                elif mtag == '[o]':
-                    ip += _i
-                    pend = 'o'
-                elif mtag == '[t]':
-                    self._tag_t(_i)
                 elif mtag == '[~]':
                     mkey = '_x' + str(self.midx)
                     self.mdict[mkey] = ['[~]', ' ']
@@ -297,7 +271,7 @@ class ModDict(object):
         ip: a model line or block
 
         Dictionary Value:
-        equation:[[d], file path, parameter, var1, var2, var3]
+        equation:[[d], file path, parameter, var1, var2, var3, file]
 
         parameters:
         s: run a python script
@@ -308,9 +282,11 @@ class ModDict(object):
         f: insert jpg, png etc, figures into calc
         i: insert and process external model file.
             Integrate sections and equation numbering.
-        r: read file data into variable
-        e: edit file. Store edits in var. (option is multiline)
+        r: read file data into variable - processed when tagged
+        e: edit file. Store edits in var3. (multiline)
         """
+
+        _prt_log = self.ew.ewrite2
 
         # check if special case of multiline 'e' option
         try:
@@ -325,19 +301,56 @@ class ModDict(object):
         param = ivect1[1].strip()
         var1 = ivect1[2].strip()
         var2 = ivect1[3].strip()
-        var3 = ivect1[4].strip()
+        var3 = ivect1[4]   # also used for edit lines and file data
 
-        mkey = '_d' + str(self.midx)
-        self.mdict[mkey] = ['[d]', fpath, param, var1, var2, var3]
+        # insert lines from text file
+        if param == 't':
+            f1 = open(fpath, 'r')
+            txstrng = f1.readlines()
+            f1.close()
+            if var1.strip() != '':
+                instxt = eval('txstrng[' + var1.strip() + ']')
+                instxt = ''.join(instxt)
+            else:
+                instxt = ''.join(txstrng)
+            mkey = '_x'+str(self.midx)
+            self.mdict[mkey] = ['[x]', instxt]
+
+            link1 = "< text inserted from file: " + str(fpath) + " >"
+            _prt_log(link1)
+            _prt_log('')
+
+        # read data
+        elif param == 'r':
+
+            # add to dictionary
+            mkey = '_r' + str(self.midx)
+            self.mdict[mkey] = ['[r]', fpath, param, var1, var2,
+                                var3, '['+self.mfile1+']']
+
+            link1 = "< data file:" + fpath + " = " + \
+                    var1 + ">"
+            _prt_log(link1)
+
+        # edit file - store edit ines in var 3
+        elif param == 'e':
+            mkey = '_e' + str(self.midx)
+            var3 = ivect[1:]
+            self.mdict[mkey] = ['[d]', fpath, param, var1, var2,
+                                var3, '['+self.mfile1+']']
+        else:
+            mkey = '_d' + str(self.midx)
+            self.mdict[mkey] = ['[d]', fpath, param, var1, var2,
+                                var3.strip(), '['+self.mfile1+']']
 
     def _tag_o(self, expr):
         """add [o] to mdict
 
         Argument:
-        expr: a model line
+            expr (str): a model line
 
         Dictionary:
-        symbolic: [[o], var, expr ]
+            symbolic: [[o], expr ]
 
         """
 
@@ -345,23 +358,24 @@ class ModDict(object):
         self.mdict[mkey] = ['[o]', expr[3:].strip()]
 
 
-    def _tag_t(self, term):
+    def _tag_t(self, line):
         """add [t] to mdict
 
         Argument:
-        i: a model line
+            i: a model line
 
         Dictionary:
-        terms: [[t], statement, expr, ref ]
+            terms: [[t], statement, expr, ref ]
 
         """
-        ivect = term
+        ivect = line
         ref, state = ivect[3:].split("|")
         var = state.split("=")[0].strip()
         expr = state.split("=")[1].strip()
-        self.mdict[var] = ['[t]', state.strip(), expr, ref, self.mfile1]
+        self.mdict[var] = ['[t]', state.strip(), expr, ref,
+                           '['+self.mfile1.split('.')[0]+']']
 
-    def _tag_c(self, _i):
+    def _tag_c(self, line):
         """add [c] to mdict
 
         Argument:
@@ -371,8 +385,7 @@ class ModDict(object):
         check:  [[c], check expr, op, limit, ref, dec, ok]
 
         """
-
-        ivect = _i.split('\n')
+        ivect = line.split('\n')
         dec, ref, ok = ivect[0].strip()[3:].split('|')
         check, op, limits = ivect[1].strip().split('|')
         self.enum += 1
@@ -380,12 +393,13 @@ class ModDict(object):
             self.enum = 1
             self.snumchk = self.snum
 
-        enumb = ' [' + self.mnum + '.' + str(self.snum) + '.'+ \
+        enumb = ' [' + self.mnum + '.' + str(self.snum) + '.' + \
                 str(self.enum) + ']'
         ref = ref.strip() + enumb
         mkey = '_c'+str(self.midx)
         self.mdict[mkey] = ['[c]', check, op, limits, ref, dec, ok]
-    def _tag_a(self, ip):
+
+    def _tag_a(self, line):
         """ add [a] to mdict.
 
         Arguments:
@@ -393,22 +407,21 @@ class ModDict(object):
 
         Dictionary:
         arrays:   [[a], statement, expr, range1, range2,
-        ref, decimals, unit1, unit2]
+        ref, decimals, unit1, unit2, model]
 
         """
-
         # reset equation number at new section
         self.enum += 1
         if self.snum > self.snumchk:
             self.enum = 1
             self.snumchk = self.snum
-        ivect = ip.strip().split('\n')
+        ivect = line.strip().split('\n')
         fnum, ref = ivect[0].strip()[3:].split("|")
         decs, unts, opt = self.fdict[int(fnum)]
-        enumb = ' [' + self.mnum + '.' + str(self.snum) + '.' + \
+        enumb = ' [' + str(self.mnum) + '.' + str(self.snum) + '.' + \
                 str(self.enum) + '] '
 
-        ref = '  ' + ref.strip().ljust(self.widthclc-len(enumb)-2) + \
+        ref = '  ' + ref.strip().ljust(self.widthc-len(enumb)-2) + \
               enumb
 
         # set dictionary values
@@ -430,33 +443,31 @@ class ModDict(object):
             expr = state.split("=")[1].strip()
 
         self.mdict[mkey] = ['[a]', state, expr, rng1, rng2, ref,
-                            decs, unts, opt, self.mfile1]
+                            decs, unts, opt,
+                            '['+self.mfile1.split('.')[0]+']']
         #print(state)
 
-    def _tag_f(self, ip):
+    def _tag_f(self, line):
         """add [f] to mdict
 
         Arguments:
         ip: a model line or block
 
         Dictionary Value:
-        function:[[f], function name, ref
+        function:[[f], function call, var, ref
 
         """
-
-        self.enum += 1
-        ivect = ip.split('\n')
-        fref = ivect[0][3:].strip()
+        ivect = line.split('\n')
         fname = ivect[1]
-        enumb = ' [' + self.mnum + '.' + str(self.snum) + '.' + \
-                str(self.enum) + ']'
-        ref = fref.strip() + enumb
+        var2 = ivect[0].split('|')[0][3:].strip()
+        ref = ivect[0].split('|')[1].strip()
 
         # set dictionary values
         mkey = '_f' + str(self.midx)
-        self.mdict[mkey] = ['[f]', fname, ref, self.mfile1]
+        self.mdict[mkey] = ['[f]', fname, var2, ref,
+                            '['+self.mfile1.split('.')[0]+']']
 
-    def _tag_e(self, ip):
+    def _tag_e(self, line):
         """add [e] to mdict.
 
         Arguments:
@@ -471,7 +482,7 @@ class ModDict(object):
         if self.snum > self.snumchk:
             self.enum = 1
             self.snumchk = self.snum
-        ivect = ip.split('\n')
+        ivect = line.split('\n')
         #print(ivect)
         fnum, ref = ivect[0][3:].split("|")
         decs, unts, opt = self.fdict[int(fnum)]
@@ -486,9 +497,9 @@ class ModDict(object):
         expr = state.split("=")[1].strip()
         var1 = state.split("=")[0].strip()
         self.mdict[var1] = ['[e]', state, expr, ref, decs, unts, opt,
-                            self.mfile1]
+                            '['+self.mfile1.split('.')[0]+']']
 
-    def _tag_s(self, ip):
+    def _tag_s(self, line):
         """add [s] to mdict.
 
         Argument:
@@ -498,15 +509,15 @@ class ModDict(object):
         sections: [[s], left string, notes]
 
         """
-
-        ivect = ip.split('\n')
+        ivect = line.split('\n')
         #print(ivect)
         sleft = ivect[0][3:].strip()
         state = ivect[1:]
         self.snum += 1
         sleft = '[' + self.mnum + '.' + str(self.snum) + '] ' + sleft
         mkey = '_s' + str(self.midx)
-        self.mdict[mkey] = ['[s]', sleft, state, self.mfile1]
+        self.mdict[mkey] = ['[s]', sleft, state,
+                            '['+self.mfile1.split('.')[0]+']']
 
     def _model_clean(self):
         """Remove non-printing lines from model file.
