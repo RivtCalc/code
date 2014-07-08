@@ -5,21 +5,35 @@ import sys
 import time
 import tabulate
 import codecs
+import oncepy
 import oncepy.oconfig as cfg
+from oncepy import ctext
 from oncepy import ccheck
 from oncepy import oconfig as cfg
-from unum import Unum
 from numpy import *
 from sympy import *
 from sympy import var as varsym
 from sympy.core.alphabets import greeks
-#from sympy.printing.latex import tex_greek_dictionary as texdict
 
+mpathcrst = os.getcwd()
+try:
+    from unitc import *
+    cfg.unitfile = 'model folder'
+except ImportError:
+    try:
+        os.chdir(os.pardir)
+        from unitc import *
+        cfg.unitfile = 'project folder'
+        os.chdir(mpathcrst)
+    except ImportError:
+        from oncepy.unitc import *
+        cfg.unitfile = 'built-in'
+os.chdir(mpathcrst)
 
 class CalcRST(object):
     """Accepts a model dictionary and writes an rst file"""
 
-    def __init__(self, odict, mpath, mfile):
+    def __init__(self, odict):
         """initialize files
 
     **Args**
@@ -31,13 +45,14 @@ class CalcRST(object):
         # execution log
         self.ew = ccheck.ModCheck()
 
-        self.mpath = mpath
-        self.rfilename = mfile.replace('.txt', '.rst')
-        self.rpath = os.path.join(mpath, self.rfilename)
-        print(self.rpath)
-        self.rfile = ''
+        self.mpath = cfg.mpath
+        self.mfile = cfg.mfile
+        #print('mfile', self.mfile)
+        self.rfilename = self.mfile.replace('.txt', '.rst')
+        self.rpath = os.path.join(self.mpath, self.rfilename)
+        #print('rpath', self.rpath)
+        self.rf1 = ''
 
-        self.cfolder = mpath
         self.prfilename = ''
         self.previous = ''
         self.xtraline = False
@@ -51,66 +66,86 @@ class CalcRST(object):
         self.symblist = []
         self.fignum = 0
 
-    def prt_rst(self):
+
+    def gen_rst(self):
         """ write rst file """
 
-        self.rfile = codecs.open(self.rpath, 'w', encoding='utf8')
-        print(time.strftime("%c"), file=self.rfile)
+        self.rf1 = codecs.open(self.rpath, 'w', encoding='utf8')
+        #print(' ' + time.strftime("%c"), file=self.rf1)
 
+        termbegin = 1
+        mtagx = ''
         for _i in self.odict:
             #print(_i, self.odict[_i])
             mtag = self.odict[_i][0]
-            #print(mtag)
-            if mtag ==   '[d]':
-                if self.odict[_i].split('|')[3].strip() == 'f':
-                    self._pdf_figure(self.odict[_i])
-                    self.xtraline = False
-            elif mtag == '[r]':
-                self._pdf_read(self.odict[_i])
+            # avoid extra lines in term lists
+            if mtagx == '[t]':
+                if mtag == '[t]':
+                    termbegin = 0
+            if mtagx == '[t]':
+                if mtag != '[t]':
+                    termbegin = 1
+                    print('  ', file=self.rf1)
+            mtagx = mtag
+
+            if mtag ==   '[r]':
+                self._rst_read(self.odict[_i])
                 self.xtraline = False
+            elif mtag == '[d]':
+                if self.odict[_i][2].strip() == 'f':
+                    self._rst_figure(self.odict[_i])
+                    self.xtraline = False
+                else:
+                    self._rst_disk(self.odict[_i])
+                    self.xtraline = False
             elif mtag == '[o]':
-                self._pdf_olic(self.odict[_i])
+                self._rst_olic(self.odict[_i])
                 self.xtraline = False
             elif mtag == '[t]':
-                self._pdf_term(self.odict[_i])
-                self.xtraline = True
+                self._rst_term(self.odict[_i], termbegin)
+                self.xtraline = False
+                termend = 0
             elif mtag == '[c]':
-                self._pdf_check(self.odict[_i])
+                self._rst_check(self.odict[_i])
                 self.xtraline = True
             elif mtag == '[a]':
-                self._pdf_array(self.odict[_i])
+                self._rst_array(self.odict[_i])
                 self.xtraline = True
             elif mtag == '[f]':
-                self._pdf_func(self.odict[_i])
-                self.xtraline = True
+                self._rst_func(self.odict[_i])
+                self.xtraline = False
             elif mtag == '[e]':
-                self._pdf_eq(_i, self.odict[_i])
+                self._rst_eq(_i, self.odict[_i])
                 self.xtraline = False
             elif mtag == '[s]':
-                self._pdf_sect(self.odict[_i])
+                self._rst_sect(self.odict[_i])
                 self.xtraline = False
             elif mtag == '[x]':
-                self._pdf_txt(self.odict[_i])
+                self._rst_txt(self.odict[_i])
                 self.xtraline = True
+            # [r] is a virtual tag
+            elif mtag == '[r]':
+                self._rst_read(self.odict[_i])
+                self.xtraline = False
             elif mtag == '[~]' and self.xtraline is False:
                 self.xtraline = True
             elif mtag == '[~]' and self.xtraline is True:
-                self._pdf_blnk()
+                self._rst_blnk()
             else:
                 continue
 
         # close rst file
-        self.rfile.close()
+        self.rf1.close()
         #for i in self.odict: print(i, self.odict[i])
 
-    def _pdf_figure(self, dval):
+    def _rst_figure(self, dval):
 
         """print tag [d]
 
         Dictionary Value:
         equation:[[d], file path, options, var1, var2, var3]
 
-        Args: strng
+        Args: str
             dval[0] - operation
             dval[1] - data file
             dval[2] - option -> 'f'
@@ -118,7 +153,6 @@ class CalcRST(object):
             dval[4] - percent width
             dval[5] - 'double' -> side by side figures
         """
-
         fpath = dval[1].strip()
         fp = os.path.join(self.mpath, fpath)
         option = dval[2].strip()
@@ -127,15 +161,15 @@ class CalcRST(object):
         param3 = dval[5].strip()
 
         if option == 'f':
-            print(' ', file=self.rfile)
-            print('.. figure:: ' + fp, file=self.rfile)
-            print('   :width: ' + param2 + ' %', file=self.rfile)
-            print('   :align: centered', file=self.rfile)
-            print('   ', file=self.rfile)
-            print('   ' + param1, file=self.rfile)
-            print(' ', file=self.rfile)
+            print(' ', file=self.rf1)
+            print('.. figure:: ' + fp, file=self.rf1)
+            print('   :width: ' + param2 + ' %', file=self.rf1)
+            print('   :align: center', file=self.rf1)
+            print('   ', file=self.rf1)
+            print('   ' + param1, file=self.rf1)
+            print(' ', file=self.rf1)
 
-    def _pdf_read(self, dval):
+    def _rst_read(self, dval):
         """read csv data file
 
         Args: strng
@@ -147,56 +181,134 @@ class CalcRST(object):
             dval[5] - skip line
             dval[6] - model file
         """
+        secthead =  str(dval[3]) + " | read data " + dval[6]
 
-        var1 = dval[3].strip()
+        print("aa-bb " + "**" + secthead + "**", file=self.rf1)
+        print('  ', file=self.rf1)
 
-        sep1 = dval[4].strip()
-        if sep1 == '':
-            sep1 = ','
-        elif sep1 == '*':
-            sep1 = " "
-
-        skip = dval[5].strip()
-        if skip == '':
-            skip = 0
+        # set skip lines
+        skip1 = dval[5]
+        if skip1 == '':
+            skip1 = int(0)
         else:
-            skip = int(skip)
+            skip1 = int(skip1)
 
         fpath = dval[1].strip()
-        file1 = open(fpath, 'r')
-        var2 = genfromtxt(file1, delimiter=sep1, skip_header=skip)
-        file1.close()
+        # set separator
+        sep1 = dval[4]
+        if sep1 == '*':
+            var4 = genfromtxt(fpath, delimiter=' ',
+                              skip_header=skip1)
+        elif sep1 == ',' or sep1 == '':
+            var4 = genfromtxt(fpath, delimiter=',',
+                              skip_header=skip1)
+        else:
+            var4 = genfromtxt(fpath, delimiter=str(sep1),
+                              skip_header=skip1)
+        #print('var4', var4[:2])
 
-        exec(var1 + '= var2')
-        eval(var1)
+        cmdstr1 = str(dval[3].strip())
+        cmdstr2 = cmdstr1 + '=' + str(list(var4))
+        self.odict[cmdstr1] = ['[rd]', cmdstr2]
+        #print(self.odict[cmdstr1])
 
-        # print reference line
-        tmp = int(self.widthclc-1) * '-'
-        print((tmp + u'\u2510').rjust(self.widthclc), 0)
+        # print data selection
+        print('  ', file=self.rf1)
+        print("file: " + dval[1].strip(), file=self.rf1)
+        print('  ', file=self.rf1)
+        print(str(var4[:4]) + ' ... ' + str(var4[-4:]),
+              file=self.rf1)
+        print('  ', file=self.rf1)
 
-        strend = "data file: " + dval[1].strip()
-        print(strend.rjust(self.widthclc), 0)
-        print(" ", 1)
 
-        # evaluate data
-        print(dval[1].strip(), 0)
-        strng_return = eval(dval[1].strip())
-        print(' ', 0)
-        print(strng_return, 0)
-        print(' ', 0)
+        # draw line
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\hrulefill', file=self.rf1)
+        print('  ', file=self.rf1)
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{2mm}', file=self.rf1)
+        print('  ', file=self.rf1)
 
-        tmp = int(self.widthclc-1) * '-'
-        print((tmp + u'\u2518').rjust(self.widthclc), 0)
-        print(" ", 0)
+        #print('mdict', self.mdict[str(var1)])
 
-    def _pdf_olic(self, dval):
+    def _rst_disk(self, dval):
+
+        """print tag [d]
+
+        Dictionary Value:
+        equation:[[d], file path, parameter, var1, var2, var3]
+
+        options:
+        s: run a python script
+        """
+        _prt_log = self.ew.ewrite2
+
+        fpath = dval[1].strip()
+        fp = os.path.abspath(fpath)
+        option = dval[2].strip()
+        var1 = dval[3].strip()
+        var2 = dval[4].strip()
+        var3 = dval[5]  # variable with edit lines
+
+        # additional disk operation output for PDF calcs
+        if option == 's':
+            # execute script in model namespace
+            f1 = open(fp, 'r')
+            fr = f1.read()
+            f1.close()
+            exec(fr, globals())
+            link1 = "< execute python script: " + str(fp) + " >"
+            _prt_log(link1)
+            _prt_log("file: " + fpath + " compiled")
+
+        elif option == 'e':
+            editlist = []
+            for item in var3:
+                editlist.append(item)
+
+            strend = "edit file " + dval[6].strip()
+            print("aa-bb " + "**" + strend + "**",
+                  file=self.rf1)
+            print(" ", file=self.rf1)
+
+            # edit line table
+            print('  ', file=self.rf1)
+            print('::', file=self.rf1)
+            print('  ', file=self.rf1)
+            print("  file: " + dval[1].strip(), file=self.rf1)
+            title1 = '  [line #]'.center(8) + \
+                     '[replacement line]'.rjust(25)
+            print(title1, file=self.rf1)
+            for _i in editlist[:-1]:
+                _j = _i.split('|')
+                print(('     ' + _j[0].strip()).ljust(10)
+                              + (_j[1].strip()), file=self.rf1)
+            print(' ', file=self.rf1)
+
+            # draw horizontal line
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{4mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\hrulefill', file=self.rf1)
+            print('  ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+
+
+    def _rst_olic(self, dval):
         """print tag [l]
 
         Dictionary:
         symbolic:[[l], expr]
 
         """
-
         dval = dval[1].replace('=', '<=')
         exp2 = dval.split('\n')
         exp3 = ' '.join([ix.strip() for ix in exp2])
@@ -206,48 +318,52 @@ class CalcRST(object):
             varsym(str(_j))
 
         symeq = eval(dval)
-        symeq2 = pretty(symeq, wrap_line=False)
-        out3 = symeq2.replace('*', u'\u22C5')
-        cnt = 0
-        for _m in out3:
-            if _m == '-':
-                cnt += 1
-                continue
-            else:
-                if cnt > 1:
-                    out3 = out3.replace('-'*cnt, u'\u2014'*cnt)
-                cnt = 0
-        print(out3.replace('<=', '='), 1)
-        print(" ", 0)
+        # symbolic repr
+        print('  ', file=self.rf1)
+        print('.. math:: ', file=self.rf1)
+        print('  ', file=self.rf1)
+        print('  ' + latex(symeq, mul_symbol="dot"), file=self.rf1)
+        print('  ', file=self.rf1)
+        print('|', file=self.rf1)
+        print('  ', file=self.rf1)
 
-    def _pdf_term(self, dval):
+    def _rst_term(self, dval, termbegin):
         """
         output terms
         terms: [[t], statement, expr, ref ]
 
         """
-        shift = int(self.widthp / 2.8)
+        shift = int(self.widthp / 2.2)
         ref = dval[3].strip().ljust(shift)
         param = dval[1].strip()
-        ptype = type(eval(dval[2]))
-        if ptype == list or ptype == ndarray or ptype == tuple:
-            param = param.split('=')[0].strip()
-        termpdf = " "*4 + ref + param
+        #ptype = type(eval(dval[2]))
+        #if ptype == list or ptype == ndarray or ptype == tuple:
+        #    param = param.split('=')[0].strip()
+        termpdf = " "*4 + ref + ' | ' + param
 
-        strend = dval[3].strip()
-        param = '  ' + dval[1].strip()
-        print(' ', file=self.rfile)
-        print('::', file=self.rfile)
-        print(' ', file=self.rfile)
-        print(termpdf, file=self.rfile)
+        if termbegin:
+            #print('termbegin')
+            print('  ', file=self.rf1)
+            print('::', file=self.rf1)
+            print('  ', file=self.rf1)
+        print(termpdf, file=self.rf1)
 
-    def _pdf_check(self, dval):
+
+    def _rst_check(self, dval):
         """print [c]
 
         Dictionary:
         check:  [[c], check expr, op, limit, ref, dec, ok]
 
         """
+
+        try:
+            exec("set_printoptions(precision=" + dval[5].strip() + ")")
+            exec("Unum.VALUE_FORMAT = '%." + dval[5].strip() + "f'")
+        except:
+            set_printoptions(precision=3)
+            Unum.VALUE_FORMAT = "%.3f"
+
         # convert variables to symbols
         for _j in self.symb:
             if _j[0] != '_':
@@ -280,67 +396,128 @@ class CalcRST(object):
         subbed = result1 + ' ' + dval[2].strip() + ' ' + result2
 
         if result:
-            comment = ' ' + dval[6].strip()
+            comment = ' - ' + dval[6].strip()
         else:
             comment = ' *** not ' + dval[6].strip() + ' ***'
-
         out2p = subbed + '  ' + comment
-        strend = dval[4].strip()
 
-        # clean output
-        #out2p = pretty((symeq1, '  ', out2, '=', out3, comment))
-        #repc = [(',', ' '), ('(', ' '), (')', ' ')]
-        #out2a = out2p
-        #for _k in repc:
-        #    out2a = out2a.replace(_k[0], _k[1])
-        #strend = ratio[3].strip()
+        # section header
+        secthead = dval[4].strip()
+        # equation label
+        print("aa-bb " + "**" + secthead + "**", file=self.rf1)
+        print('  ', file=self.rf1)
 
-        print('  ', file=self.rfile)
-        print("**yxxhfillxxx " + strend + "**", file=self.rfile)
-        print('  ', file=self.rfile)
+        # symbolic repr
+        print('  ', file=self.rf1)
+        print('.. math:: ', file=self.rf1)
+        print('  ', file=self.rf1)
+        print('  ' + latex(symeq1, mul_symbol="dot"), file=self.rf1)
+        print('  ', file=self.rf1)
+        print('|', file=self.rf1)
+        print('  ', file=self.rf1)
 
-        print('::', file=self.rfile)
-        print(' ', file=self.rfile)
-        print(pretty(symeq1), file=self.rfile)
-        print(' ', file=self.rfile)
-        print(pretty(out2p), file=self.rfile)
-        print(' ', file=self.rfile)
+        # substituted values in equation
+        # list of symbols
+        symat = symeq1.atoms(Symbol)
 
-        print(".. raw:: latex", file=self.rfile)
-        print('  ', file=self.rfile)
-        print('   \\hrulefill', file=self.rfile)
-        print('  ', file=self.rfile)
-        print(".. raw:: latex", file=self.rfile)
-        print('  ', file=self.rfile)
-        print('   \\vspace{2mm}', file=self.rfile)
-        print('  ', file=self.rfile)
+        # convert to latex form
+        latexrep = latex(symeq1, mul_symbol="dot")
+        #print('latex', latexrep)
+
+        switch1 = []
+        # rewrite equation with braces
+        for _n in symat:
+            newlatex1 = str(_n).split('__')
+            if len(newlatex1) == 2:
+                newlatex1[1] += '}'
+                newlatex1 = '~d~'.join(newlatex1)
+
+            newlatex1 = str(_n).split('_')
+            if len(newlatex1) == 2:
+                newlatex1[1] += '}'
+                newlatex1 = '~s~'.join(newlatex1)
+
+            newlatex1 = ''.join(newlatex1)
+            newlatex1 = newlatex1.replace('~d~', '__{')
+            newlatex1 = newlatex1.replace('~s~', '_{')
+            symeq1 = symeq1.subs(_n, symbols(newlatex1))
+            switch1.append([str(_n), newlatex1])
+        # list of new symbols
+
+        # substitute values
+        for _n in switch1:
+            expr1 = eval((self.odict[_n[0]][1]).split("=")[1])
+            if type(expr1) == float:
+                form = '{:.' + dval[5].strip() +'f}'
+                symvar1 = '{' + form.format(expr1) + '}'
+            else:
+                symvar1 = '{' + str(expr1) + '}'
+            latexrep = latexrep.replace(_n[1], symvar1)
+            latexrep = latexrep.replace("\{", "{")
 
 
-    def _pdf_array(self, dval):
+        # add substituted equation to rst file
+        print('  ', file=self.rf1)
+        print('.. math:: ', file=self.rf1)
+        print('  ', file=self.rf1)
+        print('  ' + latexrep, file=self.rf1)
+        print('  ', file=self.rf1)
+        print('|', file=self.rf1)
+        print('  ', file=self.rf1)
+
+        # result
+        print(' ', file=self.rf1)
+        print('.. math:: ', file=self.rf1)
+        print('  ', file=self.rf1)
+        print("  \\boldsymbol{" + latex(out2p,
+                mode='plain') + "}", file=self.rf1)
+        print('  ', file=self.rf1)
+
+        # draw line
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\hrulefill', file=self.rf1)
+        print('  ', file=self.rf1)
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{2mm}', file=self.rf1)
+        print('  ', file=self.rf1)
+
+    def _rst_array(self, dval):
         """
         print tag [a] - an ascii table from statements or variable
 
-        arrays: [[a], range1, range2, statement, expr,
-                    ref, decimals, unit1, unit2]
+        arrays:   [[a], statement, expr, range1, range2,
+        ref, decimals, unit1, unit2, model]
 
         """
 
-        set_printoptions(precision=3)
+        eformat, rformat = dval[6].split(',')
+        try:
+            exec("set_printoptions(precision=" + eformat + ")")
+            exec("Unum.VALUE_FORMAT = '%." + eformat + "f'")
+        except:
+            set_printoptions(precision=3)
+            Unum.VALUE_FORMAT = "%.3f"
 
         # table heading
-        var = dval[2].split('=')[0].strip()
+        varx = dval[2].strip()
         tright = dval[5].strip().split(' ')
         eqnum = tright[-1].strip()
         tleft = ' '.join(tright[:-1]).strip()
-        ahdpdf = tleft + ' ' + eqnum
+        tablehdr = tleft + ' ' + eqnum
 
-        print(' ', file=self.rfile)
-        print("**yxxhfillxxx " + var + " = " + ahdpdf + "**",
-              file=self.rfile)
-        print(' ', file=self.rfile)
+        print("aa-bb " + "**" + tablehdr + "**",
+              file=self.rf1)
+
+        print(' ', file=self.rf1)
+        print('**range variables:** ', file=self.rf1)
+        print(' ', file=self.rf1)
+        print(pretty(dval[3].strip()), file=self.rf1)
+        print(' ', file=self.rf1)
+        print(pretty(dval[4].strip()), file=self.rf1)
 
         vect = dval[1:]
-
         # print symbolic form
         # convert variables to symbols except for arrays
         try:
@@ -365,34 +542,42 @@ class CalcRST(object):
             if etype.strip()[:1] == '[':
                 out1 = str(vect[0].split('=')[1])
 
-            print(' ', file=self.rfile)
-            print(out1, file=self.rfile)
-            print(' ', file=self.rfile)
+            print(' ', file=self.rf1)
+            print('**equation:** ', file=self.rf1)
+            print(' ', file=self.rf1)
+            # symbolic repr
+            print('  ', file=self.rf1)
+            print('.. math:: ', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(symeq, mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+            print('|', file=self.rf1)
+            print('  ', file=self.rf1)
         except:
             pass
 
-        # strip units from terms and equations and process
-        for _j in self.odict:
-            try:
-                #print(self.odict[_j])
-                state = self.odict[_j][1].strip()
-                #print('state', state)
-                exec(state)
-                eval(self.odict[_j][2].strip())
-            except:
-                pass
-
-            try:
-                var = state.split('=')
-                state2 = var[0].strip()+'='+var[0].strip()+'.asNumber()'
-                exec(state2)
-            except:
-                pass
-
-
-        # array from disk or python code
-        if len(str(vect[3])) == 0 and len(str(vect[0])) == 0:
-            pass
+        # evaluate variables - strip units for arrays
+        for k1 in self.odict:
+            #print('k1', k1)
+            if k1[0] != '_':
+                    try:
+                        exec(self.odict[k1][1].strip())
+                    except:
+                        pass
+                    try:
+                        state = self.odict[k1][1].strip()
+                        varx = state.split('=')
+                        state2 = varx[0].strip()+'='\
+                        +varx[0].strip() + '.asNumber()'
+                        exec(state2)
+                        #print('j1', k1)
+                    except:
+                        pass
+            if k1[0:2] == '_a':
+                #print('k1-2', k1)
+                exec(self.odict[k1][3].strip())
+                exec(self.odict[k1][4].strip())
+                exec(self.odict[k1][1].strip())
 
         # single row vector - 1D table
         if len(str(vect[3])) == 0 and len(str(vect[0])) != 0:
@@ -415,7 +600,10 @@ class CalcRST(object):
                 elist2 = []
                 alist1 = eval(equa1.split('=')[1])
                 for _v in alist1:
-                        elist2.append(list(_v))
+                        try:
+                            elist2.append(list(_v))
+                        except:
+                            elist2.append(_v)
             else:
                 try:
                     elist2 = elist1.tolist()
@@ -428,8 +616,8 @@ class CalcRST(object):
             ptable = tabulate.tabulate(elist2, rlist, 'rst',
                                 floatfmt="."+dval[6].strip()+"f")
 
-            print(ptable, file=self.rfile)
-            print('  ', file=self.rfile)
+            print(ptable, file=self.rf1)
+            print('  ', file=self.rf1)
             #print(ptable)
 
         # 2D table
@@ -450,15 +638,19 @@ class CalcRST(object):
 
             # process equation
             equa1 = vect[0].strip()
+            #print('equa1', equa1)
             exec(equa1)
             etype = equa1.split('=')[1]
             if etype.strip()[:1] == '[':
                 # data is in list form
                 alist = []
                 alist1 = eval(equa1.split('=')[1])
+                #print('alist1', alist1)
                 for _v in alist1:
                     for _x in _v:
+                        #print('_x', _x)
                         alist.append(list(_x))
+                        #print('append', alist)
 
             else:
                 # data is in equation form
@@ -479,22 +671,22 @@ class CalcRST(object):
                         el = eval(eq2b)
                         alistr.append(el)
                     alist.append(alistr)
+                    #print('append', alist)
 
+            #print('alist', alist)
             for _n, _p in enumerate(alist):
                 _p.insert(0, clist[_n])
 
             # create table
-            flt1 = "."+str(dval[6]).strip()+"f"
-
-
-            # create table
+            flt1 = "." + eformat.strip() + "f"
             #print(alist)
             ptable = tabulate.tabulate(alist, rlist, 'rst',
                                        floatfmt=flt1)
-            print(ptable, file=self.rfile)
-            print('  ', file=self.rfile)
+            print(ptable, file=self.rf1)
 
-    def _pdf_func(self, dval):
+            print('  ', file=self.rf1)
+
+    def _rst_func(self, dval):
         """print tag [f]
 
         Dictionary:
@@ -509,35 +701,43 @@ class CalcRST(object):
 
         # print reference line
 
-        fhdpdf = dval[2].strip()
-
-        print(' ', file=self.rfile)
-        print("**yxxhfillxxx " + fhdpdf + "**", file=self.rfile)
-        print(' ', file=self.rfile)
-
-
+        funcname = dval[1].split('(')[0]
+        funchd = funcname.strip() + ' | function ' + dval[4].strip()
+        print("aa-bb " + "**" + funchd + "**", file=self.rf1)
+        print(' ', file=self.rf1)
 
         # evaluate function
-        strng_return = eval(dval[1].strip())
-        print(' ', file=self.rfile)
-        print(pretty(strng_return), file=self.rfile)
-        print(' ', file=self.rfile)
+        print(" ", file=self.rf1)
+        print('function description: ' + dval[3].strip(), file=self.rf1)
+        print(" ", file=self.rf1)
+        print('function call: ' + dval[1].strip(), file=self.rf1)
+        funcname = dval[1].split('(')[0]
+        docs1 = eval(funcname + '.__doc__')
+        print(' ', file=self.rf1)
+        print('**function doc:**', file=self.rf1)
+        print(' ', file=self.rf1)
+        print('::', file=self.rf1)
+        print(' ', file=self.rf1)
+        print(docs1, file=self.rf1)
+        return1 = eval(dval[1].strip())
+        print(' ', file=self.rf1)
+        if return1 is None:
+            print('function evaluates to None', file=self.rf1)
+        else:
+            print('**function return:** ' + return1, file=self.rf1)
+        print(' ', file=self.rf1)
 
+        # draw line
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\hrulefill', file=self.rf1)
+        print('  ', file=self.rf1)
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{2mm}', file=self.rf1)
+        print('  ', file=self.rf1)
 
-        print(".. raw:: latex", file=self.rfile)
-        print('  ', file=self.rfile)
-        print('   \\vspace{-9mm}', file=self.rfile)
-        print('  ', file=self.rfile)
-        print(".. raw:: latex", file=self.rfile)
-        print('  ', file=self.rfile)
-        print('   \\hrulefill', file=self.rfile)
-        print('  ', file=self.rfile)
-        print(".. raw:: latex", file=self.rfile)
-        print('  ', file=self.rfile)
-        print('   \\vspace{2mm}', file=self.rfile)
-        print('  ', file=self.rfile)
-
-    def _pdf_eq(self, var3, dval):
+    def _rst_eq(self, var3, dval):
         """tag [e]
 
         equations dict:
@@ -546,69 +746,120 @@ class CalcRST(object):
 
         """
 
-        # number of decimal places
-        #print("set_printoptions(precision="+dval[4].strip()+")")
-        #print("Unum.VALUE_FORMAT = '%." + dval[4].strip() + "f'")
+        eformat, rformat = dval[4].split(',')
+
+        # decimal places
         try:
-            exec("set_printoptions(precision=" + dval[4].strip() + ")")
-            exec("Unum.VALUE_FORMAT = '%." + dval[4].strip() + "f'")
+            exec("set_printoptions(precision=" + eformat.strip() + ")")
+            exec("Unum.VALUE_FORMAT = '%." + eformat.strip + "f'")
         except:
             set_printoptions(precision=3)
             Unum.VALUE_FORMAT = "%.3f"
 
         cunit = dval[5].strip()
-        var3 = dval[1].split("=")[0].strip()
-        val3 = eval(dval[2])
+        #var3 = dval[1].split("=")[0].strip()
+        #val3 = eval(dval[2])
+
+        # evaluate variables - strip units for arrays
+        for k1 in self.odict:
+            #print('k1', k1)
+            if k1[0] != '_':
+                    try:
+                        exec(self.odict[k1][1].strip())
+                    except:
+                        pass
+                    try:
+                        state = self.odict[k1][1].strip()
+                        varx = state.split('=')
+                        state2 = varx[0].strip()+'='\
+                        +varx[0].strip() + '.asNumber()'
+                        exec(state2)
+                        #print('j1', k1)
+                    except:
+                        pass
+            if k1[0:2] == '_a':
+                #print('k1-2', k1)
+                exec(self.odict[k1][3].strip())
+                exec(self.odict[k1][4].strip())
+                exec(self.odict[k1][1].strip())
 
         # evaluate only
         if dval[6].strip() == '0':
             exec(dval[1])
             return
 
+        # print reference line
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{2mm}', file=self.rf1)
+        print('  ', file=self.rf1)
+
+        strend = dval[3].strip()
+        print(' ', file=self.rf1)
+        print("aa-bb " + "**" + var3 + " | " + strend + "**",
+              file=self.rf1)
+        print(' ', file=self.rf1)
+
         # result only
-        elif dval[6].strip() == '1':
-            # print reference line
-            strend = dval[3].strip()
-            print(' ', file=self.rfile)
-            print("**" + var3 + " |" + "yxxhfillxxx " + strend + "**",
-                  file=self.rfile)
-            print(' ', file=self.rfile)
+        if dval[6].strip() == '1':
 
-            for _k in self.odict:
-                if _k[0] != '_':
-                    #print(type(eval(self.odict[_k][2].strip())))
-                    eval(self.odict[_k][2].strip())
-                    exec(self.odict[_k][1].strip())
+            # restore units
+            for j2 in self.odict:
+                try:
+                    state = self.odict[j2][1].strip()
+                    exec(state)
+                except:
+                        pass
 
-            # print result right justified
+            #convert result variable to greek
+            var3s = var3.split('_')
+            if var3s[0] in greeks:
+                var3g = "\\" + var3
+            else:
+                var3g = var3
+
+            # print result
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+
             if type(eval(var3)) != Unum:
-                if type(eval(var3)) == float or type(eval(var)) == float64:
-                    resultform = '{:.' + dval[4].strip()+'f}'
-                    result1 = resultform.format(float(eval(var)))
-                    print((var3 + " = " + str(result1)).rjust(self.widthp),
-                          file=self.rfile)
+                if type(eval(var3)) == float \
+                    or type(eval(var3)) == float64:
+                    resultform = '{:.' + eformat.strip() + 'f}'
+                    tmp1 = resultform.format(float(eval(var3)))
+                    result2 = var3g + " = " + str(tmp1)
+                    print(' ', file=self.rf1)
+                    print('.. math:: ', file=self.rf1)
+                    print('  ', file=self.rf1)
+                    print("  \\boldsymbol{" + latex(result2,
+                            mode='plain') + "}", file=self.rf1)
+                    print('  ', file=self.rf1)
                 else:
-                    print((var3 + " = " + str(eval(var3))).rjust(self.widthp),
-                          file=self.rfile)
+                    result2 = var3 + " = " + str(eval(var3))
+                    print(' ', file=self.rf1)
+                    print('.. math:: ', file=self.rf1)
+                    print('  ', file=self.rf1)
+                    print("  \\boldsymbol{" + latex(result2,
+                            mode='plain') + "}", file=self.rf1)
+                    print('  ', file=self.rf1)
             else:
                 if len(cunit) > 0:
-                    tmp1 = str(eval(var3).asUnit(eval(cunit)))
+                    tmp2 = str(eval(var3).asUnit(eval(cunit)))
                 else:
-                    tmp1 = str(eval(var3))
-                print((var3 + " = " + tmp1).rjust(self.widthp),
-                      file=self.rfile)
+                    tmp2 = str(eval(var3))
+                result3 = var3g + " = " + str(tmp2)
+                print(' ', file=self.rf1)
+                print('.. math:: ', file=self.rf1)
+                print('  ', file=self.rf1)
+                print("  \\boldsymbol{" + latex(result3,
+                        mode='plain') + "}", file=self.rf1)
+                print('  ', file=self.rf1)
             return
-
 
         # symbolic and substituted forms
         else:
-            # print reference line
-            strend = dval[3].strip()
-            print(' ', file=self.rfile)
-            print("**" + var3 + " |" + "yxxhfillxxx " + strend + "**",
-                  file=self.rfile)
-            print(' ', file=self.rfile)
-
 
             # print symbolic form
             for _j in self.symb:
@@ -617,114 +868,142 @@ class CalcRST(object):
 
             #print('dval2', dval[2])
             symeq = sympify(dval[2].strip())
-            print('  ', file=self.rfile)
-            print('.. math:: ', file=self.rfile)
-            print('  ', file=self.rfile)
-            print('  ' + latex(symeq, mul_symbol="dot"), file=self.rfile)
-            print(' ', file=self.rfile)
-            print('|', file=self.rfile)
+            print('  ', file=self.rf1)
+            print('.. math:: ', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(symeq, mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+            print('|', file=self.rf1)
+            print('  ', file=self.rf1)
 
-
-            # substitute values
-            # evaluate all terms and equations
+            # substitute values for variables
             if dval[6].strip() == '3':
-                for _k in self.odict:
-                    if _k[0] != '_':
-                        #print(self.odict[_k][1].strip())
-                        exec(self.odict[_k][1].strip())
 
+                # restore units
+                for j2 in self.odict:
+                    try:
+                        state = self.odict[j2][1].strip()
+                        exec(state)
+                    except:
+                        pass
+
+                # list of symbols
                 symat = symeq.atoms(Symbol)
-                symeq1 = sympify(dval[2].strip())
+                # copy of equation
+                #symeq1 = sympify(dval[2].strip())
 
-                #rewrite equation - new variables same length as value
+                # convert to latex form
+                latexrep = latex(symeq, mul_symbol="dot")
+                #print('latex', latexrep)
+
+                switch1 = []
+                # rewrite latex equation withbraces
                 for _n in symat:
-                    #get length of eval(variable)
-                    evlen = len((eval(_n.__str__())).__str__())
-                    new_var = str(_n).ljust(evlen, '~')
-                    symeq1 = symeq1.subs(_n, symbols(new_var))
-                symat1 = symeq1.atoms(Symbol)
-                out2 = pretty(symeq1, wrap_line=False)
+                    newlatex1 = str(_n).split('__')
+                    if len(newlatex1) == 2:
+                        newlatex1[1] += '}'
+                        newlatex1 = '~d~'.join(newlatex1)
 
-                #substitute variables
-                for _n in symat1:
-                    orig_var = str(_n).replace('~', '')
-                    expr = eval((self.odict[orig_var][1]).split("=")[1])
-                    if type(expr) == float:
-                        form = '{:.' + dval[4].strip()+'f}'
-                        symvar1 = form.format(eval(str(expr)))
+                    newlatex1 = str(_n).split('_')
+                    if len(newlatex1) == 2:
+                        newlatex1[1] += '}'
+                        newlatex1 = '~s~'.join(newlatex1)
+
+                    newlatex1 = ''.join(newlatex1)
+                    newlatex1 = newlatex1.replace('~d~', '__{')
+                    newlatex1 = newlatex1.replace('~s~', '_{')
+                    #symeq1 = symeq1.subs(_n, symbols(newlatex1))
+                    switch1.append([str(_n), newlatex1])
+
+                # substitute values
+                for _n in switch1:
+                    #print('swi', (self.odict[_n[0]][1]).split("=")[1])
+                    expr1 = eval((self.odict[_n[0]][1]).split("=")[1])
+                    if type(expr1) == float:
+                        form = '{:.' + eformat.strip() +'f}'
+                        symvar1 = '{' + form.format(expr1) + '}'
                     else:
-                        symvar1 = eval(orig_var.__str__()).__str__()
-                    out2 = out2.replace(str(_n), symvar1)
+                        symvar1 = '{' + str(expr1) + '}'
+                    #print('replace',_n[1], symvar1)
+                    latexrep = latexrep.replace(_n[1], symvar1)
+                    latexrep = latexrep.replace("\{", "{")
+                    #print(latexrep)
 
-                print('  ', file=self.rfile)
-                print('.. math:: ', file=self.rfile)
-                print('  ', file=self.rfile)
-                print('  ' + latex(out2, mode='plain'), file=self.rfile)
-                print('  ', file=self.rfile)
-                print('|', file=self.rfile)
+                # add substituted equation to rst file
+                print('  ', file=self.rf1)
+                print('.. math:: ', file=self.rf1)
+                print('  ', file=self.rf1)
+                print('  ' + latexrep, file=self.rf1)
+                print('  ', file=self.rf1)
+                print('|', file=self.rf1)
+                print('  ', file=self.rf1)
 
-                #convert variables to greek
-                if var.strip() in greeks:
-                    var1 = "\\" + var.strip()
-                else:
-                    var1 = var
+            # restore units
+            for j2 in self.odict:
+                try:
+                    state = self.odict[j2][1].strip()
+                    exec(state)
+                except:
+                    pass
 
-                if len(cunit.strip()) == 0:
-                    out3 = var1 + " = " + str(eval(var))
-                    print(' ', file=self.rfile)
-                    print('.. math:: ', file=self.rfile)
-                    print('  ', file=self.rfile)
-                    print("  \\boldsymbol{" + latex(out3, mode='plain') + "}",
-                                    file=self.rfile)
-                    print('  ', file=self.rfile)
-                else:
-                    out4 = var1 + " = " + str(eval(var).asUnit(eval(cunit)))
-                    print(' ', file=self.rfile)
-                    print('.. math:: ', file=self.rfile)
-                    print('  ', file=self.rfile)
-                    print("  \\boldsymbol{" + latex(out4, mode='plain') + "}",
-                                    file=self.rfile)
-                    print('  ', file=self.rfile)
+            #convert result variable to greek
+            var3s = var3.split('_')
+            if var3s[0] in greeks:
+                var3g = "\\" + var3
+            else:
+                var3g = var3
 
-
-            # print result right justified
-            if type(eval(var)) != Unum:
-                if type(eval(var)) == float or type(eval(var)) == float64:
+            # print result
+            if type(eval(var3)) != Unum:
+                if type(eval(var3)) == float \
+                    or type(eval(var3)) == float64:
                     resultform = '{:.' + dval[4].strip()+'f}'
-                    result1 = resultform.format(float(eval(var)))
-                    print((var + " = " +
-                                str(result1)).rjust(self.widthclc-1), 1)
+                    tmp1 = resultform.format(float(eval(var3)))
+                    result2 = var3g + " = " + str(tmp1)
+                    print(' ', file=self.rf1)
+                    print('.. math:: ', file=self.rf1)
+                    print('  ', file=self.rf1)
+                    print("  \\boldsymbol{" + latex(result2,
+                            mode='plain') + "}", file=self.rf1)
+                    print('  ', file=self.rf1)
                 else:
-                    print((var + " = " +
-                                str(eval(var))).rjust(self.widthclc-1), 1)
+                    result2 = var3 + " = " + str(eval(var3))
+                    print(' ', file=self.rf1)
+                    print('.. math:: ', file=self.rf1)
+                    print('  ', file=self.rf1)
+                    print("  \\boldsymbol{" + latex(result2,
+                            mode='plain') + "}", file=self.rf1)
+                    print('  ', file=self.rf1)
             else:
                 if len(cunit) > 0:
-                    tmp = str(eval(var).asUnit(eval(cunit)))
+                    exec("Unum.VALUE_FORMAT = '%." + rformat.strip()
+                         + "f'")
+                    tmp2 = str(eval(var3).asUnit(eval(cunit)))
                 else:
-                    tmp = str(eval(var))
-                print((var + " = " + tmp).rjust(self.widthclc), 1)
+                    tmp2 = str(eval(var3))
+                result3 = var3g + " = " + str(tmp2)
+                print(' ', file=self.rf1)
+                print('.. math:: ', file=self.rf1)
+                print('  ', file=self.rf1)
+                print("  \\boldsymbol{" + latex(result3,
+                        mode='plain') + "}", file=self.rf1)
+                print('  ', file=self.rf1)
 
+            # draw horizontal line
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{-9mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\hrulefill', file=self.rf1)
+            print('  ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print('  ', file=self.rf1)
 
-            strend = dval[3].strip()
-            print(' ', file=self.rfile)
-            print("**" + var + " =" + "yxxhfillxxx " + strend + "**",
-                  file=self.rfile)
-            print(' ', file=self.rfile)
-
-        print(".. raw:: latex", file=self.rfile)
-        print('  ', file=self.rfile)
-        print('   \\vspace{-9mm}', file=self.rfile)
-        print('  ', file=self.rfile)
-        print(".. raw:: latex", file=self.rfile)
-        print('  ', file=self.rfile)
-        print('   \\hrulefill', file=self.rfile)
-        print('  ', file=self.rfile)
-        print(".. raw:: latex", file=self.rfile)
-        print('  ', file=self.rfile)
-        print('   \\vspace{2mm}', file=self.rfile)
-        print('  ', file=self.rfile)
-
-    def _pdf_sect(self, dval):
+    def _rst_sect(self, dval):
 
         """print [s]
 
@@ -732,25 +1011,28 @@ class CalcRST(object):
         section: ['[s]', sleft, state, file]
 
         """
-
         tleft = dval[1].strip()
         tright = dval[3].strip()
-        print('  ', file=self.rfile)
-        print(tleft.strip() + " xxxhfillxxx " + tright.strip(),
-              file=self.rfile)
-        print("-"*self.pdfwidth, file=self.rfile)
+        print('  ', file=self.rf1)
+        print(tleft.strip() + "aa-bb " + tright.strip(),
+              file=self.rf1)
+        print("-"*self.widthp, file=self.rf1)
         notes = '\n'.join([i.strip() for i in dval[2]])
         if len(notes.strip()) > 0:
-            print(notes + '\n', file=self.rfile)
-        print(' ', file=self.rfile)
-        print(".. raw:: latex", file=self.rfile)
-        print(' ', file=self.rfile)
-        print('   \\vspace{4mm}', file=self.rfile)
-        print(' ', file=self.rfile)
+            print(notes + '\n', file=self.rf1)
+        print(' ', file=self.rf1)
+        print(".. raw:: latex", file=self.rf1)
+        print(' ', file=self.rf1)
+        print('   \\vspace{1mm}', file=self.rf1)
+        print(' ', file=self.rf1)
 
-    def _pdf_txt(self, txt):
+    def _rst_txt(self, txt):
         """output pass-through text"""
-        print(txt[1].strip(), file=self.rfile)
+        print(txt[1].strip(), file=self.rf1)
 
-    def _pdf_blnk(self):
-        print(' ', file=self.rfile)
+    def _rst_blnk(self):
+            print('  ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{4mm}', file=self.rf1)
+            print('  ', file=self.rf1)
