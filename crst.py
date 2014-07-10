@@ -494,8 +494,8 @@ class CalcRST(object):
 
         eformat, rformat = dval[6].split(',')
         try:
-            exec("set_printoptions(precision=" + eformat + ")")
-            exec("Unum.VALUE_FORMAT = '%." + eformat + "f'")
+            exec("set_printoptions(precision=" + eformat.strip() + ")")
+            exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
         except:
             set_printoptions(precision=3)
             Unum.VALUE_FORMAT = "%.3f"
@@ -751,7 +751,7 @@ class CalcRST(object):
         # decimal places
         try:
             exec("set_printoptions(precision=" + eformat.strip() + ")")
-            exec("Unum.VALUE_FORMAT = '%." + eformat.strip + "f'")
+            exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
         except:
             set_printoptions(precision=3)
             Unum.VALUE_FORMAT = "%.3f"
