@@ -1,63 +1,85 @@
-
+from __future__ import division
+from __future__ import print_function
+import os
+import sys
+import oncepy
+from oncepy import ccheck
+from oncepy import oconfig as cfg
 
 class CalcPDF(object):
+    """write PDF calc from rst file"""
 
-    def __init__(self):
+    def __init__(self, mfile, pdffile):
+        """initialize rst, tex and pdf file paths"""
 
+        self.mfile = mfile
+        #print('mfile', self.mfile)
+        self.ew = ccheck.ModCheck()
 
-            self.ew.ewrite2('')
-            self.ew.ewrite2("< rst file written >")
+        self.pdffile = pdffile
+        self.rstfile = self.mfile.replace('.txt', '.rst')
+        self.texfile = self.mfile.replace('.txt', '.tex')
+        self.pdffile1 = self.mfile.replace('.txt', '.pdf')
 
-            rstfile = self.mfile.replace('.txt', '.rst')
-            texfile = self.mfile.replace('.txt', '.tex')
-            pdffile = self.mfile.replace('.txt', '.pdf')
-            #auxfile = self.mfile.replace('.txt', '.aux')
-            #outfile = self.mfile.replace('.txt', '.out')
-            newstylepath = self.stylepath.replace('\\', '/')
-            tex1 = "".join(["python ",
-                                "%PYTHONHOME%/scripts/rst2latex.py ",
-                                "--documentclass=report ",
-                                "--documentoptions=12pt ",
-                                "--stylesheet=",
-                                newstylepath + " ",
-                                str(rstfile) + " ",
-                                str(texfile)])
+        cfg.stylefile = 'built-in'
+        self.stylepathpdf = oncepy.__path__[0] + '/once.sty'
 
-            # write tex file
-            os.system(tex1)
-            self.ew.ewrite2('')
-            self.ew.ewrite2("< tex file written >")
+        os.chdir(os.pardir)
+        if os.path.isfile('once.sty'):
+            cfg.stylefile = 'project folder'
+            self.stylepathpdf = os.getcwd() + '/once.sty'
 
-            # modify tex file after the fact to deal with escapes
-            self._mod_tex(texfile)
-            self.ew.ewrite2('')
-            self.ew.ewrite2("< tex file modified >")
+        os.chdir(cfg.mpath)
+        if os.path.isfile('once.sty'):
+            cfg.stylefile = 'model folder'
+            self.stylepathpdf = os.getcwd() + '/once.sty'
 
+    def gen_tex(self):
+        """generate and modify tex file"""
+        newstylepath = self.stylepathpdf.replace('\\', '/')
+        pypath = os.path.dirname(sys.executable)
+        rstpath = pypath + "/Scripts/rst2latex.py "
+        #print(rstpath)
+        tex1 = "".join(["python ", rstpath,
+                        "--documentclass=report ",
+                        "--documentoptions=12pt,notitlepage ",
+                        "--stylesheet=",
+                        newstylepath + " ",
+                        str(self.rstfile) + " ",
+                        str(self.texfile)])
+        # write tex file
+        #print(tex1)
+        os.system(tex1)
+        self.ew.ewrite2("< tex file written >")
+        self.mod_tex(self.texfile)
 
-            pdf1 = "xelatex " + str(texfile)
-            os.system(pdf1)
-            self.ew.ewrite2('')
-            self.ew.ewrite2("< xelatex " + str(texfile) +" >")
-            self.ew.ewrite2("< pdf file written - pass 1 >")
-            os.system(pdf1)
-            self.ew.ewrite2("< pdf file written - pass 2 >")
+    def mod_tex(self, tfile):
+        """modify tex file to handle escapes
 
-            # open pdf file
-            try:
-                os.system(pdffile)
-            except:
-                pass
+        modifies this type of entry
+        "**" + var3 + " |" + "aa-bb " + strend + "**",
+              file=self.rf1)
 
-    def _mod_tex(self, tfile):
-        """modify tex file"""
+        """
         texin = open(tfile, 'r')
         texf = texin.read()
         texin.close()
         texf = texf.replace("""inputenc""", """ """)
-        texf = texf.replace(""" xxxhfillxxx""",
-                            """\\hfill""")
-        texf = texf.replace("""yxxhfillxxx""",
-                            """\\hfill""")
+        texf = texf.replace("aa-bb ", """\\hfill""")
         texout = open(tfile, 'w')
         print(texf, file=texout)
         texout.close()
+        self.ew.ewrite2("< tex file modified >")
+
+    def gen_pdf(self):
+        """generate PDF file"""
+        pdf1 = 'xelatex ' + str(self.texfile)
+        os.system(pdf1)
+        self.ew.ewrite2('')
+        self.ew.ewrite2("< xelatex " + str(self.texfile) +" >")
+        self.ew.ewrite2("< pdf file written - pass 1 >")
+        os.system(pdf1)
+        self.ew.ewrite2("< pdf file written - pass 2 >")
+        if os.path.isfile(self.pdffile):
+            os.remove(self.pdffile)
+        os.rename(self.pdffile1, self.pdffile)
