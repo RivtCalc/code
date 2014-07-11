@@ -139,8 +139,7 @@ class CalcRST(object):
         #for i in self.odict: print(i, self.odict[i])
 
     def _rst_figure(self, dval):
-
-        """print tag [d]
+        """print figure
 
         Dictionary Value:
         equation:[[d], file path, options, var1, var2, var3]
@@ -234,8 +233,7 @@ class CalcRST(object):
         #print('mdict', self.mdict[str(var1)])
 
     def _rst_disk(self, dval):
-
-        """print tag [d]
+        """print and execute disk operations
 
         Dictionary Value:
         equation:[[d], file path, parameter, var1, var2, var3]
@@ -303,7 +301,7 @@ class CalcRST(object):
 
 
     def _rst_olic(self, dval):
-        """print tag [l]
+        """print symbolic representation
 
         Dictionary:
         symbolic:[[l], expr]
@@ -328,8 +326,8 @@ class CalcRST(object):
         print('  ', file=self.rf1)
 
     def _rst_term(self, dval, termbegin):
-        """
-        output terms
+        """print terms
+
         terms: [[t], statement, expr, ref ]
 
         """
@@ -350,7 +348,7 @@ class CalcRST(object):
 
 
     def _rst_check(self, dval):
-        """print [c]
+        """print check
 
         Dictionary:
         check:  [[c], check expr, op, limit, ref, dec, ok]
@@ -687,7 +685,7 @@ class CalcRST(object):
             print('  ', file=self.rf1)
 
     def _rst_func(self, dval):
-        """print tag [f]
+        """print function
 
         Dictionary:
 
@@ -738,7 +736,7 @@ class CalcRST(object):
         print('  ', file=self.rf1)
 
     def _rst_eq(self, var3, dval):
-        """tag [e]
+        """print equation
 
         equations dict:
         [[e], statement, expr, ref, decimals, units, prnt opt]
@@ -1004,8 +1002,7 @@ class CalcRST(object):
             print('  ', file=self.rf1)
 
     def _rst_sect(self, dval):
-
-        """print [s]
+        """print section
 
         Dictionary:
         section: ['[s]', sleft, state, file]
@@ -1031,6 +1028,7 @@ class CalcRST(object):
         print(txt[1].strip(), file=self.rf1)
 
     def _rst_blnk(self):
+        """print blank line"""
             print('  ', file=self.rf1)
             print(".. raw:: latex", file=self.rf1)
             print('  ', file=self.rf1)
