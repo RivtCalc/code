@@ -16,7 +16,7 @@ from oncepy import ccheck
 import oncepy.oconfig as cfg
 
 
-__all__ = ["cstart", "cdict", "ctext", "cpdf",
+__all__ = ["cstart", "cdict", "ctext", "crst", "cpdf",
            "cproj", "ccheck"]
 __version__ = "0.4.0"
 __author__ = 'rholland'

@@ -45,7 +45,7 @@ class ProjStart(object):
 
         """
         self.aa = OrderedDict()
-        print(self.aa)
+        #print(self.aa)
 
     def build_plist(self):
         """ build_plist() constructs the proj calc model list

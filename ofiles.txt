@@ -1,8 +1,0 @@
-__init__.py
-__main__.py
-ccheck.py
-cdict.py
-cpdf.py
-cproj.py
-cstart.py
-ctext.py

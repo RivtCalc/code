@@ -73,7 +73,7 @@ class CalcPDF(object):
 
     def gen_pdf(self):
         """generate PDF file"""
-        pdf1 = 'xelatex ' + str(self.texfile)
+        pdf1 = 'latexmk -xelatex -quiet ' + str(self.texfile)
         os.system(pdf1)
         self.ew.ewrite2('')
         self.ew.ewrite2("< xelatex " + str(self.texfile) +" >")

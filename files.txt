@@ -1,6 +1,0 @@
-cstart.py
-ccheck.py
-cdict.py
-ctext.py
-cpdf.py
-cproj.py

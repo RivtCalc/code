@@ -1,15 +1,11 @@
 # this file is read by the program - do not modify
-import oncepy
 
 # command line
 sysargv = ''
 
-# package directory
-packagepath = oncepy.__path__
-
 # full path and project file name
-ppath = ''
-pfile = ''
+ppath = '-'
+pfile = '-'
 
 # full path and main model name
 mpath = ''

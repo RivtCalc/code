@@ -26,12 +26,13 @@
     {}{0pt}{\large}[\vspace{1ex}\titlerule]
 \titlespacing*{\chapter}{0pt}{-40pt}{12pt}
 %%
-%% move page number below title block
+%% page numbers
 %%
-\pagestyle{empty}
+\fancypagestyle{plain}{%
 \fancyhf{} % clear all header and footers
-\fancypagestyle{plain}{\pagestyle{fancy}}
 \fancyhead[R]{\normalsize Page \thepage\ of \pageref{LastPage}}
-\renewcommand{\headrulewidth}{0pt} % remove the header rule
-\renewcommand{\footrulewidth}{0pt} % remove the header rule
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}}
+\pagestyle{plain}
+
 
