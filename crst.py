@@ -1029,8 +1029,8 @@ class CalcRST(object):
 
     def _rst_blnk(self):
         """print blank line"""
-            print('  ', file=self.rf1)
-            print(".. raw:: latex", file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\vspace{4mm}', file=self.rf1)
-            print('  ', file=self.rf1)
+        print('  ', file=self.rf1)
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{4mm}', file=self.rf1)
+        print('  ', file=self.rf1)
