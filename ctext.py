@@ -203,8 +203,7 @@ class CalcText(object):
 
         #print('mdict', self.mdict[str(var1)])
     def _prt_disk(self, dval):
-
-        """print tag [d]
+        """execute and print disk operations
 
         Dictionary Value:
         equation:[[d], file path, parameter, var1, var2, var3]
@@ -381,7 +380,7 @@ class CalcText(object):
             pass
 
     def _prt_olic(self, dval):
-        """print tag [l]
+        """print symbolic expression
 
         Dictionary:
         symbolic:[[l], expr]
@@ -412,7 +411,7 @@ class CalcText(object):
         self._prt_utf(" ", 0)
 
     def _prt_term(self, dval):
-        """print [t]
+        """print terms
 
         Dictionary:
         terms: [[t], statement, expr, ref ]
@@ -427,7 +426,7 @@ class CalcText(object):
         self._prt_utf(" "*4 + ref + " | " + statement,  1)
 
     def _prt_check(self, dval):
-        """print [c]
+        """print checks
 
         Dictionary:
         check:  [[c], check expr, op, limit, ref, dec, ok]
@@ -539,7 +538,7 @@ class CalcText(object):
         self._prt_utf(" ", 0)
 
     def _prt_array(self, dval):
-        """print tag [a]
+        """print arrays
 
         Dictionary:
         arrays: [[a], statement, expr, range1, range2,
@@ -732,7 +731,7 @@ class CalcText(object):
             self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 0)
 
     def _prt_func(self, dval):
-        """print tag [f]
+        """print functions
 
         Dictionary:
 
@@ -779,7 +778,7 @@ class CalcText(object):
         self._prt_utf(" ", 0)
 
     def _prt_eq(self, var3, dval):
-        """UTF print tag [e] from dictionary
+        """print equations
 
         Dictionary:
         equations:[[e], statement, expr, ref, decimals, units, prnt opt]
@@ -977,7 +976,7 @@ class CalcText(object):
             self._prt_utf(" ", 0)
 
     def _prt_sect(self, dval):
-        """print [s]
+        """print sections
 
         Dictionary:
         section: ['[s]', sleft, state, file]
