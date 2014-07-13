@@ -63,10 +63,3 @@ The program will execute the file and return results in files.
 
 To obtain a more complete UTF-8 font set install **DejaVu Mono** fonts    
 http://dejavu-fonts.org/wiki/Main_Page    
-
-    **methods:**    
-        gen_paths()  find model and project paths    
-        cmdline()  command line prompt    
-        gen_files() generate new file names    
-        out_term() check console printing flags    
-        sum_calc() write calculation summary to stdout    
