@@ -54,11 +54,13 @@ class CalcPDF(object):
         self.mod_tex(self.texfile)
 
     def mod_tex(self, tfile):
-        """modify tex file to handle escapes
+        """modify tex file and bypass escapes
 
         modifies this type of entry
         "**" + var3 + " |" + "aa-bb " + strend + "**",
               file=self.rf1)
+
+        calls one_chapter
 
         """
         texin = open(tfile, 'r')
@@ -69,7 +71,26 @@ class CalcPDF(object):
         texout = open(tfile, 'w')
         print(texf, file=texout)
         texout.close()
+        self.one_chapter(self.texfile)
+
+    def one_chapter(self, tfile):
+        """if only one chapter modify tex file
+
+        """
+        texin = open(tfile, 'r')
+        texf = texin.read()
+        texin.close()
+        if texf.find("phantom") > -1:
+            texf = texf.replace("""\\begin{document}""", '')
+            texf = texf.replace("""\\maketitle""", '')
+            texf = texf.replace("""\\title{\\phantomsection%""",
+                                """\\begin{document}""" + "\n" +
+                                """\\chapter{%""")
+        texout = open(tfile, 'w')
+        print(texf, file=texout)
+        texout.close()
         self.ew.ewrite2("< tex file modified >")
+        print("< tex file modified >")
 
     def gen_pdf(self):
         """generate PDF file"""
