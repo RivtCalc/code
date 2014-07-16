@@ -421,7 +421,9 @@ class ModDicts(object):
         ivect = line.strip().split('\n')
         fnum, ref = ivect[0].strip()[3:].split("|")
         decs, unts, opt = self.fdict[int(fnum)]
-        if unts == '':
+        try:
+            decs.split(',')
+        except:
             unts = self.fdict['default'][1]
         enumb = ' [' + str(self.mnum) + '.' + str(self.snum) + '.' + \
                 str(self.enum) + '] '
@@ -491,7 +493,9 @@ class ModDicts(object):
         #print(ivect)
         fnum, ref = ivect[0][3:].split("|")
         decs, unts, opt = self.fdict[int(fnum)]
-        if unts == '':
+        try:
+            decs.split(',')
+        except:
             unts = self.fdict['default'][1]
         enumb = ' [' + self.mnum + '.' + str(self.snum) + '.'+ \
                 str(self.enum) + ']'

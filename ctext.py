@@ -6,7 +6,6 @@ import os
 import tabulate
 import time
 from oncepy import ccheck
-from oncepy import cdict
 from oncepy import oconfig as cfg
 from numpy import *
 from sympy import *
@@ -545,16 +544,15 @@ class CalcText(object):
                     ref, decimals, unit1, unit2]
 
         """
-        eformat, rformat = dval[6].split(',')
-        if rformat == '':
-            eformat, rformat = self.fdict1.fdict['default'][1].split(',')
         try:
-            exec("set_printoptions(precision=" + eformat.strip() + ")")
-            exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
+            eformat, rformat = dval[4].split(',')
+            exec("set_printoptions(precision=" + eformat + ")")
+            exec("Unum.VALUE_FORMAT = '%." + eformat + "f'")
         except:
+            eformat = '3'
+            rformat = '3'
             set_printoptions(precision=3)
             Unum.VALUE_FORMAT = "%.3f"
-
 
         # table heading
 
@@ -786,14 +784,13 @@ class CalcText(object):
         equations:[[e], statement, expr, ref, decimals, units, prnt opt]
 
         """
-
-        eformat, rformat = dval[4].split(',')
-        if rformat == '':
-            eformat, rformat = self.fdict1.fdict['default'][1].split(',')
         try:
+            eformat, rformat = dval[4].split(',')
             exec("set_printoptions(precision=" + eformat + ")")
             exec("Unum.VALUE_FORMAT = '%." + eformat + "f'")
         except:
+            eformat = '3'
+            rformat = '3'
             set_printoptions(precision=3)
             Unum.VALUE_FORMAT = "%.3f"
 
