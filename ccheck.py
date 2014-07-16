@@ -7,7 +7,7 @@ import oncepy.oconfig as cfg
 class ModCheck(object):
 
     def __init__(self):
-        """ open log file of events and errors"""
+        """ open log file for events and errors"""
         # calc log
         lname = cfg.mfile
         logn = lname.split('.')
