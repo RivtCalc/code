@@ -7,7 +7,7 @@ from oncepy import ccheck
 import oncepy.oconfig as cfg
 
 
-class ModDict(object):
+class ModDicts(object):
     """Return dictionaries of model operations and formats
 
     Attributes:
@@ -127,6 +127,8 @@ class ModDict(object):
             mtag = _i[0:10]
             if mtag == "[#] format":
                 pendf = True
+                comnt, formt, calctype = _i.split('|')
+                self.fdict['default'] = [formt.strip(), calctype.strip()]
                 continue
             if pendf:
                 if len(_i.strip()) == 0:
@@ -418,6 +420,8 @@ class ModDict(object):
         ivect = line.strip().split('\n')
         fnum, ref = ivect[0].strip()[3:].split("|")
         decs, unts, opt = self.fdict[int(fnum)]
+        if unts == '':
+            unts = self.fdict['default'][1]
         enumb = ' [' + str(self.mnum) + '.' + str(self.snum) + '.' + \
                 str(self.enum) + '] '
 
@@ -486,6 +490,8 @@ class ModDict(object):
         #print(ivect)
         fnum, ref = ivect[0][3:].split("|")
         decs, unts, opt = self.fdict[int(fnum)]
+        if unts == '':
+            unts = self.fdict['default'][1]
         enumb = ' [' + self.mnum + '.' + str(self.snum) + '.'+ \
                 str(self.enum) + ']'
         ref = ref.strip() + enumb

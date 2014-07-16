@@ -7,6 +7,7 @@ import tabulate
 import codecs
 import oncepy
 import oncepy.oconfig as cfg
+from oncepy import cdict
 from oncepy import ctext
 from oncepy import ccheck
 from oncepy import oconfig as cfg
@@ -44,6 +45,7 @@ class CalcRST(object):
         """
         # execution log
         self.ew = ccheck.ModCheck()
+        self.fdict1 = cdict.ModDicts()
 
         self.mpath = cfg.mpath
         self.mfile = cfg.mfile
@@ -491,6 +493,9 @@ class CalcRST(object):
         """
 
         eformat, rformat = dval[6].split(',')
+        if rformat == '':
+            eformat, rformat = self.fdict1.fdict['default'][1].split(',')
+
         try:
             exec("set_printoptions(precision=" + eformat.strip() + ")")
             exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
@@ -745,7 +750,8 @@ class CalcRST(object):
         """
 
         eformat, rformat = dval[4].split(',')
-
+        if rformat == '':
+            eformat, rformat = self.fdict1.fdict['default'][1].split(',')
         # decimal places
         try:
             exec("set_printoptions(precision=" + eformat.strip() + ")")

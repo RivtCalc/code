@@ -6,6 +6,7 @@ import os
 import tabulate
 import time
 from oncepy import ccheck
+from oncepy import cdict
 from oncepy import oconfig as cfg
 from numpy import *
 from sympy import *
@@ -69,10 +70,10 @@ class CalcText(object):
         equations:[[e], statement, expr, ref, decimals, units, prnt opt]
         sections: [[s], left string, notes]
 
-
         """
 
         self.ew = ccheck.ModCheck()
+        self.fdict1 = cdict.ModDicts()
 
         self.odict = odict
         self.pyfile = pyf
@@ -546,6 +547,8 @@ class CalcText(object):
 
         """
         eformat, rformat = dval[6].split(',')
+        if rformat == '':
+            eformat, rformat = self.fdict1.fdict['default'][1].split(',')
         try:
             exec("set_printoptions(precision=" + eformat.strip() + ")")
             exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
@@ -786,7 +789,8 @@ class CalcText(object):
         """
 
         eformat, rformat = dval[4].split(',')
-
+        if rformat == '':
+            eformat, rformat = self.fdict1.fdict['default'][1].split(',')
         try:
             exec("set_printoptions(precision=" + eformat + ")")
             exec("Unum.VALUE_FORMAT = '%." + eformat + "f'")
