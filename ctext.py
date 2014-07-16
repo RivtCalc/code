@@ -71,7 +71,6 @@ class CalcText(object):
 
         """
         self.ew = ccheck.ModCheck()
-        self.fdict1 = cdict.ModDicts()
 
         self.odict = odict
         self.pyfile = pyf

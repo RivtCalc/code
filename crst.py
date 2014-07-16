@@ -7,7 +7,6 @@ import tabulate
 import codecs
 import oncepy
 import oncepy.oconfig as cfg
-from oncepy import cdict
 from oncepy import ctext
 from oncepy import ccheck
 from oncepy import oconfig as cfg
@@ -46,7 +45,6 @@ class CalcRST(object):
         """
         # execution log
         self.ew = ccheck.ModCheck()
-        self.fdict1 = cdict.ModDicts()
 
         self.mpath = cfg.mpath
         self.mfile = cfg.mfile

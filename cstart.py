@@ -132,7 +132,7 @@ class ModStart():
         self.gen_files()
 
         # build dictionaries
-        self.model1 = cdict.ModDict()
+        self.model1 = cdict.ModDicts()
 
         # write variable list to stdout
         self.var_table()

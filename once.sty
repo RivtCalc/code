@@ -2,7 +2,6 @@
 %% on-c-e modifications to the latex report class
 %%
 \usepackage{fancyhdr}
-\usepackage{lastpage}
 \usepackage[no-math]{fontspec}
 \usepackage{libertine}
 \usepackage[libertine]{newtxmath}
@@ -11,7 +10,7 @@
 %%
 \setmonofont{DejaVu Sans Mono}
 \setmonofont[Scale=0.8]{DejaVu Sans Mono}
-\DeclareMathSizes{12}{13}{11}{11}  
+\DeclareMathSizes{12}{13}{11}{11}
 %%
 %% margins
 %%
@@ -19,20 +18,36 @@
 \geometry{hmargin={1.0in,0.75in},vmargin={0.9in,1.8in}}
 \setlength{\parindent}{0in}
 %%
-%% modify section headings
-%%
-\usepackage{titlesec}
-\titleformat{\chapter}[display]{\normalfont\large\bfseries}
-    {}{0pt}{\large}[\vspace{1ex}\titlerule]
-\titlespacing*{\chapter}{0pt}{-40pt}{12pt}
-%%
 %% page numbers
 %%
 \fancypagestyle{plain}{%
 \fancyhf{} % clear all header and footers
-\fancyhead[R]{\normalsize Page \thepage\ of \pageref{LastPage}}
+\fancyhead[R]{\normalsize Page \thepage}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}}
 \pagestyle{plain}
-
-
+%%
+%% modify section headings
+%%
+\usepackage{titlesec}
+\titleformat{\chapter}
+ [display]
+ {\normalfont\large\bfseries}
+ {}{0pt}
+ {\large}
+ [\vspace{2mm}\titlerule]
+\titlespacing*{\chapter}
+ {0pt}
+ {-40pt}
+ {12pt}
+%
+\titleformat{\section}
+ [display]
+ {\normalfont\large\bfseries}
+ {}{0pt}
+ {\large}
+ [\vspace{2mm}\titlerule]
+\titlespacing*{\section}
+ {0pt}
+ {-40pt}
+ {12pt}
