@@ -26,7 +26,7 @@ class ModCheck(object):
         ef.close()
 
     def ewrite2(self, estrng):
-        """write processes"""
+        """write processes to log file"""
         #print('log', estrng)
         ef = open(self.logname, 'a')
         estrng += '\n'

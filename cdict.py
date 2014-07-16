@@ -31,6 +31,7 @@ class ModDicts(object):
         mofile.close()
 
         # read format defaults from main file
+        # default formats are also stored in dictionary
         self.widthc = 90
         for _i in self.mstr:
             mtag = _i[0:10]

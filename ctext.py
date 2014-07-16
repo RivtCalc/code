@@ -71,7 +71,6 @@ class CalcText(object):
         sections: [[s], left string, notes]
 
         """
-
         self.ew = ccheck.ModCheck()
         self.fdict1 = cdict.ModDicts()
 

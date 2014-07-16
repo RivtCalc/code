@@ -31,6 +31,7 @@ except ImportError:
         cfg.unitfile = 'built-in'
 os.chdir(mpathcrst)
 
+
 class CalcRST(object):
     """Accepts a model dictionary and writes an rst file"""
 
