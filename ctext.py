@@ -110,7 +110,7 @@ class CalcText(object):
                 self._prt_func(self.odict[_i])
                 self.xtraline = True
             elif mtag == '[e]':
-                self._prt_eq(_i, self.odict[_i])
+                self._prt_eq(self.odict[_i])
                 self.xtraline = False
             elif mtag == '[s]':
                 self._prt_sect(self.odict[_i])
@@ -617,9 +617,12 @@ class CalcText(object):
                         pass
             if k1[0:2] == '_a':
                 #print('k1-2', k1)
-                exec(self.odict[k1][3].strip())
-                exec(self.odict[k1][4].strip())
-                exec(self.odict[k1][1].strip())
+                try:
+                    exec(self.odict[k1][3].strip())
+                    exec(self.odict[k1][4].strip())
+                    exec(self.odict[k1][1].strip())
+                except:
+                    pass
 
         # single row vector - 1D table
         if len(str(vect[3])) == 0 and len(str(vect[0])) != 0:
@@ -748,9 +751,12 @@ class CalcText(object):
                     pass
             if k1[0:2] == '_a':
                 #print('ek1-2', k1)
-                exec(self.odict[k1][3].strip())
-                exec(self.odict[k1][4].strip())
-                exec(self.odict[k1][1].strip())
+                try:
+                    exec(self.odict[k1][3].strip())
+                    exec(self.odict[k1][4].strip())
+                    exec(self.odict[k1][1].strip())
+                except:
+                    pass
 
         # print reference line
         tmp = int(self.widthc-1) * '-'
@@ -822,9 +828,12 @@ class CalcText(object):
                         pass
             if k1[0:2] == '_a':
                 #print('ek1-2', k1)
-                exec(self.odict[k1][3].strip())
-                exec(self.odict[k1][4].strip())
-                exec(self.odict[k1][1].strip())
+                try:
+                    exec(self.odict[k1][3].strip())
+                    exec(self.odict[k1][4].strip())
+                    exec(self.odict[k1][1].strip())
+                except:
+                    pass
         # evaluate only - do not print
         exec(dval[1])
         if dval[6].strip() == '0':
@@ -934,8 +943,8 @@ class CalcText(object):
                     pass
             # print array
             if type(eval(var3)) == ndarray:
-                print('ndarray', var3)
-                print(eval(var3))
+                #print('ndarray', var3)
+                #print(eval(var3))
                 tmp1 = eval(var3)
                 self._prt_utf((var3 + " = "), 1)
                 self._prt_utf(' ', 0)

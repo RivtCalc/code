@@ -577,9 +577,12 @@ class CalcRST(object):
                         pass
             if k1[0:2] == '_a':
                 #print('k1-2', k1)
-                exec(self.odict[k1][3].strip())
-                exec(self.odict[k1][4].strip())
-                exec(self.odict[k1][1].strip())
+                try:
+                    exec(self.odict[k1][3].strip())
+                    exec(self.odict[k1][4].strip())
+                    exec(self.odict[k1][1].strip())
+                except:
+                    pass
 
         # single row vector - 1D table
         if len(str(vect[3])) == 0 and len(str(vect[0])) != 0:
@@ -716,9 +719,12 @@ class CalcRST(object):
                     pass
             if k1[0:2] == '_a':
                 #print('ek1-2', k1)
-                exec(self.odict[k1][3].strip())
-                exec(self.odict[k1][4].strip())
-                exec(self.odict[k1][1].strip())
+                try:
+                    exec(self.odict[k1][3].strip())
+                    exec(self.odict[k1][4].strip())
+                    exec(self.odict[k1][1].strip())
+                except:
+                    pass
 
         # evaluate function
         print(" ", file=self.rf1)
@@ -801,9 +807,12 @@ class CalcRST(object):
                         pass
             if k1[0:2] == '_a':
                 #print('k1-2', k1)
-                exec(self.odict[k1][3].strip())
-                exec(self.odict[k1][4].strip())
-                exec(self.odict[k1][1].strip())
+                try:
+                    exec(self.odict[k1][3].strip())
+                    exec(self.odict[k1][4].strip())
+                    exec(self.odict[k1][1].strip())
+                except:
+                    pass
 
         # print reference line
         print(".. raw:: latex", file=self.rf1)
