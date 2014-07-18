@@ -791,7 +791,7 @@ class CalcText(object):
         self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 0)
         self._prt_utf(" ", 0)
 
-    def _prt_eq(self, var3, dval):
+    def _prt_eq(self, dval):
         """print equations
 
         Dictionary:
@@ -801,16 +801,16 @@ class CalcText(object):
         # set decimal format
         try:
             eformat, rformat = dval[4].split(',')
-            exec("set_printoptions(precision=" + eformat + ")")
-            exec("Unum.VALUE_FORMAT = '%." + eformat + "f'")
+            exec("set_printoptions(precision=" + eformat.strip() + ")")
+            exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
         except:
-            eformat = '3'
             rformat = '3'
+            eformat = '3'
             set_printoptions(precision=3)
             Unum.VALUE_FORMAT = "%.3f"
 
         cunit = dval[5].strip()
-        var = dval[1].split("=")[0].strip()
+        var3 = dval[1].split("=")[0].strip()
 
         # evaluate variables
         for k1 in self.odict:
@@ -825,7 +825,6 @@ class CalcText(object):
                 exec(self.odict[k1][3].strip())
                 exec(self.odict[k1][4].strip())
                 exec(self.odict[k1][1].strip())
-
         # evaluate only - do not print
         exec(dval[1])
         if dval[6].strip() == '0':
@@ -837,27 +836,26 @@ class CalcText(object):
             strend = dval[3].strip()
             self._prt_utf((var3 + " | " + strend).rjust(self.widthc), 0)
             self._prt_utf(" ", 0)
-
             # print array
-            if type(eval(var)) == ndarray:
-                tmp1 = str(eval(var))
-                self._prt_utf((var + " = "), 1)
-                self._prt_utf(' ', 1)
-                self._prt_utf(tmp1, 1)
+            if type(eval(var3)) == ndarray:
+                tmp1 = eval(var3)
+                self._prt_utf((var3 + " = "), 1)
+                self._prt_utf(' ', 0)
+                self._prt_utf(tmp1, 0)
             # print result right justified
-            elif type(eval(var)) != Unum:
-                if type(eval(var)) == float or type(eval(var)) == float64:
+            elif type(eval(var3)) != Unum:
+                if type(eval(var3)) == float or type(eval(var3)) == float64:
                     resultform = '{:.' + dval[4].strip()+'f}'
-                    result1 = resultform.format(float(eval(var)))
-                    self._prt_utf((var + " = " + str(result1)).rjust(self.widthc-1), 1)
+                    result1 = resultform.format(float(eval(var3)))
+                    self._prt_utf((var3 + " = " + str(result1)).rjust(self.widthc-1), 1)
                 else:
-                    self._prt_utf((var + " = " + str(eval(var))).rjust(self.widthc-1), 1)
+                    self._prt_utf((var3 + " = " + str(eval(var3))).rjust(self.widthc-1), 1)
             else:
                 if len(cunit) > 0:
-                    tmp1 = str(eval(var).asUnit(eval(cunit)))
+                    tmp1 = str(eval(var3).asUnit(eval(cunit)))
                 else:
-                    tmp1 = str(eval(var))
-                self._prt_utf((var + " = " + tmp1).rjust(self.widthc-1), 1)
+                    tmp1 = str(eval(var3))
+                self._prt_utf((var3 + " = " + tmp1).rjust(self.widthc-1), 1)
             # print closure line
             tmp = int(self.widthc-1) * '-'
             self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 1)
@@ -880,6 +878,7 @@ class CalcText(object):
             try:
                 symeq = sympify(dval[2].strip())
                 self._prt_utf(symeq, 1)
+                self._prt_utf(" ", 0)
                 self._prt_utf(" ", 0)
             except:
                 self._prt_utf(dval[2], 1)
@@ -934,31 +933,34 @@ class CalcText(object):
                 except:
                     pass
             # print array
-            if type(eval(var)) == ndarray:
-                tmp1 = str(eval(var))
-                self._prt_utf((var + " = "), 1)
-                self._prt_utf(' ', 1)
-                self._prt_utf(tmp1, 1)
-            elif type(eval(var)) != Unum:
-                if type(eval(var)) == float or type(eval(var)) == float64:
+            if type(eval(var3)) == ndarray:
+                print('ndarray', var3)
+                print(eval(var3))
+                tmp1 = eval(var3)
+                self._prt_utf((var3 + " = "), 1)
+                self._prt_utf(' ', 0)
+                self._prt_utf(tmp1, 0)
+            elif type(eval(var3)) != Unum:
+                if type(eval(var3)) == float or type(eval(var3)) == float64:
                     resultform = '{:.' + eformat +'f}'
-                    result1 = resultform.format(float(eval(var)))
-                    self._prt_utf((var + " = " +
+                    result1 = resultform.format(float(eval(var3)))
+                    self._prt_utf((var3 + " = " +
                                 str(result1)).rjust(self.widthc-1), 1)
                 else:
-                    self._prt_utf((var + " = " +
-                                str(eval(var))).rjust(self.widthc-1), 1)
+                    self._prt_utf((var3 + " = " +
+                                str(eval(var3))).rjust(self.widthc-1), 1)
             else:
                 exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
                 if len(cunit) > 0:
-                    tmp = str(eval(var).asUnit(eval(cunit)))
+                    tmp = str(eval(var3).asUnit(eval(cunit)))
                 else:
-                    tmp = str(eval(var))
-                self._prt_utf((var + " = " +
+                    tmp = str(eval(var3))
+                self._prt_utf((var3 + " = " +
                                tmp).rjust(self.widthc-1), 1)
             tmp = int(self.widthc-1) * '-'
             self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 1)
             self._prt_utf(" ", 0)
+
 
     def _prt_sect(self, dval):
         """print sections
