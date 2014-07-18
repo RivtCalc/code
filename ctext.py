@@ -8,6 +8,7 @@ import time
 from oncepy import ccheck
 from oncepy import oconfig as cfg
 from numpy import *
+import numpy.linalg as LA
 from sympy import *
 from sympy import var as varsym
 
@@ -415,12 +416,9 @@ class CalcText(object):
         terms: [[t], statement, expr, ref ]
 
         """
-        shift = int(self.widthc / 2.8)
+        shift = int(self.widthc / 3.5)
         ref = dval[3].strip().ljust(shift)
         statement = dval[1].strip()
-        #ptype = type(eval(dval[2]))
-        #if ptype == list or ptype == ndarray or ptype == tuple:
-        #    statement = statement.split('=')[0].strip()
         self._prt_utf(" "*4 + ref + " | " + statement,  1)
 
     def _prt_check(self, dval):
@@ -738,9 +736,22 @@ class CalcText(object):
         ip: a model line or block
 
         Dictionary Value:
-        function:[[f], function call, var, ref, model number
+        function:[[f], function call, var, ref, eqn number
 
         """
+        # convert symbols to numbers - retain units
+        for k1 in self.odict:
+            if k1[0] != '_':
+                try:
+                    exec(self.odict[k1][1].strip())
+                except:
+                    pass
+            if k1[0:2] == '_a':
+                #print('ek1-2', k1)
+                exec(self.odict[k1][3].strip())
+                exec(self.odict[k1][4].strip())
+                exec(self.odict[k1][1].strip())
+
         # print reference line
         tmp = int(self.widthc-1) * '-'
         self._prt_utf((tmp + u'\u2510').rjust(self.widthc-1), 0)
@@ -763,15 +774,19 @@ class CalcText(object):
         self._prt_utf(' ', 0)
         self._prt_utf('function doc:', 0)
         self._prt_utf(docs1, 0)
+
         return1 = eval(dval[1].strip())
         self._prt_utf(' ', 0)
         if return1 is None:
-            self._prt_utf('function evaluates to None'.rjust(
-                self.widthc-1), 1)
+            self._prt_utf('function evaluates to None', 1)
         else:
-            self._prt_utf(('function return: ' + return1).rjust(
-                self.widthc-1), 1)
+            self._prt_utf('function returned: ', 1)
+            self._prt_utf(return1, 1)
 
+        # add function variable to dict
+        return2 = (return1.__repr__()).replace('\n', '')
+        self.odict[dval[2]] = ['[z]', str(dval[2])+'='+return2]
+        #print(self.odict[dval[2]])
         tmp = int(self.widthc-1) * '-'
         self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 0)
         self._prt_utf(" ", 0)
@@ -783,6 +798,7 @@ class CalcText(object):
         equations:[[e], statement, expr, ref, decimals, units, prnt opt]
 
         """
+        # set decimal format
         try:
             eformat, rformat = dval[4].split(',')
             exec("set_printoptions(precision=" + eformat + ")")
@@ -796,7 +812,7 @@ class CalcText(object):
         cunit = dval[5].strip()
         var = dval[1].split("=")[0].strip()
 
-        # evaluate variables - strip units for arrays
+        # evaluate variables
         for k1 in self.odict:
             #print('ek1', k1)
             if k1[0] != '_':
@@ -804,69 +820,45 @@ class CalcText(object):
                         exec(self.odict[k1][1].strip())
                     except:
                         pass
-                    try:
-                        state = self.odict[k1][1].strip()
-                        varx = state.split('=')
-                        state2 = varx[0].strip()+'='\
-                        +varx[0].strip() + '.asNumber()'
-                        exec(state2)
-                        #print('ej1', k1)
-                    except:
-                        pass
             if k1[0:2] == '_a':
                 #print('ek1-2', k1)
                 exec(self.odict[k1][3].strip())
                 exec(self.odict[k1][4].strip())
                 exec(self.odict[k1][1].strip())
-        # restore units
-        for j2 in self.odict:
-            try:
-                state = self.odict[j2][1].strip()
-                varx = state.split('=')
-                state2 = varx[0].strip() + '=' + varx[0].strip()
-                exec(state2)
-            except:
-                pass
 
-        # evaluate only
+        # evaluate only - do not print
+        exec(dval[1])
         if dval[6].strip() == '0':
-            exec(dval[1])
             return
-        # result only
+        # print result only
         elif dval[6].strip() == '1':
-
-            # restore units
-            for j2 in self.odict:
-                try:
-                    state = self.odict[j2][1].strip()
-                    exec(state)
-                except:
-                    pass
-
             tmp = int(self.widthc-1) * '-'
             self._prt_utf((tmp + u'\u2510').rjust(self.widthc), 1)
             strend = dval[3].strip()
             self._prt_utf((var3 + " | " + strend).rjust(self.widthc), 0)
             self._prt_utf(" ", 0)
 
+            # print array
+            if type(eval(var)) == ndarray:
+                tmp1 = str(eval(var))
+                self._prt_utf((var + " = "), 1)
+                self._prt_utf(' ', 1)
+                self._prt_utf(tmp1, 1)
             # print result right justified
-            if type(eval(var)) != Unum:
+            elif type(eval(var)) != Unum:
                 if type(eval(var)) == float or type(eval(var)) == float64:
                     resultform = '{:.' + dval[4].strip()+'f}'
                     result1 = resultform.format(float(eval(var)))
-                    self._prt_utf((var + " = " +
-                                str(result1)).rjust(self.widthc-1), 1)
+                    self._prt_utf((var + " = " + str(result1)).rjust(self.widthc-1), 1)
                 else:
-                    self._prt_utf((var + " = " +
-                                str(eval(var))).rjust(self.widthc-1), 1)
+                    self._prt_utf((var + " = " + str(eval(var))).rjust(self.widthc-1), 1)
             else:
                 if len(cunit) > 0:
                     tmp1 = str(eval(var).asUnit(eval(cunit)))
                 else:
                     tmp1 = str(eval(var))
-                self._prt_utf((var + " = " +
-                                tmp1).rjust(self.widthc-1), 1)
-
+                self._prt_utf((var + " = " + tmp1).rjust(self.widthc-1), 1)
+            # print closure line
             tmp = int(self.widthc-1) * '-'
             self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 1)
             self._prt_utf(" ", 0)
@@ -878,8 +870,7 @@ class CalcText(object):
             tmp = int(self.widthc-1) * '-'
             self._prt_utf((tmp + u'\u2510').rjust(self.widthc), 1)
             strend = dval[3].strip()
-            self._prt_utf((var3 + " | " +
-                            strend).rjust(self.widthc), 0)
+            self._prt_utf((var3 + " | " + strend).rjust(self.widthc), 0)
             self._prt_utf(" ", 0)
 
             # print symbolic form
@@ -890,25 +881,14 @@ class CalcText(object):
                 symeq = sympify(dval[2].strip())
                 self._prt_utf(symeq, 1)
                 self._prt_utf(" ", 0)
-                self._prt_utf(" ", 0)
             except:
-                pass
+                self._prt_utf(dval[2], 1)
+                self._prt_utf(" ", 0)
 
             # substitute values
-            # evaluate all terms and equations
             if dval[6].strip() == '3':
-
-                # restore units
-                for j2 in self.odict:
-                    try:
-                        state = self.odict[j2][1].strip()
-                        exec(state)
-                    except:
-                        pass
-
                 symat = symeq.atoms(Symbol)
                 symeq1 = sympify(dval[2].strip())
-
                 #rewrite equation - new variables same length as value
                 for _n in symat:
                     #get length of eval(variable)
@@ -918,7 +898,7 @@ class CalcText(object):
                 symat1 = symeq1.atoms(Symbol)
                 out2 = pretty(symeq1, wrap_line=False)
 
-                #substitute variables
+                # manage variables
                 for _n in symat1:
                     orig_var = str(_n).replace('~', '')
                     expr = eval((self.odict[orig_var][1]).split("=")[1])
@@ -953,7 +933,13 @@ class CalcText(object):
                     exec(state)
                 except:
                     pass
-            if type(eval(var)) != Unum:
+            # print array
+            if type(eval(var)) == ndarray:
+                tmp1 = str(eval(var))
+                self._prt_utf((var + " = "), 1)
+                self._prt_utf(' ', 1)
+                self._prt_utf(tmp1, 1)
+            elif type(eval(var)) != Unum:
                 if type(eval(var)) == float or type(eval(var)) == float64:
                     resultform = '{:.' + eformat +'f}'
                     result1 = resultform.format(float(eval(var)))

@@ -11,6 +11,8 @@ from oncepy import ctext
 from oncepy import ccheck
 from oncepy import oconfig as cfg
 from numpy import *
+from numpy import linalg as LA
+import numpy.linalg as linalg
 from sympy import *
 from sympy import var as varsym
 from sympy.core.alphabets import greeks
@@ -332,7 +334,7 @@ class CalcRST(object):
         terms: [[t], statement, expr, ref ]
 
         """
-        shift = int(self.widthp / 2.2)
+        shift = int(self.widthp / 3.5)
         ref = dval[3].strip().ljust(shift)
         param = dval[1].strip()
         #ptype = type(eval(dval[2]))
@@ -698,13 +700,25 @@ class CalcRST(object):
         function:[[f], function name, ref, model number
 
         """
-
         # print reference line
-
         funcname = dval[1].split('(')[0]
         funchd = funcname.strip() + ' | function ' + dval[4].strip()
+        # insert pattern for later modification of tex file
         print("aa-bb " + "**" + funchd + "**", file=self.rf1)
         print(' ', file=self.rf1)
+
+        # convert symbols to numbers - retain units
+        for k1 in self.odict:
+            if k1[0] != '_':
+                try:
+                    exec(self.odict[k1][1].strip())
+                except:
+                    pass
+            if k1[0:2] == '_a':
+                #print('ek1-2', k1)
+                exec(self.odict[k1][3].strip())
+                exec(self.odict[k1][4].strip())
+                exec(self.odict[k1][1].strip())
 
         # evaluate function
         print(" ", file=self.rf1)
@@ -713,19 +727,37 @@ class CalcRST(object):
         print('function call: ' + dval[1].strip(), file=self.rf1)
         funcname = dval[1].split('(')[0]
         docs1 = eval(funcname + '.__doc__')
-        print(' ', file=self.rf1)
+        print('  ', file=self.rf1)
         print('**function doc:**', file=self.rf1)
-        print(' ', file=self.rf1)
+        print('  ', file=self.rf1)
         print('::', file=self.rf1)
-        print(' ', file=self.rf1)
-        print(docs1, file=self.rf1)
+        print('  ', file=self.rf1)
+        print('  ' + docs1, file=self.rf1)
+        print('  ', file=self.rf1)
+
         return1 = eval(dval[1].strip())
-        print(' ', file=self.rf1)
         if return1 is None:
             print('function evaluates to None', file=self.rf1)
+            print('  ', file=self.rf1)
         else:
-            print('**function return:** ' + return1, file=self.rf1)
-        print(' ', file=self.rf1)
+            print('**function returned:** ', file=self.rf1)
+            tmp1 = str(return1)
+            if '[[' in tmp1:
+                tmp2 = tmp1.replace(' [', '.  [')
+                tmp1 = tmp2.replace('[[', '. [[')
+            elif '[' in tmp1:
+                tmp1 = tmp1.replace('[', '. [')
+            else:
+                tmp1 = '  ' + tmp1
+            print('  ', file=self.rf1)
+            print('::', file=self.rf1)
+            print('  ', file=self.rf1)
+            print(tmp1, file=self.rf1)
+            print('  ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{4mm}', file=self.rf1)
+            print('  ', file=self.rf1)
 
         # draw line
         print(".. raw:: latex", file=self.rf1)
@@ -759,21 +791,12 @@ class CalcRST(object):
         #var3 = dval[1].split("=")[0].strip()
         #val3 = eval(dval[2])
 
-        # evaluate variables - strip units for arrays
+        # evaluate variables
         for k1 in self.odict:
             #print('k1', k1)
             if k1[0] != '_':
                     try:
                         exec(self.odict[k1][1].strip())
-                    except:
-                        pass
-                    try:
-                        state = self.odict[k1][1].strip()
-                        varx = state.split('=')
-                        state2 = varx[0].strip()+'='\
-                        +varx[0].strip() + '.asNumber()'
-                        exec(state2)
-                        #print('j1', k1)
                     except:
                         pass
             if k1[0:2] == '_a':
@@ -782,48 +805,49 @@ class CalcRST(object):
                 exec(self.odict[k1][4].strip())
                 exec(self.odict[k1][1].strip())
 
-        # evaluate only
-        if dval[6].strip() == '0':
-            exec(dval[1])
-            return
-
         # print reference line
         print(".. raw:: latex", file=self.rf1)
         print('  ', file=self.rf1)
         print('   \\vspace{2mm}', file=self.rf1)
         print('  ', file=self.rf1)
 
+        exec(dval[1])
+        # evaluate only
+        if dval[6].strip() == '0':
+            return
         strend = dval[3].strip()
-        print(' ', file=self.rf1)
+        print('  ', file=self.rf1)
         print("aa-bb " + "**" + var3 + " | " + strend + "**",
               file=self.rf1)
-        print(' ', file=self.rf1)
+        print('  ', file=self.rf1)
 
         # result only
         if dval[6].strip() == '1':
-
-            # restore units
-            for j2 in self.odict:
-                try:
-                    state = self.odict[j2][1].strip()
-                    exec(state)
-                except:
-                        pass
-
             #convert result variable to greek
             var3s = var3.split('_')
             if var3s[0] in greeks:
                 var3g = "\\" + var3
             else:
                 var3g = var3
-
             # print result
-            print(".. raw:: latex", file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\vspace{2mm}', file=self.rf1)
-            print('  ', file=self.rf1)
-
-            if type(eval(var3)) != Unum:
+            if type(eval(var3)) == ndarray:
+                tmp1 = str(eval(var3))
+                if '[[' in tmp1:
+                    tmp2 = tmp1.replace(' [', '.  [')
+                    tmp1 = tmp2.replace('[[', '. [[')
+                else:
+                    tmp1 = tmp1.replace('[', '. [')
+                print('  ', file=self.rf1)
+                print('::', file=self.rf1)
+                print('  ', file=self.rf1)
+                print('. ' + var3 + ' = ', file=self.rf1)
+                print(tmp1, file=self.rf1)
+                print('  ', file=self.rf1)
+                print(".. raw:: latex", file=self.rf1)
+                print('  ', file=self.rf1)
+                print('   \\vspace{4mm}', file=self.rf1)
+                print('  ', file=self.rf1)
+            elif type(eval(var3)) != Unum:
                 if type(eval(var3)) == float \
                     or type(eval(var3)) == float64:
                     resultform = '{:.' + eformat.strip() + 'f}'
@@ -859,42 +883,35 @@ class CalcRST(object):
 
         # symbolic and substituted forms
         else:
-
             # print symbolic form
             for _j in self.symb:
                 if str(_j)[0] != '_':
                     varsym(str(_j))
-
             #print('dval2', dval[2])
-            symeq = sympify(dval[2].strip())
-            print('  ', file=self.rf1)
-            print('.. math:: ', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('  ' + latex(symeq, mul_symbol="dot"), file=self.rf1)
-            print('  ', file=self.rf1)
-            print('|', file=self.rf1)
-            print('  ', file=self.rf1)
-
+            try:
+                symeq = sympify(dval[2].strip())
+                print('  ', file=self.rf1)
+                print('.. math:: ', file=self.rf1)
+                print('  ', file=self.rf1)
+                print('  ' + latex(symeq, mul_symbol="dot"), file=self.rf1)
+                print('  ', file=self.rf1)
+                print('|', file=self.rf1)
+                print('  ', file=self.rf1)
+            except:
+                symeq = dval[2].strip()
+                print('  ', file=self.rf1)
+                print('::', file=self.rf1)
+                print('  ', file=self.rf1)
+                print('  ' + symeq, file=self.rf1)
             # substitute values for variables
             if dval[6].strip() == '3':
-
-                # restore units
-                for j2 in self.odict:
-                    try:
-                        state = self.odict[j2][1].strip()
-                        exec(state)
-                    except:
-                        pass
-
                 # list of symbols
                 symat = symeq.atoms(Symbol)
                 # copy of equation
                 #symeq1 = sympify(dval[2].strip())
-
                 # convert to latex form
                 latexrep = latex(symeq, mul_symbol="dot")
                 #print('latex', latexrep)
-
                 switch1 = []
                 # rewrite latex equation withbraces
                 for _n in symat:
@@ -902,18 +919,15 @@ class CalcRST(object):
                     if len(newlatex1) == 2:
                         newlatex1[1] += '}'
                         newlatex1 = '~d~'.join(newlatex1)
-
                     newlatex1 = str(_n).split('_')
                     if len(newlatex1) == 2:
                         newlatex1[1] += '}'
                         newlatex1 = '~s~'.join(newlatex1)
-
                     newlatex1 = ''.join(newlatex1)
                     newlatex1 = newlatex1.replace('~d~', '__{')
                     newlatex1 = newlatex1.replace('~s~', '_{')
                     #symeq1 = symeq1.subs(_n, symbols(newlatex1))
                     switch1.append([str(_n), newlatex1])
-
                 # substitute values
                 for _n in switch1:
                     #print('swi', (self.odict[_n[0]][1]).split("=")[1])
@@ -927,7 +941,6 @@ class CalcRST(object):
                     latexrep = latexrep.replace(_n[1], symvar1)
                     latexrep = latexrep.replace("\{", "{")
                     #print(latexrep)
-
                 # add substituted equation to rst file
                 print('  ', file=self.rf1)
                 print('.. math:: ', file=self.rf1)
@@ -936,7 +949,6 @@ class CalcRST(object):
                 print('  ', file=self.rf1)
                 print('|', file=self.rf1)
                 print('  ', file=self.rf1)
-
             # restore units
             for j2 in self.odict:
                 try:
@@ -944,16 +956,31 @@ class CalcRST(object):
                     exec(state)
                 except:
                     pass
-
             #convert result variable to greek
             var3s = var3.split('_')
             if var3s[0] in greeks:
                 var3g = "\\" + var3
             else:
                 var3g = var3
-
             # print result
-            if type(eval(var3)) != Unum:
+            if type(eval(var3)) == ndarray:
+                tmp1 = str(eval(var3))
+                if '[[' in tmp1:
+                    tmp2 = tmp1.replace(' [', '.  [')
+                    tmp1 = tmp2.replace('[[', '. [[')
+                else:
+                    tmp1 = tmp1.replace('[', '. [')
+                print('  ', file=self.rf1)
+                print('::', file=self.rf1)
+                print('  ', file=self.rf1)
+                print('. ' + var3 + ' = ', file=self.rf1)
+                print(tmp1, file=self.rf1)
+                print('  ', file=self.rf1)
+                print(".. raw:: latex", file=self.rf1)
+                print('  ', file=self.rf1)
+                print('   \\vspace{4mm}', file=self.rf1)
+                print('  ', file=self.rf1)
+            elif type(eval(var3)) != Unum:
                 if type(eval(var3)) == float \
                     or type(eval(var3)) == float64:
                     resultform = '{:.' + dval[4].strip()+'f}'
