@@ -5,6 +5,7 @@ import sys
 import os
 import tabulate
 import time
+import pprint as ppr
 from oncepy import ccheck
 from oncepy import oconfig as cfg
 from numpy import *
@@ -239,7 +240,7 @@ class CalcText(object):
             exec(fr, globals())
             link1 = "< execute python script: " + str(fp) + " >"
             _prt_log(link1)
-            _prt_log("file: " + fpath + " compiled")
+            _prt_log("file: " + fpath + " executed")
 
         elif option == 't':
             # this option is handled in cdict.ModDict._tag_d
@@ -416,10 +417,13 @@ class CalcText(object):
         terms: [[t], statement, expr, ref ]
 
         """
-        shift = int(self.widthc / 3.5)
+        #ptype = type(eval(dval[2]))
+        val1 = eval(dval[2].strip())
+        var1 = dval[1].split('=')[0].strip()
+        state = var1 + ' = ' + str(val1)
+        shift = int(self.widthc / 3.2)
         ref = dval[3].strip().ljust(shift)
-        statement = dval[1].strip()
-        self._prt_utf(" "*4 + ref + " | " + statement,  1)
+        self._prt_utf(" "*4 + ref + " | " + state,  1)
 
     def _prt_check(self, dval):
         """print checks
@@ -750,14 +754,13 @@ class CalcText(object):
                 except:
                     pass
             if k1[0:2] == '_a':
-                #print('ek1-2', k1)
+                print('ek1-2', k1, self.odict[k1])
                 try:
                     exec(self.odict[k1][3].strip())
                     exec(self.odict[k1][4].strip())
                     exec(self.odict[k1][1].strip())
                 except:
                     pass
-
         # print reference line
         tmp = int(self.widthc-1) * '-'
         self._prt_utf((tmp + u'\u2510').rjust(self.widthc-1), 0)
@@ -780,14 +783,14 @@ class CalcText(object):
         self._prt_utf(' ', 0)
         self._prt_utf('function doc:', 0)
         self._prt_utf(docs1, 0)
-
-        return1 = eval(dval[1].strip())
         self._prt_utf(' ', 0)
+        #print(dval[1].strip())
+        return1 = eval(dval[1].strip())
         if return1 is None:
-            self._prt_utf('function evaluates to None', 1)
+            self._prt_utf('function evaluates to None', 0)
         else:
-            self._prt_utf('function returned: ', 1)
-            self._prt_utf(return1, 1)
+            self._prt_utf('function returned: ', 0)
+            self._prt_utf(return1, 0)
 
         # add function variable to dict
         return2 = (return1.__repr__()).replace('\n', '')
@@ -827,7 +830,7 @@ class CalcText(object):
                     except:
                         pass
             if k1[0:2] == '_a':
-                #print('ek1-2', k1)
+                #print('ek1-2', k1, self.odict[k1])
                 try:
                     exec(self.odict[k1][3].strip())
                     exec(self.odict[k1][4].strip())
@@ -846,11 +849,18 @@ class CalcText(object):
             self._prt_utf((var3 + " | " + strend).rjust(self.widthc), 0)
             self._prt_utf(" ", 0)
             # print array
-            if type(eval(var3)) == ndarray:
+            typev = type(eval(var3))
+            if typev == ndarray:
                 tmp1 = eval(var3)
                 self._prt_utf((var3 + " = "), 1)
                 self._prt_utf(' ', 0)
                 self._prt_utf(tmp1, 0)
+            elif typev == list or typev == tuple:
+                tmp1 = eval(var3)
+                self._prt_utf((var3 + " = "), 1)
+                self._prt_utf(' ', 0)
+                plist1 = ppr.pformat(tmp1, width=40)
+                self._prt_utf(plist1, 0)
             # print result right justified
             elif type(eval(var3)) != Unum:
                 if type(eval(var3)) == float or type(eval(var3)) == float64:
@@ -942,14 +952,19 @@ class CalcText(object):
                 except:
                     pass
             # print array
-            if type(eval(var3)) == ndarray:
-                #print('ndarray', var3)
-                #print(eval(var3))
+            typev = type(eval(var3))
+            if typev == ndarray:
                 tmp1 = eval(var3)
                 self._prt_utf((var3 + " = "), 1)
                 self._prt_utf(' ', 0)
                 self._prt_utf(tmp1, 0)
-            elif type(eval(var3)) != Unum:
+            elif typev == list or typev == tuple:
+                tmp1 = eval(var3)
+                self._prt_utf((var3 + " = "), 1)
+                self._prt_utf(' ', 0)
+                plist1 = ppr.pformat(tmp1, width=40)
+                self._prt_utf(plist1, 0)
+            elif typev != Unum:
                 if type(eval(var3)) == float or type(eval(var3)) == float64:
                     resultform = '{:.' + eformat +'f}'
                     result1 = resultform.format(float(eval(var3)))
@@ -969,7 +984,6 @@ class CalcText(object):
             tmp = int(self.widthc-1) * '-'
             self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 1)
             self._prt_utf(" ", 0)
-
 
     def _prt_sect(self, dval):
         """print sections

@@ -1,13 +1,10 @@
 from __future__ import division
 from __future__ import print_function
 import os
-import sys
-import time
 import tabulate
 import codecs
 import oncepy
 import oncepy.oconfig as cfg
-from oncepy import ctext
 from oncepy import ccheck
 from oncepy import oconfig as cfg
 from numpy import *
@@ -334,13 +331,12 @@ class CalcRST(object):
         terms: [[t], statement, expr, ref ]
 
         """
-        shift = int(self.widthp / 3.5)
+        val1 = eval(dval[2].strip())
+        var1 = dval[1].split('=')[0].strip()
+        state = var1 + ' = ' + str(val1)
+        shift = int(self.widthp / 2.5)
         ref = dval[3].strip().ljust(shift)
-        param = dval[1].strip()
-        #ptype = type(eval(dval[2]))
-        #if ptype == list or ptype == ndarray or ptype == tuple:
-        #    param = param.split('=')[0].strip()
-        termpdf = " "*4 + ref + ' | ' + param
+        termpdf = " "*4 + ref + ' | ' + state
 
         if termbegin:
             #print('termbegin')
@@ -348,7 +344,6 @@ class CalcRST(object):
             print('::', file=self.rf1)
             print('  ', file=self.rf1)
         print(termpdf, file=self.rf1)
-
 
     def _rst_check(self, dval):
         """print check
@@ -734,7 +729,7 @@ class CalcRST(object):
         funcname = dval[1].split('(')[0]
         docs1 = eval(funcname + '.__doc__')
         print('  ', file=self.rf1)
-        print('**function doc:**', file=self.rf1)
+        print('**function doc string:**', file=self.rf1)
         print('  ', file=self.rf1)
         print('::', file=self.rf1)
         print('  ', file=self.rf1)
@@ -754,7 +749,9 @@ class CalcRST(object):
             elif '[' in tmp1:
                 tmp1 = tmp1.replace('[', '. [')
             else:
-                tmp1 = '  ' + tmp1
+                print('lead', tmp1[0:2], 'x')
+                if tmp1[0:2] != '  ':
+                    tmp1 = '  ' + tmp1
             print('  ', file=self.rf1)
             print('::', file=self.rf1)
             print('  ', file=self.rf1)
@@ -762,7 +759,7 @@ class CalcRST(object):
             print('  ', file=self.rf1)
             print(".. raw:: latex", file=self.rf1)
             print('  ', file=self.rf1)
-            print('   \\vspace{4mm}', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
             print('  ', file=self.rf1)
 
         # draw line
@@ -814,16 +811,18 @@ class CalcRST(object):
                 except:
                     pass
 
-        # print reference line
+        exec(dval[1])
+        # evaluate only
+        if dval[6].strip() == '0':
+            print('  ', file=self.rf1)
+            return
+
+        # equation reference line
+        print('  ', file=self.rf1)
         print(".. raw:: latex", file=self.rf1)
         print('  ', file=self.rf1)
         print('   \\vspace{2mm}', file=self.rf1)
         print('  ', file=self.rf1)
-
-        exec(dval[1])
-        # evaluate only
-        if dval[6].strip() == '0':
-            return
         strend = dval[3].strip()
         print('  ', file=self.rf1)
         print("aa-bb " + "**" + var3 + " | " + strend + "**",
@@ -839,13 +838,32 @@ class CalcRST(object):
             else:
                 var3g = var3
             # print result
-            if type(eval(var3)) == ndarray:
+            typev = type(eval(var3))
+            if typev == ndarray:
                 tmp1 = str(eval(var3))
                 if '[[' in tmp1:
                     tmp2 = tmp1.replace(' [', '.  [')
                     tmp1 = tmp2.replace('[[', '. [[')
                 else:
                     tmp1 = tmp1.replace('[', '. [')
+                print('  ', file=self.rf1)
+                print('::', file=self.rf1)
+                print('  ', file=self.rf1)
+                print('. ' + var3 + ' = ', file=self.rf1)
+                print(tmp1, file=self.rf1)
+                print('  ', file=self.rf1)
+                print(".. raw:: latex", file=self.rf1)
+                print('  ', file=self.rf1)
+                print('   \\vspace{4mm}', file=self.rf1)
+                print('  ', file=self.rf1)
+            elif typev == list or typev == tuple:
+                tmp1 = str(eval(var3))
+                if '[[' in tmp1:
+                    tmp2 = tmp1.replace(' [', '.  [')
+                    tmp1 = tmp2.replace('[[', '. [[')
+                else:
+                    tmp1 = tmp1.replace('[', '. [')
+                tmp1 = tmp1.replace('],', '],\n')
                 print('  ', file=self.rf1)
                 print('::', file=self.rf1)
                 print('  ', file=self.rf1)
@@ -972,13 +990,32 @@ class CalcRST(object):
             else:
                 var3g = var3
             # print result
-            if type(eval(var3)) == ndarray:
+            typev = type(eval(var3))
+            if typev == ndarray:
                 tmp1 = str(eval(var3))
                 if '[[' in tmp1:
                     tmp2 = tmp1.replace(' [', '.  [')
                     tmp1 = tmp2.replace('[[', '. [[')
                 else:
                     tmp1 = tmp1.replace('[', '. [')
+                print('  ', file=self.rf1)
+                print('::', file=self.rf1)
+                print('  ', file=self.rf1)
+                print('. ' + var3 + ' = ', file=self.rf1)
+                print(tmp1, file=self.rf1)
+                print('  ', file=self.rf1)
+                print(".. raw:: latex", file=self.rf1)
+                print('  ', file=self.rf1)
+                print('   \\vspace{4mm}', file=self.rf1)
+                print('  ', file=self.rf1)
+            elif typev == list or typev == tuple:
+                tmp1 = str(eval(var3))
+                if '[[' in tmp1:
+                    tmp2 = tmp1.replace(' [', '.  [')
+                    tmp1 = tmp2.replace('[[', '. [[')
+                else:
+                    tmp1 = tmp1.replace('[', '. [')
+                tmp1 = tmp1.replace('],', '],\n')
                 print('  ', file=self.rf1)
                 print('::', file=self.rf1)
                 print('  ', file=self.rf1)

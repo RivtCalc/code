@@ -1,3 +1,4 @@
+# version 0.4.0
 from unum import Unum
 unit = Unum.unit
 
@@ -34,7 +35,9 @@ LX      = unit( 'lx'    , LM / M**2 , 'lux'            )
 # warning : conversion assumes relative temperatures
 celsius = CELSIUS = unit( 'deg C' , K         , 'degree Celsius' )
 FAHR    = unit('degF', K*9./5 , 'degree Fahrenheit')
+##
 ## ===================== structural engineering units ==============
+##
 G   = unit('G', 9.80665 * M/S**2, 'gravity acceleration')
 PA  = unit('Pa', N / M**2, 'pascal')
 MPA = unit('MPa', PA*(10**6), 'megapascals')
