@@ -331,13 +331,50 @@ class CalcRST(object):
         terms: [[t], statement, expr, ref ]
 
         """
+        ptype = type(eval(dval[2]))
         val1 = eval(dval[2].strip())
         var1 = dval[1].split('=')[0].strip()
+        if ptype == ndarray:
+            tmp1 = str(val1)
+            if '[[' in tmp1:
+                tmp2 = tmp1.replace(' [', '.  [')
+                tmp1 = tmp2.replace('[[', '. [[')
+            else:
+                tmp1 = tmp1.replace('[', '. [')
+            print('  ', file=self.rf1)
+            print('::', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('. ' + var1 + ' = ', file=self.rf1)
+            print(tmp1, file=self.rf1)
+            print('  ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{4mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            return
+        elif ptype == list or ptype == tuple:
+            tmp1 = str(val1)
+            if '[[' in tmp1:
+                tmp2 = tmp1.replace(' [', '.  [')
+                tmp1 = tmp2.replace('[[', '. [[')
+            else:
+                tmp1 = tmp1.replace('[', '. [')
+            tmp1 = tmp1.replace('],', '],\n')
+            print('  ', file=self.rf1)
+            print('::', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('. ' + var3 + ' = ', file=self.rf1)
+            print(tmp1, file=self.rf1)
+            print('  ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{4mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            return
         state = var1 + ' = ' + str(val1)
         shift = int(self.widthp / 2.5)
         ref = dval[3].strip().ljust(shift)
         termpdf = " "*4 + ref + ' | ' + state
-
         if termbegin:
             #print('termbegin')
             print('  ', file=self.rf1)

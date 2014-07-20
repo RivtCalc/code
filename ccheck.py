@@ -22,7 +22,7 @@ class ModCheck(object):
         #print('log', estrng)
         ef = open(self.logname, 'w')
         ef.write("< start log - todo: write error logs >\n")
-        ef.write("< time.strftime('%c') >\n")
+        ef.write("<" + time.strftime('%c') + ">\n")
         ef.close()
 
     def ewrite2(self, estrng):

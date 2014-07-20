@@ -417,13 +417,18 @@ class CalcText(object):
         terms: [[t], statement, expr, ref ]
 
         """
-        #ptype = type(eval(dval[2]))
+        ptype = type(eval(dval[2]))
         val1 = eval(dval[2].strip())
         var1 = dval[1].split('=')[0].strip()
         state = var1 + ' = ' + str(val1)
+        if ptype == ndarray or ptype == list or ptype == tuple:
+            state = var1 + ' = ' + '\n' + str(val1)
         shift = int(self.widthc / 3.2)
         ref = dval[3].strip().ljust(shift)
-        self._prt_utf(" "*4 + ref + " | " + state,  1)
+        if ptype == ndarray or ptype == list or ptype == tuple:
+            self._prt_utf(" "*4 + ref + " | " + state,  0)
+        else:
+            self._prt_utf(" "*4 + ref + " | " + state,  1)
 
     def _prt_check(self, dval):
         """print checks
