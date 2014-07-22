@@ -1,4 +1,4 @@
-
+"""
 **onceutf.py**
 ==============
 The program formats structural calculations using a simple, natural
@@ -27,19 +27,13 @@ and package the program for pypi and other distributions.
 
 onceutf.py, example models and the user manual can be downloaded from:
 
-**onceutf**
-https://on-c-e.us
+    **onceutf: ** https://on-c-e.us
 
-Progress is tracked at Trello:
-http://on-c-e.info
+    Progress is tracked at Trello: http://on-c-e.info
 
-Source code and documentation for are at github:
-http://on-c-e.github.io/
+    Source code and documentation for are at github: http://on-c-e.github.io/
 
-
-email contact:
-r holland at
-once.pyproject@gmail.com
+    email contact: r holland once.pyproject@gmail.com
 
 Running the Program
 ===================
@@ -92,3 +86,4 @@ representation in an IDE.  **DejaVu Mono** fonts are recommended and
 can be downloaded here:
 
     http://dejavu-fonts.org/wiki/Main_Page
+"""
