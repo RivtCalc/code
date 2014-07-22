@@ -44,18 +44,23 @@ class ModStart():
     add input error checking, add a unit test framework and
     package the program for pypi distribution.
 
-    Progress can be tracked at Trello:
-    https://on-c-e.info
+    The program runs on the following operating systems and
+    Python scientific platforms::
 
-    Source code and documentation are here:
-        http://on-c-e.github.io/
+    workstation (Windows, Linux, OSX: Anaconda, Enthought, Pythonxy)
 
-    For further details refer to the user manual and programs here:
-        http://on-c-e.org/programs/
+    Models that do not use projects or PDF calcs run on::
 
-    email contact:
-    r holland
-    once.pyproject@gmail.com
+    web (Linux: Wakari, PythonAnywhere)
+    mobile (Android: QPython, iOS: Pythonista)
+
+    Progress can be tracked at Trello: https://on-c-e.info
+
+    Source code and documentation are here: http://on-c-e.github.io/
+
+    Refer to the user manual and programs here: http://on-c-e.org/programs/
+
+    email contact: r holland once.pyproject@gmail.com
 
     Running the Program
     ===================

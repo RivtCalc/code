@@ -363,7 +363,7 @@ class CalcRST(object):
             print('  ', file=self.rf1)
             print('::', file=self.rf1)
             print('  ', file=self.rf1)
-            print('. ' + var3 + ' = ', file=self.rf1)
+            print('. ' + var1 + ' = ', file=self.rf1)
             print(tmp1, file=self.rf1)
             print('  ', file=self.rf1)
             print(".. raw:: latex", file=self.rf1)
