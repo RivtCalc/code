@@ -1,13 +1,13 @@
-
 **onceutf.py**
 ==============
 The program formats structural calculations using a simple, natural
 markup language as input.  It is a single, long module that takes a
 **on-c-e** model as input and returns a formatted UTF-8 calc. It runs
-on local (Anaconda, Enthought, Pythonxy),
-web (Wakari, PythonAnywhere), and
-mobile (QPython-Android, Pythonista - iOS)
-Python scientific platforms.
+on the following operating systems and Python scientific platforms::
+
+    workstation (Windows, Linux, OSX: Anaconda, Enthought, Pythonxy)
+    web (Linux: Wakari, PythonAnywhere)
+    mobile (Android: QPython, iOS: Pythonista)
 
 The module is a subset of the package **oncepy** and combines
 several modules into a single file to simplify installation
@@ -86,4 +86,3 @@ representation in an IDE.  **DejaVu Mono** fonts are recommended and
 can be downloaded here:
 
     http://dejavu-fonts.org/wiki/Main_Page
-
