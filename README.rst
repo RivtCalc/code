@@ -1,65 +1,94 @@
-oncepy
-======
 
-The program **oncepy** takes a **on-c-e** ASCII model as input    
-and returns a formatted structural engineering calculation. The    
-program formats structural calculations using a simple, natural    
-markup language.    
+**onceutf.py**
+==============
+The program formats structural calculations using a simple, natural
+markup language as input.  It is a single, long module that takes a
+**on-c-e** model as input and returns a formatted UTF-8 calc. It runs
+on local (Anaconda, Enthought, Pythonxy),
+web (Wakari, PythonAnywhere), and
+mobile (QPython-Android, Pythonista - iOS)
+Python scientific platforms.
 
-The beta code and documentation are released to solicit    
-participation and feedback on basic concepts.  Currently the    
-program can run usable calculation models, as illustrated in the    
-examples. Some classes and methods are not implemented yet.    
-The current beta development cycle will complete model operations,    
-add input error checking, add a unit test framework and    
-package the program for pypi distribution.    
+The module is a subset of the package **oncepy** and combines
+several modules into a single file to simplify installation
+and experimentation, particulary on web and mobile platforms.
+incorporates the Unum and tabulate packages as classes since
+they are typically not part of Python scientific distributions.
+It includes **oncepy** capabilities except for
+projects, PDF calcs and external units. It
 
-Progress can be tracked at Trello:    
-https://on-c-e.info    
+Participation and feedback are very welcome.
+Currently the program can run calculation models as
+illustrated in the examples. Some classes and methods are
+not implemented yet (see Trello roadmap). The current beta
+development cycle will complete model and project operations,
+add input error checking, unit tests
+and package the program for pypi and other distributions.
 
-Source code and documentation are here:    
-    http://on-c-e.github.io/    
+onceutf.py, example models and the user manual can be downloaded from:
 
-For further details refer to the user manual and programs here:    
-    http://on-c-e.org/programs/    
+**onceutf**
+https://on-c-e.us
 
-email contact:    
-r holland    
-once.pyproject@gmail.com    
+Progress is tracked at Trello:
+http://on-c-e.info
 
-Running the Program    
-===================    
-
-Copy the **oncepy** package (folder) to the python/lib/site-packages    
-directory. From a terminal window type:    
-
-.. code:: python    
-
-    python -m oncepy xxyy.model.txt (-c or -b)    
+Source code and documentation for are at github:
+http://on-c-e.github.io/
 
 
-where *xxyy.model.txt* is the file name, xx is the chapter number    
-and yy is the model number.    
+email contact:
+r holland at
+once.pyproject@gmail.com
 
-The program will write the calc file calxxyy.model.txt and the    
--c or -b options will echo the calc to a console (-c) or    
-a Windows browser (-b). The -b option is needed on Windows because    
-of UTF-8 encoding limitations in the console.    
+Running the Program
+===================
+Copy **onceutf_nnn.py** and the model file into the same directory,
+change to the directory and type, from a terminal window:
 
-To open a terminal window in a folder in Windows 7 or 8 ,    
-navigate to the folder using Explorer, hold the shift key,right click,    
-click on 'open command window here' in the context menu.    
+.. code:: python
 
-Change the browser encoding settings if needed:    
------------------------------------------------    
-Chrome  - type chrome:settings/fonts  in url bar -    
-scroll to the bottom of the dialog box and make the change    
+    python onceutfnnn.py xxyy.model.txt (-e or -b)
 
-Firefox - options - content - advanced - UTF-8    
+        if onceutfnnn.py and model are in the same folder
 
-Internet Explorer - right click - encoding - UTF-8    
 
-The program will execute the file and return results in files.    
+    python -m onceutfnnn xxyy.model.txt (-e or -b)
 
-To obtain a more complete UTF-8 font set install **DejaVu Mono** fonts    
-http://dejavu-fonts.org/wiki/Main_Page    
+        if onceutfnnn.py is copied to Python/Lib/site-packages
+
+
+where 'nnn' is the version number (i.e. 040) and *xxyy.model.txt*
+is the file name where xx is the chapter number and yy is the model
+number.  The command lower form has the advantage of being available to
+every model folder and the Komodo Edit tool buttons.
+
+
+The program will write the calc file calxxyy.model.txt and the
+-e or -b options will echo the calc to a console or terminal (-e) or
+a Windows browser (-b). The -b option is needed on Windows because
+of UTF-8 encoding limitations in the console/terminal.
+
+To open a terminal window in a folder in Windows 7 or 8 ,
+navigate to the folder using Explorer, hold the shift key,right click,
+click on 'open command window here' in the context menu.
+
+Change the browser encoding settings if needed:
+-----------------------------------------------
+Chrome  - type chrome:settings/fonts  in url bar -
+scroll to the bottom of the dialog box and make the change
+
+Firefox - options - content - advanced - UTF-8
+
+Internet Explorer - right click - encoding - UTF-8
+
+For further details refer to the  user manual and programs here:
+
+    **oncepy**
+    http://structurelabs.knackhq.com/oncedb#programs/
+
+A relatively complete UTF-8 font set is needed for proper math
+representation in an IDE.  **DejaVu Mono** fonts are recommended and
+can be downloaded here:
+
+    http://dejavu-fonts.org/wiki/Main_Page
