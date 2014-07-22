@@ -1,4 +1,4 @@
-"""
+
 **onceutf.py**
 ==============
 The program formats structural calculations using a simple, natural
@@ -86,4 +86,4 @@ representation in an IDE.  **DejaVu Mono** fonts are recommended and
 can be downloaded here:
 
     http://dejavu-fonts.org/wiki/Main_Page
-"""
+
