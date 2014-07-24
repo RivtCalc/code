@@ -1,8 +1,11 @@
 """ This module makes the oncepy package a program module
 
-It determines whether the file is a model or project file
-Start the program from the model directory with
-python -m oncepy modelname.txt
+The module determines whether the file is a model or project file
+Start the program from the model directory (division) with
+
+    python -m oncepy nnnnn.modelname.txt
+
+where nnnn is the model number.
 
 """
 from __future__ import division
@@ -23,10 +26,11 @@ __author__ = 'rholland'
 
 if __name__ == '__main__':
 
-    #read command line arguments
-    cfg.sysargv = sys.argv
     startmod = cstart.ModStart
     startproj = cproj.ProjStart
+
+    #read command line arguments
+    cfg.sysargv = sys.argv
 
     # check if command line is valid
     if len(cfg.sysargv) < 2:
@@ -72,11 +76,12 @@ if __name__ == '__main__':
             if _i1.split()[0].strip()[0:3] == '[p]':
                 cfg.pfile = cfg.sysargv[1]
                 cfg.ppath = os.getcwd()
-                print("project operations are not ")
+                print("project operations are not supported yet")
+                break
                 #_startproj()
-
     # if no [p] tag in file run as model
     startmod()
+
     # clean up
     if len(cfg.sysargv) > 2 and '-noclean' in cfg.sysargv:
         pass

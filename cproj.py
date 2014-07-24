@@ -13,44 +13,27 @@ class ProjStart(object):
 
         **methods**
         build_pdict() constructs the proj calc data dictionary
-        build_plist() constructs the proj calc model list
+        build_plist() constructs the proj calc division list
 
         """
         # files
 
 
         # method tags
-        slist = ['[p]', '[:]', '[#]', '[~]']
-        self.stags = slist
-        self.ppath = cfg.ppath
+        plist = ['[p]', '[#] pformat' '[#]', '[~]']
+        self.ptags = plist
+        self.pd = OrderedDict()
 
-        pend = False
-        for _j in self.mstr:
-            mtag = _j.strip()[0:3]
-            if mtag == '[#]':
-                if str(_j[:10]) == '[#] format': pend = True
-                continue
-            if pend and len(_j.strip()) == 0:
-                pend = False
-                continue
-            if pend:
-                continue
-            self.mstrx.append(_j)
-        #print('mstrx',self.mstrx)
 
     def build_pdict(self):
-        """
-        The dictionary structure is:
-        [project data key]:[values]
+        """constructs the project data dictionary
 
         """
-        self.aa = OrderedDict()
-        #print(self.aa)
+        pass
+
 
     def build_plist(self):
-        """ build_plist() constructs the proj calc model list
-
-        calc file list: [calcfile, pdfsize, calctemplate]
+        """ constructs the proj calc division list
 
         """
 

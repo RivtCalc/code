@@ -36,13 +36,12 @@ class ModStart():
     program formats structural calculations using a simple, natural
     markup language.
 
-    The beta code and documentation are released to solicit
-    participation and feedback on basic concepts.  Currently the
-    program can run usable calculation models, as illustrated in the
-    examples. Some classes and methods are not implemented yet.
-    The current beta development cycle will complete model operations,
-    add input error checking, add a unit test framework and
-    package the program for pypi distribution.
+    Currently the program can run usable calculation models,
+    as illustrated in the User Manual examples. Some classes and
+    methods are not implemented yet. The current beta development
+    cycle will complete model operations, add input error checking,
+    add a unit test framework and package the program for
+    pypi distribution.
 
     The program runs on the following operating systems and
     Python scientific platforms::
@@ -52,7 +51,8 @@ class ModStart():
     Models that do not use projects or PDF calcs run on::
 
     web (Linux: Wakari, PythonAnywhere)
-    mobile (Android: QPython, iOS: Pythonista)
+
+    mobile - **use onceutf.py** (Android: QPython, iOS: Pythonista)
 
     Progress can be tracked at Trello: https://on-c-e.info
 
@@ -71,7 +71,6 @@ class ModStart():
     .. code:: python
 
         python -m oncepy xxyy.model.txt (-c or -b)
-
 
     where *xxyy.model.txt* is the file name, xx is the chapter number
     and yy is the model number.
