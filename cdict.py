@@ -404,9 +404,7 @@ class ModDicts(object):
         if self.snum > self.snumchk:
             self.enum = 1
             self.snumchk = self.snum
-
-        enumb = ' [' + str(self.snum) + '.' + \
-                str(self.enum) + ']'
+        enumb = ' [' + str(self.snum) + '.' + str(self.enum) + ']'
         ref = ref.strip() + enumb
         mkey = '_c'+str(self.midx)
         self.mdict[mkey] = ['[c]', check, op, limits, ref, dec, ok]
