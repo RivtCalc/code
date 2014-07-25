@@ -230,6 +230,7 @@ class CalcText(object):
         var1 = dval[3].strip()
         var2 = dval[4].strip()
         var3 = dval[5]  # variable with edit lines
+        # dval[6] = mfile
 
         # relative path specified for the following options
         if option == 's':
@@ -759,7 +760,7 @@ class CalcText(object):
                 except:
                     pass
             if k1[0:2] == '_a':
-                print('ek1-2', k1, self.odict[k1])
+                #print('ek1-2', k1, self.odict[k1])
                 try:
                     exec(self.odict[k1][3].strip())
                     exec(self.odict[k1][4].strip())
@@ -1049,8 +1050,7 @@ class CalcText(object):
                         "        from oncepy.unitc import *",
                         "        print('unitc import from oncepy')",
                         "    except:",
-                        "       print ' '",
-                        "       print 'unitc not found' ",
+                        "       print('unitc not found') ",
                         "       pass"]).format(cfg.mpath))
 
         pyfile1.write(importstr + 2*"\n")

@@ -292,6 +292,14 @@ class ModDicts(object):
 
         _prt_log = self.ew.ewrite2
 
+        self.enum += 1
+        if self.snum > self.snumchk:
+            self.enum = 1
+            self.snumchk = self.snum
+
+        enumb = ' [' + str(self.snum) + '.' + \
+                str(self.enum) + ']'
+
         # check if special case of multiline 'e' option
         try:
             ivect = mstrng.split('\n')
@@ -330,7 +338,7 @@ class ModDicts(object):
             # add to dictionary
             mkey = '_r' + str(self.midx)
             self.mdict[mkey] = ['[r]', fpath, param, var1, var2,
-                                var3, '['+self.mfile1+']']
+                                var3, enumb]
 
             link1 = "< data file:" + fpath + " = " + \
                     var1 + ">"
@@ -341,11 +349,11 @@ class ModDicts(object):
             mkey = '_e' + str(self.midx)
             var3 = ivect[1:]
             self.mdict[mkey] = ['[d]', fpath, param, var1, var2,
-                                var3, '['+self.mfile1+']']
+                                var3, enumb]
         else:
             mkey = '_d' + str(self.midx)
             self.mdict[mkey] = ['[d]', fpath, param, var1, var2,
-                                var3.strip(), '['+self.mfile1+']']
+                                var3.strip(), enumb]
 
     def _tag_o(self, expr):
         """add [o] to mdict
