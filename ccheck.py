@@ -9,9 +9,7 @@ class ModCheck(object):
     def __init__(self):
         """ open log file for events and errors"""
         # calc log
-        lname = cfg.mfile
-        logn = lname.split('.')
-        self.logname = '.'.join(['log' + logn[0], logn[1], logn[2]])
+        self.logname = '_modellog.txt'
 
     def ewrite1(self):
         """delete log file and initialize new file"""

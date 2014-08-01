@@ -22,7 +22,6 @@ except ImportError:
         os.chdir(os.pardir)
         from unitc import *
         cfg.unitfile = 'project folder'
-        os.chdir(mpathctext)
     except ImportError:
         from oncepy.unitc import *
         cfg.unitfile = 'built-in'
@@ -1031,29 +1030,51 @@ class CalcText(object):
         """write python code to file from dictionary"""
         pyfile1 = open(self.pyfile, 'w')
         #write import commands
-        importstr = str("\n".join(["from __future__ import division",
-                        "from __future__ import print_function",
-                        "import sys",
-                        "import oncepy",
-                        "from numpy import *",
-                        "from collections import OrderedDict",
-                        "try:",
-                        "   from unum import Unum",
-                        "except:",
-                        " print('unum module not found')",
-                        "sys.path.append('{}')",
-                        "try:",
-                        "   from unitc import *",
-                        "   print('unitc imported from directory')",
-                        "except: ",
-                        "    try:",
-                        "        from oncepy.unitc import *",
-                        "        print('unitc import from oncepy')",
-                        "    except:",
-                        "       print('unitc not found') ",
-                        "       pass"]).format(cfg.mpath))
+        str1 = ('from __future__ import division\n'
+                'from __future__ import print_function\n'
+                'import os\n'
+                'import sys\n'
+                'import oncepy\n'
+                'from sympy import *\n'
+                'from numpy import *\n'
+                'import numpy.linalg as LA\n'
+                'from collections import OrderedDict\n')
+
+        str2 = ('\n""" \n'
+                'this file contains Python equations from the on-c-e model \n ' +
+                    cfg.mfile + '\n'
+                '\nFor interactive analysis copy and paste the entire file\n'
+                'into an Ipython Notebook cell or Komodo IDE interactive shell.\n'
+
+                '\nFor interactive analysis in IPython click on the IP[y]\n'
+                'toolbar button. The equations will be copied to the sqlite '
+                'history database and opened in the IPython interpreter. \n'
+                '""" \n \n')
+
+        str3 = "sys.path.append('" + str(os.getcwd()) + "')"
+
+        str4 = """
+try:
+   from unum import Unum
+except:
+ print('unum module not found')
+
+try:
+   from unitc import *
+   print('unitc imported from directory')
+except:
+    try:
+        from oncepy.unitc import *
+        print('unitc imported from oncepy')
+    except:
+       print('unitc not found')
+       pass
+"""
+
+        importstr = str1 + str2 + str3 + str4
 
         pyfile1.write(importstr + 2*"\n")
+        pyfile1.write("# begin equations" + "\n")
 
         # write statements for IPython
         for _j in self.odict:
@@ -1084,7 +1105,7 @@ class CalcText(object):
                                   rng1[1].strip()]
                 pdict[(rng2[0]).strip()] = [self.odict[_k][2].strip(),
                                   rng2[1].strip()]
-        pyfile1.write(str('_md =  ') + str(pdict))
+        #pyfile1.write(str('_md =  ') + str(pdict))
         pyfile1.close()
 
     def _prt_summary(self):

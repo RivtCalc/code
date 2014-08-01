@@ -237,7 +237,7 @@ class ModStart():
         self.pdff = '.'.join(['cal' + calcf1[0], calcf1[1], 'pdf'])
         self.calcf = '.'.join(['cal' + calcf1[0], calcf1[1], calcf1[2]])
         self.sumf = '.'.join(['sum' + calcf1[0], calcf1[1], calcf1[2]])
-        self.pyf = cfg.mfile.replace('.txt', '.py')
+        self.pyf = '_onceeq.py'
 
         csumm1 = ("""
     Calculation Summary
