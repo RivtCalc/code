@@ -549,15 +549,15 @@ class ModDicts(object):
         """
         pend = False
         for _j in self.mstr:
-            mtag = _j.strip()[0:3]
             if str(_j[:8]) == '[#] stop':
                 self.mstrx.append(_j)
                 continue
-            if mtag == '[#]':
-                if str(_j[:10]) == '[#] format':
-                    pend = True
+            elif str(_j[:9]) == '[#] break':
+                _j = ".. raw:: latex\n   \n   \\newpage\n   \n"
+            elif str(_j[:10]) == '[#] format':
+                pend = True
                 continue
-            if pend and len(_j.strip()) == 0:
+            elif pend and len(_j.strip()) == 0:
                 pend = False
                 continue
             if pend:

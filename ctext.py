@@ -1020,11 +1020,12 @@ class CalcText(object):
         """print pass-through text"""
         # reST modification
         #print('txt', txt)
+
         if txt[1][1] == '|':
             txt1 = txt[1][1:].rstrip()
         else:
             txt1 = txt[1].rstrip()
-        self._prt_utf(txt1, 1)
+            self._prt_utf(txt1, 1)
 
     def _prt_py(self):
         """write python code to file from dictionary"""

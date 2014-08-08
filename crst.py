@@ -104,7 +104,6 @@ class CalcRST(object):
             elif mtag == '[t]':
                 self._rst_term(self.odict[_i], termbegin)
                 self.xtraline = False
-                termend = 0
             elif mtag == '[c]':
                 self._rst_check(self.odict[_i])
                 self.xtraline = True
@@ -786,7 +785,6 @@ class CalcRST(object):
             elif '[' in tmp1:
                 tmp1 = tmp1.replace('[', '. [')
             else:
-                print('lead', tmp1[0:2], 'x')
                 if tmp1[0:2] != '  ':
                     tmp1 = '  ' + tmp1
             print('  ', file=self.rf1)
