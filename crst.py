@@ -348,27 +348,17 @@ class CalcRST(object):
             print('  ', file=self.rf1)
             print(".. raw:: latex", file=self.rf1)
             print('  ', file=self.rf1)
-            print('   \\vspace{4mm}', file=self.rf1)
+            print('   \\vspace{1mm}', file=self.rf1)
             print('  ', file=self.rf1)
             return
         elif ptype == list or ptype == tuple:
             tmp1 = str(val1)
-            if '[[' in tmp1:
-                tmp2 = tmp1.replace(' [', '.  [')
-                tmp1 = tmp2.replace('[[', '. [[')
+            if ']]' in tmp1:
+                tmp1 = tmp1.replace(']]', ']]\n')
             else:
-                tmp1 = tmp1.replace('[', '. [')
-            tmp1 = tmp1.replace('],', '],\n')
-            print('  ', file=self.rf1)
-            print('::', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('. ' + var1 + ' = ', file=self.rf1)
+                tmp1 = tmp1.replace(']', ']\n')
+            print('\n' + var1 + ' = ', file=self.rf1)
             print(tmp1, file=self.rf1)
-            print('  ', file=self.rf1)
-            print(".. raw:: latex", file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\vspace{4mm}', file=self.rf1)
-            print('  ', file=self.rf1)
             return
         state = var1 + ' = ' + str(val1)
         shift = int(self.widthp / 2.5)
@@ -889,7 +879,7 @@ class CalcRST(object):
                 print('  ', file=self.rf1)
                 print(".. raw:: latex", file=self.rf1)
                 print('  ', file=self.rf1)
-                print('   \\vspace{4mm}', file=self.rf1)
+                print('   \\vspace{1mm}', file=self.rf1)
                 print('  ', file=self.rf1)
             elif typev == list or typev == tuple:
                 tmp1 = str(eval(var3))
@@ -907,7 +897,7 @@ class CalcRST(object):
                 print('  ', file=self.rf1)
                 print(".. raw:: latex", file=self.rf1)
                 print('  ', file=self.rf1)
-                print('   \\vspace{4mm}', file=self.rf1)
+                print('   \\vspace{1mm}', file=self.rf1)
                 print('  ', file=self.rf1)
             elif type(eval(var3)) != Unum:
                 if type(eval(var3)) == float \
