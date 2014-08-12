@@ -1,11 +1,11 @@
 ﻿%%
 %% on-c-e modifications to the latex report class
-%% 0.4.0
-%% 
+%%
 \usepackage{fancyhdr}
 \usepackage[no-math]{fontspec}
 \usepackage{libertine}
 \usepackage[libertine]{newtxmath}
+\usepackage{currfile}
 %%
 %% math font
 %%
@@ -22,7 +22,8 @@
 %% page numbers
 %%
 \fancypagestyle{plain}{%
-\fancyhf{} % clear all header and footers
+\fancyhf{} % clear all headers and footers
+\fancyhead[L]{\normalsize file: \currfilename}
 \fancyhead[R]{\normalsize Page \thepage}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}}
