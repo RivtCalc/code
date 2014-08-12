@@ -900,7 +900,7 @@ responsibility for all existing inputs and results.
                 print('  ', file=self.rf1)
                 print(".. raw:: latex", file=self.rf1)
                 print('  ', file=self.rf1)
-                print('   \\vspace{1mm}', file=self.rf1)
+                print('   \\vspace{4mm}', file=self.rf1)
                 print('  ', file=self.rf1)
             elif typev == list or typev == tuple:
                 tmp1 = str(eval(var3))
@@ -918,7 +918,7 @@ responsibility for all existing inputs and results.
                 print('  ', file=self.rf1)
                 print(".. raw:: latex", file=self.rf1)
                 print('  ', file=self.rf1)
-                print('   \\vspace{1mm}', file=self.rf1)
+                print('   \\vspace{4mm}', file=self.rf1)
                 print('  ', file=self.rf1)
             elif type(eval(var3)) != Unum:
                 if type(eval(var3)) == float \
@@ -968,7 +968,7 @@ responsibility for all existing inputs and results.
                 print('  ', file=self.rf1)
                 print('  ' + latex(symeq, mul_symbol="dot"), file=self.rf1)
                 print('  ', file=self.rf1)
-                print('|', file=self.rf1)
+                #print('|', file=self.rf1)
                 print('  ', file=self.rf1)
             except:
                 symeq = dval[2].strip()
