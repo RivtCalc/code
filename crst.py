@@ -133,6 +133,27 @@ class CalcRST(object):
             else:
                 continue
 
+        # add calc license
+        for _i in self.odict:
+            if _i == '_pd':
+                self._rst_blnk()
+                lic_txt = """
+___________________________________________________________________________
+
+This calc (the calc) is generated from a generic on-c-e model template.
+The calc is distributed under the CCO 1.0 Public Domain Dedication
+(see http://creativecommons.org/publicdomain/zero/1.0/ ). The calc is not a
+structural design calculation and the template must be
+modified by the user prior to use. The calc user assumes sole and complete
+responsibility for all existing inputs and results.
+"""
+
+                self._rst_txt([' ', lic_txt])
+
+        # print end of calc
+        self._rst_blnk()
+        self._rst_txt([' ','\n**[end of calc]**'])
+
         # close rst file
         self.rf1.close()
         #for i in self.odict: print(i, self.odict[i])

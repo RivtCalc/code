@@ -56,6 +56,7 @@ class CalcText(object):
         _d + incremented number - disk operation
         _f + incremented number - function
         _r + incremented number - external data files and content
+        _pd - license text
 
         the dictionary structure is:
         single line inputs:
@@ -128,6 +129,16 @@ class CalcText(object):
                 self._prt_blnk()
             else:
                 continue
+
+        # add calc license
+        for _i in self.odict:
+            if _i == '_pd':
+                #print('pd',self.odict[_i])
+                self._prt_utf(self.odict[_i], 0)
+
+        # print end of calc
+        self._prt_utf('\n[end of calc]', 0)
+
         # close calc file
         self.cfile.close()
         # print ipython file
@@ -1025,7 +1036,7 @@ class CalcText(object):
             txt1 = txt[1][1:].rstrip()
         else:
             txt1 = txt[1].rstrip()
-            self._prt_utf(txt1, 1)
+        self._prt_utf(txt1, 1)
 
     def _prt_py(self):
         """write python code to file from dictionary"""

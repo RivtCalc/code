@@ -124,6 +124,9 @@ if __name__ == '__main__':
         except OSError:
             pass
 
+    # write end of file
+
+
     # check that error log is closed
     _ew.ewclose()
 
