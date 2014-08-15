@@ -867,7 +867,7 @@ responsibility for all existing inputs and results.
         print('  ', file=self.rf1)
         print(".. raw:: latex", file=self.rf1)
         print('  ', file=self.rf1)
-        print('   \\vspace{2mm}', file=self.rf1)
+        print('   \\vspace{1mm}', file=self.rf1)
         print('  ', file=self.rf1)
         strend = dval[3].strip()
         print('  ', file=self.rf1)
@@ -968,7 +968,9 @@ responsibility for all existing inputs and results.
                 print('  ', file=self.rf1)
                 print('  ' + latex(symeq, mul_symbol="dot"), file=self.rf1)
                 print('  ', file=self.rf1)
-                #print('|', file=self.rf1)
+                print(".. raw:: latex", file=self.rf1)
+                print('  ', file=self.rf1)
+                print('   \\vspace{1mm}', file=self.rf1)
                 print('  ', file=self.rf1)
             except:
                 symeq = dval[2].strip()
@@ -1020,7 +1022,10 @@ responsibility for all existing inputs and results.
                 print('  ', file=self.rf1)
                 print('  ' + latexrep, file=self.rf1)
                 print('  ', file=self.rf1)
-                print('|', file=self.rf1)
+                print(".. raw:: latex", file=self.rf1)
+                print('  ', file=self.rf1)
+                print('   \\vspace{1mm}', file=self.rf1)
+                print('  ', file=self.rf1)
                 print('  ', file=self.rf1)
             # restore units
             for j2 in self.odict:
