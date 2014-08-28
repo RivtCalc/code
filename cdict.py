@@ -10,9 +10,10 @@ import oncepy.oconfig as cfg
 class ModDicts(object):
     """Return dictionaries of model operations and formats
 
-    Attributes:
+    Methods:
         build_fdict(str list): format dictionary
         build_mdict(str list): ordered dictionary of operations
+        build_fidict() # file operation dictionary
 
     """
     def __init__(self):
@@ -35,7 +36,7 @@ class ModDicts(object):
         self.widthc = 90
         for _i in self.mstr:
             mtag = _i[0:10]
-            if mtag == "[#] format":
+            if mtag == "#- format":
                 ilist = _i[3:].split('|')
                 caltype = ilist[2].strip()
                 cfg.caltype = caltype

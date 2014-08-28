@@ -2,6 +2,7 @@ from __future__ import print_function
 from __future__ import division
 import os
 import sys
+import time
 import tabulate
 import oncepy
 import oncepy.oconfig as cfg
@@ -28,7 +29,7 @@ except ImportError:
 os.chdir(mpathcstart)
 
 
-class ModStart():
+class ModStart(object):
     """reads a on-c-e model and returns a UTF-8 or PDF calc
 
     The program **oncepy** takes a **on-c-e** ASCII model as input
@@ -118,7 +119,6 @@ class ModStart():
         self.pdff = ''
         self.pyf = ''
         self.sumf = ''
-
         self.ew = ccheck.ModCheck()
 
         if cfg.stylefile == 'project folder':
@@ -146,9 +146,9 @@ class ModStart():
                        self.sumf)
 
         # calculation type
-        self.ew.ewrite2('')
-        self.ew.ewrite2('<calculation type> ' + cfg.caltype)
-        self.ew.ewrite2('')
+        self.ew.ewrite2('', 0)
+        self.ew.ewrite2('<calculation type> ' + cfg.caltype, 0)
+        self.ew.ewrite2('', 0)
 
         rstfile = ''
         texfile = ''
@@ -188,11 +188,12 @@ class ModStart():
 
             rstout1 = crst.CalcRST(self.model1.mdict)
             rstout1.gen_rst()
-            self.ew.ewrite2("< rst file written >")
+            self.ew.ewrite2("< rst file written >", 0)
+
             pdfout1 = cpdf.CalcPDF(cfg.mfile, self.pdff)
             pdfout1.gen_tex()
             pdfout1.gen_pdf()
-            self.ew.ewrite2("< pdf file written >")
+            self.ew.ewrite2("< pdf file written >", 0)
 
             # open pdf file
             #try:
@@ -206,8 +207,8 @@ class ModStart():
             rstfile = cfg.mfile.replace('.txt', '.rst')
             rstout1 = crst.CalcRST(self.model1.mdict)
             rstout1.gen_rst()
-            self.ew.ewrite2('')
-            self.ew.ewrite2("< rst file written >")
+            self.ew.ewrite2('', 0)
+            self.ew.ewrite2("< rst file written >", 0)
         else:
             pass
 
@@ -222,12 +223,10 @@ class ModStart():
                                 self.calcf, self.pyf, self.sumf,
                                 rstfile, texfile, self.pdff))
 
-        print('\n', csumm2)
-        print("< calculation completed >")
-        self.ew.ewrite2(csumm2)
-        self.ew.ewrite2("< calculation completed >")
+        self.ew.ewrite2(csumm2, 1)
+        self.ew.ewrite2("< calculation completed >", 1)
 
-        # UTF-8 calc to console or browser, -c or -b switch
+        # -c or -b switch, UTF-8 calc to console or browser,
         self.out_term()
 
     def gen_files(self):
@@ -238,6 +237,11 @@ class ModStart():
         self.calcf = '.'.join(['cal' + calcf1[0], calcf1[1], calcf1[2]])
         self.sumf = '.'.join(['sum' + calcf1[0], calcf1[1], calcf1[2]])
         self.pyf = '_onceeq.py'
+
+        #write calc file early to avoid Komodo dialog response
+        f1 = open(self.calcf,'w')
+        f1.write(time.strftime("%c"))
+        f1.close()
 
         csumm1 = ("""
     Calculation Summary

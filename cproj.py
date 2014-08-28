@@ -6,7 +6,7 @@ import os
 
 
 class ProjStart(object):
-    """Assemble calcs into project calc set"""
+    """Assemble calcs into project calc set - not started"""
 
     def __init__(self):
         """ Construct lists and dictionaries of project calc data

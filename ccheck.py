@@ -5,7 +5,8 @@ import oncepy.oconfig as cfg
 
 
 class ModCheck(object):
-
+    """beginnings of an error checking and logging class
+    """
     def __init__(self):
         """ open log file for events and errors"""
         # calc log
@@ -23,13 +24,15 @@ class ModCheck(object):
         ef.write("<" + time.strftime('%c') + ">\n")
         ef.close()
 
-    def ewrite2(self, estrng):
+    def ewrite3(self, estrg, flg):
         """write processes to log file"""
         #print('log', estrng)
         ef = open(self.logname, 'a')
-        estrng += '\n'
-        ef.write(estrng)
+        estrg += '\n'
+        ef.write(estrg)
         ef.close()
+        if flg:
+            print(estrg + '\n')
     def ewclose(self):
         """close log file """
         try:

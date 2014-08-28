@@ -10,6 +10,7 @@ where nnnn is the model number.
 """
 from __future__ import division
 from __future__ import print_function
+import locale
 import os
 import sys
 import oncepy
@@ -21,8 +22,10 @@ import oncepy.oconfig as cfg
 
 __all__ = ["cstart", "cdict", "ctext", "crst", "cpdf",
            "cproj", "ccheck"]
-__version__ = "0.4.0"
+__version__ = "0.4.5"
 __author__ = 'rholland'
+locale.setlocale(locale.LC_ALL, '')
+
 
 if __name__ == '__main__':
 
