@@ -31,6 +31,7 @@ class ModCheck(object):
         estrg += '\n'
         ef.write(estrg)
         ef.close()
+        # output to std out
         if flg:
             print(estrg + '\n')
     def ewclose(self):
