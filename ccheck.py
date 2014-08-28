@@ -24,7 +24,7 @@ class ModCheck(object):
         ef.write("<" + time.strftime('%c') + ">\n")
         ef.close()
 
-    def ewrite3(self, estrg, flg):
+    def ewrite2(self, estrg, flg):
         """write processes to log file"""
         #print('log', estrng)
         ef = open(self.logname, 'a')
