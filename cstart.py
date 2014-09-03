@@ -39,10 +39,7 @@ class ModStart(object):
 
     Currently the program can run usable calculation models,
     as illustrated in the User Manual examples. Some classes and
-    methods are not implemented yet. The current beta development
-    cycle will complete model operations, add input error checking,
-    add a unit test framework and package the program for
-    pypi distribution.
+    methods are not implemented yet.
 
     The program runs on the following operating systems and
     Python scientific platforms::
@@ -51,7 +48,7 @@ class ModStart(object):
 
     Models that do not use projects or PDF calcs run on::
 
-    web (Linux: Wakari, PythonAnywhere)
+    web (Linux, Wakari, PythonAnywhere)
 
     mobile - **use onceutf.py** (Android: QPython, iOS: Pythonista)
 
@@ -73,15 +70,15 @@ class ModStart(object):
 
         python -m oncepy xxyy.model.txt (-c or -b)
 
-    where *xxyy.model.txt* is the file name, xx is the chapter number
-    and yy is the model number.
+    where *ddmm.model.txt* is the file name, dd is the division number
+    and mm is the model number.
 
-    The program will write the calc file calxxyy.model.txt and the
-    -c or -b options will echo the calc to a console (-c) or
+    The program will write the calc file calddmm.model.txt and the
+    -c or -b options will echo the calc to a shell (-e) or
     a Windows browser (-b). The -b option is needed on Windows because
-    of UTF-8 encoding limitations in the console.
+    of UTF-8 encoding limitations in the shell.
 
-    To open a terminal window in a folder in Windows 7 or 8 ,
+    To open a command shell window in a folder in Windows 7 or 8 ,
     navigate to the folder using Explorer, hold the shift key,right click,
     click on 'open command window here' in the context menu.
 
@@ -99,7 +96,7 @@ class ModStart(object):
     To obtain a more complete UTF-8 font set install **DejaVu Mono** fonts
     http://dejavu-fonts.org/wiki/Main_Page
 
-        **methods:**
+    methods:
             gen_paths()  find model and project paths
             cmdline()  command line prompt
             gen_files() generate new file names
@@ -108,7 +105,7 @@ class ModStart(object):
 
         """
     def __init__(self):
-        """initialize files and process classes
+        """generate file names and table of variables
 
         file names are stored in oconfig.py
 
@@ -121,6 +118,7 @@ class ModStart(object):
         self.sumf = ''
         self.ew = ccheck.ModCheck()
 
+        # path to pdf style file
         if cfg.stylefile == 'project folder':
             os.chdir(os.pardir)
             self.stylepath = os.getcwd()
@@ -130,106 +128,8 @@ class ModStart(object):
         else:
             self.stylepath = oncepy.__path__
 
-        sys.path.append(cfg.mpath)
 
-        # generate new file names
-        self.gen_files()
-
-        # build dictionaries
-        self.model1 = cdict.ModDicts()
-
-        # write variable list to stdout
-        self.var_table()
-
-        # write UTF calc
-        ctext.CalcText(self.model1.mdict, self.calcf, self.pyf,
-                       self.sumf)
-
-        # calculation type
-        self.ew.ewrite2('', 0)
-        self.ew.ewrite2('<calculation type> ' + cfg.caltype, 0)
-        self.ew.ewrite2('', 0)
-
-        rstfile = ''
-        texfile = ''
-
-        # write rst and PDF calc if options selected
-        if cfg.caltype.strip() == 'pdf'or \
-                        cfg.caltype.strip() == 'PDF':
-
-            # PDF files
-            rstfile = cfg.mfile.replace('.txt', '.rst')
-            texfile = cfg.mfile.replace('.txt', '.tex')
-            auxfile = cfg.mfile.replace('.txt', '.aux')
-            outfile = cfg.mfile.replace('.txt', '.out')
-            logfile = cfg.mfile.replace('.txt', '.log')
-
-            # clean out any auxiliary files
-            try:
-                os.remove(rstfile)
-            except OSError:
-                pass
-            try:
-                os.remove(auxfile)
-            except OSError:
-                pass
-            try:
-                os.remove(texfile)
-            except OSError:
-                pass
-            try:
-                os.remove(outfile)
-            except OSError:
-                pass
-            try:
-                os.remove(logfile)
-            except OSError:
-                pass
-
-            rstout1 = crst.CalcRST(self.model1.mdict)
-            rstout1.gen_rst()
-            self.ew.ewrite2("< rst file written >", 0)
-
-            pdfout1 = cpdf.CalcPDF(cfg.mfile, self.pdff)
-            pdfout1.gen_tex()
-            pdfout1.gen_pdf()
-            self.ew.ewrite2("< pdf file written >", 0)
-
-            # open pdf file
-            #try:
-            #    os.system(self.pdff)
-            #    self.ew.ewrite2('')
-            #    self.ew.ewrite2("< opened PDF calc >")
-            #except:
-            #    pass
-
-        elif cfg.caltype.strip() == 'rst':
-            rstfile = cfg.mfile.replace('.txt', '.rst')
-            rstout1 = crst.CalcRST(self.model1.mdict)
-            rstout1.gen_rst()
-            self.ew.ewrite2('', 0)
-            self.ew.ewrite2("< rst file written >", 0)
-        else:
-            pass
-
-        csumm2 =  ((" Files written:\n" +
-                    " ------------------\n" +
-                    " model file    :  {}\n" +
-                    " python file   :  {}\n" +
-                    " summary file  :  {}\n" +
-                    " reST file     :  {}\n" +
-                    " tex file      :  {}\n" +
-                    " PDF file      :  {}\n").format(
-                                self.calcf, self.pyf, self.sumf,
-                                rstfile, texfile, self.pdff))
-
-        self.ew.ewrite2(csumm2, 1)
-        self.ew.ewrite2("< calculation completed >", 1)
-
-        # -c or -b switch, UTF-8 calc to console or browser,
-        self.out_term()
-
-    def gen_files(self):
+    def gen_filenames(self):
         """generate new file names"""
 
         calcf1 = cfg.mfile.split('.')
@@ -243,48 +143,59 @@ class ModStart(object):
         f1.write(time.strftime("%c"))
         f1.close()
 
+        return self.calcf, self.pyf, self.sumf
+
+    def file_summary(self):
+        """file summary table
+        """
+
         csumm1 = ("""
-    Calculation Summary
-    ===================
+    File Summary
+    ============
 
     Files and paths
     ---------------
-    model input    :  {}
-    calc output    :  {}
-    py output file :  {}
-    summary file   :  {}
-    units path     :  {}
-    model path     :  {}
-    project path   :  {}
-    project file   :  {}
-    style path     :  {}
+    model input        :  {}
+    calc output        :  {}
+    py output file     :  {}
+    summary file       :  {}
+    units path         :  {}
+    model path         :  {}
+    project path       :  {}
+    project file       :  {}
+    style path         :  {}
+    calc type (margin) :  {}
         """.format(cfg.mfile, self.calcf, self.pyf, self.sumf,
                    cfg.unitfile, cfg.mpath,
-                   cfg.ppath, cfg.pfile, cfg.stylefile))
+                   cfg.ppath, cfg.pfile, cfg.stylefile, cfg.caltype))
 
-        print(csumm1)
-        self.ew.ewrite2(csumm1)
+        self.ew.errwrite(csumm1, 1)
 
-    def var_table(self):
-        """write terms, equations, arrays and functions to stdout
+    def var_table(self, mdict1):
+        """summarize terms, equations, arrays and functions
 
         Dictionary:
 
-        arrays:    [[a], statement, expr, range1, range2,
-                    ref, decimals, unit1, unit2]
-        functions: [[f], function name, ref]
-        equations: [[e], state, expr, ref, decimals, units, prnt opt]
-        terms:     [[t], statement, expr, ref ]
+        terms [var]     : [[t], statement, expr, ref ]
+        arrays[var]     : [[a], statement, expr, range1, range2,
+                            ref, decimals, unit1, unit2]
+        functions [var] : [[f], function name, ref]
+        equations [var] : [[e], state, expr, ref, decimals, units, prnt opt]
 
         """
 
         tab1 = []
-        for _m in self.model1.mdict:
-            #print(_m, self.model1.mdict[_m])
-            if self.model1.mdict[_m][0] == '[t]':
-                edict1 = self.model1.mdict[_m]
+        modnum = cfg.mfile.split('.')[0]
+
+        for m1 in mdict1:
+            #print(m1, mdict1[m1] )
+            if mdict1[m1][0] == '[m]':
+                modnum = mdict1[m1][1]
+
+            if mdict1[m1][0] == '[t]':
+                edict1 = mdict1[m1]
                 state1 = edict1[1].strip()
-                term1 = _m.strip()
+                term1 = m1.strip()
                 val4 = ''
                 try:
                     exec(state1)
@@ -299,8 +210,6 @@ class ModStart(object):
                 except:
                     val1 = str(type(val2)).split("'")[1]
 
-                mfile2 = self.model1.mdict[_m][4]
-
                 if val4 == "[t] runtime":
                     val1 = val4
                 try:
@@ -308,31 +217,12 @@ class ModStart(object):
                 except:
                     unitx = '-'
 
-                tab1.append(['| ' + str(term1), val1, unitx, mfile2])
+                tab1.append(['| ' + str(term1), val1, unitx, modnum])
 
-            elif self.model1.mdict[_m][0] == '[e]':
-                edict1 = self.model1.mdict[_m]
-                term1 = _m.strip()
-                state1 = edict1[1].strip()
-                mfile2 = self.model1.mdict[_m][7]
-                val1 = 'equation'
-                state1 = edict1[1].strip()
-                try:
-                    exec(state1)
-                except:
-                    val1 = "[e] runtime"
-
-                try:
-                    unitx = str(self.model1.mdict[_m][5])
-                except:
-                    unitx = '-'
-
-                tab1.append(['| ' + str(term1), val1, unitx, mfile2])
-
-            elif self.model1.mdict[_m][0] == '[a]':
-                edict1 = self.model1.mdict[_m]
-                term1 = self.model1.mdict[_m][1].split('=')[0].strip()
-                if self.model1.mdict[_m][4] == '':
+            elif mdict1[m1][0] == '[a]':
+                edict1 = mdict1[m1]
+                term1 = mdict1[m1][1].split('=')[0].strip()
+                if mdict1[m1][4] == '':
                     val1 = "1D array"
                 else:
                     val1 = "2D array"
@@ -343,37 +233,46 @@ class ModStart(object):
                 except:
                     val1 = "[a] runtime"
                 unitx = '-'
-                mfile2 = self.model1.mdict[_m][9]
-                tab1.append(['| ' + str(term1), val1, unitx, mfile2])
+                tab1.append(['| ' + str(term1), val1, unitx, modnum])
 
-            elif self.model1.mdict[_m][0] == '[f]':
-                term1 = self.model1.mdict[_m][2].strip()
+            elif mdict1[m1][0] == '[f]':
+                term1 = mdict1[m1][1].strip()
                 val1 = "function"
                 unitx = "-"
-                mfile2 = self.model1.mdict[_m][4]
-                tab1.append(['| ' + str(term1), val1, unitx, mfile2])
+                tab1.append(['| ' + str(term1.split('(')[0]),
+                             val1, unitx, modnum])
 
-            elif self.model1.mdict[_m][0] == '[d]':
-                if self.model1.mdict[_m][2].strip() == 'r':
-                    term1 = self.model1.mdict[_m][3].strip()
-                    val1 = "data"
-                    unitx = "-"
-                    mfile2 = self.model1.mdict[_m][6]
-                    tab1.append(['| ' + str(term1), val1, unitx, mfile2])
+            elif mdict1[m1][0] == '[e]':
+                edict1 = mdict1[m1]
+                term1 = m1.strip()
+                val1 = 'equation'
+                state1 = edict1[1].strip()
+
+                try:
+                    exec(state1)
+                except:
+                    val1 = "[e] runtime"
+                try:
+                    unitx = str(mdict1[m1][5])
+                except:
+                    unitx = '-'
+
+                tab1.append(['| ' + str(term1), val1, unitx, modnum])
+
+            elif mdict1[m1][0] == '[r]':
+                term1 = mdict1[m1][3].strip()
+                val1 = "[file] runtime"
+                unitx = "-"
+                tab1.append(['| ' + str(term1), val1, unitx, modnum])
 
             else:
                 pass
 
-        print("   Table of Model Variables")
-
-        ## onceweb modified
+        self.ew.errwrite("   Table of Model Variables", 1)
         table1 = tabulate
-        tabout1 = (table1.tabulate(tab1,
+        self.ew.errwrite(table1.tabulate(tab1,
                 headers=[' Variable', 'Value or Type', 'Units', 'Model'],
-                tablefmt='rst', floatfmt=".4f"))
-
-        print(tabout1)
-        self.ew.ewrite2(tabout1)
+                tablefmt='rst', floatfmt=".4f"), 1)
 
     def out_term(self):
         """check -e or -b flag and echo calc to console or browser"""
@@ -385,11 +284,9 @@ class ModStart(object):
                   "echo calc  =============================")
             print()
             try:
-                mod1 = open(self.calcf, 'r')
-                _r = mod1.readlines()
-                mod1.close()
-                for _i in _r:
-                    print(_i)
+                with open(self.calcf, 'r') as mod1:
+                    for i in mod1.readlines():
+                        print(i)
             except OSError:
                 pass
         elif len(sysargv) > 2 and '-b' in sysargv:
@@ -412,8 +309,8 @@ class ModStart(object):
         print()
         print("oncepy  ver:" + version)
         print("Use:")
-        print("python -m oncepy xxyy.modfile.txt (options)")
-        print("   where xx is the chapter and yy is the model number")
+        print("python -m oncepy ddmm.modfile.txt (options)")
+        print("   where dd is the division and mm is the model number")
         print()
         print("options:")
         print("   -h    prints this prompt")
@@ -428,14 +325,14 @@ class ModStart(object):
         print("set browser encoding to UTF-8; refer to user manual")
         print()
         print("outputs:")
-        print("   logxxyy.model.txt")
+        print("   logddmm.model.txt")
         print()
         print("if no errors then outputs:")
-        print("     xxyy.modfile.py     (Python equation file")
-        print("     calxxyy.modfile.txt (UTF-8 calc")
-        print("     sumxxyy.modfile.txt (calculation summary)")
+        print("     ddmm.modfile.py     (Python equation file")
+        print("     calddmm.modfile.txt (UTF-8 calc")
+        print("     sumddmm.modfile.txt (calculation summary)")
         print("if option selected in model or project file:")
-        print("     calxxyy.modfile.pdf (PDF calc")
+        print("     calddmm.modfile.pdf (PDF calc")
         print("     project.pdf (PDF project calc)")
 
         sys.exit(1)

@@ -12,7 +12,7 @@ mpath = ''
 mfile = ''
 
 # calculation output type - can be txt, rst or pdf
-caltype = 'txt'
+caltype = 0
 
 # default decimal places
 defaultdec = '3'
@@ -24,3 +24,4 @@ unitfile = 'built-in'
 # source of once.sty file: default is package folder
 # file in local folder overrides project folder
 stylefile = 'built-in'
+stylepath = '/'

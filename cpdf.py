@@ -9,17 +9,18 @@ from oncepy import oconfig as cfg
 class CalcPDF(object):
     """write PDF calc from rst file"""
 
-    def __init__(self, mfile, pdffile):
+    def __init__(self, mfile):
         """initialize rst, tex and pdf file paths"""
 
         self.mfile = mfile
         #print('mfile', self.mfile)
         self.ew = ccheck.ModCheck()
 
-        self.pdffile = pdffile
+        self.pdffile = ('cal' + self.mfile).replace('.txt','.pdf')
+        self.pdffile1 = self.mfile.replace('.txt', '.pdf')
         self.rstfile = self.mfile.replace('.txt', '.rst')
         self.texfile = self.mfile.replace('.txt', '.tex')
-        self.pdffile1 = self.mfile.replace('.txt', '.pdf')
+
 
         cfg.stylefile = 'built-in'
         self.stylepathpdf = oncepy.__path__[0] + '/once.sty'
@@ -35,7 +36,9 @@ class CalcPDF(object):
             self.stylepathpdf = os.getcwd() + '/once.sty'
 
     def gen_tex(self):
-        """generate and modify tex file"""
+        """generate tex file and call mod_tex
+
+        """
         newstylepath = self.stylepathpdf.replace('\\', '/')
         pypath = os.path.dirname(sys.executable)
         rstpath = pypath + "/Scripts/rst2latex.py "
@@ -47,18 +50,16 @@ class CalcPDF(object):
                         newstylepath + " ",
                         str(self.rstfile) + " ",
                         str(self.texfile)])
-        # write tex file
         #print(tex1)
         os.system(tex1)
-        self.ew.ewrite2("< tex file written >")
+        self.ew.errwrite("< tex file written >", 0)
         self.mod_tex(self.texfile)
 
     def mod_tex(self, tfile):
         """modify tex file and bypass escapes
 
         modifies this type of entry
-        "**" + var3 + " |" + "aa-bb " + strend + "**",
-              file=self.rf1)
+        "**" + var3 + " |" + "aa-bb " + strend + "**", file=self.rf1)
 
         calls one_chapter
 
@@ -74,7 +75,7 @@ class CalcPDF(object):
         self.one_chapter(self.texfile)
 
     def one_chapter(self, tfile):
-        """if only one chapter modify tex file
+        """modify tex file for one chapter
 
         """
         texin = open(tfile, 'r')
@@ -89,18 +90,19 @@ class CalcPDF(object):
         texout = open(tfile, 'w')
         print(texf, file=texout)
         texout.close()
-        self.ew.ewrite2("< tex file modified >")
-        print("< tex file modified >")
+        self.ew.errwrite("< tex file modified >", 0)
 
     def gen_pdf(self):
-        """generate PDF file"""
+        """generate PDF file
+
+        """
         pdf1 = 'latexmk -xelatex -quiet ' + str(self.texfile)
         os.system(pdf1)
-        self.ew.ewrite2('')
-        self.ew.ewrite2("< xelatex " + str(self.texfile) +" >")
-        self.ew.ewrite2("< pdf file written - pass 1 >")
+        self.ew.errwrite('', 1)
+        self.ew.errwrite("< xelatex " + str(self.texfile) +" >", 0)
+        self.ew.errwrite("< pdf file written - pass 1 >", 0)
         os.system(pdf1)
-        self.ew.ewrite2("< pdf file written - pass 2 >")
+        self.ew.errwrite("< pdf file written - pass 2 >", 0)
         if os.path.isfile(self.pdffile):
             os.remove(self.pdffile)
         os.rename(self.pdffile1, self.pdffile)
