@@ -286,8 +286,8 @@ class CalcUTF(object):
 
         out2p = subbed + '  ' + comment
         strend = dval[4].strip()
-        tmp = int(self.widthc-1) * '-'
-        self._prt_utf((tmp + u'\u2510').rjust(self.widthc), 0)
+        tmp = int(self.widthc-2) * '-'
+        self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 0)
         self._prt_utf(strend.rjust(self.widthc), 1)
         self._prt_utf(" ", 0)
 
@@ -337,8 +337,8 @@ class CalcUTF(object):
 
         # result
         self._prt_utf(out2p.rjust(self.widthc-1), 1)
-        tmp = int(self.widthc-1) * '-'
-        self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 0)
+        tmp = int(self.widthc-2) * '-'
+        self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
         self._prt_utf(" ", 0)
 
     def _prt_array(self, dval):
@@ -361,16 +361,13 @@ class CalcUTF(object):
 
         #print('array dval', dval)
         # table heading
-        tmp = int(self.widthc-1) * '-'
-        self._prt_utf((tmp + (u'\u2510')).rjust(self.widthc), 0)
+        tmp = int(self.widthc-2) * '-'
+        self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 0)
         tright = dval[5].strip().split(' ')
         eqnum = tright[-1].strip()
         tleft = ' '.join(tright[:-1]).strip()
         self._prt_utf((tleft + ' ' + eqnum).rjust(self.widthc), 0)
-
-        varx = dval[1].strip()
         self._prt_utf(' ', 0)
-        self._prt_utf('range variables: ' + varx, 0)
 
 
         # print symbolic form
@@ -396,12 +393,11 @@ class CalcUTF(object):
             if etype.strip()[:1] == '[':
                 out1 = str(vect[0].split('=')[1])
 
-            self._prt_utf("equation: ", 1)
             self._prt_utf(" ", 0)
             self._prt_utf(out1, 1)
             self._prt_utf(" ", 0)
         except:
-            self._prt_utf('equation: ' + vect[0].strip(), 1)
+            self._prt_utf(vect[0].strip(), 1)
             self._prt_utf(" ", 0)
 
         # add array variables to odict
@@ -468,8 +464,9 @@ class CalcUTF(object):
                                 floatfmt="."+ eformat +"f")
 
             self._prt_utf(ptable, 1)
-            tmp = int(self.widthc-1) * '-'
-            self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 0)
+            tmp = int(self.widthc-2) * '-'
+            self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
+
 
         # 2D table
         if len(str(vect[3])) != 0 and len(str(vect[0])) != 0:
@@ -530,8 +527,8 @@ class CalcUTF(object):
 
             # print table
             self._prt_utf(nstr, 1)
-            tmp = int(self.widthc-1) * '-'
-            self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 0)
+            tmp = int(self.widthc-2) * '-'
+            self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
 
     def _prt_func(self, dval):
         """print functions
@@ -562,7 +559,7 @@ class CalcUTF(object):
                     pass
         # print reference line
         tmp = int(self.widthc-1) * '-'
-        self._prt_utf((tmp + u'\u2510').rjust(self.widthc-1), 0)
+        self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc-1), 0)
 
         funcname = dval[1].split('(')[0]
 
@@ -593,8 +590,8 @@ class CalcUTF(object):
         return2 = (return1.__repr__()).replace('\n', '')
         self.odict[dval[2]] = ['[z]', str(dval[2])+'='+return2]
         #print(self.odict[dval[2]])
-        tmp = int(self.widthc-1) * '-'
-        self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 0)
+        tmp = int(self.widthc-2) * '-'
+        self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
         self._prt_utf(" ", 0)
 
     def _prt_eq(self, dval):
@@ -615,8 +612,6 @@ class CalcUTF(object):
             set_printoptions(precision=3)
             Unum.VALUE_FORMAT = "%.3f"
 
-        if dval[6].strip() == '':
-            dval[6] = '3'
         cunit = dval[5].strip()
         var3 = dval[1].split("=")[0].strip()
 
@@ -635,58 +630,18 @@ class CalcUTF(object):
                         exec(self.odict[k1][1].strip())
                     except:
                         pass
-            #print(k1,self.odict[k1][1].strip() )
 
+        if dval[6].strip() == '' :
+            dval[6] = '3'
         # evaluate only - do not print
-        exec(dval[1])
         if dval[6].strip() == '0':
             return
 
-        # print result only
-        elif dval[6].strip() == '1':
-            tmp = int(self.widthc-1) * '-'
-            self._prt_utf((tmp + u'\u2510').rjust(self.widthc), 1)
-            strend = dval[3].strip()
-            self._prt_utf((var3 + " | " + strend).rjust(self.widthc), 0)
-            self._prt_utf(" ", 0)
-            # print array
-            typev = type(eval(var3))
-            if typev == ndarray:
-                tmp1 = eval(var3)
-                self._prt_utf((var3 + " = "), 1)
-                self._prt_utf(' ', 0)
-                self._prt_utf(tmp1, 0)
-            elif typev == list or typev == tuple:
-                tmp1 = eval(var3)
-                self._prt_utf((var3 + " = "), 1)
-                self._prt_utf(' ', 0)
-                plist1 = ppr.pformat(tmp1, width=40)
-                self._prt_utf(plist1, 0)
-            # print result right justified
-            elif type(eval(var3)) != Unum:
-                if type(eval(var3)) == float or type(eval(var3)) == float64:
-                    resultform = '{:.' + dval[4].strip()+'f}'
-                    result1 = resultform.format(float(eval(var3)))
-                    self._prt_utf((var3 + " = " + str(result1)).rjust(self.widthc-1), 1)
-                else:
-                    self._prt_utf((var3 + " = " + str(eval(var3))).rjust(self.widthc-1), 1)
-            else:
-                if len(cunit) > 0:
-                    tmp1 = str(eval(var3).asUnit(eval(cunit)))
-                else:
-                    tmp1 = str(eval(var3))
-                self._prt_utf((var3 + " = " + tmp1).rjust(self.widthc-1), 1)
-            # print closure line
-            tmp = int(self.widthc-1) * '-'
-            self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 1)
-            self._prt_utf(" ", 0)
-            return
-
         # symbolic and substituted forms
-        else:
+        if dval[6].strip() == '3' or dval[6] == '2':
             # print reference line
-            tmp = int(self.widthc-1) * '-'
-            self._prt_utf((tmp + u'\u2510').rjust(self.widthc), 1)
+            tmp = int(self.widthc-2) * '-'
+            self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 1)
             strend = dval[3].strip()
             self._prt_utf((var3 + " | " + strend).rjust(self.widthc-1), 0)
             self._prt_utf(" ", 0)
@@ -755,39 +710,49 @@ class CalcUTF(object):
                     exec(state)
                 except:
                     pass
-            # print array
-            typev = type(eval(var3))
-            if typev == ndarray:
-                tmp1 = eval(var3)
-                self._prt_utf((var3 + " = "), 1)
-                self._prt_utf(' ', 0)
-                self._prt_utf(tmp1, 0)
-            elif typev == list or typev == tuple:
-                tmp1 = eval(var3)
-                self._prt_utf((var3 + " = "), 1)
-                self._prt_utf(' ', 0)
-                plist1 = ppr.pformat(tmp1, width=40)
-                self._prt_utf(plist1, 0)
-            elif typev != Unum:
-                if type(eval(var3)) == float or type(eval(var3)) == float64:
-                    resultform = '{:.' + eformat +'f}'
-                    result1 = resultform.format(float(eval(var3)))
-                    self._prt_utf((var3 + " = " +
-                                str(result1)).rjust(self.widthc-1), 1)
-                else:
-                    self._prt_utf((var3 + " = " +
-                                str(eval(var3))).rjust(self.widthc-1), 1)
-            else:
-                exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
-                if len(cunit) > 0:
-                    tmp = str(eval(var3).asUnit(eval(cunit)))
-                else:
-                    tmp = str(eval(var3))
+
+        # print result only
+        if dval[6].strip() == '1':
+            tmp = int(self.widthc-2) * '-'
+            self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 1)
+            strend = dval[3].strip()
+            self._prt_utf((var3 + " | " + strend).rjust(self.widthc), 0)
+            self._prt_utf(" ", 0)
+
+        # print array
+        typev = type(eval(var3))
+        if typev == ndarray:
+            tmp1 = eval(var3)
+            self._prt_utf((var3 + " = "), 1)
+            self._prt_utf(' ', 0)
+            self._prt_utf(tmp1, 0)
+        elif typev == list or typev == tuple:
+            tmp1 = eval(var3)
+            self._prt_utf((var3 + " = "), 1)
+            self._prt_utf(' ', 0)
+            plist1 = ppr.pformat(tmp1, width=40)
+            self._prt_utf(plist1, 0)
+        elif typev != Unum:
+            if type(eval(var3)) == float or type(eval(var3)) == float64:
+                resultform = '{:.' + eformat +'f}'
+                result1 = resultform.format(float(eval(var3)))
                 self._prt_utf((var3 + " = " +
-                               tmp).rjust(self.widthc-1), 1)
-        # line
-        tmp = int(self.widthc-1) * '-'
-        self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 1)
+                            str(result1)).rjust(self.widthc-1), 1)
+            else:
+                self._prt_utf((var3 + " = " +
+                            str(eval(var3))).rjust(self.widthc-1), 1)
+        else:
+            exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
+            if len(cunit) > 0:
+                tmp = str(eval(var3).asUnit(eval(cunit)))
+            else:
+                tmp = str(eval(var3))
+            self._prt_utf((var3 + " = " +
+                           tmp).rjust(self.widthc-1), 1)
+
+        # horizontal line
+        tmp = int(self.widthc-2) * '-'
+        self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 1)
         self._prt_utf(" ", 0)
 
     def _prt_file(self, refnum1):

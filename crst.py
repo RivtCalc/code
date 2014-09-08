@@ -428,23 +428,13 @@ class CalcRST(object):
             Unum.VALUE_FORMAT = "%.3f"
 
         # table heading
-        varx = dval[2].strip()
+        vect = dval[1:]
         tright = dval[5].strip().split(' ')
         eqnum = tright[-1].strip()
         tleft = ' '.join(tright[:-1]).strip()
         tablehdr = tleft + ' ' + eqnum
+        print("aa-bb " + "**" + tablehdr + "**", file=self.rf1)
 
-        print("aa-bb " + "**" + tablehdr + "**",
-              file=self.rf1)
-
-        print(' ', file=self.rf1)
-        print('**range variables:** ', file=self.rf1)
-        print(' ', file=self.rf1)
-        print(pretty(dval[3].strip()), file=self.rf1)
-        print(' ', file=self.rf1)
-        print(pretty(dval[4].strip()), file=self.rf1)
-
-        vect = dval[1:]
         # print symbolic form
         # convert variables to symbols except for arrays
         try:
@@ -455,28 +445,30 @@ class CalcRST(object):
             #convert array variable
             var1 = vect[2].split('=')[0].strip()
             varsym(str(var1))
-
             try:
                 var2 = vect[3].split('=')[0].strip()
                 varsym(str(var2))
             except:
                 pass
-
-            symeq = eval(vect[1].strip())
-            out1 = symeq
+            try:
+                symeq = latex(eval(vect[1].strip()))
+                var0 = latex(vect[0].split('=')[0])
+                symeq1 = var0 + ' = ' + symeq
+            except:
+                symeq = vect[1].strip()
+                var0 =  vect[0].split('=')[0]
+                symeq1 = var0 + ' = ' + symeq
+            #print('latex', symeq1)
 
             etype = vect[0].split('=')[1]
             if etype.strip()[:1] == '[':
                 out1 = str(vect[0].split('=')[1])
 
-            print(' ', file=self.rf1)
-            print('**equation:** ', file=self.rf1)
-            print(' ', file=self.rf1)
             # symbolic repr
             print('  ', file=self.rf1)
             print('.. math:: ', file=self.rf1)
             print('  ', file=self.rf1)
-            print('  ' + latex(symeq, mul_symbol="dot"), file=self.rf1)
+            print('  ' + latex(symeq1, mul_symbol="dot"), file=self.rf1)
             print('  ', file=self.rf1)
             print('|', file=self.rf1)
             print('  ', file=self.rf1)
@@ -508,7 +500,6 @@ class CalcRST(object):
                     exec(self.odict[k1][1].strip())
                 except:
                     pass
-
         # single row vector - 1D table
         if len(str(vect[3])) == 0 and len(str(vect[0])) != 0:
             # process range variable 1 and heading
@@ -517,7 +508,6 @@ class CalcRST(object):
             rnge1a = rnge1.split('=')
             rlist = [vect[6].strip() + ' = ' +
                      str(_r)for _r in eval(rnge1a[1])]
-
             #process equation
             equa1 = vect[0].strip()
             #print(equa1)
@@ -541,11 +531,10 @@ class CalcRST(object):
                     elist2 = elist1
 
             elist2 = [elist2]
-            # create table
-            # onceutf modified
+
+            # create 1D table
             ptable = tabulate.tabulate(elist2, rlist, 'rst',
                                 floatfmt="."+dval[6].strip()+"f")
-
             print(ptable, file=self.rf1)
             print('  ', file=self.rf1)
             #print(ptable)
@@ -581,7 +570,6 @@ class CalcRST(object):
                         #print('_x', _x)
                         alist.append(list(_x))
                         #print('append', alist)
-
             else:
                 # data is in equation form
                 equa1a = vect[0].strip().split('=')
@@ -603,17 +591,15 @@ class CalcRST(object):
                     alist.append(alistr)
                     #print('append', alist)
 
-            #print('alist', alist)
             for _n, _p in enumerate(alist):
                 _p.insert(0, clist[_n])
 
-            # create table
+            # create 2D table
             flt1 = "." + eformat.strip() + "f"
             #print(alist)
             ptable = tabulate.tabulate(alist, rlist, 'rst',
                                        floatfmt=flt1)
             print(ptable, file=self.rf1)
-
             print('  ', file=self.rf1)
 
     def _rst_func(self, dval):
@@ -795,9 +781,6 @@ class CalcRST(object):
             if dval[6].strip() == '3':
                 # list of symbols
                 symat = symeq.atoms(Symbol)
-                # copy of equation
-                #symeq1 = sympify(dval[2].strip())
-                # convert to latex form
                 latexrep = latex(symeq, mul_symbol="dot")
                 #print('latex', latexrep)
                 switch1 = []
@@ -819,16 +802,20 @@ class CalcRST(object):
                 # substitute values
                 for _n in switch1:
                     #print('swi', (self.odict[_n[0]][1]).split("=")[1])
-                    expr1 = eval((self.odict[_n[0]][1]).split("=")[1])
-                    if type(expr1) == float:
-                        form = '{:.' + eformat.strip() +'f}'
-                        symvar1 = '{' + form.format(expr1) + '}'
-                    else:
-                        symvar1 = '{' + str(expr1) + '}'
-                    #print('replace',_n[1], symvar1)
-                    latexrep = latexrep.replace(_n[1], symvar1)
-                    latexrep = latexrep.replace("\{", "{")
-                    #print(latexrep)
+                    # avoid problems with units
+                    try:
+                        expr1 = eval((self.odict[_n[0]][1]).split("=")[1])
+                        if type(expr1) == float:
+                            form = '{:.' + eformat.strip() +'f}'
+                            symvar1 = '{' + form.format(expr1) + '}'
+                        else:
+                            symvar1 = '{' + str(expr1) + '}'
+                        #print('replace',_n[1], symvar1)
+                        latexrep = latexrep.replace(_n[1], symvar1)
+                        latexrep = latexrep.replace("\{", "{")
+                        #print(latexrep)
+                    except:
+                        pass
                 # add substituted equation to rst file
                 print('  ', file=self.rf1)
                 print('.. math:: ', file=self.rf1)
@@ -865,7 +852,7 @@ class CalcRST(object):
                 var3g = var3
         # print result
         typev = type(eval(var3))
-        print('typev', typev)
+        #print('typev', typev)
         if typev == ndarray:
             tmp1 = str(eval(var3))
             if '[[' in tmp1:
@@ -905,7 +892,7 @@ class CalcRST(object):
         elif type(eval(var3)) != Unum:
             if type(eval(var3)) == float \
                 or type(eval(var3)) == float64:
-                resultform = '{:.' + dval[4].strip()+'f}'
+                resultform = '{:.' + rformat.strip()+'f}'
                 tmp1 = resultform.format(float(eval(var3)))
                 result2 = var3g + " = " + str(tmp1)
             else:

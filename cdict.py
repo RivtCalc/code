@@ -78,56 +78,67 @@ class ModDicts(object):
         comod = ''
         # find comodels
         for lines in self.mmod:
-            try:
-                if lines.strip()[:2] == '#-' and lines.split()[2] == 'i':
+            if len(lines.strip()) > 3:
+                if lines.split()[0] == '#-' and lines.count('|') == 0:
                     fino = lines.split()[1]
                     for ln2 in self.mmod:
                         try:
-                            if (ln2.split('|')[1].strip() == 'i' and
-                                    ln2.split()[1] == fino):
+                            if ln2.split('|')[1].strip() == 'i' and \
+                                            ln2.split()[1] == fino:
                                 os.chdir(os.pardir)
                                 copath = os.path.abspath(ln2.split('|')[2].strip())
                                 with open(copath, 'r') as f1:
                                     comod = f1.readlines()
                         except:
-                            pass
-
-                    # write model segments to dicts
+                            continue
+                # write model segments to dicts
                     os.chdir(self.mpath)
-                    if len(mainmod1) > 0:
-                        # build main model dict
-                        curmod = [self.mpathfile, mainmod1]
-                        self.modelnum = os.path.basename(self.mpathfile).split('.')[0]
-                        self._build_mdict(curmod)  # model dictionary
-                        mainmod1 = []
+                    if len(comod) > 0:
+                        if len(mainmod1) > 0:
+                            # build main model dict
+                            curmod = [self.mpathfile, mainmod1]
+                            self.modelnum = os.path.basename(self.mpathfile).split('.')[0]
+                            self._build_fdict(curmod)  # format dictionary
+                            self.ew.errwrite("< format dictionary completed >"
+                            + self.modelnum, 1)
+                            self._build_mdict(curmod)  # model dictionary
+                            self.ew.errwrite("< model dict appended - model >"
+                                             + self.modelnum, 1)
+                            mainmod1 = []
 
-                        # build comodel dicts
-                        mflag1 += 1
-                        curmod = [copath, comod]
-                        self.modelnum = os.path.basename(copath).split('.')[0]
-                        self._build_fdict(curmod)  # format dictionary
-                        self.ew.errwrite("< comodel format dictionary appended >", 1)
-                        self._build_fidict(curmod)  # file dictionary
-                        self.ew.errwrite("< comodel file dictionary appended >", 1)
-                        self._build_mdict(curmod)  # model dictionary
-                        continue
-            except:
-                pass
-
+                            # comodel dict
+                            mflag1 += 1
+                            curmod = [copath, comod]
+                            self.modelnum = os.path.basename(copath).split('.')[0]
+                            self._build_fdict(curmod)  # format dictionary
+                            self.ew.errwrite("< format dict appended - comodel >"
+                                             + self.modelnum, 1)
+                            self._build_fidict(curmod)  # file dictionary
+                            self.ew.errwrite("< file dict appended - comodel >"
+                                             + self.modelnum, 1)
+                            self._build_mdict(curmod)  # model dictionary
+                            self.ew.errwrite("< model dict appended - comodel >"
+                                                 + self.modelnum, 1)
+                            comod = ''
+                            continue
             mainmod1.append(lines)
 
         # write remaining main model segments
-        mflag1 += 1
+        os.chdir(self.mpath)
         curmod = [self.mpathfile, mainmod1]
         self.modelnum = os.path.basename(self.mpathfile).split('.')[0]
         self._build_fdict(curmod)  # format dictionary
-        self.ew.errwrite("< main model format dictionary created >", 1)
+        self.ew.errwrite("< format dictionary completed >"
+             + self.modelnum, 1)
         self._build_fidict(curmod)  # file dictionary
-        self.ew.errwrite("< main model file dictionary created >", 1)
+        self.ew.errwrite("< file dictionary completed >"
+             + self.modelnum, 1)
         self._build_mdict(curmod)  # model dictionary
-
-        self.ew.errwrite("< model dictionary complete - no. models = " +
+        self.ew.errwrite("< model dictionary completed >"
+             + self.modelnum, 1)
+        self.ew.errwrite("< model dictionaries completed - no. models = " +
                     str(mflag1) + " >\n", 1)
+
 
     def get_mdict(self):
         return self.mdict
@@ -147,8 +158,10 @@ class ModDicts(object):
         fdict[refnumber] : [decimals, units, units]
 
         """
+        with open(curmod[0]) as cm:
+            cmtxt = cm.readlines()
         pend1 = False
-        for i in curmod[1]:
+        for i in cmtxt:
             mtag = i[0:9]
             if mtag == "#- format":
                 pend1 = True
@@ -173,10 +186,13 @@ class ModDicts(object):
 
         """
         # set reference values
+        with open(curmod[0]) as cm:
+            cmtxt = cm.readlines()
+        # set reference values
         pend1 = False
         pend2 = False
         editlist = []
-        for i in curmod[1]:
+        for i in cmtxt:
             if i[:7] == "#- file":
                 pend1 = True
                 continue
