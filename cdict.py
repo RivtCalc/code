@@ -72,7 +72,7 @@ class ModDicts(object):
         """
 
         # construct list of model and comodel lines
-        mflag1 = 0
+        mflag1 = 1
         mainmod1 = []
         copath = ''
         comod = ''

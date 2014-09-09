@@ -196,36 +196,32 @@ class ModStart(object):
                 edict1 = mdict1[m1]
                 state1 = edict1[1].strip()
                 term1 = m1.strip()
-                val4 = ''
+                unitx = ''
+                val11 = ''
                 try:
                     exec(state1)
+                    val11 = '[t] ' + str(eval(term1))
+                    if type(eval(term1)) == list or type(eval(term1))== ndarray:
+                        val11 = '[t] ' + 'list or array'
                 except:
-                    val4 = "[t] runtime"
-                try:
-                    val2 = eval(term1)
-                except:
-                    val2 = ''
-                try:
-                    val1 = str(val2.asNumber())
-                except:
-                    val1 = str(type(val2)).split("'")[1]
-
-                if val4 == "[t] runtime":
-                    val1 = val4
-                try:
-                    unitx = str(val2.strUnit())
-                except:
+                    val11 = "[t] runtime"
                     unitx = '-'
 
-                tab1.append(['| ' + str(term1), val1, unitx, modnum])
+                try:
+                    val11 = "[t] " + str(eval(term1).asNumber())
+                    unitx = str(eval(term1).strUnit())
+                except:
+                    pass
+
+                tab1.append(['| ' + str(term1), val11, unitx, modnum])
 
             elif mdict1[m1][0] == '[a]':
                 edict1 = mdict1[m1]
                 term1 = mdict1[m1][1].split('=')[0].strip()
                 if mdict1[m1][4] == '':
-                    val1 = "1D array"
+                    val1 = "1D [a]"
                 else:
-                    val1 = "2D array"
+                    val1 = "2D [a]"
 
                 state1 = edict1[1].strip()
                 try:
@@ -237,7 +233,7 @@ class ModStart(object):
 
             elif mdict1[m1][0] == '[f]':
                 term1 = mdict1[m1][1].strip()
-                val1 = "function"
+                val1 = "[f] runtime "
                 unitx = "-"
                 tab1.append(['| ' + str(term1.split('(')[0]),
                              val1, unitx, modnum])
@@ -245,19 +241,21 @@ class ModStart(object):
             elif mdict1[m1][0] == '[e]':
                 edict1 = mdict1[m1]
                 term1 = m1.strip()
-                val1 = 'equation'
+                val1 = "[e] runtime "
                 state1 = edict1[1].strip()
-
+                unitx = '-'
                 try:
-                    exec(state1)
+                    val14 = '[e] ' + str(eval(term1))
+                    if type(eval(term1)) == list or type(eval(term1))== ndarray:
+                        val14 = '[e] ' + 'list or array'
                 except:
-                    val1 = "[e] runtime"
+                    val4 = "[e] runtime"
                 try:
                     unitx = str(mdict1[m1][5])
                 except:
                     unitx = '-'
 
-                tab1.append(['| ' + str(term1), val1, unitx, modnum])
+                tab1.append(['| ' + str(term1), val4, unitx, modnum])
 
             elif mdict1[m1][0] == '[r]':
                 term1 = mdict1[m1][3].strip()
@@ -271,7 +269,7 @@ class ModStart(object):
         self.ew.errwrite("   Table of Model Variables", 1)
         table1 = tabulate
         self.ew.errwrite(table1.tabulate(tab1,
-                headers=[' Variable', 'Value or Type', 'Units', 'Model'],
+                headers=[' Variable', 'Type and Value', 'Units', 'Model'],
                 tablefmt='rst', floatfmt=".4f"), 1)
 
     def out_term(self):
