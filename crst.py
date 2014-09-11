@@ -614,8 +614,10 @@ class CalcRST(object):
 
         """
         # print reference line
-        funcname = dval[1].split('(')[0]
-        funchd = funcname.strip() + ' | function ' + dval[4].strip()
+
+        funcdescrip = dval[3].split(']')[1]
+        funchd = funcdescrip.strip() + ' | function ' + dval[4].strip()
+
         # insert pattern for later modification of tex file
         print("aa-bb " + "**" + funchd + "**", file=self.rf1)
         print(' ', file=self.rf1)
@@ -646,7 +648,7 @@ class CalcRST(object):
 
         # evaluate function
         print(" ", file=self.rf1)
-        print('function description: ' + dval[3].strip(), file=self.rf1)
+        print('return variable: ' + dval[2].strip(), file=self.rf1)
         print(" ", file=self.rf1)
         print('function call: ' + dval[1].strip(), file=self.rf1)
         funcname = dval[1].split('(')[0]

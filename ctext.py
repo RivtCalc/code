@@ -559,10 +559,8 @@ class CalcUTF(object):
                 except:
                     pass
         # print reference line
-        tmp = int(self.widthc-1) * '-'
+        tmp = int(self.widthc-2) * '-'
         self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc-1), 0)
-
-        funcname = dval[1].split('(')[0]
 
         funcdescrip = dval[3].split(']')[1]
         strend = funcdescrip.strip() + ' | function ' + dval[4].strip()
@@ -570,10 +568,10 @@ class CalcUTF(object):
 
         # evaluate function
         self._prt_utf(" ", 0)
-        self._prt_utf('model return value variable: '
-                      + dval[2].strip(), 0)
+        self._prt_utf('return variable: ' + dval[2].strip(), 0)
         self._prt_utf(" ", 1)
         self._prt_utf('function call: ' + dval[1].strip(), 0)
+        funcname = dval[1].split('(')[0]
         docs1 = eval(funcname + '.__doc__')
         self._prt_utf(' ', 0)
         self._prt_utf('function doc:', 0)
@@ -753,9 +751,9 @@ class CalcUTF(object):
             if type(eval(var3)) == float or type(eval(var3)) == float64:
                 resultform = "%."+rformat + "f"
                 res1 = locale.format(resultform , eval(var3), grouping=True)
-                self._prt_utf((var3 +"="+ str(res1)).rjust(self.widthc-1), 1)
+                self._prt_utf((var3 +" = "+ str(res1)).rjust(self.widthc-1), 1)
             else:
-                self._prt_utf((var3 +"="+ str(eval(var3))).rjust(self.widthc-1), 1)
+                self._prt_utf((var3 +" = "+ str(eval(var3))).rjust(self.widthc-1), 1)
 
         # horizontal line
         tmp = int(self.widthc-2) * '-'
