@@ -3,6 +3,7 @@ from __future__ import print_function
 import codecs
 import sys
 import os
+import locale
 import tabulate
 import time
 import pprint as ppr
@@ -26,7 +27,7 @@ except ImportError:
         from oncepy.unitc import *
         cfg.unitfile = 'built-in'
 os.chdir(mpathctext)
-
+locale.setlocale(locale.LC_ALL, '')
 
 class CalcUTF(object):
     """Return UTF-8 calcs
@@ -719,7 +720,7 @@ class CalcUTF(object):
             self._prt_utf((var3 + " | " + strend).rjust(self.widthc), 0)
             self._prt_utf(" ", 0)
 
-        # print array
+        # result
         typev = type(eval(var3))
         if typev == ndarray:
             tmp1 = eval(var3)
@@ -732,28 +733,35 @@ class CalcUTF(object):
             self._prt_utf(' ', 0)
             plist1 = ppr.pformat(tmp1, width=40)
             self._prt_utf(plist1, 0)
-        elif typev != Unum:
-            if type(eval(var3)) == float or type(eval(var3)) == float64:
-                resultform = '{:.' + eformat +'f}'
-                result1 = resultform.format(float(eval(var3)))
-                self._prt_utf((var3 + " = " +
-                            str(result1)).rjust(self.widthc-1), 1)
-            else:
-                self._prt_utf((var3 + " = " +
-                            str(eval(var3))).rjust(self.widthc-1), 1)
-        else:
+        elif typev == Unum:
             exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
             if len(cunit) > 0:
-                tmp = str(eval(var3).asUnit(eval(cunit)))
+                tmp = eval(var3).asUnit(eval(cunit))
             else:
-                tmp = str(eval(var3))
-            self._prt_utf((var3 + " = " +
-                           tmp).rjust(self.widthc-1), 1)
+                tmp = eval(var3)
+            tmp1 = tmp.strUnit()
+            tmp2 = tmp.asNumber()
+            chkunit = str(tmp).split()
+            #print('chkunit', tmp, chkunit)
+            if len(chkunit) < 2:
+                tmp1 = ''
+            resultform = "%."+rformat + "f"
+            result1 = locale.format(resultform , tmp2, grouping=True)
+            tmp3 = result1 + ' '  + tmp1
+            self._prt_utf((var3 + " = " + tmp3).rjust(self.widthc-1), 1)
+        else:
+            if type(eval(var3)) == float or type(eval(var3)) == float64:
+                resultform = "%."+rformat + "f"
+                res1 = locale.format(resultform , eval(var3), grouping=True)
+                self._prt_utf((var3 +"="+ str(res1)).rjust(self.widthc-1), 1)
+            else:
+                self._prt_utf((var3 +"="+ str(eval(var3))).rjust(self.widthc-1), 1)
 
         # horizontal line
         tmp = int(self.widthc-2) * '-'
         self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 1)
         self._prt_utf(" ", 0)
+
 
     def _prt_file(self, refnum1):
         """process file operations from file dictionary

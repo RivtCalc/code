@@ -2,6 +2,7 @@ from __future__ import division
 from __future__ import print_function
 from collections import OrderedDict
 import os
+import glob
 from numpy import *
 from oncepy import ccheck
 import oncepy.oconfig as cfg
@@ -68,7 +69,7 @@ class ModDicts(object):
                 self.defaultdec = dec1
 
     def build_dicts(self):
-        """ build fdict, fidict a mdict
+        """ build fdict, fidict and mdict
         """
 
         # construct list of model and comodel lines
@@ -78,17 +79,24 @@ class ModDicts(object):
         comod = ''
         # find comodels
         for lines in self.mmod:
+            #print(lines)
             if len(lines.strip()) > 3:
                 if lines.split()[0] == '#-' and lines.count('|') == 0:
                     fino = lines.split()[1]
                     for ln2 in self.mmod:
                         try:
-                            if ln2.split('|')[1].strip() == 'i' and \
-                                            ln2.split()[1] == fino:
+                            if ln2.split()[1] == fino and \
+                                        ln2.split('|')[1].strip() == 'i':
                                 os.chdir(os.pardir)
-                                copath = os.path.abspath(ln2.split('|')[2].strip())
-                                with open(copath, 'r') as f1:
+                                cofile1 = ln2.split('|')[2].strip()
+                                dirpat = cofile1[0:2] + '*'
+                                dirpat1 = glob.glob(dirpat)
+                                copath = os.path.abspath(dirpat1[0])
+                                copath2 = os.path.join(copath, cofile1)
+                                print('copath', copath2)
+                                with open(copath2, 'r') as f1:
                                     comod = f1.readlines()
+                                print('done')
                         except:
                             continue
                 # write model segments to dicts
@@ -99,7 +107,7 @@ class ModDicts(object):
                             curmod = [self.mpathfile, mainmod1]
                             self.modelnum = os.path.basename(self.mpathfile).split('.')[0]
                             self._build_fdict(curmod)  # format dictionary
-                            self.ew.errwrite("< format dictionary completed >"
+                            self.ew.errwrite("< format dict appended - model >"
                             + self.modelnum, 1)
                             self._build_mdict(curmod)  # model dictionary
                             self.ew.errwrite("< model dict appended - model >"
@@ -108,8 +116,8 @@ class ModDicts(object):
 
                             # comodel dict
                             mflag1 += 1
-                            curmod = [copath, comod]
-                            self.modelnum = os.path.basename(copath).split('.')[0]
+                            curmod = [copath2, comod]
+                            self.modelnum = os.path.basename(copath2).split('.')[0]
                             self._build_fdict(curmod)  # format dictionary
                             self.ew.errwrite("< format dict appended - comodel >"
                                              + self.modelnum, 1)

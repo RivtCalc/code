@@ -3,13 +3,13 @@ from __future__ import print_function
 import os
 import tabulate
 import codecs
+import locale
 import oncepy
 import oncepy.oconfig as cfg
 from oncepy import ccheck
 from oncepy import oconfig as cfg
 from numpy import *
 from numpy import linalg as LA
-import numpy.linalg as linalg
 from sympy import *
 from sympy import var as varsym
 from sympy.core.alphabets import greeks
@@ -333,6 +333,14 @@ class CalcRST(object):
         print("aa-bb " + "**" + secthead + "**", file=self.rf1)
         print('  ', file=self.rf1)
 
+        # draw horizontal line
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{-1mm}', file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\hrulefill', file=self.rf1)
+        print('  ', file=self.rf1)
+
         # symbolic repr
         print('  ', file=self.rf1)
         print('.. math:: ', file=self.rf1)
@@ -399,15 +407,6 @@ class CalcRST(object):
                 mode='plain') + "}", file=self.rf1)
         print('  ', file=self.rf1)
 
-        # draw line
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\hrulefill', file=self.rf1)
-        print('  ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\vspace{2mm}', file=self.rf1)
-        print('  ', file=self.rf1)
 
     def _rst_array(self, dval):
         """
@@ -621,6 +620,14 @@ class CalcRST(object):
         print("aa-bb " + "**" + funchd + "**", file=self.rf1)
         print(' ', file=self.rf1)
 
+        # draw horizontal line
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{-1mm}', file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\hrulefill', file=self.rf1)
+        print('  ', file=self.rf1)
+
         # convert symbols to numbers - retain units
         for k1 in self.odict:
             if k1[0] != '_':
@@ -677,16 +684,6 @@ class CalcRST(object):
             print('   \\vspace{2mm}', file=self.rf1)
             print('  ', file=self.rf1)
 
-        # draw line
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\hrulefill', file=self.rf1)
-        print('  ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\vspace{2mm}', file=self.rf1)
-        print('  ', file=self.rf1)
-
     def _rst_eq(self, var3, dval):
         """print equation
 
@@ -736,15 +733,17 @@ class CalcRST(object):
             return
 
         # equation reference line
-        print('  ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\vspace{1mm}', file=self.rf1)
-        print('  ', file=self.rf1)
         strend = dval[3].strip()
         print('  ', file=self.rf1)
         print("aa-bb " + "**" + var3 + " | " + strend + "**",
               file=self.rf1)
+        print('  ', file=self.rf1)
+        # draw horizontal line
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{-1mm}', file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\hrulefill', file=self.rf1)
         print('  ', file=self.rf1)
 
         # symbolic and substituted forms
@@ -841,36 +840,20 @@ class CalcRST(object):
             var3g = "\\" + var3
         else:
             var3g = var3
-
-        # result only
-        if dval[6].strip() == '1':
-            #convert result variable to greek
-            var3s = var3.split('_')
-            if var3s[0] in greeks:
-                var3g = "\\" + var3
-            else:
-                var3g = var3
         # print result
         typev = type(eval(var3))
         #print('typev', typev)
+        print1 = 0
         if typev == ndarray:
+            print1 = 1
             tmp1 = str(eval(var3))
             if '[[' in tmp1:
                 tmp2 = tmp1.replace(' [', '.  [')
                 tmp1 = tmp2.replace('[[', '. [[')
             else:
                 tmp1 = tmp1.replace('[', '. [')
-            print('  ', file=self.rf1)
-            print('::', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('. ' + var3 + ' = ', file=self.rf1)
-            print(tmp1, file=self.rf1)
-            print('  ', file=self.rf1)
-            print(".. raw:: latex", file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\vspace{4mm}', file=self.rf1)
-            print('  ', file=self.rf1)
         elif typev == list or typev == tuple:
+            print1 = 1
             tmp1 = str(eval(var3))
             if '[[' in tmp1:
                 tmp2 = tmp1.replace(' [', '.  [')
@@ -879,6 +862,32 @@ class CalcRST(object):
             else:
                 tmp1 = tmp1.replace('[', '. [')
                 tmp1 = tmp1.replace('],', '],\n')
+        elif typev == Unum:
+            print1 = 2
+            exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
+            if len(cunit) > 0:
+                tmp = eval(var3).asUnit(eval(cunit))
+            else:
+                tmp = eval(var3)
+            tmp1 = tmp.strUnit()
+            tmp2 = tmp.asNumber()
+            chkunit = str(tmp).split()
+            #print('chkunit', tmp, chkunit)
+            if len(chkunit) < 2:
+                tmp1 = ''
+            resultform = "%."+rformat + "f"
+            result1 = locale.format(resultform , tmp2, grouping=True)
+            tmp3 = result1 + ' '  + tmp1
+        else:
+            print1 = 2
+            if type(eval(var3)) == float or type(eval(var3)) == float64:
+                resultform = "%."+rformat + "f"
+                tmp3 = locale.format(resultform , eval(var3), grouping=True)
+            else:
+                self._prt_utf((var3 +"="+ str(eval(var3))).rjust(self.widthc-1), 1)
+
+        # for lists and arrays
+        if print1 == 1:
             print('  ', file=self.rf1)
             print('::', file=self.rf1)
             print('  ', file=self.rf1)
@@ -888,49 +897,27 @@ class CalcRST(object):
             print(".. raw:: latex", file=self.rf1)
             print('  ', file=self.rf1)
             print('   \\vspace{4mm}', file=self.rf1)
-            print('  ', file=self.rf1)
-        elif type(eval(var3)) != Unum:
-            if type(eval(var3)) == float \
-                or type(eval(var3)) == float64:
-                resultform = '{:.' + rformat.strip()+'f}'
-                tmp1 = resultform.format(float(eval(var3)))
-                result2 = var3g + " = " + str(tmp1)
-            else:
-                result2 = var3 + " = " + str(eval(var3))
-            print(' ', file=self.rf1)
-            print('.. math:: ', file=self.rf1)
-            print('  ', file=self.rf1)
-            print("  {" + latex(result2, mode='plain') + "}", file=self.rf1)
-            print('  ', file=self.rf1)
-        else:
-            if len(cunit) > 0:
-                exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
-                tmp2 = str(eval(var3).asUnit(eval(cunit)))
-            else:
-                tmp2 = str(eval(var3))
-            # add space between number and units
-            result3 = var3g + " = " + str(tmp2)
-            result4 = latex(result3).split()
-            result5 = ''.join(result4[:-2]) + ' \ '.join(result4[-2:])
-            print(' ', file=self.rf1)
-            print('.. math:: ', file=self.rf1)
-            print('  ', file=self.rf1)
-            print("  {" + latex(result5, mode='plain') + "}", file=self.rf1)
             print('  ', file=self.rf1)
 
-        # draw horizontal line
+        # for equations with and without units
+        if print1 == 2:
+            # add space between units
+            try:
+                result2 = latex(tmp3).split()
+                tmp3 = ''.join(result2[:-2]) + ' \ '.join(result2[-2:])
+            except:
+                pass
+            print(' ', file=self.rf1)
+            print('.. math:: ', file=self.rf1)
+            print('  ', file=self.rf1)
+            print("  {" + latex(tmp3, mode='plain') + "}", file=self.rf1)
+            print('  ', file=self.rf1)
+
         print(".. raw:: latex", file=self.rf1)
         print('  ', file=self.rf1)
-        print('   \\vspace{-9mm}', file=self.rf1)
+        print('   \\vspace{-8mm}', file=self.rf1)
         print('  ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\hrulefill', file=self.rf1)
-        print('  ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\vspace{2mm}', file=self.rf1)
-        print('  ', file=self.rf1)
+
 
     def _rst_file(self, refnum):
         """process file operations from file dictionary
