@@ -68,15 +68,15 @@ class ModStart(object):
 
     .. code:: python
 
-        python -m oncepy xxyy.model.txt (-c or -b)
+        python -m oncepy ddmm.model.txt (-c or -b)
 
-    where *ddmm.model.txt* is the file name, dd is the division number
-    and mm is the model number.
+    where *ddmm.model.txt* is the file name, *ddmm* is the model number,
+    *dd* is the division number, and *mm* is the model designation.
 
     The program will write the calc file calddmm.model.txt and the
-    -c or -b options will echo the calc to a shell (-e) or
-    a Windows browser (-b). The -b option is needed on Windows because
-    of UTF-8 encoding limitations in the shell.
+    -e or -b options will echo the calc to a shell (-e) or
+    a Windows browser (-b). The -b option is needed in the Windows shell because
+    the shell lacks needed UTF-8 encoding.
 
     To open a command shell window in a folder in Windows 7 or 8 ,
     navigate to the folder using Explorer, hold the shift key,right click,
@@ -84,30 +84,34 @@ class ModStart(object):
 
     Change the browser encoding settings if needed:
     -----------------------------------------------
-    Chrome  - type chrome:settings/fonts  in url bar -
+    Chrome: type chrome:settings/fonts in url bar -
     scroll to the bottom of the dialog box and make the change
 
-    Firefox - options - content - advanced - UTF-8
+    Firefox: options - content - advanced - UTF-8
 
-    Internet Explorer - right click - encoding - UTF-8
+    Internet Explorer: right click - encoding - UTF-8
 
-    The program will execute the file and return results in files.
+    For further details refer to the user manual:
 
-    To obtain a more complete UTF-8 font set install **DejaVu Mono** fonts
-    http://dejavu-fonts.org/wiki/Main_Page
+        http://on-c-e.us/
 
-    methods:
-            gen_paths()  find model and project paths
-            cmdline()  command line prompt
-            gen_files() generate new file names
-            out_term() check console printing flags
-            sum_calc() write calculation summary to stdout
+    A relatively complete UTF-8 font set is needed for proper math
+    representation in an IDE.  **DejaVu Mono** fonts are recommended and
+    can be downloaded here:
 
+        http://dejavu-fonts.org/wiki/Main_Page
+
+        ModStart methods:
+        gen_filenames() read files and generate new file names
+        file_summary() write summary of calculation results to stdout
+        var_table(mdict1) generate variable table
+        out_term() write processing log to terminal
         """
+
     def __init__(self):
         """generate file names and table of variables
 
-        file names are stored in oconfig.py
+        file names are stored in oconfig.py in the once package directory
 
         """
         # initialize file names
@@ -127,7 +131,6 @@ class ModStart(object):
             self.stylepath = os.getcwd()
         else:
             self.stylepath = oncepy.__path__
-
 
     def gen_filenames(self):
         """generate new file names"""
