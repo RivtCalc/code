@@ -222,7 +222,7 @@ class CalcRST(object):
         var1 = dval[1].split('=')[0].strip()
 
         state = var1 + ' = ' + str(val1)
-        shift = int(self.widthp / 2.5)
+        shift = int(self.widthp / 2.0)
         ref = dval[3].strip().ljust(shift)
         termpdf = " "*4 + ref + ' | ' + state
 
