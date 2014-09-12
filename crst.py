@@ -886,7 +886,7 @@ class CalcRST(object):
                 resultform = "%."+rformat + "f"
                 tmp3 = locale.format(resultform , eval(var3), grouping=True)
             else:
-                self._prt_utf((var3 +"="+ str(eval(var3))).rjust(self.widthc-1), 1)
+                tmp3 = var3 +"="+ str(eval(var3))
 
         # for lists and arrays
         if print1 == 1:
