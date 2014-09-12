@@ -211,24 +211,24 @@ class CalcRST(object):
         print('|', file=self.rf1)
         print('  ', file=self.rf1)
 
-    def _rst_term(self, dval, termbegin):
+    def _rst_term(self, dval2, termbegin):
         """print terms
 
         terms: [[t], statement, expr, ref ]
 
         """
-        ptype = type(eval(dval[2]))
-        val1 = eval(dval[2].strip())
-        var1 = dval[1].split('=')[0].strip()
-
+        val1 = eval(dval2[2])
+        ptype = type(val1)
+        var1 = dval2[1].split('=')[0].strip()
         state = var1 + ' = ' + str(val1)
         shift = int(self.widthp / 2.0)
-        ref = dval[3].strip().ljust(shift)
+        ref = dval2[3].strip().ljust(shift)
         termpdf = " "*4 + ref + ' | ' + state
 
         if ptype == ndarray or ptype == list or ptype == tuple:
+            shift = int(self.widthp / 2.1)
+            ref = dval2[3].strip().ljust(shift)
             termpdf = '. ' + ref + ' | ' + var1 + ' = ' + '\n'
-
 
         if ptype == ndarray:
             tmp1 = str(val1)
@@ -243,10 +243,6 @@ class CalcRST(object):
             print(termpdf, file=self.rf1)
             print(tmp1, file=self.rf1)
             print('  ', file=self.rf1)
-            print(".. raw:: latex", file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\vspace{1mm}', file=self.rf1)
-            print('  ', file=self.rf1)
             return
 
         elif ptype == list or ptype == tuple:
@@ -260,10 +256,6 @@ class CalcRST(object):
             print('  ', file=self.rf1)
             print(termpdf, file=self.rf1)
             print(tmp1, file=self.rf1)
-            print('  ', file=self.rf1)
-            print(".. raw:: latex", file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\vspace{1mm}', file=self.rf1)
             print('  ', file=self.rf1)
             return
 
@@ -417,7 +409,7 @@ class CalcRST(object):
 
         """
         try:
-            eformat, rformat = dval[4].split(',')
+            eformat, rformat = dval[6].split(',')
             exec("set_printoptions(precision=" + eformat + ")")
             exec("Unum.VALUE_FORMAT = '%." + eformat + "f'")
         except:
@@ -433,6 +425,15 @@ class CalcRST(object):
         tleft = ' '.join(tright[:-1]).strip()
         tablehdr = tleft + ' ' + eqnum
         print("aa-bb " + "**" + tablehdr + "**", file=self.rf1)
+
+        # draw horizontal line
+        print('  ', file=self.rf1)
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{-1mm}', file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\hrulefill', file=self.rf1)
+        print('  ', file=self.rf1)
 
         # print symbolic form
         # convert variables to symbols except for arrays
@@ -533,7 +534,7 @@ class CalcRST(object):
 
             # create 1D table
             ptable = tabulate.tabulate(elist2, rlist, 'rst',
-                                floatfmt="."+dval[6].strip()+"f")
+                                floatfmt="."+eformat.strip()+"f")
             print(ptable, file=self.rf1)
             print('  ', file=self.rf1)
             #print(ptable)

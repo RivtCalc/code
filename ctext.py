@@ -215,10 +215,8 @@ class CalcUTF(object):
         terms: [[t], statement, expr, ref ]
 
         """
-        ptype = type(eval(dval[2]))
-        #print('dval2',dval[2])
-        val1 = eval(dval[2].strip())
-        #print('val1', val1)
+        val1 = eval(dval[2])
+        ptype = type(val1)
         var1 = dval[1].split('=')[0].strip()
         state = var1 + ' = ' + str(val1)
         if ptype == ndarray or ptype == list or ptype == tuple:
