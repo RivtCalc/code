@@ -200,23 +200,23 @@ class ModStart(object):
                 state1 = edict1[1].strip()
                 term1 = m1.strip()
                 unitx = ''
-                val11 = ''
+                val2 = ''
                 try:
                     exec(state1)
-                    val11 = '[t] ' + str(eval(term1))
+                    val2 = '[t] ' + str(eval(term1))
                     if type(eval(term1)) == list or type(eval(term1))== ndarray:
-                        val11 = '[t] ' + 'list or array'
+                        val2 = '[t] ' + 'list or array'
                 except:
-                    val11 = "[t] runtime"
+                    val2 = "[t] runtime"
                     unitx = '-'
 
                 try:
-                    val11 = "[t] " + str(eval(term1).asNumber())
+                    val2 = "[t] " + str(eval(term1).asNumber())
                     unitx = str(eval(term1).strUnit())
                 except:
                     pass
 
-                tab1.append(['| ' + str(term1), val11, unitx, modnum])
+                tab1.append(['| ' + str(term1), val2, unitx, modnum])
 
             elif mdict1[m1][0] == '[a]':
                 edict1 = mdict1[m1]
@@ -244,13 +244,13 @@ class ModStart(object):
             elif mdict1[m1][0] == '[e]':
                 edict1 = mdict1[m1]
                 term1 = m1.strip()
-                val1 = "[e] runtime "
+                val4 = "[e] runtime "
                 state1 = edict1[1].strip()
                 unitx = '-'
                 try:
-                    val14 = '[e] ' + str(eval(term1))
+                    val4 = '[e] ' + str(eval(term1))
                     if type(eval(term1)) == list or type(eval(term1))== ndarray:
-                        val14 = '[e] ' + 'list or array'
+                        val4 = '[e] ' + 'list or array'
                 except:
                     val4 = "[e] runtime"
                 try:
