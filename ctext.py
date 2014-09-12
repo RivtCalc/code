@@ -563,7 +563,7 @@ class CalcUTF(object):
         self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc-1), 0)
 
         funcdescrip = dval[3].split(']')[1]
-        strend = funcdescrip.strip() + ' | function ' + dval[4].strip()
+        strend = funcdescrip.strip() + ' ' + dval[4].strip()
         self._prt_utf(strend.rjust(self.widthc - 1), 0)
 
         # evaluate function
@@ -930,11 +930,11 @@ class CalcUTF(object):
         fp = os.path.abspath(fpath)
         var1 = dval[2].strip()
         var2 = dval[3].strip()
-        var3 = dval[4]  # variable with edit lines
+        var3 = dval[4]
 
         # print reference line
-        tmp = int(self.widthc-1) * '-'
-        self._prt_utf((tmp + u'\u2510').rjust(self.widthc), 0)
+        tmp = int(self.widthc-2) * '-'
+        self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 0)
 
         #print('dval', dval)
         strend = var1 + " | read data "
@@ -974,8 +974,8 @@ class CalcUTF(object):
         self._prt_utf(str(var4[:4]) + ' ... ' + str(var4[-4:]), 1)
         self._prt_utf(' ', 0)
 
-        tmp = int(self.widthc-1) * '-'
-        self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 0)
+        tmp = int(self.widthc-2) * '-'
+        self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
         self._prt_utf(" ", 0)
 
         #print('mdict', self.mdict[str(var1)])
@@ -1033,10 +1033,10 @@ class CalcUTF(object):
             f.write(writefile)
             f.close()
 
-            tmp = int(self.widthc-1) * '-'
-            self._prt_utf((tmp + u'\u2510').rjust(self.widthc), 0)
+            tmp = int(self.widthc-2) * '-'
+            self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 0)
 
-            strend = "edit file " + dval[1].strip()
+            strend = dval[1].strip() + " | edit file "
             self._prt_utf(strend.rjust(self.widthc - 1), 0)
             self._prt_utf(" ", 0)
 
@@ -1050,13 +1050,12 @@ class CalcUTF(object):
                               + (_i[1].strip()), 1)
             self._prt_utf(' ', 0)
 
-            tmp = int(self.widthc-1) * '-'
-            self._prt_utf((tmp + u'\u2518').rjust(self.widthc), 0)
+            tmp = int(self.widthc-2) * '-'
+            self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
             self._prt_utf(" ", 0)
 
             link1 = "< edited file: " + str(fpath) + " >"
             self.ew.errwrite(link1, 0)
-
 
     def _prt_txt(self, txt):
         """print pass-through text"""

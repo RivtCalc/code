@@ -616,7 +616,7 @@ class CalcRST(object):
         # print reference line
 
         funcdescrip = dval[3].split(']')[1]
-        funchd = funcdescrip.strip() + ' | function ' + dval[4].strip()
+        funchd = funcdescrip.strip() + ' ' + dval[4].strip()
 
         # insert pattern for later modification of tex file
         print("aa-bb " + "**" + funchd + "**", file=self.rf1)
@@ -1115,10 +1115,20 @@ class CalcRST(object):
         for item in var3:
             editlist.append(item)
 
-        strend = "edit file " + dval[1].strip()
+        strend = dval[1].strip() + " | edit file"
         print("aa-bb " + "**" + strend + "**",
               file=self.rf1)
         print(" ", file=self.rf1)
+
+        # draw line
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\hrulefill', file=self.rf1)
+        print('  ', file=self.rf1)
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{2mm}', file=self.rf1)
+        print('  ', file=self.rf1)
 
         # edit table
         print('  ', file=self.rf1)
@@ -1133,20 +1143,6 @@ class CalcRST(object):
             print(('     ' + _j[0].strip()).ljust(10)
                           + (_j[1].strip()), file=self.rf1)
         print(' ', file=self.rf1)
-
-        # draw horizontal line
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\vspace{4mm}', file=self.rf1)
-        print('  ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\hrulefill', file=self.rf1)
-        print('  ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\vspace{2mm}', file=self.rf1)
-        print('  ', file=self.rf1)
 
     def _rst_txt(self, txt):
         """output pass-through text"""
