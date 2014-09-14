@@ -10,7 +10,9 @@ class CalcPDF(object):
     """write PDF calc from rst file"""
 
     def __init__(self, mfile):
-        """initialize rst, tex and pdf file paths"""
+        """Initialize rst, tex and pdf file paths.
+
+        """
 
         self.mfile = mfile
         #print('mfile', self.mfile)
@@ -36,7 +38,7 @@ class CalcPDF(object):
             self.stylepathpdf = os.getcwd() + '/once.sty'
 
     def gen_tex(self):
-        """generate tex file and call mod_tex
+        """Generate tex file and call mod_tex.
 
         """
         newstylepath = self.stylepathpdf.replace('\\', '/')
@@ -56,12 +58,14 @@ class CalcPDF(object):
         self.mod_tex(self.texfile)
 
     def mod_tex(self, tfile):
-        """modify tex file and bypass escapes
+        """Modify tex file to avoid problems with escapes.
+        ::
 
-        modifies this type of entry
-        "**" + var3 + " |" + "aa-bb " + strend + "**", file=self.rf1)
+         modifies this type of entry:
+         "**" + var3 + " |" + "aa-bb " + strend + "**", file=self.rf1)
 
-        calls one_chapter
+        calls:
+            self.one_chapter: modifies chapter settings, no title page.
 
         """
         texin = open(tfile, 'r')
@@ -75,7 +79,7 @@ class CalcPDF(object):
         self.one_chapter(self.texfile)
 
     def one_chapter(self, tfile):
-        """modify tex file for one chapter
+        """Modify tex file chapter setting, no title page.
 
         """
         texin = open(tfile, 'r')
@@ -93,7 +97,7 @@ class CalcPDF(object):
         self.ew.errwrite("< tex file modified >", 0)
 
     def gen_pdf(self):
-        """generate PDF file
+        """Call external programs that write PDF file from reStructureText.
 
         """
         pdf1 = 'latexmk -xelatex -quiet ' + str(self.texfile)

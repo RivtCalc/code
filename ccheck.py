@@ -5,15 +5,20 @@ import oncepy.oconfig as cfg
 
 
 class ModCheck(object):
-    """beginnings of error checking and logging class
+    """beginnings of an error checking and logging class
+
     """
     def __init__(self):
-        """ open log file for events and errors"""
+        """ open log file for events and errors
+
+        """
         # calc log
         self.logname = '_modellog.txt'
 
     def logstart(self):
-        """delete log file and initialize new file"""
+        """delete log file and initialize new file
+
+        """
         try:
             os.remove(self.logname)
         except:
@@ -24,7 +29,9 @@ class ModCheck(object):
             ef.write("<" + time.strftime('%c') + ">\n")
 
     def errwrite(self, estrg, flg):
-        """write processes to log file"""
+        """write processes to log file
+
+        """
         #print('log', estrg)
         with open(self.logname, 'a') as ef:
             estrg += '\n'
@@ -32,7 +39,9 @@ class ModCheck(object):
         if flg:
             print(estrg + '\n')
     def logclose(self):
-        """close log file """
+        """close log file
+
+        """
         try:
             with open(self.logname, 'a') as ef:
                 ef.write("<" + time.strftime('%c') + ">\n")
@@ -41,8 +50,9 @@ class ModCheck(object):
             print('error: log file not closed')
 
     def filesum(self):
-        """file summary table"""
+        """file summary table
 
+        """
         csumm2 =  ((" Files written:\n" +
                     " ------------------\n" +
                     " model file    :  {}\n" +

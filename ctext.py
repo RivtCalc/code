@@ -31,12 +31,9 @@ locale.setlocale(locale.LC_ALL, '')
 
 class CalcUTF(object):
     """Return UTF-8 calcs
+    ::
 
-        """
-    def __init__(self, odict1, filedict1, calcf, pyf, sumf):
-        """Return UTF_8 calcs
-
-        Arguments:
+     Arguments:
         odict (ordered dict) : clean model dictionary
         calcf (str): UTF-8 calc file name
         pyf   (str): Python model name
@@ -59,24 +56,37 @@ class CalcUTF(object):
         _m + incremented number - current model directory
         _pd - license text
 
-        the dictionary structure is:
-        single line inputs:
+     The dictionary structure is:
+
+     single line inputs:
         file:     [[i], refnum, description, mod number]
         sections: [[s], left string, notes]
         symbolic: [[y], expr]
         terms:    [[t], statement, expr, ref ]
 
-        internal:
+     internal:
         blank line: [~]
         text:       [[x], text]
         read data   [[rd], var = data]
 
-        multiline inputs
+     multiline inputs
         check:    [[c], check expr, limits, ref, ok]
         arrays:   [[a], state1, expr, range1, range2, ref, dec, u1, u2]
         function: [[f], function call, var, ref, eq num]
         equations:[[e], statement, expr, ref, decimals, units, prnt opt]
 
+    """
+
+    def __init__(self, odict1, filedict1, calcf, pyf, sumf):
+        """Initialize parameters for UTF calc.
+        ::
+
+         Arguments:
+            odict1 (dictionary):  model dictionary; array and file ops added
+            filedict1 (dctionary): file operation dictionary
+            calcf (string): calc file name
+            pyf (string): python file name
+            sumf (string): summary file name
         """
         # dicts
         self.ew = ccheck.ModCheck()
@@ -110,7 +120,7 @@ class CalcUTF(object):
                     pass
 
     def gen_utf(self):
-        """generate utf calc from model dictionary
+        """Generate utf calc from model dictionary.
 
         """
 
@@ -167,10 +177,11 @@ class CalcUTF(object):
         #for _i in self.odict: print(i, self.odict[i])
 
     def _prt_sect(self, dval):
-        """print sections
+        """Print sections to UTF-8.
+        ::
 
-        Dictionary:
-        section: ['[s]', sleft, file number]
+         arguments:
+            dval (dictionary value): ['[s]', sleft, file number]
 
         """
         self._prt_utf('='*self.widthc, 0)
@@ -178,10 +189,11 @@ class CalcUTF(object):
         self._prt_utf('='*self.widthc, 0)
 
     def _prt_sym(self, dval):
-        """print symbolic expression
+        """Print symbolic expression  to UTF-8.
+        ::
 
-        Dictionary:
-        _y : [[y], expr]
+         arguments:
+            dval (dictionary value): ['[y]', expr]
 
         """
 
@@ -209,10 +221,11 @@ class CalcUTF(object):
         self._prt_utf(" ", 0)
 
     def _prt_term(self, dval):
-        """print terms
+        """Print terms to UTF-8.
+        ::
 
-        Dictionary:
-        terms: [[t], statement, expr, ref ]
+         arguments:
+            dval (dictionary value): ['[t]', statement, expr, ref ]
 
         """
         val1 = eval(dval[2])
@@ -229,10 +242,11 @@ class CalcUTF(object):
             self._prt_utf(" "*4 + ref + " | " + state,  1)
 
     def _prt_check(self, dval):
-        """print checks
+        """Print checks to UTF-8.
+        ::
 
-        Dictionary:
-        check:  [[c], check expr, op, limit, ref, dec, ok]
+         arguments:
+            dval (dictionary value):  [[c], check expr, op, limit, ref, dec, ok]
 
         """
         try:
@@ -341,11 +355,12 @@ class CalcUTF(object):
         self._prt_utf(" ", 0)
 
     def _prt_array(self, dval):
-        """print arrays
+        """Print arrays to UTF-8.
+        ::
 
-        Dictionary:
-        arrays: [[a], statement, expr, range1, range2,
-                    ref, decimals, unit1, unit2]
+         arguments:
+            dval (dictionary values): [[a], statement, expr, range1, range2,
+                                    ref, decimals, unit1, unit2]
 
         """
         try:
@@ -530,15 +545,11 @@ class CalcUTF(object):
             self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
 
     def _prt_func(self, dval):
-        """print functions
+        """Print functions to UTF-8.
+        ::
 
-        Dictionary:
-
-        Arguments:
-        ip: a model line or block
-
-        Dictionary Value:
-        function:[[f], function call, var, ref, eqn number
+         arguments:
+            dval (dictionary value): [[f], function call, var, ref, eqn number
 
         """
         # convert symbols to numbers - retain units
@@ -592,10 +603,12 @@ class CalcUTF(object):
         self._prt_utf(" ", 0)
 
     def _prt_eq(self, dval):
-        """print equations
+        """Print equations to UTF-8.
+        ::
 
-        Dictionary:
-        equations:[[e], statement, expr, ref, decimals, units, prnt opt]
+         arguments:
+            dval (dictionary value) [[e], statement, expr, ref, decimals,
+                                    units, prnt opt]
 
         """
         # set decimal format
@@ -760,38 +773,41 @@ class CalcUTF(object):
 
 
     def _prt_file(self, refnum1):
-        """process file operations from file dictionary
+        """Process file operations from file dictionary.
+        ::
 
-        model dictionary:
-        '_i' : [[i], ref num, description, modnum]
+         arguments:
+            refnum1 (string): file operation reference number
 
-        File dictionary:
-        file op number :[option, file path, var1, var2, var3, modnum]
 
-        options:
-        s: run a python script
-        t: add text file contents to output
-            No operations are processed.
-        o: run an external operating system command.
-        w: write values of variable to file. w+ appends to file.
-        f: insert jpg, png etc, figures into calc
-        i: insert and process external model file.
-            Integrate sections and equation numbering.
-        r: read file data into variable - processed when tagged
-        e: edit file. Store edits in var3. (multiline)
+         file dictionary:
+            file op number :[option, file path, var1, var2, var3, modnum]
 
-        For non-equation entries the dictionary key is:
-        _x + incremented number - pass-through text
-        _y + incremented number - symbolic representation
-        _s + incremented number - sections
-        _t + incremented number - inserted text
-        _p + incremented number - python code
-        _c + incremented number - check operation
-        _a + incremented number - array and ranges
-        _m + incremented number - current model directory
-        _i + incremented number - file operation
-        _f + incremented number - function
-        _pd - license text
+         options:
+            s: run a python script
+            t: add text file contents to output
+                No operations are processed.
+            o: run an external operating system command.
+            w: write values of variable to file. w+ appends to file.
+            f: insert jpg, png etc, figures into calc
+            i: insert and process external model file.
+                Integrate sections and equation numbering.
+            r: read file data into variable - processed when tagged
+            e: edit file. Store edits in var3. (multiline)
+
+         for equation entries the dictionary key is the resultant variable
+         for non-equation entries the dictionary key is:
+            _x + incremented number - pass-through text
+            _y + incremented number - symbolic representation
+            _s + incremented number - sections
+            _t + incremented number - inserted text
+            _p + incremented number - python code
+            _c + incremented number - check operation
+            _a + incremented number - array and ranges
+            _m + incremented number - current model directory
+            _i + incremented number - file operation
+            _f + incremented number - function
+            _pd - license text
 
         """
         dval = self.fidict[refnum1[1]]
@@ -910,15 +926,17 @@ class CalcUTF(object):
             pass
 
     def _prt_read(self, dval):
-        """read csv data file
+        """Read csv data file.
+        ::
 
-        Args: str
-            option = dval[0].strip()
-            fpath = dval[1].strip()
-                fp = os.path.abspath(fpath)
-            var1 = dval[2].strip() # variable
-            var2 = dval[3].strip() # sep character
-            var3 = dval[4]  # skip lines
+         arguments:
+            dval (dictionary value):
+                option = dval[0].strip()
+                fpath = dval[1].strip()
+                    fp = os.path.abspath(fpath)
+                var1 = dval[2].strip() # variable
+                var2 = dval[3].strip() # sep character
+                var3 = dval[4]  # skip lines
             var4 = data from genfromtext
 
         """
@@ -979,15 +997,17 @@ class CalcUTF(object):
         #print('mdict', self.mdict[str(var1)])
 
     def _prt_edit(self, dval):
-            """ edit existing file through line replacement
+            """Edit existing file through line replacement.
+            ::
 
-            Args: str
-                option = dval[0].strip()
-                fpath = dval[1].strip()
-                    fp = os.path.abspath(fpath)
-                var1 = dval[2].strip()
-                var2 = dval[3].strip()
-                var3 = dval[4]  # variable with edit lines
+             arguments:
+                dval (dictionary value):
+                    option = dval[0].strip()
+                    fpath = dval[1].strip()
+                        fp = os.path.abspath(fpath)
+                    var1 = dval[2].strip()
+                    var2 = dval[3].strip()
+                    var3 = dval[4]  # variable with edit lines
 
             """
 
@@ -1056,7 +1076,13 @@ class CalcUTF(object):
             self.ew.errwrite(link1, 0)
 
     def _prt_txt(self, txt):
-        """print pass-through text"""
+        """Print pass-through text.
+        ::
+
+         arguments:
+            txt (string): text that is not part of an operation
+
+        """
         #print('txt', txt)
         # reST modification
         if txt[1].strip()[0] == '|':
@@ -1070,18 +1096,40 @@ class CalcUTF(object):
             self._prt_utf(txt1, 1)
 
     def _prt_blnk(self):
-        """insert blank line"""
+        """Insert blank line.
+
+        """
         self._prt_utf(' ', 0)
 
     def _prt_utf(self, mentry, pp):
-        """write output to utf-8 encoded file"""
+        """Write text to utf-8 encoded file.
+        ::
+
+         arguments:
+            mentry (string): line of text
+            pp (integer): flag for utf-8 and pretty print
+
+        """
         if pp:
             mentry = pretty(mentry, use_unicode=True, num_columns=92)
         print(mentry, file=self.cfile)
 
     def _prt_py(self):
-        """write python code to file from dictionary"""
+        """write python code to file from dictionary
+        ::
 
+         write imports, terms, equations to Python importable file
+         the following libraries are imported when the file is imported:
+            os
+            sys
+            oncepy
+            sympy
+            numpy
+            numpy.linalg
+            OrderedDict
+         todo: add array terms and variables to the file
+
+        """
         pyfile1 = open(self.pyfile, 'w')
         #write import commands
         str1 = ('from __future__ import division\n'
@@ -1164,15 +1212,16 @@ except:
         pyfile1.close()
 
     def _prt_summary(self):
-        """write model file summary to summary file
+        """write model summary to summary file
+        ::
 
-        summary descriptions from sections, arrays, functions and equations
-        sections: [[s], left string, notes]
-        arrays:   [[a], state1, expr, range1, range2, ref, dec, u1, u2]
-        function: [[f], function call, var, ref, eq num]
-        equations:[[e], statement, expr, ref, decimals, units, prnt opt]
+         summarize sections, arrays, functions and equations
+            sections: [[s], left string, notes]
+            arrays:   [[a], state1, expr, range1, range2, ref, dec, u1, u2]
+            function: [[f], function call, var, ref, eq num]
+            equations:[[e], statement, expr, ref, decimals, units, prnt opt]
+
         """
-
         sumfile1 = open(self.sumfile, 'w')
         for i in self.odict:
             mtype = self.odict[i][0]

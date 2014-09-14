@@ -1,4 +1,4 @@
-# this file is read by the program - do not modify
+# this file is manipulated by the program - do not modify
 
 # command line
 sysargv = ''
