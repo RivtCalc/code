@@ -27,6 +27,7 @@ except ImportError:
         oCfg.unitfile = 'built-in'
 os.chdir(mpathcstart)
 
+__version__ = '0.4.6'
 
 class ModStart(object):
     """initialize file names and write tabular input summaries
@@ -74,7 +75,7 @@ class ModStart(object):
 
         #start calc file early to avoid Komodo dialog response
         f1 = open(self.calcf,'w')
-        f1.write(time.strftime("%c"))
+        f1.write(time.strftime("%c") + "     onceutf version: " + __version__)
         f1.close()
 
         return self.calcf, self.pyf, self.sumf

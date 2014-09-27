@@ -13,6 +13,8 @@ from numpy import *
 import numpy.linalg as LA
 from sympy import *
 from sympy import var as varsym
+from PIL import Image as PImage
+from PIL import ImageOps as PImageOps
 
 mpathctext = os.getcwd()
 try:
@@ -28,6 +30,9 @@ except ImportError:
         cfg.unitfile = 'built-in'
 os.chdir(mpathctext)
 locale.setlocale(locale.LC_ALL, '')
+
+__version__ = "0.4.6"
+__author__ = 'rholland'
 
 class CalcUTF(object):
     """Return UTF-8 calcs
@@ -107,7 +112,8 @@ class CalcUTF(object):
         self.xtraline = False
 
         # print date at top of calc
-        self._prt_utf(time.strftime("%c"), 0)
+        self._prt_utf(time.strftime("%c")+
+            "     onceutf version: " + __version__, 0)
 
         # add array variables (not range variables) to model dictionary key
         for k1 in self.odict:
@@ -189,35 +195,76 @@ class CalcUTF(object):
         self._prt_utf('='*self.widthc, 0)
 
     def _prt_sym(self, dval):
-        """Print symbolic expression  to UTF-8.
-        ::
+        """print symbolic expression
 
-         arguments:
-            dval (dictionary value): ['[y]', expr]
+        Dictionary:
+        _y : [[y], symlang, expr, eqnumber]
 
         """
+        sf1 = 1.33
+        pr1 = "\\documentclass[preview, 12pt]{standalone}\n" \
+                    "\\begin{document}\n"
 
-        dval = dval[1].replace('=', '<=')
-        exp2 = dval.split('\n')
-        exp3 = ' '.join([ix.strip() for ix in exp2])
-        symp1 = sympify(exp3)
+        if dval[1] == 'n':
+            return
+        self._prt_utf(dval[3].rjust(self.widthc-1), 0)
 
-        for _j in symp1.atoms():
-            varsym(str(_j))
+        if dval[1] == 's' or dval[1] == 'f':
+            expr1 = dval[2].replace('=', '<=')
+            exp2 = expr1.split('\n')
+            exp3 = ' '.join([ix.strip() for ix in exp2])
+            symp1 = sympify(exp3)
 
-        symeq = eval(dval)
-        symeq2 = pretty(symeq, wrap_line=False)
-        out3 = symeq2.replace('*', u'\u22C5')
-        cnt = 0
-        for _m in out3:
-            if _m == '-':
-                cnt += 1
-                continue
-            else:
-                if cnt > 1:
-                    out3 = out3.replace('-'*cnt, u'\u2014'*cnt)
-                cnt = 0
-        self._prt_utf(out3.replace('<=', '='), 1)
+            for _j in symp1.atoms():
+                varsym(str(_j))
+
+            symeq = eval(expr1)
+            symeq2 = pretty(symeq, wrap_line=False)
+            out3 = symeq2.replace('*', u'\u22C5')
+            cnt = 0
+            for _m in out3:
+                if _m == '-':
+                    cnt += 1
+                    continue
+                else:
+                    if cnt > 1:
+                        out3 = out3.replace('-'*cnt, u'\u2014'*cnt)
+                    cnt = 0
+            self._prt_utf(out3.replace('<=', '='), 1)
+            self._prt_utf(" ", 0)
+            try:
+                if dval[1] == 'f':
+                    f1 = "latex" + str(dval[3].strip()) + ".png"
+                    self._prt_utf("equation <file: " + str(f1) + ">", 1)
+                    expr5 = latex(eval(expr1))
+                    expr6 = '$'+ expr5.replace('<=', '=') +'$'
+                    printing.preview(expr6, output='png', viewer='file',
+                                     filename=f1, preamble=pr1)
+                    im10 = PImage.open(f1)
+                    imwidth, imheight = im10.size
+                    im20 = im10.resize((int(imwidth*sf1), int(imheight*sf1)), PImage.BICUBIC)
+                    im20 = PImageOps.expand(im20,border=10,fill='white')
+                    im20.save(f1, "PNG")
+            except:
+                self.ew.errwrite("< f option for [y] operation requires LaTeX - "
+                             "file not written >", 1)
+
+        try:
+            if dval[1] == 'x':
+                f1 = "latex" + str(dval[3].strip()) + ".png"
+                self._prt_utf("equation <file: " + str(f1) + ">", 1)
+                expr6 = '$' + dval[2] + '$'
+                printing.preview(expr6, output='png', viewer='file',
+                                 filename=f1, preamble=pr1)
+                im10 = PImage.open(f1)
+                imwidth, imheight = im10.size
+                im20 = im10.resize((int(imwidth*sf1), int(imheight*sf1)), PImage.BICUBIC)
+                im20 = PImageOps.expand(im20,border=10,fill='white')
+                im20.save(f1, "PNG")
+        except:
+            self.ew.errwrite("< x option for [y] operation requires LaTeX - "
+                         "file not written >", 1)
+
         self._prt_utf(" ", 0)
 
     def _prt_term(self, dval):

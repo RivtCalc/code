@@ -99,7 +99,7 @@ from oncepy.ccheck import ModCheck
 import oncepy.oconfig as oCfg
 from sympy.core.cache import *
 
-__version__ = "0.4.5"
+__version__ = "0.4.6"
 __author__ = 'rholland'
 locale.setlocale(locale.LC_ALL, '')
 
@@ -133,26 +133,31 @@ def _gencalc(fi4):
                 oCfg.caltype = i2.split('|')[2].strip()
 
     if float(oCfg.caltype) != 0:
-        try:                                        # find PDF style file
-            f2 = open('once.sty')
-            f2.close()
-            oCfg.stylefile = 'model folder'
-            oCfg.stylepath = os.getcwd()
-        except IOError:
-            try:
-                os.chdir(os.pardir)
-                f3 = open('once.sty')
-                f3.close()
-                oCfg.stylefile = 'project folder'
+        try:
+            os.system('latex --version')                           # check for LaTeX
+            try:                                     # find PDF style file
+                f2 = open('once.sty')
+                f2.close()
+                oCfg.stylefile = 'model folder'
                 oCfg.stylepath = os.getcwd()
-                os.chdir(oCfg.mpath)
             except IOError:
-                os.chdir(oncepy.__path__[0])
-                f4 = open('once.sty')
-                f4.close()
-                oCfg.stylefile = 'built-in'
-                oCfg.stylepath = os.getcwd()
+                try:
+                    os.chdir(os.pardir)
+                    f3 = open('once.sty')
+                    f3.close()
+                    oCfg.stylefile = 'project folder'
+                    oCfg.stylepath = os.getcwd()
+                    os.chdir(oCfg.mpath)
+                except IOError:
+                    os.chdir(oncepy.__path__[0])
+                    f4 = open('once.sty')
+                    f4.close()
+                    oCfg.stylefile = 'built-in'
+                    oCfg.stylepath = os.getcwd()
                 os.chdir(oCfg.mpath)
+        except(OSError):
+            oCfg.caltype = 0
+            _ew.errwrite("< latex not installed - PDF calc not generated >", 1)
 
     modinit.file_summary()                          # write file table
     modinit.var_table(mdict)                        # write variable table
@@ -193,6 +198,7 @@ def _gencalc(fi4):
         ew.errwrite("< pdf file written >", 0)
 
 #------------------------------------------------------------------------------
+
 if __name__ == '__main__':                      # start program
     #print(sys.argv)
     oCfg.sysargv = sys.argv

@@ -95,7 +95,6 @@ class CalcRST(object):
         self.symb = self.odict.keys()
         self.symblist = []
 
-
         #paths and files
         self.mpath = cfg.mpath
         self.mfile = cfg.mfile
@@ -163,7 +162,7 @@ class CalcRST(object):
                 self.xtraline = False
             elif mtag == '[x]':
                 self._rst_txt(self.odict[_i])
-                self.xtraline = True
+                self.xtraline = False
             else:
                 pass
 
@@ -206,26 +205,42 @@ class CalcRST(object):
         ::
 
          arguments:
-            dval (dictionary value): [[y], expr]
+            dval (dictionary value): [[y], expr, eqnumber]
 
         """
-        dval = dval[1].replace('=', '<=')
-        exp2 = dval.split('\n')
-        exp3 = ' '.join([ix.strip() for ix in exp2])
-        symp1 = sympify(exp3)
+        tright = dval[3].strip()
+        print('  ', file=self.rf1)
+        print("aa-bb " + '**'+tright+'**', file=self.rf1)
 
-        for _j in symp1.atoms():
-            varsym(str(_j))
+        if dval[1] == 's' or dval[1] == 'f':
+            dval1 = dval[2].replace('=', '<=')
+            exp2 = dval1.split('\n')
+            exp3 = ' '.join([ix.strip() for ix in exp2])
+            symp1 = sympify(exp3)
 
-        symeq = eval(dval)
-        # symbolic repr
-        print('  ', file=self.rf1)
-        print('.. math:: ', file=self.rf1)
-        print('  ', file=self.rf1)
-        print('  ' + latex(symeq, mul_symbol="dot"), file=self.rf1)
-        print('  ', file=self.rf1)
-        print('|', file=self.rf1)
-        print('  ', file=self.rf1)
+            for _j in symp1.atoms():
+                varsym(str(_j))
+
+            symeq = eval(dval1)
+            symeq1 = latex(symeq, mul_symbol="dot")
+            symeq2 = symeq1.replace('\\leq', '=', )
+
+            print('  ', file=self.rf1)
+            print('.. math:: ', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + symeq2, file=self.rf1)
+            print('  ', file=self.rf1)
+            print('|', file=self.rf1)
+            print('  ', file=self.rf1)
+
+        if dval[1] == 'x' or dval[1] == 'n':
+            print('  ', file=self.rf1)
+            print('.. math:: ', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + dval[2], file=self.rf1)
+            print('  ', file=self.rf1)
+            print('|', file=self.rf1)
+            print('  ', file=self.rf1)
 
     def _rst_term(self, dval2, termbegin):
         """Print terms to reStructuredText.
@@ -1187,7 +1202,12 @@ class CalcRST(object):
             txt (string): text that is not part of an operation
 
         """
-        if txt[1].strip()[0] != '#':
+        if txt[1].strip()[0] == '#':
+            return
+        if txt[1][0:7].strip() == '' and txt[1].strip()[0] in '-+1234567890':
+            print(txt[1].rstrip(), file=self.rf1)
+            self.xtraline = False
+        else:
             print(txt[1].strip(), file=self.rf1)
 
     def _rst_blnk(self):

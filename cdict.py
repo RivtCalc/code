@@ -443,19 +443,29 @@ class ModDicts(object):
         self.mdict[mkey] = ['[s]', sleft, '[' + str(self.modelnum) +']']
 
     def _tag_y(self, line):
-        """Add [y] symbolic op to mdict.
-        ::
+        """add [y] symbolic op to mdict
 
-         Argument:
+        Argument:
             line: symbolic line
 
-         Dictionary:
-            symbolic: [[y], expr ]
+        Dictionary:
+            symbolic: [[y], symlang, expr ]
 
         """
 
+        # reset equation number at new section
+        self.enum += 1
+        if self.snum > self.snumchk:
+            self.enum = 1
+            self.snumchk = self.snum
+        enumb = ' [' + str(self.snum) + '.' + str(self.enum) + ']'
+
+
+
         mkey = '_y' + str(self.cnt)
-        self.mdict[mkey] = ['[y]', line[3:].strip()]
+        symlang = line[3:].split('|')[0].strip()
+        expr = line[3:].split('|')[1].strip()
+        self.mdict[mkey] = ['[y]', symlang, expr, enumb]
 
     def _tag_t(self, line):
         """Add [t] term op to mdict.
@@ -639,6 +649,6 @@ class ModDicts(object):
 This document (the calc) is generated from a on-c-e public domain template.
 The calc is licensed under the CCO 1.0 Public Domain Dedication
 at http://creativecommons.org/publicdomain/zero/1.0/
-The calc is not a structural design calculation. The calc user
-assumes sole responsibility for all inputs and results.
+The calc is not a structural design calculation and the user
+is solely responsible for inputs and results.
 """
