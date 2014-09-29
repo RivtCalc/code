@@ -13,8 +13,11 @@ from numpy import *
 import numpy.linalg as LA
 from sympy import *
 from sympy import var as varsym
-from PIL import Image as PImage
-from PIL import ImageOps as PImageOps
+try:
+    from PIL import Image as PImage
+    from PIL import ImageOps as PImageOps
+except:
+    pass
 
 mpathctext = os.getcwd()
 try:
@@ -182,6 +185,9 @@ class CalcUTF(object):
         self._prt_summary()                 # print calc summary file
         #for _i in self.odict: print(i, self.odict[i])
 
+    def get_odict(self):
+        return self.odict
+
     def _prt_sect(self, dval):
         """Print sections to UTF-8.
         ::
@@ -289,11 +295,10 @@ class CalcUTF(object):
             self._prt_utf(" "*4 + ref + " | " + state,  1)
 
     def _prt_check(self, dval):
-        """Print checks to UTF-8.
-        ::
+        """print checks
 
-         arguments:
-            dval (dictionary value):  [[c], check expr, op, limit, ref, dec, ok]
+        Dictionary:
+        check:  [[c], check expr, op, limit, ref, dec, ok]
 
         """
         try:
@@ -361,7 +366,8 @@ class CalcUTF(object):
         for _n in symat:
             #get length of eval(variable)
             evlen = len((eval(_n.__str__())).__str__())
-            new_var = str(_n).ljust(evlen, '~')
+            new_var = str(_n).rjust(evlen, '~')
+            new_var = new_var.replace('_','|')
             symeq1 = symeq1.subs(_n, symbols(new_var))
         # list of new symbols
         symat1 = symeq1.atoms(Symbol)
@@ -370,6 +376,7 @@ class CalcUTF(object):
         #substitute values
         for _n in symat1:
             o_var = str(_n).replace('~', '')
+            o_var = o_var.replace('|', '_')
             expr1 = eval((self.odict[o_var][1]).split("=")[1])
             if type(expr1) == float:
                 form = '{:.' + dval[5].strip()+'f}'
@@ -650,12 +657,10 @@ class CalcUTF(object):
         self._prt_utf(" ", 0)
 
     def _prt_eq(self, dval):
-        """Print equations to UTF-8.
-        ::
+        """print equations
 
-         arguments:
-            dval (dictionary value) [[e], statement, expr, ref, decimals,
-                                    units, prnt opt]
+        Dictionary:
+        equations:[[e], statement, expr, ref, decimals, units, prnt opt]
 
         """
         # set decimal format
@@ -694,6 +699,8 @@ class CalcUTF(object):
         if dval[6].strip() == '0':
             return
 
+        exec(dval[1])
+
         # symbolic and substituted forms
         if dval[6].strip() == '3' or dval[6] == '2':
             # print reference line
@@ -721,27 +728,29 @@ class CalcUTF(object):
                 symat = symeq.atoms(Symbol)
                 symeq1 = sympify(dval[2].strip())
                 #rewrite equation - new variables same length as value
-                for _n in symat:
+                for _n2 in symat:
                     #get length of eval(variable)
-                    evlen = len((eval(_n.__str__())).__str__())
-                    new_var = str(_n).ljust(evlen, '~')
-                    symeq1 = symeq1.subs(_n, symbols(new_var))
+                    evlen = len((eval(_n2.__str__())).__str__())
+                    new_var = str(_n2).rjust(evlen, '~')
+                    new_var = new_var.replace('_','|')
+                    symeq1 = symeq1.subs(_n2, symbols(new_var))
                 symat1 = symeq1.atoms(Symbol)
                 out2 = pretty(symeq1, wrap_line=False)
 
                 # manage variable substitution
-                for _n in symat1:
-                    orig_var = str(_n).replace('~', '')
+                for _n1 in symat1:
+                    orig_var = str(_n1).replace('~', '')
+                    orig_var = orig_var.replace('|', '_')
                     try:
                         expr = eval((self.odict[orig_var][1]).split("=")[1])
                         if type(expr) == float:
                             form = '{:.' + eformat +'f}'
-                            symvar1 = form.format(eval(str(expr)))
+                            symeval1 = form.format(eval(str(expr)))
                         else:
-                            symvar1 = eval(orig_var.__str__()).__str__()
+                            symeval1 = eval(orig_var.__str__()).__str__()
                     except:
-                        symvar1 = eval(orig_var.__str__()).__str__()
-                    out2 = out2.replace(str(_n), symvar1)
+                        symeval1 = eval(orig_var.__str__()).__str__()
+                    out2 = out2.replace(_n1.__str__(), symeval1)
 
                 # clean up unicode
                 out3 = out2.replace('*', u'\u22C5')
@@ -767,14 +776,6 @@ class CalcUTF(object):
                     exec(state)
                 except:
                     pass
-
-        # print result only
-        if dval[6].strip() == '1':
-            tmp = int(self.widthc-2) * '-'
-            self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 1)
-            strend = dval[3].strip()
-            self._prt_utf((var3 + " | " + strend).rjust(self.widthc), 0)
-            self._prt_utf(" ", 0)
 
         # result
         typev = type(eval(var3))
@@ -809,9 +810,9 @@ class CalcUTF(object):
             if type(eval(var3)) == float or type(eval(var3)) == float64:
                 resultform = "%."+rformat + "f"
                 res1 = locale.format(resultform , eval(var3), grouping=True)
-                self._prt_utf((var3 +" = "+ str(res1)).rjust(self.widthc-1), 1)
+                self._prt_utf((var3 +"="+ str(res1)).rjust(self.widthc-1), 1)
             else:
-                self._prt_utf((var3 +" = "+ str(eval(var3))).rjust(self.widthc-1), 1)
+                self._prt_utf((var3 +"="+ str(eval(var3))).rjust(self.widthc-1), 1)
 
         # horizontal line
         tmp = int(self.widthc-2) * '-'
@@ -1027,7 +1028,7 @@ class CalcUTF(object):
 
         cmdstr1 = str(dval[2].strip())
         cmdstr2 = cmdstr1 + '=' + str(list(var4))
-        exec cmdstr2
+        exec(cmdstr2)
         self.odict[cmdstr1] = ['[rd]', cmdstr2]
         #print('cmdstr1', cmdstr1, self.odict[cmdstr1])
 
@@ -1226,7 +1227,7 @@ except:
         pyfile1.write(importstr + 2*"\n")
         pyfile1.write("# begin equations" + "\n")
 
-        # write statements for IPython
+        # write individual statements
         for _j in self.odict:
             mtype = self.odict[_j][0]
             if mtype == '[t]':
@@ -1239,22 +1240,46 @@ except:
                     if len(self.odict[_j][2].strip()):
                         pyfile1.write(self.odict[_j][2].strip() + '\n')
 
-        # write dictionary of variables for IPython
-        pdict = {}
-        for _k in self.odict:
-            if _k[0] != '_':
-                try:
-                    pdict[str(_k).strip()] = [self.odict[_k][1].strip(),
-                                        self.odict[_k][2].strip()]
-                except:
-                    pass
-            if _k == '_a':
-                rng1 = self.odict[_k][1].split('=')
-                rng2 = self.odict[_k][2].split('=')
-                pdict[str(rng1[0]).strip()] = [self.odict[_k][1].strip(),
-                                  rng1[1].strip()]
-                pdict[(rng2[0]).strip()] = [self.odict[_k][2].strip(),
-                                  rng2[1].strip()]
+        # write list of statements
+        _vardef =[]
+        for k1 in self.odict:                       # overwrite symbolic representation
+            if k1[0] != '_' or k1[0:2] == '_a':
+                    try:
+                        exec(self.odict[k1][1].strip())
+                        if '=' in self.odict[k1][1].strip():
+                            _vardef.append(self.odict[k1][1].strip())
+                    except:
+                        pass
+                    try:
+                        exec(self.odict[k1][3].strip())
+                        if '=' in self.odict[k1][3].strip():
+                            _vardef.append(self.odict[k1][3].strip())
+                    except:
+                        pass
+                    try:
+                        exec(self.odict[k1][4].strip())
+                        if '=' in self.odict[k1][4].strip():
+                            _vardef.append(self.odict[k1][4].strip())
+                    except:
+                        pass
+        pyfile1.write('_vardef = ' + str(_vardef) + '\n')
+
+        # write dictionary of variables
+        #pdict = {}
+        #for _k in self.odict:
+        #    if _k[0] != '_':
+        #        try:
+        #            pdict[str(_k).strip()] = [self.odict[_k][1].strip(),
+        #                                self.odict[_k][2].strip()]
+        #        except:
+        #            pass
+        #    if _k == '_a':
+        #        rng1 = self.odict[_k][1].split('=')
+        #        rng2 = self.odict[_k][2].split('=')
+        #        pdict[str(rng1[0]).strip()] = [self.odict[_k][1].strip(),
+        #                          rng1[1].strip()]
+        #        pdict[(rng2[0]).strip()] = [self.odict[_k][2].strip(),
+        #                          rng2[1].strip()]
         #pyfile1.write(str('_md =  ') + str(pdict))
         pyfile1.close()
 

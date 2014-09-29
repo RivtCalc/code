@@ -104,6 +104,73 @@ __author__ = 'rholland'
 locale.setlocale(locale.LC_ALL, '')
 
 #------------------------------------------------------------------------------
+def _cmdline(version):
+    """command line help
+    ::
+
+     Prints help with -h switch or error.
+
+    """
+    print()
+    print("oncepy  ver:" + version)
+    print("Use:")
+    print("python -m oncepy ddmm.modfile.txt (options)")
+    print("   where dd is the division and mm is the model number")
+    print()
+    print("options:")
+    print("   -h    prints this prompt")
+    print("   -c    echoes UTF-8 calc to console (stdout)")
+    print("   -b    opens UTF-8 calc in Windows browser")
+    print("         tries the following browsers in order:")
+    print("             start chrome modfile.m.txt ")
+    print("             start firefox modfile.m.txt")
+    print("             start iexplore file:///%CD%/modfile.m.txt")
+    print("   -noclean  leaves PDF intermediate files on disk")
+    print()
+    print("set browser encoding to UTF-8; refer to user manual")
+    print()
+    print("outputs:")
+    print("   logddmm.model.txt")
+    print()
+    print("if no errors then outputs:")
+    print("     ddmm.modfile.py     (Python equation file")
+    print("     calddmm.modfile.txt (UTF-8 calc")
+    print("     sumddmm.modfile.txt (calculation summary)")
+    print("if option selected in model or project file:")
+    print("     calddmm.modfile.pdf (PDF calc")
+    print("     project.pdf (PDF project calc)")
+
+def _outterm(echoflag, calcf):
+    """-e or -b flag echoes calc to console or browser
+    ::
+
+     -b switch needed primarily on Window where UTF-8 is missing
+
+    """
+    # onceweb modified
+    if echoflag == 'e':
+        print()
+        print("|======================  "
+                "echo calc  =====================|")
+        print()
+        try:
+            with open(calcf, 'r') as mod1:
+                for i in mod1.readlines():
+                    print(i)
+        except OSError:
+            pass
+    elif echoflag == 'b':
+        try:
+            os.system("start chrome " + calcf)
+        except OSError:
+            try:
+                os.system("start firefox " + calcf)
+            except OSError:
+                try:
+                    os.system("start iexplore file:///%CD%/" + calcf)
+                except OSError:
+                    pass
+
 def _gencalc(fi4):
     """ program execution sequence
     ::
@@ -121,7 +188,6 @@ def _gencalc(fi4):
     dicts.build_dicts()
     fidict = dicts.get_fidict()
     mdict = dicts.get_mdict()
-    modinit.out_term()                              # echo output if -e or -b
 
     oCfg.caltype = 0                                # check for PDF calc flag
     with open(oCfg.sysargv[1], 'r') as f5:
@@ -197,11 +263,16 @@ def _gencalc(fi4):
         pdfout1.gen_pdf()
         ew.errwrite("< pdf file written >", 0)
 
+        odict1 = newmod.get_odict()
+        _outterm(_echoflag, calcf)              # echo UTF calc
+        return odict1
+
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':                      # start program
     #print(sys.argv)
     oCfg.sysargv = sys.argv
+    _echoflag = ''
 
     startmod = ModStart
     startproj = ProjStart
@@ -213,6 +284,39 @@ if __name__ == '__main__':                      # start program
         startmod.cmdline(__version__)
     if len(oCfg.sysargv) > 2 and '-noclean' in oCfg.sysargv:
         _cleanflag = 0                          # set clean aux files flag
+
+    if len(oCfg.sysargv) < 2:                  # check command line input
+        _cmdline()
+        mpath = os.getcwd()
+        os.chdir(mpath)
+        print("  ")
+        print("current working directory: " + mpath)
+        print("  ")
+        userinput = input('enter model name and arguments : ').split()
+        print("enter model file: " + os.getcwd())
+        try:
+            mfile = userinput[0]
+            if '-e' in userinput:
+                _echoflag = 'e'
+            elif '-b' in userinput:
+                _echoflag = 'b'
+        except:
+            sys.exit(1)
+    elif oCfg.sysargv[1] == '-h':
+        _cmdline()
+        sys.exit(1)
+    else:
+        mfile = sys.argv[1]                 # model name
+        mpath = os.getcwd()                 # model path
+        os.chdir(mpath)
+        if len(oCfg.sysargv) > 2:
+            if '-e' in oCfg.sysargv:
+                _echoflag = 'e'
+            elif '-b' in oCfg.sysargv:
+                _echoflag = 'b'
+            elif '-noclean' in oCfg.sysargv:
+                _cleanflag = 0
+
 
     _ew = ModCheck()                            # start execution log
     _ew.logstart()
@@ -247,7 +351,31 @@ if __name__ == '__main__':                      # start program
     fi5 = [rstfile, texfile, auxfile, outfile, logfile,
                texmak1, texmak2]
 
-    _gencalc(fi5)                               # generate calcs
+    odict2 = _gencalc(fi5)                               # generate calcs
+
+
+    _vardef =[]
+    for k1 in odict2:                       # overwrite symbolic representation
+        if k1[0] != '_' or k1[0:2] == '_a':
+                try:
+                    exec(odict2[k1][1].strip())
+                    if '=' in odict2[k1][1].strip():
+                        _vardef.append(odict2[k1][1].strip())
+                except:
+                    pass
+                try:
+                    exec(odict2[k1][3].strip())
+                    if '=' in odict2[k1][3].strip():
+                        _vardef.append(odict2[k1][3].strip())
+                except:
+                    pass
+                try:
+                    exec(odict2[k1][4].strip())
+                    if '=' in odict2[k1][4].strip():
+                        _vardef.append(odict2[k1][4].strip())
+                except:
+                    pass
+
 
     _ew.errwrite("< calc completed >", 1)
     _ew.logclose()                              # close log
