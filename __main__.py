@@ -87,6 +87,7 @@ from __future__ import division
 from __future__ import print_function
 import locale
 import os
+import glob
 import sys
 import oncepy
 from oncepy.cproj import ProjStart
@@ -277,18 +278,15 @@ if __name__ == '__main__':                      # start program
     startmod = ModStart
     startproj = ProjStart
 
+    if '-h' in sys.argv:
+        _cmdline()
+        sys.exit(1)
+
     _cleanflag = 1
     if len(oCfg.sysargv) < 2:                    # check command line input
         startmod.cmdline(__version__)
-    elif oCfg.sysargv[1] == '-h':
-        startmod.cmdline(__version__)
-    if len(oCfg.sysargv) > 2 and '-noclean' in oCfg.sysargv:
-        _cleanflag = 0                          # set clean aux files flag
-
-    if len(oCfg.sysargv) < 2:                  # check command line input
         _cmdline()
         mpath = os.getcwd()
-        os.chdir(mpath)
         print("  ")
         print("current working directory: " + mpath)
         print("  ")
@@ -302,28 +300,29 @@ if __name__ == '__main__':                      # start program
                 _echoflag = 'b'
         except:
             sys.exit(1)
-    elif oCfg.sysargv[1] == '-h':
-        _cmdline()
-        sys.exit(1)
     else:
         mfile = sys.argv[1]                 # model name
         mpath = os.getcwd()                 # model path
-        os.chdir(mpath)
         if len(oCfg.sysargv) > 2:
             if '-e' in oCfg.sysargv:
                 _echoflag = 'e'
             elif '-b' in oCfg.sysargv:
                 _echoflag = 'b'
             elif '-noclean' in oCfg.sysargv:
-                _cleanflag = 0
 
+    if len(oCfg.sysargv) > 2 and '-noclean' in sys.argv:
+        _cleanflag = 0                      # set clean aux files flag
 
-    _ew = ModCheck()                            # start execution log
-    _ew.logstart()
+    try:                                    # check if model exists in cur dir
+        os.chdir(mpath)
+        f2 = open(mfile,'r')
+    except:                                 # change to model directory
+        projdiv = mfile.strip()[0:2]
+        mpath = glob.glob(mpath + "/" + projdiv + "*")[0]
 
-
-    oCfg.mfile = oCfg.sysargv[1]                  # set paths
-    oCfg.mpath = os.getcwd()
+    os.chdir(mpath)
+    oCfg.mfile = mfile                # set paths
+    oCfg.mpath = mpath
     os.chdir(oCfg.mpath)
     sys.path.append(oCfg.mpath)
     #print(oCfg.mfile)
@@ -341,7 +340,7 @@ if __name__ == '__main__':                      # start program
                 break
                 #_startproj()
 
-    rstfile = oCfg.mfile.replace('.txt', '.rst') # list of auxiliary files
+    rstfile = oCfg.mfile.replace('.txt', '.rst') # list of PDF auxiliary files
     texfile = oCfg.mfile.replace('.txt', '.tex')
     auxfile = oCfg.mfile.replace('.txt', '.aux')
     outfile = oCfg.mfile.replace('.txt', '.out')
@@ -350,12 +349,12 @@ if __name__ == '__main__':                      # start program
     texmak2 = oCfg.mfile.replace('.txt', '.fdb_latexmk')
     fi5 = [rstfile, texfile, auxfile, outfile, logfile,
                texmak1, texmak2]
+    _ew = ModCheck()                        # start execution log
+    _ew.logstart()
+    odict2 = _gencalc(fi5)                  # generate calcs
 
-    odict2 = _gencalc(fi5)                               # generate calcs
-
-
-    _vardef =[]
-    for k1 in odict2:                       # overwrite symbolic representation
+    _vardef =[]                             # list of equations for shell
+    for k1 in odict2:                       # exec and overwrite any symbolics
         if k1[0] != '_' or k1[0:2] == '_a':
                 try:
                     exec(odict2[k1][1].strip())
@@ -363,18 +362,19 @@ if __name__ == '__main__':                      # start program
                         _vardef.append(odict2[k1][1].strip())
                 except:
                     pass
-                try:
-                    exec(odict2[k1][3].strip())
-                    if '=' in odict2[k1][3].strip():
-                        _vardef.append(odict2[k1][3].strip())
-                except:
-                    pass
-                try:
-                    exec(odict2[k1][4].strip())
-                    if '=' in odict2[k1][4].strip():
-                        _vardef.append(odict2[k1][4].strip())
-                except:
-                    pass
+                if k1[0:2] == '_a':
+                    try:
+                        exec(odict2[k1][3].strip())
+                        if '=' in odict2[k1][3].strip():
+                            _vardef.append(odict2[k1][3].strip())
+                    except:
+                        pass
+                    try:
+                        exec(odict2[k1][4].strip())
+                        if '=' in odict2[k1][4].strip():
+                            _vardef.append(odict2[k1][4].strip())
+                    except:
+                        pass
 
 
     _ew.errwrite("< calc completed >", 1)

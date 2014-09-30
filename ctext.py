@@ -1184,7 +1184,6 @@ class CalcUTF(object):
                 'from __future__ import print_function\n'
                 'import os\n'
                 'import sys\n'
-                'import oncepy\n'
                 'from sympy import *\n'
                 'from numpy import *\n'
                 'import numpy.linalg as LA\n'
@@ -1201,7 +1200,8 @@ class CalcUTF(object):
                 'history database and opened in the IPython interpreter. \n'
                 '""" \n \n')
 
-        str3 = "sys.path.append('" + str(os.getcwd()) + "')"
+        str3a = str(os.getcwd()).replace("\\", "\\\\")
+        str3 = "sys.path.append('" + str3a + "')"
 
         str4 = """
 try:
