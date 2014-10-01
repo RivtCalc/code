@@ -211,7 +211,6 @@ class CalcUTF(object):
         pr1 = "\\documentclass[preview, 12pt]{standalone}\n" \
                     "\\begin{document}\n"
 
-        print('dval '+ dval[1])
         if dval[1] == 'n':
             return
         self._prt_utf(dval[3].rjust(self.widthc-1), 0)
@@ -262,7 +261,6 @@ class CalcUTF(object):
                 f2 = "latex" + str(dval[3].strip()) + ".png"
                 self._prt_utf("equation <file: " + str(f2) + ">", 1)
                 expr6 = '$' + dval[2].strip() + '$'
-                print('***0' + expr6)
                 printing.preview(expr6, output='png', viewer='file',
                                  filename=f2, preamble=pr1)
                 im10 = PImage.open(f2)
@@ -273,7 +271,6 @@ class CalcUTF(object):
             except IOError:
                 self.ew.errwrite("< x option for [y] operation requires LaTeX and PIL - "
                          "file not written >", 1)
-
         self._prt_utf(" ", 0)
 
     def _prt_term(self, dval):
