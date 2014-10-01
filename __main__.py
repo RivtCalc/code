@@ -308,7 +308,6 @@ if __name__ == '__main__':                      # start program
                 _echoflag = 'e'
             elif '-b' in oCfg.sysargv:
                 _echoflag = 'b'
-            elif '-noclean' in oCfg.sysargv:
 
     if len(oCfg.sysargv) > 2 and '-noclean' in sys.argv:
         _cleanflag = 0                      # set clean aux files flag

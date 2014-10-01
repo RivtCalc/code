@@ -211,6 +211,7 @@ class CalcUTF(object):
         pr1 = "\\documentclass[preview, 12pt]{standalone}\n" \
                     "\\begin{document}\n"
 
+        print('dval '+ dval[1])
         if dval[1] == 'n':
             return
         self._prt_utf(dval[3].rjust(self.widthc-1), 0)
@@ -238,8 +239,9 @@ class CalcUTF(object):
                     cnt = 0
             self._prt_utf(out3.replace('<=', '='), 1)
             self._prt_utf(" ", 0)
-            try:
-                if dval[1] == 'f':
+
+            if dval[1] == 'f':
+                try:
                     f1 = "latex" + str(dval[3].strip()) + ".png"
                     self._prt_utf("equation <file: " + str(f1) + ">", 1)
                     expr5 = latex(eval(expr1))
@@ -249,26 +251,27 @@ class CalcUTF(object):
                     im10 = PImage.open(f1)
                     imwidth, imheight = im10.size
                     im20 = im10.resize((int(imwidth*sf1), int(imheight*sf1)), PImage.BICUBIC)
-                    im20 = PImageOps.expand(im20,border=10,fill='white')
-                    im20.save(f1, "PNG")
-            except:
-                self.ew.errwrite("< f option for [y] operation requires LaTeX - "
+                    im30 = PImageOps.expand(im20, border=10, fill='white')
+                    im30.save(f1, "PNG")
+                except IOError:
+                    self.ew.errwrite("< f option for [y] operation requires LaTeX and PIL - "
                              "file not written >", 1)
 
-        try:
-            if dval[1] == 'x':
-                f1 = "latex" + str(dval[3].strip()) + ".png"
-                self._prt_utf("equation <file: " + str(f1) + ">", 1)
-                expr6 = '$' + dval[2] + '$'
+        if dval[1] == 'x':
+            try:
+                f2 = "latex" + str(dval[3].strip()) + ".png"
+                self._prt_utf("equation <file: " + str(f2) + ">", 1)
+                expr6 = '$' + dval[2].strip() + '$'
+                print('***0' + expr6)
                 printing.preview(expr6, output='png', viewer='file',
-                                 filename=f1, preamble=pr1)
-                im10 = PImage.open(f1)
+                                 filename=f2, preamble=pr1)
+                im10 = PImage.open(f2)
                 imwidth, imheight = im10.size
                 im20 = im10.resize((int(imwidth*sf1), int(imheight*sf1)), PImage.BICUBIC)
-                im20 = PImageOps.expand(im20,border=10,fill='white')
-                im20.save(f1, "PNG")
-        except:
-            self.ew.errwrite("< x option for [y] operation requires LaTeX - "
+                im30 = PImageOps.expand(im20, border=10, fill='white')
+                im30.save(f2, "PNG")
+            except IOError:
+                self.ew.errwrite("< x option for [y] operation requires LaTeX and PIL - "
                          "file not written >", 1)
 
         self._prt_utf(" ", 0)
@@ -1170,12 +1173,10 @@ class CalcUTF(object):
          the following libraries are imported when the file is imported:
             os
             sys
-            oncepy
             sympy
             numpy
             numpy.linalg
             OrderedDict
-         todo: add array terms and variables to the file
 
         """
         pyfile1 = open(self.pyfile, 'w')
@@ -1195,9 +1196,14 @@ class CalcUTF(object):
                 '\nFor interactive analysis copy and paste the entire file\n'
                 'into an Ipython Notebook cell or Komodo IDE interactive shell.\n'
 
-                '\nFor interactive analysis in IPython click on the IP[y]\n'
-                'toolbar button. The equations will be copied to the sqlite '
-                'history database and opened in the IPython interpreter. \n'
+                '\nFor interactive analysis in IPython in Komodo click on\n'
+                'the IP[y] toolbar button. The equations will be copied to\n'
+                'the sqlite history database and opened in the IPython interpreter.\n'
+
+                '\nFor interactive analysis in the Pyzo shell copy and paste\n'
+                'the Pyzo command lines above - one at a time.  Copy and paste '
+                'equations from this file into the shell for interactive '
+                'analysis - one at a time\n'
                 '""" \n \n')
 
         str3a = str(os.getcwd()).replace("\\", "\\\\")
@@ -1221,28 +1227,36 @@ except:
        pass
 """
 
+        mpath1 = cfg.mpath.replace('\\','\\\\')
+        pyfile1.write('\n# Pyzo command lines:\n# cd ' + mpath1 +
+                      '\n# run -m onceutf ' + str(cfg.mfile)+ '\n')
 
-        importstr = str1 + str2 + str3 + str4
+        importstr = str2 + str1 + str3 + str4
 
         pyfile1.write(importstr + 2*"\n")
-        pyfile1.write("# begin equations" + "\n")
 
+        pyfile1.write("# begin equations" + "\n")
         # write individual statements
         for _j in self.odict:
             mtype = self.odict[_j][0]
             if mtype == '[t]':
-                pyfile1.write(self.odict[_j][1].strip()+'\n')
+                pyfile1.write(self.odict[_j][1].strip()+'; '+ str(_j)+ '\n')
             elif mtype == '[e]':
-                pyfile1.write(self.odict[_j][1].strip()+'\n')
+                pyfile1.write(self.odict[_j][1].strip()+'; '+ str(_j)+ '\n')
             elif mtype == '[a]':
+                    var1 = self.odict[_j][1].strip().split('=')[0]
                     if len(self.odict[_j][1].strip()):
-                        pyfile1.write(self.odict[_j][1].strip() +'\n')
-                    if len(self.odict[_j][2].strip()):
-                        pyfile1.write(self.odict[_j][2].strip() + '\n')
+                        pyfile1.write(self.odict[_j][1].strip()+'; '+var1+'\n')
+                    var3 = self.odict[_j][3].strip().split('=')[0]
+                    if len(self.odict[_j][3].strip()):
+                        pyfile1.write(self.odict[_j][3].strip()+'; '+var3+'\n')
+                    var4 = self.odict[_j][4].strip().split('=')[0]
+                    if len(self.odict[_j][4].strip()):
+                        pyfile1.write(self.odict[_j][4].strip()+'; '+var4+'\n')
 
         # write list of statements
         _vardef =[]
-        for k1 in self.odict:                       # overwrite symbolic representation
+        for k1 in self.odict:               # overwrite symbolic representation
             if k1[0] != '_' or k1[0:2] == '_a':
                     try:
                         exec(self.odict[k1][1].strip())
@@ -1282,6 +1296,7 @@ except:
         #                          rng2[1].strip()]
         #pyfile1.write(str('_md =  ') + str(pdict))
         pyfile1.close()
+
 
     def _prt_summary(self):
         """write model summary to summary file
