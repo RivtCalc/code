@@ -63,7 +63,7 @@ class ModDicts(object):
         # read format defaults from main model file
         self.widthc = 90
         for _i in self.mmod:
-            mtag = _i[0:10]
+            mtag = _i[0:11]
             if mtag == "#- formateq":
                 ilist = _i[3:].split('|')
                 dec1 = ilist[1].strip()
@@ -188,7 +188,7 @@ class ModDicts(object):
             cmtxt = cm.readlines()
         pend1 = False
         for i in cmtxt:
-            mtag = i[0:9]
+            mtag = i[0:11]
             if mtag == "#- formateq":
                 pend1 = True
                 tg, fmt, caltyp = i.split('|')
@@ -223,7 +223,7 @@ class ModDicts(object):
         pend2 = False
         editlist = []
         for i in cmtxt:
-            if i[:7] == "#- fileop":
+            if i[:9] == "#- fileop":
                 pend1 = True
                 continue
 
