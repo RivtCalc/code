@@ -64,7 +64,7 @@ class ModDicts(object):
         self.widthc = 90
         for _i in self.mmod:
             mtag = _i[0:10]
-            if mtag == "#- format":
+            if mtag == "#- formateq":
                 ilist = _i[3:].split('|')
                 dec1 = ilist[1].strip()
                 self.defaultdec = dec1
@@ -172,7 +172,7 @@ class ModDicts(object):
         return self.fidict
 
     def _build_fdict(self, curmod):
-        """Build format dictionary from '#- format' op tag.
+        """Build format dictionary from '#- formateq' op tag.
         ::
 
          Append if more than one model
@@ -189,7 +189,7 @@ class ModDicts(object):
         pend1 = False
         for i in cmtxt:
             mtag = i[0:9]
-            if mtag == "#- format":
+            if mtag == "#- formateq":
                 pend1 = True
                 tg, fmt, caltyp = i.split('|')
                 self.fdict['default'] = [fmt.strip(), caltyp.strip(), '']
@@ -203,7 +203,7 @@ class ModDicts(object):
                     self.fdict[fnum] = [dec2.strip(), unt.strip(), lbl.strip()]
 
     def _build_fidict(self, curmod):
-        """Build file dictionary from '#- file' op tag.
+        """Build file dictionary from '#- fileop' op tag.
         ::
 
          Append if more than one model.
@@ -223,7 +223,7 @@ class ModDicts(object):
         pend2 = False
         editlist = []
         for i in cmtxt:
-            if i[:7] == "#- file":
+            if i[:7] == "#- fileop":
                 pend1 = True
                 continue
 

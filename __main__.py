@@ -194,9 +194,9 @@ def _gencalc(fi4):
     with open(oCfg.sysargv[1], 'r') as f5:
         readlines2 = f5.readlines()
     for i2 in readlines2:
-        # check for #- format tag
+        # check for #- formateq tag
         if len(i2.strip()) > 0:
-            if i2.split('|')[0].strip() == '#- format':
+            if i2.split('|')[0].strip() == '#- formateq':
                 oCfg.caltype = i2.split('|')[2].strip()
 
     if float(oCfg.caltype) != 0:
