@@ -100,7 +100,7 @@ from oncepy.ccheck import ModCheck
 import oncepy.oconfig as oCfg
 from sympy.core.cache import *
 
-__version__ = "0.4.6"
+__version__ = "0.4.7"
 __author__ = 'rholland'
 locale.setlocale(locale.LC_ALL, '')
 
