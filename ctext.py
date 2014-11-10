@@ -239,7 +239,7 @@ class CalcUTF(object):
             self._prt_utf(out3.replace('<=', '='), 1)
             self._prt_utf(" ", 0)
 
-            if dval[1] == 'f':
+            if dval[1] == 'p':
                 try:
                     f1 = "latex" + str(dval[3].strip()) + ".png"
                     self._prt_utf("equation <file: " + str(f1) + ">", 1)
@@ -253,7 +253,7 @@ class CalcUTF(object):
                     im30 = PImageOps.expand(im20, border=10, fill='white')
                     im30.save(f1, "PNG")
                 except IOError:
-                    self.ew.errwrite("< f option for [y] operation requires LaTeX and PIL - "
+                    self.ew.errwrite("< p option for [y] operation requires LaTeX and PIL - "
                              "file not written >", 1)
 
         if dval[1] == 'x':

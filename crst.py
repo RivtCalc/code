@@ -212,7 +212,7 @@ class CalcRST(object):
         print('  ', file=self.rf1)
         print("aa-bb " + '**'+tright+'**', file=self.rf1)
 
-        if dval[1] == 's' or dval[1] == 'f':
+        if dval[1] == 's' or dval[1] == 'p':
             dval1 = dval[2].replace('=', '<=')
             exp2 = dval1.split('\n')
             exp3 = ' '.join([ix.strip() for ix in exp2])
@@ -233,7 +233,7 @@ class CalcRST(object):
             print('|', file=self.rf1)
             print('  ', file=self.rf1)
 
-        if dval[1] == 'x' or dval[1] == 'n':
+        if dval[1] == 'x':
             print('  ', file=self.rf1)
             print('.. math:: ', file=self.rf1)
             print('  ', file=self.rf1)
