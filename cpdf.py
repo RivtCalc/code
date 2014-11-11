@@ -100,7 +100,7 @@ class CalcPDF(object):
         """Call external programs that write PDF file from reStructureText.
 
         """
-        pdf1 = 'latexmk -xelatex -quiet ' + str(self.texfile)
+        pdf1 = 'latexmk -xelatex -quiet -f ' + str(self.texfile)
         os.system(pdf1)
         self.ew.errwrite('', 1)
         self.ew.errwrite("< xelatex " + str(self.texfile) +" >", 0)

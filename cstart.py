@@ -207,5 +207,7 @@ class ModStart(object):
         self.ew.errwrite(table1.tabulate(tab1,
                 headers=[' Variable', 'Type and Value', 'Units', 'Model'],
                 tablefmt='rst', floatfmt=".4f"), 1)
+        if len(tab1) == 0:
+            self.ew.errwrite("   [No variables in model]", 1)
 
 

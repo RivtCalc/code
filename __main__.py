@@ -353,28 +353,30 @@ if __name__ == '__main__':                      # start program
     odict2 = _gencalc(fi5)                  # generate calcs
 
     _vardef =[]                             # list of equations for shell
-    for k1 in odict2:                       # exec and overwrite any symbolics
-        if k1[0] != '_' or k1[0:2] == '_a':
-                try:
-                    exec(odict2[k1][1].strip())
-                    if '=' in odict2[k1][1].strip():
-                        _vardef.append(odict2[k1][1].strip())
-                except:
-                    pass
-                if k1[0:2] == '_a':
+    try:
+        for k1 in odict2:                       # exec and overwrite any symbolics
+            if k1[0] != '_' or k1[0:2] == '_a':
                     try:
-                        exec(odict2[k1][3].strip())
-                        if '=' in odict2[k1][3].strip():
-                            _vardef.append(odict2[k1][3].strip())
+                        exec(odict2[k1][1].strip())
+                        if '=' in odict2[k1][1].strip():
+                            _vardef.append(odict2[k1][1].strip())
                     except:
                         pass
-                    try:
-                        exec(odict2[k1][4].strip())
-                        if '=' in odict2[k1][4].strip():
-                            _vardef.append(odict2[k1][4].strip())
-                    except:
-                        pass
-
+                    if k1[0:2] == '_a':
+                        try:
+                            exec(odict2[k1][3].strip())
+                            if '=' in odict2[k1][3].strip():
+                                _vardef.append(odict2[k1][3].strip())
+                        except:
+                            pass
+                        try:
+                            exec(odict2[k1][4].strip())
+                            if '=' in odict2[k1][4].strip():
+                                _vardef.append(odict2[k1][4].strip())
+                        except:
+                            pass
+    except:
+        print("equation dictionary is empty")
 
     _ew.errwrite("< calc completed >", 1)
     _ew.logclose()                              # close log

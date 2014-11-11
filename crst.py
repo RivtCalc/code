@@ -119,8 +119,10 @@ class CalcRST(object):
         termbegin = 1 # avoid extra lines in term lists
         mtagx = ''
         for _i in self.odict:
+            self.xtraline = True
             #print(_i, self.odict[_i])
             mtag = self.odict[_i][0]
+            #print(mtag)
             if mtagx == '[t]':
                 if mtag == '[t]':
                     termbegin = 0
@@ -166,8 +168,8 @@ class CalcRST(object):
             else:
                 pass
 
-            if mtag == '[~]' and self.xtraline is False:
-                self.xtraline = True
+            #if mtag == '[~]' and self.xtraline is False:
+            #    self.xtraline = True
             if mtag == '[~]' and self.xtraline is True:
                 self._rst_blnk()
 
@@ -1203,12 +1205,16 @@ class CalcRST(object):
 
         """
         if txt[1].strip()[0] == '#':
-            return
-        if txt[1][0:7].strip() == '' and txt[1].strip()[0] in '-+1234567890':
+            pass
+        elif txt[1].strip() == "`":
+            print('  ', file=self.rf1)
+            self.xtraline = False
+        elif txt[1][0:7].strip() == '' and txt[1].strip()[0] in '-+1234567890':
             print(txt[1].rstrip(), file=self.rf1)
             self.xtraline = False
         else:
-            print(txt[1].strip(), file=self.rf1)
+            print(txt[1].rstrip(), file=self.rf1)
+            self.xtraline = True
 
     def _rst_blnk(self):
         """Print blank line.
@@ -1219,3 +1225,4 @@ class CalcRST(object):
         print('  ', file=self.rf1)
         print('   \\vspace{4mm}', file=self.rf1)
         print('  ', file=self.rf1)
+
