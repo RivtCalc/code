@@ -802,15 +802,15 @@ class CalcUTF(object):
             #print('chkunit', tmp, chkunit)
             if len(chkunit) < 2:
                 tmp1 = ''
-            resultform = "%."+rformat + "f"
-            result1 = locale.format(resultform , tmp2, grouping=True)
+            resultform = "{:,."+rformat + "f}"
+            result1 = resultform.format(tmp2)
             tmp3 = result1 + ' '  + tmp1
             self._prt_utf((var3 + " = " + tmp3).rjust(self.widthc-1), 1)
         else:
             if type(eval(var3)) == float or type(eval(var3)) == float64:
-                resultform = "%."+rformat + "f"
-                res1 = locale.format(resultform , eval(var3), grouping=True)
-                self._prt_utf((var3 +"="+ str(res1)).rjust(self.widthc-1), 1)
+                resultform = "{:,."+rformat + "f}"
+                result1 = resultform.format(eval(var3))
+                self._prt_utf((var3 +"="+ str(result1)).rjust(self.widthc-1), 1)
             else:
                 self._prt_utf((var3 +"="+ str(eval(var3))).rjust(self.widthc-1), 1)
 
