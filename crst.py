@@ -913,14 +913,14 @@ class CalcRST(object):
             #print('chkunit', tmp, chkunit)
             if len(chkunit) < 2:
                 tmp1 = ''
-            resultform = "%."+rformat + "f"
-            result1 = locale.format(resultform , tmp2, grouping=True)
+            resultform = "{:,."+rformat + "f}"
+            result1 = resultform.format(tmp2)
             tmp3 = var3 +"="+ result1 + ' '  + tmp1
         else:
             print1 = 2
             if type(eval(var3)) == float or type(eval(var3)) == float64:
-                resultform = "%."+rformat + "f"
-                result1 = locale.format(resultform ,eval(var3), grouping=True)
+                resultform = "{:,."+rformat + "f}"
+                result1 = resultform.format(eval(var3))
                 tmp3 = var3 +"="+ result1
             else:
                 tmp3 = var3 +"="+ str(eval(var3))
