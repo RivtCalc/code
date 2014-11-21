@@ -647,8 +647,8 @@ class ModDicts(object):
 """____________________________________________________________________________
 
 This document (the calc) is generated from a on-c-e public domain template.
-The calc is licensed under the CCO 1.0 Public Domain Dedication
+The template is licensed under the CCO 1.0 Public Domain Dedication
 at http://creativecommons.org/publicdomain/zero/1.0/
-The calc is not a structural design calculation and the user
-is solely responsible for inputs and results.
+Neither the template or calc represent structural designs and
+the user is solely responsible for inputs and results.
 """

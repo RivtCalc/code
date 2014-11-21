@@ -954,7 +954,7 @@ class CalcRST(object):
 
         print(".. raw:: latex", file=self.rf1)
         print('  ', file=self.rf1)
-        print('   \\vspace{-8mm}', file=self.rf1)
+        print('   \\vspace{-4mm}', file=self.rf1)
         print('  ', file=self.rf1)
 
 
@@ -1220,9 +1220,15 @@ class CalcRST(object):
         """Print blank line.
 
         """
+        #print('  ', file=self.rf1)
+        #print(".. raw:: latex", file=self.rf1)
+        #print('  ', file=self.rf1)
+        #print('   \\vspace{1mm}', file=self.rf1)
         print('  ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\vspace{4mm}', file=self.rf1)
-        print('  ', file=self.rf1)
+        print('.. ', file=self.rf1)
+        print('   ', file=self.rf1)
+
+
+
+
 

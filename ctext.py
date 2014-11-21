@@ -13,6 +13,7 @@ from numpy import *
 import numpy.linalg as LA
 from sympy import *
 from sympy import var as varsym
+from sympy import printing
 try:
     from PIL import Image as PImage
     from PIL import ImageOps as PImageOps
@@ -211,11 +212,8 @@ class CalcUTF(object):
         pr1 = "\\documentclass[preview, 12pt]{standalone}\n" \
                     "\\begin{document}\n"
 
-        if dval[1] == 'n':
-            return
-        self._prt_utf(dval[3].rjust(self.widthc-1), 0)
 
-        if dval[1] == 's' or dval[1] == 'f':
+        if dval[1] == 's' or dval[1] == 'p':
             expr1 = dval[2].replace('=', '<=')
             exp2 = expr1.split('\n')
             exp3 = ' '.join([ix.strip() for ix in exp2])
@@ -239,10 +237,10 @@ class CalcUTF(object):
             self._prt_utf(out3.replace('<=', '='), 1)
             self._prt_utf(" ", 0)
 
-            if dval[1] == 'p':
-                try:
+            try:
+                if dval[1] == 'p':
                     f1 = "latex" + str(dval[3].strip()) + ".png"
-                    self._prt_utf("equation <file: " + str(f1) + ">", 1)
+                    self._prt_utf("equation <file: " + str(f1) + ">", 0)
                     expr5 = latex(eval(expr1))
                     expr6 = '$'+ expr5.replace('<=', '=') +'$'
                     printing.preview(expr6, output='png', viewer='file',
@@ -250,27 +248,28 @@ class CalcUTF(object):
                     im10 = PImage.open(f1)
                     imwidth, imheight = im10.size
                     im20 = im10.resize((int(imwidth*sf1), int(imheight*sf1)), PImage.BICUBIC)
-                    im30 = PImageOps.expand(im20, border=10, fill='white')
-                    im30.save(f1, "PNG")
-                except IOError:
-                    self.ew.errwrite("< p option for [y] operation requires LaTeX and PIL - "
+                    im20 = PImageOps.expand(im20,border=10,fill='white')
+                    im20.save(f1, "PNG")
+            except:
+                self.ew.errwrite("< p option for [y] operation requires LaTeX - "
                              "file not written >", 1)
 
         if dval[1] == 'x':
             try:
-                f2 = "latex" + str(dval[3].strip()) + ".png"
-                self._prt_utf("equation <file: " + str(f2) + ">", 1)
-                expr6 = '$' + dval[2].strip() + '$'
+                f1 = "latex" + str(dval[3].strip()) + ".png"
+                self._prt_utf("equation <file: " + str(f1) + ">", 0)
+                expr6 =  '$' + dval[2].strip() + '$'
+
                 printing.preview(expr6, output='png', viewer='file',
-                                 filename=f2, preamble=pr1)
-                im10 = PImage.open(f2)
+                                 filename=f1, preamble=pr1)
+                im10 = PImage.open(f1)
                 imwidth, imheight = im10.size
                 im20 = im10.resize((int(imwidth*sf1), int(imheight*sf1)), PImage.BICUBIC)
-                im30 = PImageOps.expand(im20, border=10, fill='white')
-                im30.save(f2, "PNG")
-            except IOError:
-                self.ew.errwrite("< x option for [y] operation requires LaTeX and PIL - "
-                         "file not written >", 1)
+                im20 = PImageOps.expand(im20, border=10, fill='white')
+                im20.save(f1, "PNG")
+            except:
+                self.ew.errwrite("< x option for [y] operation requires LaTeX - "
+                               "file not written >", 1)
         self._prt_utf(" ", 0)
 
     def _prt_term(self, dval):
