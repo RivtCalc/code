@@ -1,5 +1,5 @@
 **oncepy**
-==============
+===========
 
 The package *oncepy* and the portable module *onceutf.py* take a
 *on-c-e* ASCII model *ddmm.model.txt* as input and return formatted
