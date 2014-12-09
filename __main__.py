@@ -11,30 +11,34 @@ the model number,  *dd* is the division number, and *mm* is the model
 designation.
 ::
 
- oncepy and onceutf.py platforms:
-    Anaconda, Enthought, Pythonxy on
-    Windows, Linux, OSX
+ platforms:
+    Anaconda, Enthought, Pythonxy or a minimum installation (see manual)
+    on Windows, Linux, OSX
 
- onceutf.py platforms:
-    web: Wakari, PythonAnywhere in browser
-    mobile: QPython on Android, Pythonista on iOS
+    onceutf.py: Wakari, PythonAnywhere web platforms
+    onceutf.py: QPython, Pythonista on Android and iOS
 
-**Example oncepy**
+**oncepy**
 
 Unzip and copy the **oncepy** package (folder) to the python/lib/site-packages
-directory. From a terminal window type:
+directory. From a terminal window in the model or directory type:
 
 .. code:: python
 
     python -m oncepy ddmm.model.txt (-e or -b)
 
 The -e or -b options echo the calc to a shell (-e) or a Windows
-browser (-b). The -b option is needed in the Windows shell because
-the shell lacks needed UTF-8 encoding.
+browser (-b). The -b option is needed when the shell lacks complete UTF-8
+encoding.
 
-**Example onceutf.py**
+If the program is started from a directory other than the model or
+project directory, the full path needs to be prepended
+to the model name.
 
-*onceutfnnn.py* can be run in two ways. Simply copy it and a model file into
+
+**onceutf.py**
+
+*onceutfnnn.py* can be run as a module or script. Copy it and a model file into
 the same directory and start from a console window in that directory:
 
 .. code:: python
@@ -48,14 +52,17 @@ onceutfnnn.py to Python/Lib/site-packages and run from any directory:
 
     python -m onceutfnnn ddmm.model.txt (-e or -b)
 
-Rename onceutfnnn.py to onceutf.py for a simpler invocation and compatibility
+Rename onceutfnnn.py to onceutf.py for simpler invocation and compatibility
 with *on-c-e* toolbars and macros for Komodo Edit.
 
-**General**
+**Windows**
 
 Open a command shell window in a folder in Windows 7 or 8 by
 navigating to the folder using Explorer, hold the shift key,right click,
 click on 'open command window here' in the context menu.
+
+
+**General**
 
 Change the browser encoding settings if needed as follows:
 ::
@@ -100,7 +107,7 @@ from oncepy.ccheck import ModCheck
 import oncepy.oconfig as oCfg
 from sympy.core.cache import *
 
-__version__ = "0.4.7"
+__version__ = "0.5.0"
 __author__ = 'rholland'
 locale.setlocale(locale.LC_ALL, '')
 
@@ -173,7 +180,7 @@ def _outterm(echoflag, calcf):
                     pass
 
 def _gencalc(fi4):
-    """ program execution sequence
+    """ program execution
     ::
 
      arguments:
@@ -201,7 +208,7 @@ def _gencalc(fi4):
 
     if float(oCfg.caltype) != 0:
         try:
-            os.system('latex --version')                           # check for LaTeX
+            os.system('latex --version')             # check for LaTeX
             try:                                     # find PDF style file
                 f2 = open('once.sty')
                 f2.close()
@@ -259,7 +266,7 @@ def _gencalc(fi4):
         rstout1.gen_rst()
         ew.errwrite("< rst file written >", 0)
 
-        pdfout1 = CalcPDF(oCfg.mfile)            # generate PDF calc
+        pdfout1 = CalcPDF(oCfg.mfile, oCfg.mpath)            # generate PDF calc
         pdfout1.gen_tex()
         pdfout1.gen_pdf()
         ew.errwrite("< pdf file written >", 0)
@@ -270,7 +277,7 @@ def _gencalc(fi4):
 
 #------------------------------------------------------------------------------
 
-if __name__ == '__main__':                      # start program
+if __name__ == '__main__':                  # start program
     #print(sys.argv)
     oCfg.sysargv = sys.argv
     _echoflag = ''
@@ -278,56 +285,85 @@ if __name__ == '__main__':                      # start program
     startmod = ModStart
     startproj = ProjStart
 
+    _ew = ModCheck()                        # start execution log
+    _ew.logstart()
+
     if '-h' in sys.argv:
         _cmdline()
         sys.exit(1)
 
     _cleanflag = 1
-    if len(oCfg.sysargv) < 2:                    # check command line input
-        startmod.cmdline(__version__)
-        _cmdline()
+    if len(oCfg.sysargv) < 2:               # check command line input
+        _cmdline(__version__)
         mpath = os.getcwd()
         print("  ")
         print("current working directory: " + mpath)
         print("  ")
-        userinput = input('enter model name and arguments : ').split()
-        print("enter model file: " + os.getcwd())
+        userinput = raw_input("enter model name and arguments [or 'q' to quit] : ").split()
+        if userinput[0] == 'q' :
+            sys.exit(0)
         try:
-            mfile = userinput[0]
+            mfile = os.path.basename(userinput[0]) # model name
+            mpath = os.path.dirname(userinput[0])  # model path
+            if len(mpath) == 0:
+                mpath = os.getcwd()
+            os.chdir(mpath)                       # set model directory as pwd
+            f2 = open(mfile,'r')                  # does model exist in cur dir
+            f2.close()
+
             if '-e' in userinput:
                 _echoflag = 'e'
             elif '-b' in userinput:
                 _echoflag = 'b'
         except:
-            sys.exit(1)
+            try:
+                projdiv = mfile.strip()[0:2]      # look for model below proj dir
+                mpath = glob.glob(mpath + "/" + projdiv + "*")[0]
+                os.chdir(mpath)
+                f2 = open(mfile,'r')               # does model exist in cur dir
+                f2.close()
+            except IOError:
+                _ew.errwrite(sys.argv[1] + ' not found', 1)
+                sys.exit(1)
     else:
-        mfile = sys.argv[1]                 # model name
-        mpath = os.getcwd()                 # model path
-        if len(oCfg.sysargv) > 2:
-            if '-e' in oCfg.sysargv:
-                _echoflag = 'e'
-            elif '-b' in oCfg.sysargv:
-                _echoflag = 'b'
+        try:
+            mfile = os.path.basename(sys.argv[1]) # model name
+            mpath = os.path.dirname(sys.argv[1])  # model path
+            if len(mpath) == 0:
+                mpath = os.getcwd()
+            os.chdir(mpath)                       # set model directory as pwd
+            f2 = open(mfile,'r')                  # does model exist in cur dir
+            f2.close()
+
+            if len(oCfg.sysargv) > 2:             # echo flag
+                if '-e' in oCfg.sysargv:
+                    _echoflag = 'e'
+                elif '-b' in oCfg.sysargv:
+                    _echoflag = 'b'
+        except:
+            try:
+                projdiv = mfile.strip()[0:2]      # look for model below proj dir
+                mpath = glob.glob(mpath + "/" + projdiv + "*")[0]
+                os.chdir(mpath)
+                f2 = open(mfile,'r')         # does model exist in cur dir
+                f2.close()
+            except IOError:
+                _ew.errwrite(sys.argv[1] + ' not found', 1)
+                sys.exit(1)
 
     if len(oCfg.sysargv) > 2 and '-noclean' in sys.argv:
-        _cleanflag = 0                      # set clean aux files flag
+        _cleanflag = 0                       # set clean aux files flag
 
-    try:                                    # check if model exists in cur dir
-        os.chdir(mpath)
-        f2 = open(mfile,'r')
-    except:                                 # change to model directory
-        projdiv = mfile.strip()[0:2]
-        mpath = glob.glob(mpath + "/" + projdiv + "*")[0]
 
     os.chdir(mpath)
-    oCfg.mfile = mfile                # set paths
+    oCfg.mfile = mfile                      # set paths
     oCfg.mpath = mpath
     os.chdir(oCfg.mpath)
     sys.path.append(oCfg.mpath)
     #print(oCfg.mfile)
-    clear_cache()                               # clear sympy cache
+    clear_cache()                           # clear sympy cache
 
-    with open(oCfg.sysargv[1], 'r') as _f1:      # check for project tag [p]
+    with open(oCfg.sysargv[1], 'r') as _f1: # check for project tag [p]
         _readlines1 = _f1.readlines()
     for _i1 in _readlines1:
         if len(_i1.strip()) > 0:
@@ -348,13 +384,18 @@ if __name__ == '__main__':                      # start program
     texmak2 = oCfg.mfile.replace('.txt', '.fdb_latexmk')
     fi5 = [rstfile, texfile, auxfile, outfile, logfile,
                texmak1, texmak2]
-    _ew = ModCheck()                        # start execution log
-    _ew.logstart()
+
+    _ew.errwrite(" ", 1)
+    _ew.errwrite("< begin calc processing >", 1)
+    _ew.errwrite(" ", 1)
+
+    os.chdir(mpath)
+    sys.path.append(mpath)
     odict2 = _gencalc(fi5)                  # generate calcs
 
-    _vardef =[]                             # list of equations for shell
+    _vardef =[]                             # gen list of equations for shell
     try:
-        for k1 in odict2:                       # exec and overwrite any symbolics
+        for k1 in odict2:                   # exec eq and overwrite symbolics
             if k1[0] != '_' or k1[0:2] == '_a':
                     try:
                         exec(odict2[k1][1].strip())

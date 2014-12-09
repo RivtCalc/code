@@ -14,6 +14,8 @@ from sympy import *
 from sympy import var as varsym
 from sympy.core.alphabets import greeks
 
+import cstart
+
 mpathcrst = os.getcwd()
 try:
     from unitc import *
@@ -178,7 +180,10 @@ class CalcRST(object):
                 self._rst_txt(['[pd]', self.odict[i2]])
 
         self._rst_blnk()
-        self._rst_txt([' ','\n**[end of calc]**'])  # end calc
+        if cstart.ModStart.novars == 1:
+            self._rst_txt([' ','\n**[end of doc]**'])  # end calc
+        if cstart.ModStart.novars == 0:
+            self._rst_txt([' ','\n**[end of calc]**'])  # end calc
         self.rf1.close()                            # close rst file
         #for i in self.odict: print(i, self.odict[i])
 
@@ -454,6 +459,7 @@ class CalcRST(object):
             rformat = '3'
             set_printoptions(precision=3)
             Unum.VALUE_FORMAT = "%.3f"
+            Unum.VALUE_FORMAT = "%.3f"
 
         # table heading
         vect = dval[1:]
@@ -461,54 +467,37 @@ class CalcRST(object):
         eqnum = tright[-1].strip()
         tleft = ' '.join(tright[:-1]).strip()
         tablehdr = tleft + ' ' + eqnum
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{7mm}', file=self.rf1)
+        print('  ', file=self.rf1)
         print("aa-bb " + "**" + tablehdr + "**", file=self.rf1)
 
         # draw horizontal line
-        print('  ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\vspace{-1mm}', file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\hrulefill', file=self.rf1)
-        print('  ', file=self.rf1)
+        #print('  ', file=self.rf1)
+        #print(".. raw:: latex", file=self.rf1)
+        #print('  ', file=self.rf1)
+        #print('   \\vspace{-1mm}', file=self.rf1)
+        #print('  ', file=self.rf1)
+        #print('   \\hrulefill', file=self.rf1)
+        #print('  ', file=self.rf1)
 
-        # print symbolic form
-        # convert variables to symbols except for arrays
+        # symbolic forms
+        for _j in self.symb:
+            if str(_j)[0] != '_':
+                varsym(str(_j))
+
+        # range variables
         try:
-            for _j in self.symb:
-                if str(_j)[0] != '_':
-                    varsym(str(_j))
+            var1 = vect[2].strip()
+            var2 = vect[3].strip()
+        except:
+            pass
 
-            #convert array variable
-            var1 = vect[2].split('=')[0].strip()
-            varsym(str(var1))
-            try:
-                var2 = vect[3].split('=')[0].strip()
-                varsym(str(var2))
-            except:
-                pass
-            try:
-                symeq = latex(eval(vect[1].strip()))
-                var0 = latex(vect[0].split('=')[0])
-                symeq1 = var0 + ' = ' + symeq
-            except:
-                symeq = vect[1].strip()
-                var0 =  vect[0].split('=')[0]
-                symeq1 = var0 + ' = ' + symeq
-            #print('latex', symeq1)
-
-            etype = vect[0].split('=')[1]
-            if etype.strip()[:1] == '[':
-                out1 = str(vect[0].split('=')[1])
-
-            # symbolic repr
-            print('  ', file=self.rf1)
-            print('.. math:: ', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('  ' + latex(symeq1, mul_symbol="dot"), file=self.rf1)
-            print('  ', file=self.rf1)
-            print('|', file=self.rf1)
-            print('  ', file=self.rf1)
+        # equation
+        try:
+            var0 = vect[0].split('=')[0].strip()
+            symeq = vect[0].split('=')[1].strip()
         except:
             pass
 
@@ -537,9 +526,98 @@ class CalcRST(object):
                     exec(self.odict[k1][1].strip())
                 except:
                     pass
+
+        # imported table
+        if len(str(vect[1])) == 0:
+            # symbolic repr
+            print('  ', file=self.rf1)
+            print('.. raw:: latex', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  Table Variable:', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(var0, mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+
+            _a = eval(vect[0])
+
+            # print table
+            table2 = tabulate
+            flt1 = "." + eformat.strip() + "f"
+            ptable = table2.tabulate(_a[1:], _a[0], 'rst', floatfmt=flt1)
+            print(ptable, file=self.rf1)
+            print('  ', file=self.rf1)
+
+
+        # explicit table
+        elif len(str(vect[2])) == 0 and len(str(vect[3])) == 0:
+            print('  ', file=self.rf1)
+            print('.. raw:: latex', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  Table Variable:', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(var0, mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+
+            ops = [' - ',' + ',' * ',' / ']
+            _a1 = vect[0].split('=')[0].strip()
+            cmd_str1 = _a1 + ' = array(' + vect[1] +')'
+            exec(cmd_str1)
+
+            _a = eval(_a1).tolist()
+            # evaluate numbers
+            for inx in ndindex(eval(_a1).shape):
+                try:
+                    _fltn1 = float(_a[inx[0]][inx[1]])
+                    _a[inx[0]][inx[1]] = _fltn1
+                except:
+                    pass
+                #print('chk1', inx, _a[inx[0]][inx[1]])
+
+            # evaluate expressions
+            for inx in ndindex(eval(_a1).shape):
+                for _k in ops:
+                        if _k in str(_a[inx[0]][inx[1]]) :
+                            _fltn2 = _a[inx[0]][inx[1]]
+                            _a[inx[0]][inx[1]] = eval(_fltn2)
+                            break
+            # print table
+            table2 = tabulate
+            flt1 = "." + eformat.strip() + "f"
+            ptable = table2.tabulate(_a[1:], _a[0], 'rst', floatfmt=flt1)
+            print(ptable, file=self.rf1)
+            print('  ', file=self.rf1)
+
+
         # single row vector - 1D table
-        if len(str(vect[3])) == 0 and len(str(vect[0])) != 0:
+        elif len(str(vect[3])) == 0 and len(str(vect[0])) != 0:
             # process range variable 1 and heading
+            symeq1 = sympify(symeq)
+            print('  ', file=self.rf1)
+            print('.. raw:: latex', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  Variables:', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{1mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(var1, mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(var0 + ' =', mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{1mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('.. math:: ', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(symeq1, mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+
             rnge1 = vect[2]
             exec(rnge1.strip())
             rnge1a = rnge1.split('=')
@@ -577,7 +655,34 @@ class CalcRST(object):
             #print(ptable)
 
         # 2D table
-        if len(str(vect[3])) != 0 and len(str(vect[0])) != 0:
+        elif len(str(vect[3])) != 0 and len(str(vect[0])) != 0:
+            symeq1 = sympify(symeq)
+            print('  ', file=self.rf1)
+            print('.. raw:: latex', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  Variables:', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{1mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(var1, mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(var2, mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(var0 + ' =', mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{1mm}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('.. math:: ', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('  ' + latex(symeq1, mul_symbol="dot"), file=self.rf1)
+            print('  ', file=self.rf1)
+
             # process range variable 1
             rnge1 = vect[2]
             exec(rnge1.strip())
@@ -657,12 +762,12 @@ class CalcRST(object):
         print(' ', file=self.rf1)
 
         # draw horizontal line
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\vspace{-1mm}', file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\hrulefill', file=self.rf1)
-        print('  ', file=self.rf1)
+        #print(".. raw:: latex", file=self.rf1)
+        #print('  ', file=self.rf1)
+        #print('   \\vspace{-1mm}', file=self.rf1)
+        #print('  ', file=self.rf1)
+        #print('   \\hrulefill', file=self.rf1)
+        #print('  ', file=self.rf1)
 
         # convert symbols to numbers - retain units
         for k1 in self.odict:
@@ -772,17 +877,21 @@ class CalcRST(object):
 
         # equation reference line
         strend = dval[3].strip()
+        print(".. raw:: latex", file=self.rf1)
         print('  ', file=self.rf1)
+        print('   \\vspace{7mm}', file=self.rf1)
+        print('  ', file=self.rf1)
+
         print("aa-bb " + "**" + var3 + " | " + strend + "**",
               file=self.rf1)
         print('  ', file=self.rf1)
         # draw horizontal line
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\vspace{-1mm}', file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\hrulefill', file=self.rf1)
-        print('  ', file=self.rf1)
+        #print(".. raw:: latex", file=self.rf1)
+        #print('  ', file=self.rf1)
+        #print('   \\vspace{-1mm}', file=self.rf1)
+        #print('  ', file=self.rf1)
+        #print('   \\hrulefill', file=self.rf1)
+        #print('  ', file=self.rf1)
 
         # symbolic and substituted forms
         if dval[6].strip() == '2' or dval[6].strip() == '3':
@@ -796,7 +905,7 @@ class CalcRST(object):
                 print('  ', file=self.rf1)
                 print(".. raw:: latex", file=self.rf1)
                 print('  ', file=self.rf1)
-                print('   \\vspace{1mm}', file=self.rf1)
+                print('   \\vspace{5mm}', file=self.rf1)
                 print('  ', file=self.rf1)
                 print('.. math:: ', file=self.rf1)
                 print('  ', file=self.rf1)
@@ -804,7 +913,7 @@ class CalcRST(object):
                 print('  ', file=self.rf1)
                 print(".. raw:: latex", file=self.rf1)
                 print('  ', file=self.rf1)
-                print('   \\vspace{1mm}', file=self.rf1)
+                print('   \\vspace{5mm}', file=self.rf1)
                 print('  ', file=self.rf1)
             except:
                 symeq = dval[2].strip()
@@ -861,7 +970,7 @@ class CalcRST(object):
                 print('  ', file=self.rf1)
                 print(".. raw:: latex", file=self.rf1)
                 print('  ', file=self.rf1)
-                print('   \\vspace{1mm}', file=self.rf1)
+                print('   \\vspace{5mm}', file=self.rf1)
                 print('  ', file=self.rf1)
                 print('  ', file=self.rf1)
             # restore units
@@ -1136,9 +1245,9 @@ class CalcRST(object):
 
 
         # draw line
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\hrulefill', file=self.rf1)
+        #print(".. raw:: latex", file=self.rf1)
+        #print('  ', file=self.rf1)
+        #print('   \\hrulefill', file=self.rf1)
         print('  ', file=self.rf1)
         print(".. raw:: latex", file=self.rf1)
         print('  ', file=self.rf1)
@@ -1173,9 +1282,9 @@ class CalcRST(object):
         print(" ", file=self.rf1)
 
         # draw line
-        print(".. raw:: latex", file=self.rf1)
-        print('  ', file=self.rf1)
-        print('   \\hrulefill', file=self.rf1)
+        #print(".. raw:: latex", file=self.rf1)
+        #print('  ', file=self.rf1)
+        #print('   \\hrulefill', file=self.rf1)
         print('  ', file=self.rf1)
         print(".. raw:: latex", file=self.rf1)
         print('  ', file=self.rf1)

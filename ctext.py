@@ -20,6 +20,8 @@ try:
 except:
     pass
 
+import cstart
+
 mpathctext = os.getcwd()
 try:
     from unitc import *
@@ -35,7 +37,7 @@ except ImportError:
 os.chdir(mpathctext)
 locale.setlocale(locale.LC_ALL, '')
 
-__version__ = "0.4.6"
+__version__ = "0.5.0"
 __author__ = 'rholland'
 
 class CalcUTF(object):
@@ -134,12 +136,27 @@ class CalcUTF(object):
 
         """
 
+        directive_flag = 0
         for _i in self.odict:
             mtag = self.odict[_i][0]
             #print('rmtag', mtag, _i, self.odict[_i])
 
             if self.odict[_i][1].strip() == '#stop':
                 sys.exit(1)
+
+            # skip directives
+            if directive_flag == 2 and self.odict[_i][1][0] == "`":
+                directive_flag = 0
+                self._prt_utf('\nraw latex directive < directive not shown in UTF calc >', 1)
+                continue
+            elif self.odict[_i][1][0:3] == '.. ':
+                directive_flag = 1
+                continue
+            elif directive_flag > 0 and self.odict[_i][1][0] == "`":
+                directive_flag = 2
+                continue
+            elif directive_flag > 0:
+                continue
 
             if mtag ==   '[i]':
                 self._prt_file(self.odict[_i])
@@ -180,8 +197,11 @@ class CalcUTF(object):
             if i2 == '_pd':
                 self._prt_utf(self.odict[i2],0)
 
-        self._prt_utf('\n[end of calc]', 0) # end calc
-        self.cfile.close()                  # close calc file
+        if cstart.ModStart.novars == 1:
+            self._prt_utf('\n[end of doc]', 0) # end calc
+        if cstart.ModStart.novars == 0:
+            self._prt_utf('\n[end of calc]', 0) # end calc
+        # self.cfile.close()                # close calc file
         self._prt_py()                      # print ipython file
         self._prt_summary()                 # print calc summary file
         #for _i in self.odict: print(i, self.odict[i])
@@ -240,7 +260,6 @@ class CalcUTF(object):
             try:
                 if dval[1] == 'p':
                     f1 = "latex" + str(dval[3].strip()) + ".png"
-                    self._prt_utf("equation <file: " + str(f1) + ">", 0)
                     expr5 = latex(eval(expr1))
                     expr6 = '$'+ expr5.replace('<=', '=') +'$'
                     printing.preview(expr6, output='png', viewer='file',
@@ -250,6 +269,7 @@ class CalcUTF(object):
                     im20 = im10.resize((int(imwidth*sf1), int(imheight*sf1)), PImage.BICUBIC)
                     im20 = PImageOps.expand(im20,border=10,fill='white')
                     im20.save(f1, "PNG")
+                    self._prt_utf("equation <file: " + str(f1) + ">", 1)
             except:
                 self.ew.errwrite("< p option for [y] operation requires LaTeX - "
                              "file not written >", 1)
@@ -257,9 +277,7 @@ class CalcUTF(object):
         if dval[1] == 'x':
             try:
                 f1 = "latex" + str(dval[3].strip()) + ".png"
-                self._prt_utf("equation <file: " + str(f1) + ">", 0)
                 expr6 =  '$' + dval[2].strip() + '$'
-
                 printing.preview(expr6, output='png', viewer='file',
                                  filename=f1, preamble=pr1)
                 im10 = PImage.open(f1)
@@ -267,6 +285,8 @@ class CalcUTF(object):
                 im20 = im10.resize((int(imwidth*sf1), int(imheight*sf1)), PImage.BICUBIC)
                 im20 = PImageOps.expand(im20, border=10, fill='white')
                 im20.save(f1, "PNG")
+                self._prt_utf(" ", 1)
+                self._prt_utf("equation <file: " + str(f1) + ">", 1)
             except:
                 self.ew.errwrite("< x option for [y] operation requires LaTeX - "
                                "file not written >", 1)
@@ -408,12 +428,11 @@ class CalcUTF(object):
         self._prt_utf(" ", 0)
 
     def _prt_array(self, dval):
-        """Print arrays to UTF-8.
-        ::
+        """print arrays
 
-         arguments:
-            dval (dictionary values): [[a], statement, expr, range1, range2,
-                                    ref, decimals, unit1, unit2]
+        Dictionary:
+        arrays: [[a], statement, expr, range1, range2,
+                    ref, decimals, unit1, unit2]
 
         """
         try:
@@ -436,38 +455,29 @@ class CalcUTF(object):
         self._prt_utf((tleft + ' ' + eqnum).rjust(self.widthc), 0)
         self._prt_utf(' ', 0)
 
-
-        # print symbolic form
-        # convert variables to symbols
         vect = dval[1:]
+
+        # symbolic forms
+        for _j in self.symb:
+            if str(_j)[0] != '_':
+                varsym(str(_j))
+
+        # range variables
         try:
-            for _j in self.symb:
-                if str(_j)[0] != '_':
-                    varsym(str(_j))
-            #convert array variable
-            var1 = vect[2].split('=')[0].strip()
-            varsym(str(var1))
-            try:
-                var2 = vect[3].split('=')[0].strip()
-                varsym(str(var2))
-            except:
-                pass
-
-            symeq = eval(vect[1].strip())
-            out1 = symeq
-
-            etype = vect[0].split('=')[1]
-            if etype.strip()[:1] == '[':
-                out1 = str(vect[0].split('=')[1])
-
-            self._prt_utf(" ", 0)
-            self._prt_utf(out1, 1)
-            self._prt_utf(" ", 0)
+            var1 = vect[2].strip()
+            var2 = vect[3].strip()
         except:
-            self._prt_utf(vect[0].strip(), 1)
-            self._prt_utf(" ", 0)
+            pass
 
-        # add array variables to odict
+        # equation
+        try:
+            var0 = vect[0].split('=')[0].strip()
+            var0s = varsym(var0)
+            symeq = vect[0].split('=')[1].strip()
+            symeq1 = sympify(symeq)
+        except:
+            pass
+
         # evaluate equation and array variables - strip units
         for k1 in self.odict:
             if k1[0] != '_' or k1[0:2] == '_a':
@@ -491,15 +501,90 @@ class CalcUTF(object):
                         #print('j1', k1)
                     except:
                         pass
+            #print(k1, eval(k1))
+
+        # imported table
+        if len(str(vect[1])) == 0:
+            self._prt_utf(" ", 0)
+            self._prt_utf("Table Variable:", 0)
+            self._prt_utf("--------------- ", 0)
+            self._prt_utf(" ", 0)
+            self._prt_utf(var0s, 0)
+            self._prt_utf(" ", 0)
+
+            _a = eval(vect[0])
+
+            # print table
+            table2 = tabulate
+            flt1 = "." + eformat.strip() + "f"
+            ptable = table2.tabulate(_a[1:], _a[0], 'rst', floatfmt=flt1)
+            nstr = pretty(ptable, use_unicode=True, num_columns=92)
+            self._prt_utf(nstr, 1)
+            tmp = int(self.widthc-1) * '-'
+            self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
+
+        # explicit table
+        elif len(str(vect[2])) == 0 and len(str(vect[3])) == 0:
+            out1 = 'Table Variable: ' + var0
+            self._prt_utf(" ", 0)
+            self._prt_utf("Table Variable:", 0)
+            self._prt_utf("--------------- ", 0)
+            self._prt_utf(" ", 0)
+            self._prt_utf(var0s, 0)
+            self._prt_utf(" ", 0)
+
+            ops = [' - ',' + ',' * ',' / ']
+            _a1 = vect[0].split('=')[0].strip()
+            cmd_str1 = _a1 + ' = array(' + vect[1] +')'
+            exec(cmd_str1)
+
+            _a = eval(_a1).tolist()
+            # evaluate numbers
+            for inx in ndindex(eval(_a1).shape):
+                try:
+                    _fltn1 = float(_a[inx[0]][inx[1]])
+                    _a[inx[0]][inx[1]] = _fltn1
+                except:
+                    pass
+                #print('chk1', inx, _a[inx[0]][inx[1]])
+
+            # evaluate expressions
+            for inx in ndindex(eval(_a1).shape):
+                for _k in ops:
+                        if _k in str(_a[inx[0]][inx[1]]) :
+                            _fltn2 = _a[inx[0]][inx[1]]
+                            _a[inx[0]][inx[1]] = eval(_fltn2)
+                            break
+            # print table
+            table2 = tabulate
+            flt1 = "." + eformat.strip() + "f"
+            ptable = table2.tabulate(_a[1:], _a[0], 'rst', floatfmt=flt1)
+            nstr = pretty(ptable, use_unicode=True, num_columns=92)
+            self._prt_utf(nstr, 1)
+            tmp = int(self.widthc-1) * '-'
+            self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
 
         # single row vector - 1D table
-        if len(str(vect[3])) == 0 and len(str(vect[0])) != 0:
+        elif len(str(vect[3])) == 0 and len(str(vect[0])) != 0:
+            out1  =  var0s
+            out1a =  symeq1
+            out2  =  var1
+            self._prt_utf(" ",   0)
+            self._prt_utf("Variables: ",   0)
+            self._prt_utf("----------",    0)
+            self._prt_utf(' ', 0)
+            self._prt_utf(out2,  1)
+            self._prt_utf(' ',   0)
+            self._prt_utf(out1,  1)
+            self._prt_utf(out1a, 1)
+            self._prt_utf(' ',   0)
+
             # process range variable 1
             rnge1 = vect[2]
             exec(rnge1.strip())
             rnge1a = rnge1.split('=')
             rlist = [vect[6].strip() + ' = ' +
-                     str(_r)for _r in eval(rnge1a[1])]
+                     str(_r) for _r in eval(rnge1a[1])]
 
             #process equation
             equa1 = vect[0].strip()
@@ -529,14 +614,28 @@ class CalcUTF(object):
             table1 = tabulate
             ptable = table1.tabulate(elist2, rlist, 'rst',
                                 floatfmt="."+ eformat +"f")
-
             self._prt_utf(ptable, 1)
             tmp = int(self.widthc-2) * '-'
             self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
 
-
         # 2D table
-        if len(str(vect[3])) != 0 and len(str(vect[0])) != 0:
+        elif len(str(vect[3])) != 0 and len(str(vect[0])) != 0:
+            out1  =  var0s
+            out1a =  symeq1
+            out2  =  var1
+            out3  =  var2
+            self._prt_utf(" ",   0)
+            self._prt_utf("Variables: ",   0)
+            self._prt_utf("----------",    0)
+            self._prt_utf(" ", 0)
+            self._prt_utf(out2,  1)
+            self._prt_utf(' ',   0)
+            self._prt_utf(out3,  1)
+            self._prt_utf(" ",   0)
+            self._prt_utf(out1,  1)
+            self._prt_utf(out1a, 1)
+            self._prt_utf(' ',   0)
+
             # process range variable 1
             rnge1 = vect[2]
             exec(rnge1.strip())
@@ -586,15 +685,13 @@ class CalcUTF(object):
             for _n, _p in enumerate(alist):
                 _p.insert(0, clist[_n])
 
-            # create table
+            # print table
             table2 = tabulate
             flt1 = "." + eformat.strip() + "f"
             ptable = table2.tabulate(alist, rlist, 'rst', floatfmt=flt1)
             nstr = pretty(ptable, use_unicode=True, num_columns=92)
-
-            # print table
             self._prt_utf(nstr, 1)
-            tmp = int(self.widthc-2) * '-'
+            tmp = int(self.widthc-1) * '-'
             self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
 
     def _prt_func(self, dval):
@@ -1240,15 +1337,15 @@ except:
             elif mtype == '[e]':
                 pyfile1.write(self.odict[_j][1].strip()+'; '+ str(_j)+ '\n')
             elif mtype == '[a]':
-                    var1 = self.odict[_j][1].strip().split('=')[0]
-                    if len(self.odict[_j][1].strip()):
-                        pyfile1.write(self.odict[_j][1].strip()+'; '+var1+'\n')
                     var3 = self.odict[_j][3].strip().split('=')[0]
                     if len(self.odict[_j][3].strip()):
                         pyfile1.write(self.odict[_j][3].strip()+'; '+var3+'\n')
                     var4 = self.odict[_j][4].strip().split('=')[0]
                     if len(self.odict[_j][4].strip()):
                         pyfile1.write(self.odict[_j][4].strip()+'; '+var4+'\n')
+                    var1 = self.odict[_j][1].strip().split('=')[0]
+                    if len(self.odict[_j][1].strip()):
+                        pyfile1.write(self.odict[_j][1].strip()+'; '+var1+'\n')
 
         # write list of statements
         _vardef =[]

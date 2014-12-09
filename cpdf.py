@@ -9,12 +9,13 @@ from oncepy import oconfig as cfg
 class CalcPDF(object):
     """write PDF calc from rst file"""
 
-    def __init__(self, mfile):
+    def __init__(self, mfile, mpath):
         """Initialize rst, tex and pdf file paths.
 
         """
 
         self.mfile = mfile
+        self.mpath = mpath
         #print('mfile', self.mfile)
         self.ew = ccheck.ModCheck()
 
@@ -42,20 +43,32 @@ class CalcPDF(object):
 
         """
         newstylepath = self.stylepathpdf.replace('\\', '/')
-        pypath = os.path.dirname(sys.executable)
-        rstpath = pypath + "/Scripts/rst2latex.py "
-        #print(rstpath)
-        tex1 = "".join(["python ", rstpath,
+        try:
+            pypath = os.path.dirname(sys.executable)
+            rstpath = pypath + "/Scripts/rst2latex.py "
+            with open(rstpath) as f:
+                f.close()
+            pythoncall = 'python '
+            self.ew.errwrite("< rst2latex path > " + rstpath, 1)
+        except:
+            rstpath = "~/bin/rst2latex.py "
+            self.ew.errwrite("< rst2latex path > " + rstpath, 1)
+            pythoncall = 'python2.7 '
+
+        tex1 = "".join([pythoncall, rstpath,
                         "--documentclass=report ",
                         "--documentoptions=12pt,notitlepage ",
                         "--stylesheet=",
                         newstylepath + " ",
-                        str(self.rstfile) + " ",
-                        str(self.texfile)])
-        #print(tex1)
-        os.system(tex1)
-        self.ew.errwrite("< tex file written >", 0)
-        self.mod_tex(self.texfile)
+                        str(self.mpath + '/' + self.rstfile) + " ",
+                        str(self.mpath + '/' + self.texfile)])
+        try:
+            os.system(tex1)
+            self.ew.errwrite("< tex file written >", 1)
+            self.mod_tex(self.texfile)
+        except:
+            print("< error in docutils writer call >" + tex1)
+            pass
 
     def mod_tex(self, tfile):
         """Modify tex file to avoid problems with escapes.
@@ -97,10 +110,11 @@ class CalcPDF(object):
         self.ew.errwrite("< tex file modified >", 0)
 
     def gen_pdf(self):
-        """Call external programs that write PDF file from reStructureText.
+        """Write PDF file from tex file.
 
         """
         pdf1 = 'latexmk -xelatex -quiet -f ' + str(self.texfile)
+        #pdf1 = 'xetex ' + str(self.texfile)
         os.system(pdf1)
         self.ew.errwrite('', 1)
         self.ew.errwrite("< xelatex " + str(self.texfile) +" >", 0)

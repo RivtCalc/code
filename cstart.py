@@ -40,6 +40,10 @@ class ModStart(object):
         out_term(): write processing log to terminal
 
     """
+
+    # set flag for zero variables in calc
+    novars = 0
+
     def __init__(self):
         """initialize file names
         ::
@@ -208,6 +212,7 @@ class ModStart(object):
                 headers=[' Variable', 'Type and Value', 'Units', 'Model'],
                 tablefmt='rst', floatfmt=".4f"), 1)
         if len(tab1) == 0:
+            ModStart.novars = 1
             self.ew.errwrite("   [No variables in model]", 1)
 
 

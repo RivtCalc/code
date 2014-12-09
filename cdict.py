@@ -511,15 +511,14 @@ class ModDicts(object):
         self.mdict[mkey] = ['[c]', check, op, limits, ref, dec, ok]
 
     def _tag_a(self, block):
-        """ Add [a] array op to mdict.
-        ::
+        """ add [a] array op to mdict.
 
-         Arguments:
-            block: array block of input
+        Arguments:
+        block: array lines
 
-         Dictionary:
-            _a : [[a], statement, expr, range1, range2,
-            ref, decimals, unit1, unit2, mod number]
+        Dictionary:
+        _a : [[a], statement, expr, range1, range2,
+                    ref, decimals, unit1, unit2, mod number]
 
         """
         # reset equation number at new section
@@ -527,44 +526,52 @@ class ModDicts(object):
         if self.snum > self.snumchk:
             self.enum = 1
             self.snumchk = self.snum
-
         ivect = block.strip().split('\n')
-
+        # read format
         try:
             ref, fnum = ivect[0][3:].split("#-")
             fnum = str(self.modelnum) + fnum.strip()
         except:
             ref = ivect[0][3:]
             fnum = str(self.modelnum) + '01'
-
         decs, unts, opt = self.fdict[fnum]
-
         try:
             decs.split(',')
         except:
             decs = self.fdict['default'][1]
-        enumb = ' [' + str(self.snum) + '.' + str(self.enum) + '] '
-        ref = '  ' + ref.strip().ljust(self.widthc-len(enumb)-2) + \
-              enumb
 
-        # set dictionary values
+        enumb = ' [' + str(self.snum) + '.' + str(self.enum) + '] '
+        ref = '  ' + ref.strip().ljust(self.widthc-len(enumb)-2) + enumb
         rng1 = rng2 = state = expr = ''
         mkey = '_a' + str(self.cnt)
         arrayblock = ivect[1:]
-        if len(arrayblock) == 1:
-            state = expr = arrayblock[0]
 
+        # imported table
+        if '=' not in arrayblock[0]:
+            state = arrayblock[0].strip()
+
+        # explicit table
+        elif '=' in arrayblock[0] and '=' not in arrayblock[1]:
+            _k = ''
+            state1 = [_i.strip()[:] + _k for _i in arrayblock]
+            state2 = ''.join(state1)
+            expr = state2.split("=")[1].strip()
+            state = state2
+
+        # vector from range
         elif len(arrayblock) == 2:
             rng1 = arrayblock[0]
             state = arrayblock[1]
             expr = state.split("=")[1].strip()
 
+        # table from ranges
         elif len(arrayblock) == 3:
             rng1 = arrayblock[0]
             rng2 = arrayblock[1]
             state = arrayblock[2]
             expr = state.split("=")[1].strip()
 
+        # set dictionary values
         self.mdict[mkey] = ['[a]', state, expr, rng1, rng2, ref,
                             decs, unts, opt, '[' + self.modelnum + ']']
         #print(state)
@@ -647,8 +654,8 @@ class ModDicts(object):
 """____________________________________________________________________________
 
 This document (the calc) is generated from a on-c-e public domain template.
-The template is licensed under the CCO 1.0 Public Domain Dedication
+The calc is licensed under the CCO 1.0 Public Domain Dedication
 at http://creativecommons.org/publicdomain/zero/1.0/
-Neither the template or calc represent structural designs and
-the user is solely responsible for inputs and results.
+The calc is not a structural design calculation. The calc user
+assumes sole responsibility for all inputs and results.
 """
