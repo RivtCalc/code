@@ -14,20 +14,25 @@ from oncepy import cpdf
 from numpy import *
 
 mpathcstart = os.getcwd()
+
 try:
+    with open('unitc.py') as ufile:
+        pass
     from unitc import *
     oCfg.unitfile = 'model folder'
-except ImportError:
+except :
     try:
         os.chdir(os.pardir)
+        with open('unitc.py') as ufile:
+            pass
         from unitc import *
         oCfg.unitfile = 'project folder'
-    except ImportError:
+    except :
         from oncepy.unitc import *
         oCfg.unitfile = 'built-in'
 os.chdir(mpathcstart)
 
-__version__ = '0.4.6'
+__version__ = '0.5.0'
 
 class ModStart(object):
     """initialize file names and write tabular input summaries
@@ -77,12 +82,7 @@ class ModStart(object):
         self.sumf = '.'.join(['sum' + calcf1[0], calcf1[1], calcf1[2]])
         self.pyf = '_onceeq.py'
 
-        #start calc file early to avoid Komodo dialog response
-        f1 = open(self.calcf,'w')
-        f1.write(time.strftime("%c") + "     onceutf version: " + __version__)
-        f1.close()
-
-        return self.calcf, self.pyf, self.sumf
+        return self.calcf, self.pyf, self.sumf, self.pdff
 
     def file_summary(self):
         """file name summary table

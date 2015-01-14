@@ -433,14 +433,24 @@ class ModDicts(object):
             line: section line
 
          Dictionary:
-            _s: [[s], left string, mod number]
+            _s: [[s], left string, mod number, section number, toc flag]
 
         """
         stitle = line[3:].strip()
+        tocflg = 0
+        try:
+            sleft1 = stitle.split('#-')
+            sleft = sleft1[0]
+            if sleft1[1].strip() == 'toc':
+                tocflg = 1
+        except:
+            sleft  =  stitle
+
+        print('tocflg', tocflg)
         self.snum += 1
-        sleft = '[' + str(self.snum) + '] ' + stitle
+        snum1 = '[' + str(self.snum) + ']'
         mkey = '_s' + str(self.cnt)
-        self.mdict[mkey] = ['[s]', sleft, '[' + str(self.modelnum) +']']
+        self.mdict[mkey] = ['[s]',sleft,'['+str(self.modelnum)+']',snum1,tocflg]
 
     def _tag_y(self, line):
         """add [y] symbolic op to mdict

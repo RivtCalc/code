@@ -22,19 +22,24 @@ except:
 
 import cstart
 
-mpathctext = os.getcwd()
+mpathcstart = os.getcwd()
+
 try:
+    with open('unitc.py') as ufile:
+        pass
     from unitc import *
     cfg.unitfile = 'model folder'
-except ImportError:
+except :
     try:
         os.chdir(os.pardir)
+        with open('unitc.py') as ufile:
+            pass
         from unitc import *
         cfg.unitfile = 'project folder'
-    except ImportError:
+    except :
         from oncepy.unitc import *
         cfg.unitfile = 'built-in'
-os.chdir(mpathctext)
+os.chdir(mpathcstart)
 locale.setlocale(locale.LC_ALL, '')
 
 __version__ = "0.5.0"
@@ -198,7 +203,7 @@ class CalcUTF(object):
                 self._prt_utf(self.odict[i2],0)
 
         if cstart.ModStart.novars == 1:
-            self._prt_utf('\n[end of doc]', 0) # end calc
+            self._prt_utf('\n[end of calc]', 0) # end calc
         if cstart.ModStart.novars == 0:
             self._prt_utf('\n[end of calc]', 0) # end calc
         # self.cfile.close()                # close calc file
@@ -214,12 +219,31 @@ class CalcUTF(object):
         ::
 
          arguments:
-            dval (dictionary value): ['[s]', sleft, file number]
+            dval (dictionary value): [[s], left string, mod number,
+                                        section number, toc flag]
 
         """
         self._prt_utf('='*self.widthc, 0)
-        self._prt_utf(dval[1] + dval[2].rjust(self.widthc - len(dval[1])-1), 1)
+        self._prt_utf(dval[1] + (dval[2]+dval[3]).rjust(self.widthc -
+                                                        len(dval[1])-1), 1)
         self._prt_utf('='*self.widthc, 0)
+
+
+        if dval[4]:
+            _sects1 = []
+            for _dkey in self.odict:
+                if _dkey[0:2] == '_s':
+                    _sval1 = self.odict[_dkey]
+                    _sects1.append(str(_sval1[3]) + ' ' + str(_sval1[1]))
+
+
+            self._prt_utf('\n    Calc Sections', 0)
+            self._prt_utf('    =============', 0)
+
+            for _sect1 in _sects1:
+                self._prt_utf('    '+ _sect1, 0)
+
+            self._prt_utf('\n', 0)
 
     def _prt_sym(self, dval):
         """print symbolic expression
@@ -231,6 +255,10 @@ class CalcUTF(object):
         sf1 = 1.33
         pr1 = "\\documentclass[preview, 12pt]{standalone}\n" \
                     "\\begin{document}\n"
+
+        strend = dval[3].strip()
+        self._prt_utf(strend.rjust(self.widthc-1), 0)
+        self._prt_utf(" ", 0)
 
 
         if dval[1] == 's' or dval[1] == 'p':
@@ -334,28 +362,29 @@ class CalcUTF(object):
                 varsym(_j)
 
         # symbolic form
-        symeq1 = eval(dval[1].strip() + dval[2].strip() +
-                      dval[3].strip())
+        symeq1 = eval(dval[1].strip() + dval[2].strip() + dval[3].strip())
         #pprint(symeq1)
         # evaluate variables
         for _k in self.odict:
             if _k[0] != '_':
                 #print(self.odict[_k][1].strip())
                 exec(self.odict[_k][1].strip())
+
             if _k[0:2] == '_a':
                 #print('array', self.odict[_k][1].strip())
                 exec(self.odict[_k][3].strip())
                 exec(self.odict[_k][4].strip())
                 exec(self.odict[_k][1].strip())
+
         # substitute values
         try:
             nounits1 = eval(dval[1].strip()).asNumber()
         except:
-                nounits1 = eval(dval[1].strip())
+            nounits1 = eval(dval[1].strip())
         try:
             nounits2 = eval(dval[3].strip()).asNumber()
         except:
-                nounits2 = eval(dval[3].strip())
+            nounits2 = eval(dval[3].strip())
 
         result = eval(str(nounits1) + dval[2].strip() + str(nounits2))
         resultform = '{:.' + dval[5].strip() + 'f}'
@@ -534,31 +563,32 @@ class CalcUTF(object):
             self._prt_utf(" ", 0)
 
             ops = [' - ',' + ',' * ',' / ']
-            _a1 = vect[0].split('=')[0].strip()
-            cmd_str1 = _a1 + ' = array(' + vect[1] +')'
+            _z1 = vect[0].split('=')[0].strip()
+            cmd_str1 = _z1 + ' = array(' + vect[1] +')'
+            #print(cmd_str1)
             exec(cmd_str1)
 
-            _a = eval(_a1).tolist()
+            _z = eval(_z1).tolist()
             # evaluate numbers
-            for inx in ndindex(eval(_a1).shape):
+            for inx in ndindex(eval(_z1).shape):
                 try:
-                    _fltn1 = float(_a[inx[0]][inx[1]])
-                    _a[inx[0]][inx[1]] = _fltn1
+                    _fltn1 = float(_z[inx[0]][inx[1]])
+                    _z[inx[0]][inx[1]] = _fltn1
                 except:
                     pass
                 #print('chk1', inx, _a[inx[0]][inx[1]])
 
             # evaluate expressions
-            for inx in ndindex(eval(_a1).shape):
+            for inx in ndindex(eval(_z1).shape):
                 for _k in ops:
-                        if _k in str(_a[inx[0]][inx[1]]) :
-                            _fltn2 = _a[inx[0]][inx[1]]
-                            _a[inx[0]][inx[1]] = eval(_fltn2)
+                        if _k in str(_z[inx[0]][inx[1]]) :
+                            _fltn2 = _z[inx[0]][inx[1]]
+                            _z[inx[0]][inx[1]] = eval(_fltn2)
                             break
             # print table
             table2 = tabulate
             flt1 = "." + eformat.strip() + "f"
-            ptable = table2.tabulate(_a[1:], _a[0], 'rst', floatfmt=flt1)
+            ptable = table2.tabulate(_z[1:], _z[0], 'rst', floatfmt=flt1)
             nstr = pretty(ptable, use_unicode=True, num_columns=92)
             self._prt_utf(nstr, 1)
             tmp = int(self.widthc-1) * '-'
@@ -607,8 +637,8 @@ class CalcUTF(object):
                     elist2 = elist1.tolist()
                 except:
                     elist2 = elist1
+                elist2 = [elist2]
 
-            elist2 = [elist2]
             #print('elist', elist2)
             # create table
             table1 = tabulate
@@ -656,12 +686,12 @@ class CalcUTF(object):
             etype = equa1.split('=')[1]
             if etype.strip()[:1] == '[':
                 # data is in list form
-                alist = []
-                alist1 = eval(equa1.split('=')[1])
-                for _v in alist1:
-                    for _x in _v:
-                        #print('_x', type(_x), _x)
-                        alist.append(list(_x))
+                #alist = []
+                alist = eval(equa1.split('=')[1])
+                # for _v in alist1:
+                #     for _x in _v:
+                #         #print('_x', type(_x), _x)
+                #         alist.append(list(_x))
             else:
                 # data is in equation form
                 equa1a = vect[0].strip().split('=')
@@ -864,7 +894,6 @@ class CalcUTF(object):
                 self._prt_utf(out3, 1)
                 self._prt_utf(" ", 0)
 
-            # print result right justified
             # restore units
             for j2 in self.odict:
                 try:

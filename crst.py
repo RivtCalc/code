@@ -181,7 +181,7 @@ class CalcRST(object):
 
         self._rst_blnk()
         if cstart.ModStart.novars == 1:
-            self._rst_txt([' ','\n**[end of doc]**'])  # end calc
+            self._rst_txt([' ','\n**[end of calc]**'])  # end calc
         if cstart.ModStart.novars == 0:
             self._rst_txt([' ','\n**[end of calc]**'])  # end calc
         self.rf1.close()                            # close rst file
@@ -192,15 +192,57 @@ class CalcRST(object):
         ::
 
          Dictionary:
-            section: ['[s]', sleft, file]
+            section: [[s], left string, mod number, section number, toc flag]
 
         """
         tleft = dval[1].strip()
-        tright = dval[2].strip()
+        tright = dval[2].strip() + dval[3].strip()
         print('  ', file=self.rf1)
         print(tleft.strip() + "aa-bb " + tright.strip(),
               file=self.rf1)
         print("-"*self.widthp, file=self.rf1)
+        print(' ', file=self.rf1)
+
+        if dval[4]:
+            _sects1 = []
+            for _dkey in self.odict:
+                if _dkey[0:2] == '_s':
+                    _sval1 = self.odict[_dkey]
+                    _sects1.append("""\\textbf{""" + _sval1[3] + "}" +
+                    '  ' + str(_sval1[1]))
+
+            print(' ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print(' ', file=self.rf1)
+            print('   \\vspace{1mm}', file=self.rf1)
+            print('   \\hspace{15mm}', file=self.rf1)
+            print('   \\textbf{Calc Sections}', file=self.rf1)
+            print(' ', file=self.rf1)
+
+            print(' ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print(' ', file=self.rf1)
+            print('   \\vspace{-3mm}', file=self.rf1)
+            print('   \\hspace{15mm}', file=self.rf1)
+            print('   \\rule{26mm}{0.4pt}', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print(' ', file=self.rf1)
+
+            for _sect1 in _sects1:
+                print(' ', file=self.rf1)
+                print(".. raw:: latex", file=self.rf1)
+                print(' ', file=self.rf1)
+                print('   \\hspace{15mm}', file=self.rf1)
+                print('   \\vspace{1mm}', file=self.rf1)
+                print(' ' + _sect1, file=self.rf1)
+                print(' ', file=self.rf1)
+
+            print(' ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print(' ', file=self.rf1)
+            print('   \\vspace{2mm}', file=self.rf1)
+            print(' ', file=self.rf1)
+
         print(' ', file=self.rf1)
         print(".. raw:: latex", file=self.rf1)
         print(' ', file=self.rf1)
@@ -215,9 +257,17 @@ class CalcRST(object):
             dval (dictionary value): [[y], expr, eqnumber]
 
         """
+
         tright = dval[3].strip()
         print('  ', file=self.rf1)
         print("aa-bb " + '**'+tright+'**', file=self.rf1)
+
+        print('  ', file=self.rf1)
+        print(".. raw:: latex", file=self.rf1)
+        print('  ', file=self.rf1)
+        print('   \\vspace{-10mm}', file=self.rf1)
+        print('  ', file=self.rf1)
+
 
         if dval[1] == 's' or dval[1] == 'p':
             dval1 = dval[2].replace('=', '<=')
@@ -567,27 +617,34 @@ class CalcRST(object):
             cmd_str1 = _a1 + ' = array(' + vect[1] +')'
             exec(cmd_str1)
 
-            _a = eval(_a1).tolist()
+            ops = [' - ',' + ',' * ',' / ']
+            _z1 = vect[0].split('=')[0].strip()
+            cmd_str1 = _z1 + ' = array(' + vect[1] +')'
+            #print(cmd_str1)
+            exec(cmd_str1)
+
+            _z = eval(_z1).tolist()
             # evaluate numbers
-            for inx in ndindex(eval(_a1).shape):
+            for inx in ndindex(eval(_z1).shape):
                 try:
-                    _fltn1 = float(_a[inx[0]][inx[1]])
-                    _a[inx[0]][inx[1]] = _fltn1
+                    _fltn1 = float(_z[inx[0]][inx[1]])
+                    _z[inx[0]][inx[1]] = _fltn1
                 except:
                     pass
                 #print('chk1', inx, _a[inx[0]][inx[1]])
 
             # evaluate expressions
-            for inx in ndindex(eval(_a1).shape):
+            for inx in ndindex(eval(_z1).shape):
                 for _k in ops:
-                        if _k in str(_a[inx[0]][inx[1]]) :
-                            _fltn2 = _a[inx[0]][inx[1]]
-                            _a[inx[0]][inx[1]] = eval(_fltn2)
+                        if _k in str(_z[inx[0]][inx[1]]) :
+                            _fltn2 = _z[inx[0]][inx[1]]
+                            _z[inx[0]][inx[1]] = eval(_fltn2)
                             break
+
             # print table
             table2 = tabulate
             flt1 = "." + eformat.strip() + "f"
-            ptable = table2.tabulate(_a[1:], _a[0], 'rst', floatfmt=flt1)
+            ptable = table2.tabulate(_z[1:], _z[0], 'rst', floatfmt=flt1)
             print(ptable, file=self.rf1)
             print('  ', file=self.rf1)
 
@@ -632,20 +689,20 @@ class CalcRST(object):
             elist1 = eval(var2)
             if etype.strip()[:1] == '[':
                 # data is in list form
-                elist2 = []
-                alist1 = eval(equa1.split('=')[1])
-                for _v in alist1:
-                        try:
-                            elist2.append(list(_v))
-                        except:
-                            elist2.append(_v)
+                #elist2 = []
+                elist2 = eval(equa1.split('=')[1])
+                # for _v in alist1:
+                #         try:
+                #             elist2.append(list(_v))
+                #         except:
+                #             elist2.append(_v)
             else:
                 try:
                     elist2 = elist1.tolist()
                 except:
                     elist2 = elist1
 
-            elist2 = [elist2]
+                elist2 = [elist2]
 
             # create 1D table
             ptable = tabulate.tabulate(elist2, rlist, 'rst',
@@ -704,13 +761,13 @@ class CalcRST(object):
             etype = equa1.split('=')[1]
             if etype.strip()[:1] == '[':
                 # data is in list form
-                alist = []
-                alist1 = eval(equa1.split('=')[1])
+                #alist = []
+                alist = eval(equa1.split('=')[1])
                 #print('alist1', alist1)
-                for _v in alist1:
-                    for _x in _v:
+                # for _v in alist1:
+                #     for _x in _v:
                         #print('_x', _x)
-                        alist.append(list(_x))
+                #         alist.append(list(_x))
                         #print('append', alist)
             else:
                 # data is in equation form
@@ -1156,7 +1213,7 @@ class CalcRST(object):
         """Print figure to reStructureText.
 
         Dictionary Value:
-        equation:[[d], optins, file path, var1, var2, var3]
+        figure:[[d], options, file path, var1, var2, var3]
 
         arguments:
             dval (dicionary value):

@@ -92,6 +92,7 @@ Package author: Rod Holland once.pyproject@gmail.com
 """
 from __future__ import division
 from __future__ import print_function
+import time
 import locale
 import os
 import glob
@@ -148,8 +149,8 @@ def _cmdline(version):
     print("     calddmm.modfile.pdf (PDF calc")
     print("     project.pdf (PDF project calc)")
 
-def _outterm(echoflag, calcf):
-    """-e or -b flag echoes calc to console or browser
+def _outterm(echoflag, calctyp):
+    """-e, -b or -p flag echoes calc to console or browser
     ::
 
      -b switch needed primarily on Window where UTF-8 is missing
@@ -167,17 +168,18 @@ def _outterm(echoflag, calcf):
                     print(i)
         except OSError:
             pass
-    elif echoflag == 'b':
+    elif echoflag == 'b' or echoflag =='p':
         try:
-            os.system("start chrome " + calcf)
+            os.system("start chrome " + calctyp)
         except OSError:
             try:
-                os.system("start firefox " + calcf)
+                os.system("start firefox " + calctyp)
             except OSError:
                 try:
-                    os.system("start iexplore file:///%CD%/" + calcf)
+                    os.system("start iexplore file:///%CD%/" + calctyp)
                 except OSError:
                     pass
+
 
 def _gencalc(fi4):
     """ program execution
@@ -190,8 +192,13 @@ def _gencalc(fi4):
     ew = ModCheck()
 
     # generate calc file
-    modinit = ModStart()
-    calcf, pyf, sumf = modinit.gen_filenames()      # generate filenames
+    modinit1 = ModStart()
+    calcf1, pyf1, sumf1, pdff1 = modinit1.gen_filenames() # generate filenames
+
+    #start calc file early to avoid Komodo dialog prompt
+    with open(calcf1,'w') as f1:
+        f1.write(time.strftime("%c") + "     onceutf version: " + __version__)
+
     dicts = ModDicts()                              # generate dicts
     dicts.build_dicts()
     fidict = dicts.get_fidict()
@@ -233,9 +240,9 @@ def _gencalc(fi4):
             oCfg.caltype = 0
             _ew.errwrite("< latex not installed - PDF calc not generated >", 1)
 
-    modinit.file_summary()                          # write file table
-    modinit.var_table(mdict)                        # write variable table
-    newmod = CalcUTF(mdict, fidict, calcf, pyf, sumf)
+    modinit1.file_summary()                          # write file table
+    modinit1.var_table(mdict)                        # write variable table
+    newmod = CalcUTF(mdict, fidict, calcf1, pyf1, sumf1)
     newmod.gen_utf()                                # generate UTF calc
     if float(oCfg.caltype) != 0:                    # PDF calc margin
         try:
@@ -272,7 +279,6 @@ def _gencalc(fi4):
         ew.errwrite("< pdf file written >", 0)
 
         odict1 = newmod.get_odict()
-        _outterm(_echoflag, calcf)              # echo UTF calc
         return odict1
 
 #------------------------------------------------------------------------------
@@ -315,6 +321,9 @@ if __name__ == '__main__':                  # start program
                 _echoflag = 'e'
             elif '-b' in userinput:
                 _echoflag = 'b'
+            elif '-p' in userinput:
+                _echoflag = 'p'
+
         except:
             try:
                 projdiv = mfile.strip()[0:2]      # look for model below proj dir
@@ -340,6 +349,9 @@ if __name__ == '__main__':                  # start program
                     _echoflag = 'e'
                 elif '-b' in oCfg.sysargv:
                     _echoflag = 'b'
+                elif '-p' in oCfg.sysargv:
+                    _echoflag = 'p'
+
         except:
             try:
                 projdiv = mfile.strip()[0:2]      # look for model below proj dir
@@ -421,6 +433,18 @@ if __name__ == '__main__':                  # start program
 
     _ew.errwrite("< calc completed >", 1)
     _ew.logclose()                              # close log
+
+                                                # echo calc
+    modinit2 = ModStart()
+    calcf2, pyf2, sumf2, pdff2 = modinit2.gen_filenames()     # generate filenames
+
+    try:
+        if _echoflag == 'e' or _echoflag == 'b':
+            _outterm(_echoflag, calcf2)
+        elif _echoflag == 'p':
+            _outterm(_echoflag, pdff2)
+    except:
+        pass
 
     if _cleanflag:                              # remove auxiliary files
         for i5 in fi5:
