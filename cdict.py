@@ -446,7 +446,7 @@ class ModDicts(object):
         except:
             sleft  =  stitle
 
-        print('tocflg', tocflg)
+        #print('tocflg', tocflg)
         self.snum += 1
         snum1 = '[' + str(self.snum) + ']'
         mkey = '_s' + str(self.cnt)
@@ -613,14 +613,14 @@ class ModDicts(object):
         self.mdict[mkey] = ['[f]', fname, var2, ref, enumb]
 
     def _tag_e(self, block):
-        """Add [e] equation op to mdict.
-        ::
+        """add [e] op to mdict.
 
-         Arguments:
-            block: equation lines
+        Arguments:
+        block: equation lines
 
-         Dictionary key : value:
-            _e : [[e], statement, expr, ref, decimals, units, prnt opt, mod number]
+        Dictionary key : value:
+        _e : [[e], statement, expr, ref, decimals, units,
+                prnt opt, mod number, eqnum]
 
         """
         # reset equation number at new section
@@ -643,17 +643,22 @@ class ModDicts(object):
             decs.split(',')
         except:
             unts = self.fdict['default'][1]
-        enumb = ' [' + str(self.snum) + '.' + str(self.enum) + ']'
-        ref = ref.strip() + enumb
+        eqnum = ' [' + str(self.snum) + '.' + str(self.enum) + ']'
 
         # set dictionary values
-        state = ''
+        if '=' not in ref:
+            state = ''
+            ref = ref.strip()
+        else:
+            state = ref.strip()
+            ref = ''
+
         for j in line1[1:]:
             state = state + j.strip()
         expr = state.split("=")[1].strip()
         var1 = state.split("=")[0].strip()
         self.mdict[var1] = ['[e]', state, expr, ref, decs, unts, opt,
-                            '['+ self.modelnum +']']
+                            '['+ self.modelnum +']', eqnum]
 
     def _tag_pd(self):
         """add public domain license to dict

@@ -786,7 +786,8 @@ class CalcUTF(object):
         """print equations
 
         Dictionary:
-        equations:[[e], statement, expr, ref, decimals, units, prnt opt]
+        equations:[[e], statement, expr, ref, decimals, units,
+                prnt opt, mod num, eq num]
 
         """
         # set decimal format
@@ -819,22 +820,26 @@ class CalcUTF(object):
                     except:
                         pass
 
-        if dval[6].strip() == '' :
-            dval[6] = '3'
+        exec(dval[1])
+
         # evaluate only - do not print
         if dval[6].strip() == '0':
             return
 
-        exec(dval[1])
+        if dval[6].strip() == '' :
+            dval[6] = '3'
+
+        # print reference line
+        tmp = int(self.widthc-2) * '-'
+        self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 1)
+        strend = dval[8].strip()
+        self._prt_utf((var3 + " | " + strend).rjust(self.widthc-1), 0)
+        if dval[3] <> '':
+            self._prt_utf(dval[3].strip().rjust(self.widthc-1), 0)
+        self._prt_utf(" ", 0)
 
         # symbolic and substituted forms
         if dval[6].strip() == '3' or dval[6] == '2':
-            # print reference line
-            tmp = int(self.widthc-2) * '-'
-            self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 1)
-            strend = dval[3].strip()
-            self._prt_utf((var3 + " | " + strend).rjust(self.widthc-1), 0)
-            self._prt_utf(" ", 0)
 
             # print symbolic form
             for _j in self.symb:
@@ -851,49 +856,53 @@ class CalcUTF(object):
 
             # substitute values
             if dval[6].strip() == '3':
-                symat = symeq.atoms(Symbol)
-                symeq1 = sympify(dval[2].strip())
-                #rewrite equation - new variables same length as value
-                for _n2 in symat:
-                    #get length of eval(variable)
-                    evlen = len((eval(_n2.__str__())).__str__())
-                    new_var = str(_n2).rjust(evlen, '~')
-                    new_var = new_var.replace('_','|')
-                    symeq1 = symeq1.subs(_n2, symbols(new_var))
-                symat1 = symeq1.atoms(Symbol)
-                out2 = pretty(symeq1, wrap_line=False)
+                try:
+                    symat = symeq.atoms(Symbol)
+                    symeq1 = sympify(dval[2].strip())
+                    #rewrite equation - new variables same length as value
+                    for _n2 in symat:
+                        #get length of eval(variable)
+                        evlen = len((eval(_n2.__str__())).__str__())
+                        new_var = str(_n2).rjust(evlen, '~')
+                        new_var = new_var.replace('_','|')
+                        symeq1 = symeq1.subs(_n2, symbols(new_var))
+                    symat1 = symeq1.atoms(Symbol)
+                    out2 = pretty(symeq1, wrap_line=False)
 
-                # manage variable substitution
-                for _n1 in symat1:
-                    orig_var = str(_n1).replace('~', '')
-                    orig_var = orig_var.replace('|', '_')
-                    try:
-                        expr = eval((self.odict[orig_var][1]).split("=")[1])
-                        if type(expr) == float:
-                            form = '{:.' + eformat +'f}'
-                            symeval1 = form.format(eval(str(expr)))
-                        else:
+                    # manage variable substitution
+                    for _n1 in symat1:
+                        orig_var = str(_n1).replace('~', '')
+                        orig_var = orig_var.replace('|', '_')
+                        try:
+                            expr = eval((self.odict[orig_var][1]).split("=")[1])
+                            if type(expr) == float:
+                                form = '{:.' + eformat +'f}'
+                                symeval1 = form.format(eval(str(expr)))
+                            else:
+                                symeval1 = eval(orig_var.__str__()).__str__()
+                        except:
                             symeval1 = eval(orig_var.__str__()).__str__()
-                    except:
-                        symeval1 = eval(orig_var.__str__()).__str__()
-                    out2 = out2.replace(_n1.__str__(), symeval1)
+                        out2 = out2.replace(_n1.__str__(), symeval1)
 
-                # clean up unicode
-                out3 = out2.replace('*', u'\u22C5')
-                cnt = 0
-                for _m in out3:
-                    if _m == '-':
-                        cnt += 1
-                        continue
-                    else:
-                        if cnt > 1:
-                            out3 = out3.replace('-'*cnt, u'\u2014'*cnt)
-                        cnt = 0
+                    # clean up unicode
+                    out3 = out2.replace('*', u'\u22C5')
+                    cnt = 0
+                    for _m in out3:
+                        if _m == '-':
+                            cnt += 1
+                            continue
+                        else:
+                            if cnt > 1:
+                                out3 = out3.replace('-'*cnt, u'\u2014'*cnt)
+                            cnt = 0
 
-                # print substituted form
-                self._prt_utf(out3, 1)
-                self._prt_utf(" ", 0)
+                    # print substituted form
+                    self._prt_utf(out3, 1)
+                    self._prt_utf(" ", 0)
+                except:
+                    pass
 
+            # print result right justified
             # restore units
             for j2 in self.odict:
                 try:
@@ -901,7 +910,6 @@ class CalcUTF(object):
                     exec(state)
                 except:
                     pass
-
         # result
         typev = type(eval(var3))
         if typev == ndarray:
@@ -940,10 +948,9 @@ class CalcUTF(object):
                 self._prt_utf((var3 +"="+ str(eval(var3))).rjust(self.widthc-1), 1)
 
         # horizontal line
-        tmp = int(self.widthc-2) * '-'
-        self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 1)
+        tmp3 = int(self.widthc-2) * '-'
+        self._prt_utf((u'\u2514' + tmp3 + u'\u2518').rjust(self.widthc), 1)
         self._prt_utf(" ", 0)
-
 
     def _prt_file(self, refnum1):
         """Process file operations from file dictionary.

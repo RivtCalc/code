@@ -92,6 +92,7 @@ Package author: Rod Holland once.pyproject@gmail.com
 """
 from __future__ import division
 from __future__ import print_function
+import subprocess
 import time
 import locale
 import os
@@ -108,7 +109,7 @@ from oncepy.ccheck import ModCheck
 import oncepy.oconfig as oCfg
 from sympy.core.cache import *
 
-__version__ = "0.5.0"
+__version__ = "0.5.4"
 __author__ = 'rholland'
 locale.setlocale(locale.LC_ALL, '')
 
@@ -168,7 +169,7 @@ def _outterm(echoflag, calctyp):
                     print(i)
         except OSError:
             pass
-    elif echoflag == 'b' or echoflag =='p':
+    elif echoflag == 'b':
         try:
             os.system("start chrome " + calctyp)
         except OSError:
@@ -179,7 +180,11 @@ def _outterm(echoflag, calctyp):
                     os.system("start iexplore file:///%CD%/" + calctyp)
                 except OSError:
                     pass
-
+    elif echoflag == 'p':
+        try:
+            subprocess.Popen(calctyp, shell=True)
+        except OSError:
+            pass
 
 def _gencalc(fi4):
     """ program execution

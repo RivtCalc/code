@@ -889,7 +889,7 @@ class CalcRST(object):
          arguments:
             var3 (string): dictionary key, resultant variable
             dval (dictionary value): [[e], statement, expr, ref, decimals,
-                                units, prnt opt]
+                                units, prnt opt, enum]
 
         """
         try:
@@ -933,15 +933,22 @@ class CalcRST(object):
             return
 
         # equation reference line
-        strend = dval[3].strip()
+        strend = dval[8].strip()
         print(".. raw:: latex", file=self.rf1)
         print('  ', file=self.rf1)
         print('   \\vspace{7mm}', file=self.rf1)
         print('  ', file=self.rf1)
-
-        print("aa-bb " + "**" + var3 + " | " + strend + "**",
-              file=self.rf1)
+        print("aa-bb " + "**" + var3 + " | " + strend + "**", file=self.rf1)
         print('  ', file=self.rf1)
+        ref3 = dval[3].strip()
+        if ref3 <> '':
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\hfill\\text{' + ref3 + '}', file=self.rf1)
+            print('   \\begin{flushleft}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\end{flushleft}', file=self.rf1)
+            print('  ', file=self.rf1)
         # draw horizontal line
         #print(".. raw:: latex", file=self.rf1)
         #print('  ', file=self.rf1)
@@ -983,53 +990,57 @@ class CalcRST(object):
             # substitute values for variables
             if dval[6].strip() == '3':
                 # list of symbols
-                symat = symeq.atoms(Symbol)
-                latexrep = latex(symeq, mul_symbol="dot")
-                #print('latex', latexrep)
-                switch1 = []
-                # rewrite latex equation withbraces
-                for _n in symat:
-                    newlatex1 = str(_n).split('__')
-                    if len(newlatex1) == 2:
-                        newlatex1[1] += '}'
-                        newlatex1 = '~d~'.join(newlatex1)
-                    newlatex1 = str(_n).split('_')
-                    if len(newlatex1) == 2:
-                        newlatex1[1] += '}'
-                        newlatex1 = '~s~'.join(newlatex1)
-                    newlatex1 = ''.join(newlatex1)
-                    newlatex1 = newlatex1.replace('~d~', '__{')
-                    newlatex1 = newlatex1.replace('~s~', '_{')
-                    #symeq1 = symeq1.subs(_n, symbols(newlatex1))
-                    switch1.append([str(_n), newlatex1])
-                # substitute values
-                for _n in switch1:
-                    #print('swi', (self.odict[_n[0]][1]).split("=")[1])
-                    # avoid problems with units
-                    try:
-                        expr1 = eval((self.odict[_n[0]][1]).split("=")[1])
-                        if type(expr1) == float:
-                            form = '{:.' + eformat.strip() +'f}'
-                            symvar1 = '{' + form.format(expr1) + '}'
-                        else:
-                            symvar1 = '{' + str(expr1) + '}'
-                        #print('replace',_n[1], symvar1)
-                        latexrep = latexrep.replace(_n[1], symvar1)
-                        latexrep = latexrep.replace("\{", "{")
-                        #print(latexrep)
-                    except:
-                        pass
-                # add substituted equation to rst file
-                print('  ', file=self.rf1)
-                print('.. math:: ', file=self.rf1)
-                print('  ', file=self.rf1)
-                print('  ' + latexrep, file=self.rf1)
-                print('  ', file=self.rf1)
-                print(".. raw:: latex", file=self.rf1)
-                print('  ', file=self.rf1)
-                print('   \\vspace{5mm}', file=self.rf1)
-                print('  ', file=self.rf1)
-                print('  ', file=self.rf1)
+                try:
+                    symat = symeq.atoms(Symbol)
+                    latexrep = latex(symeq, mul_symbol="dot")
+                    #print('latex', latexrep)
+                    switch1 = []
+                    # rewrite latex equation withbraces
+                    for _n in symat:
+                        newlatex1 = str(_n).split('__')
+                        if len(newlatex1) == 2:
+                            newlatex1[1] += '}'
+                            newlatex1 = '~d~'.join(newlatex1)
+                        newlatex1 = str(_n).split('_')
+                        if len(newlatex1) == 2:
+                            newlatex1[1] += '}'
+                            newlatex1 = '~s~'.join(newlatex1)
+                        newlatex1 = ''.join(newlatex1)
+                        newlatex1 = newlatex1.replace('~d~', '__{')
+                        newlatex1 = newlatex1.replace('~s~', '_{')
+                        #symeq1 = symeq1.subs(_n, symbols(newlatex1))
+                        switch1.append([str(_n), newlatex1])
+                    # substitute values
+                    for _n in switch1:
+                        #print('swi', (self.odict[_n[0]][1]).split("=")[1])
+                        # avoid problems with units
+                        try:
+                            expr1 = eval((self.odict[_n[0]][1]).split("=")[1])
+                            if type(expr1) == float:
+                                form = '{:.' + eformat.strip() +'f}'
+                                symvar1 = '{' + form.format(expr1) + '}'
+                            else:
+                                symvar1 = '{' + str(expr1) + '}'
+                            #print('replace',_n[1], symvar1)
+                            latexrep = latexrep.replace(_n[1], symvar1)
+                            latexrep = latexrep.replace("\{", "{")
+                            #print(latexrep)
+                        except:
+                            pass
+                    # add substituted equation to rst file
+                    print('  ', file=self.rf1)
+                    print('.. math:: ', file=self.rf1)
+                    print('  ', file=self.rf1)
+                    print('  ' + latexrep, file=self.rf1)
+                    print('  ', file=self.rf1)
+                    print(".. raw:: latex", file=self.rf1)
+                    print('  ', file=self.rf1)
+                    print('   \\vspace{5mm}', file=self.rf1)
+                    print('  ', file=self.rf1)
+                    print('  ', file=self.rf1)
+                except:
+                    pass
+
             # restore units
             for j2 in self.odict:
                 try:
