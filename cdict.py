@@ -528,7 +528,7 @@ class ModDicts(object):
 
         Dictionary:
         _a : [[a], statement, expr, range1, range2,
-                    ref, decimals, unit1, unit2, mod number]
+                    ref, decimals, unit1, unit2, mod number, eq number]
 
         """
         # reset equation number at new section
@@ -551,7 +551,7 @@ class ModDicts(object):
             decs = self.fdict['default'][1]
 
         enumb = ' [' + str(self.snum) + '.' + str(self.enum) + '] '
-        ref = '  ' + ref.strip().ljust(self.widthc-len(enumb)-2) + enumb
+        ref = ref.strip()
         rng1 = rng2 = state = expr = ''
         mkey = '_a' + str(self.cnt)
         arrayblock = ivect[1:]
@@ -583,7 +583,7 @@ class ModDicts(object):
 
         # set dictionary values
         self.mdict[mkey] = ['[a]', state, expr, rng1, rng2, ref,
-                            decs, unts, opt, '[' + self.modelnum + ']']
+                            decs, unts, opt, '[' + self.modelnum + ']', enumb]
         #print(state)
 
     def _tag_f(self, block):

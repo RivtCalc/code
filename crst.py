@@ -497,7 +497,7 @@ class CalcRST(object):
 
          arguments:
             dval (dictionary value): [[a], statement, expr, range1, range2,
-                                    ref, decimals, unit1, unit2, model]
+                                    ref, decimals, unit1, unit2, modnum, eqnum]
 
         """
         try:
@@ -513,15 +513,23 @@ class CalcRST(object):
 
         # table heading
         vect = dval[1:]
-        tright = dval[5].strip().split(' ')
-        eqnum = tright[-1].strip()
-        tleft = ' '.join(tright[:-1]).strip()
-        tablehdr = tleft + ' ' + eqnum
+        eqnum = dval[10].strip()
+        tablehdr = 'Table  ' + eqnum
         print(".. raw:: latex", file=self.rf1)
         print('  ', file=self.rf1)
         print('   \\vspace{7mm}', file=self.rf1)
         print('  ', file=self.rf1)
         print("aa-bb " + "**" + tablehdr + "**", file=self.rf1)
+        print('  ', file=self.rf1)
+        ref5 = dval[5].strip()
+        if ref5 <> '':
+            print(".. raw:: latex", file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\hfill\\text{' + ref5 + '}', file=self.rf1)
+            print('   \\begin{flushleft}', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\end{flushleft}', file=self.rf1)
+            print('  ', file=self.rf1)
 
         # draw horizontal line
         #print('  ', file=self.rf1)
@@ -579,19 +587,7 @@ class CalcRST(object):
 
         # imported table
         if len(str(vect[1])) == 0:
-            # symbolic repr
-            print('  ', file=self.rf1)
-            print('.. raw:: latex', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\vspace{2mm}', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('  Table Variable:', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('  ' + latex(var0, mul_symbol="dot"), file=self.rf1)
-            print('  ', file=self.rf1)
-
             _a = eval(vect[0])
-
             # print table
             table2 = tabulate
             flt1 = "." + eformat.strip() + "f"
@@ -599,36 +595,24 @@ class CalcRST(object):
             print(ptable, file=self.rf1)
             print('  ', file=self.rf1)
 
-
         # explicit table
         elif len(str(vect[2])) == 0 and len(str(vect[3])) == 0:
-            print('  ', file=self.rf1)
-            print('.. raw:: latex', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\vspace{2mm}', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('  Table Variable:', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('  ' + latex(var0, mul_symbol="dot"), file=self.rf1)
-            print('  ', file=self.rf1)
-
             ops = [' - ',' + ',' * ',' / ']
             _a1 = vect[0].split('=')[0].strip()
             cmd_str1 = _a1 + ' = array(' + vect[1] +')'
             exec(cmd_str1)
 
-            ops = [' - ',' + ',' * ',' / ']
             _z1 = vect[0].split('=')[0].strip()
             cmd_str1 = _z1 + ' = array(' + vect[1] +')'
             #print(cmd_str1)
             exec(cmd_str1)
 
-            _z = eval(_z1).tolist()
+            _rc = eval(_z1).tolist()
             # evaluate numbers
             for inx in ndindex(eval(_z1).shape):
                 try:
-                    _fltn1 = float(_z[inx[0]][inx[1]])
-                    _z[inx[0]][inx[1]] = _fltn1
+                    _fltn1 = float(_rc[inx[0]][inx[1]])
+                    _rc[inx[0]][inx[1]] = _fltn1
                 except:
                     pass
                 #print('chk1', inx, _a[inx[0]][inx[1]])
@@ -636,15 +620,15 @@ class CalcRST(object):
             # evaluate expressions
             for inx in ndindex(eval(_z1).shape):
                 for _k in ops:
-                        if _k in str(_z[inx[0]][inx[1]]) :
-                            _fltn2 = _z[inx[0]][inx[1]]
-                            _z[inx[0]][inx[1]] = eval(_fltn2)
+                        if _k in str(_rc[inx[0]][inx[1]]) :
+                            _fltn2 = _rc[inx[0]][inx[1]]
+                            _rc[inx[0]][inx[1]] = eval(_fltn2)
                             break
 
             # print table
             table2 = tabulate
             flt1 = "." + eformat.strip() + "f"
-            ptable = table2.tabulate(_z[1:], _z[0], 'rst', floatfmt=flt1)
+            ptable = table2.tabulate(_rc[1:], _rc[0], 'rst', floatfmt=flt1)
             print(ptable, file=self.rf1)
             print('  ', file=self.rf1)
 
@@ -663,10 +647,6 @@ class CalcRST(object):
             print('   \\vspace{1mm}', file=self.rf1)
             print('  ', file=self.rf1)
             print('  ' + latex(var1, mul_symbol="dot"), file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\vspace{2mm}', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('  ' + latex(var0 + ' =', mul_symbol="dot"), file=self.rf1)
             print('  ', file=self.rf1)
             print('   \\vspace{1mm}', file=self.rf1)
             print('  ', file=self.rf1)
@@ -729,13 +709,9 @@ class CalcRST(object):
             print('  ', file=self.rf1)
             print('  ' + latex(var2, mul_symbol="dot"), file=self.rf1)
             print('  ', file=self.rf1)
-            print('   \\vspace{2mm}', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('  ' + latex(var0 + ' =', mul_symbol="dot"), file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\vspace{1mm}', file=self.rf1)
-            print('  ', file=self.rf1)
             print('.. math:: ', file=self.rf1)
+            print('  ', file=self.rf1)
+            print('   \\vspace{4mm}', file=self.rf1)
             print('  ', file=self.rf1)
             print('  ' + latex(symeq1, mul_symbol="dot"), file=self.rf1)
             print('  ', file=self.rf1)

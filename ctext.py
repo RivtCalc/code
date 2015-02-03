@@ -461,7 +461,7 @@ class CalcUTF(object):
 
         Dictionary:
         arrays: [[a], statement, expr, range1, range2,
-                    ref, decimals, unit1, unit2]
+                    ref, decimals, unit1, unit2, modnum, eqnum]
 
         """
         try:
@@ -478,10 +478,9 @@ class CalcUTF(object):
         # table heading
         tmp = int(self.widthc-2) * '-'
         self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 0)
-        tright = dval[5].strip().split(' ')
-        eqnum = tright[-1].strip()
-        tleft = ' '.join(tright[:-1]).strip()
-        self._prt_utf((tleft + ' ' + eqnum).rjust(self.widthc), 0)
+        tleft = 'Table'
+        self._prt_utf((tleft + '  ' + dval[10]).rjust(self.widthc), 0)
+        self._prt_utf(dval[5].strip().rjust(self.widthc-1), 0)
         self._prt_utf(' ', 0)
 
         vect = dval[1:]
@@ -534,15 +533,8 @@ class CalcUTF(object):
 
         # imported table
         if len(str(vect[1])) == 0:
-            self._prt_utf(" ", 0)
-            self._prt_utf("Table Variable:", 0)
-            self._prt_utf("--------------- ", 0)
-            self._prt_utf(" ", 0)
-            self._prt_utf(var0s, 0)
-            self._prt_utf(" ", 0)
 
             _a = eval(vect[0])
-
             # print table
             table2 = tabulate
             flt1 = "." + eformat.strip() + "f"
@@ -554,26 +546,18 @@ class CalcUTF(object):
 
         # explicit table
         elif len(str(vect[2])) == 0 and len(str(vect[3])) == 0:
-            out1 = 'Table Variable: ' + var0
-            self._prt_utf(" ", 0)
-            self._prt_utf("Table Variable:", 0)
-            self._prt_utf("--------------- ", 0)
-            self._prt_utf(" ", 0)
-            self._prt_utf(var0s, 0)
-            self._prt_utf(" ", 0)
-
             ops = [' - ',' + ',' * ',' / ']
             _z1 = vect[0].split('=')[0].strip()
             cmd_str1 = _z1 + ' = array(' + vect[1] +')'
             #print(cmd_str1)
             exec(cmd_str1)
 
-            _z = eval(_z1).tolist()
+            _rc = eval(_z1).tolist()
             # evaluate numbers
             for inx in ndindex(eval(_z1).shape):
                 try:
-                    _fltn1 = float(_z[inx[0]][inx[1]])
-                    _z[inx[0]][inx[1]] = _fltn1
+                    _fltn1 = float(_rc[inx[0]][inx[1]])
+                    _rc[inx[0]][inx[1]] = _fltn1
                 except:
                     pass
                 #print('chk1', inx, _a[inx[0]][inx[1]])
@@ -581,14 +565,14 @@ class CalcUTF(object):
             # evaluate expressions
             for inx in ndindex(eval(_z1).shape):
                 for _k in ops:
-                        if _k in str(_z[inx[0]][inx[1]]) :
-                            _fltn2 = _z[inx[0]][inx[1]]
-                            _z[inx[0]][inx[1]] = eval(_fltn2)
+                        if _k in str(_rc[inx[0]][inx[1]]) :
+                            _fltn2 = _rc[inx[0]][inx[1]]
+                            _rc[inx[0]][inx[1]] = eval(_fltn2)
                             break
             # print table
             table2 = tabulate
             flt1 = "." + eformat.strip() + "f"
-            ptable = table2.tabulate(_z[1:], _z[0], 'rst', floatfmt=flt1)
+            ptable = table2.tabulate(_rc[1:], _rc[0], 'rst', floatfmt=flt1)
             nstr = pretty(ptable, use_unicode=True, num_columns=92)
             self._prt_utf(nstr, 1)
             tmp = int(self.widthc-1) * '-'
@@ -605,7 +589,6 @@ class CalcUTF(object):
             self._prt_utf(' ', 0)
             self._prt_utf(out2,  1)
             self._prt_utf(' ',   0)
-            self._prt_utf(out1,  1)
             self._prt_utf(out1a, 1)
             self._prt_utf(' ',   0)
 
@@ -616,6 +599,7 @@ class CalcUTF(object):
             rlist = [vect[6].strip() + ' = ' +
                      str(_r) for _r in eval(rnge1a[1])]
 
+            #print('rlist', rlist)
             #process equation
             equa1 = vect[0].strip()
             #print('equa1', equa1)
@@ -637,6 +621,7 @@ class CalcUTF(object):
                     elist2 = elist1.tolist()
                 except:
                     elist2 = elist1
+
                 elist2 = [elist2]
 
             #print('elist', elist2)
@@ -662,7 +647,6 @@ class CalcUTF(object):
             self._prt_utf(' ',   0)
             self._prt_utf(out3,  1)
             self._prt_utf(" ",   0)
-            self._prt_utf(out1,  1)
             self._prt_utf(out1a, 1)
             self._prt_utf(' ',   0)
 
@@ -688,10 +672,11 @@ class CalcUTF(object):
                 # data is in list form
                 #alist = []
                 alist = eval(equa1.split('=')[1])
-                # for _v in alist1:
-                #     for _x in _v:
-                #         #print('_x', type(_x), _x)
-                #         alist.append(list(_x))
+                #for _v in alist1:
+                #    for _x in _v:
+                #        print('_x', type(_x), _x)
+                #       alist.append(list(_x))
+
             else:
                 # data is in equation form
                 equa1a = vect[0].strip().split('=')
@@ -833,7 +818,7 @@ class CalcUTF(object):
         tmp = int(self.widthc-2) * '-'
         self._prt_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 1)
         strend = dval[8].strip()
-        self._prt_utf((var3 + " | " + strend).rjust(self.widthc-1), 0)
+        self._prt_utf((var3 + "  " + strend).rjust(self.widthc-1), 0)
         if dval[3] <> '':
             self._prt_utf(dval[3].strip().rjust(self.widthc-1), 0)
         self._prt_utf(" ", 0)
