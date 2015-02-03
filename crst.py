@@ -914,7 +914,7 @@ class CalcRST(object):
         print('  ', file=self.rf1)
         print('   \\vspace{7mm}', file=self.rf1)
         print('  ', file=self.rf1)
-        print("aa-bb " + "**" + var3 + " | " + strend + "**", file=self.rf1)
+        print("aa-bb " + "**" + var3 + "  " + strend + "**", file=self.rf1)
         print('  ', file=self.rf1)
         ref3 = dval[3].strip()
         if ref3 <> '':
