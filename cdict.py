@@ -61,7 +61,7 @@ class ModDicts(object):
             self.modelnum = '0001'
 
         # read format defaults from main model file
-        self.widthc = 90
+        self.widthc = 80
         for _i in self.mmod:
             mtag = _i[0:11]
             if mtag == "#- formateq":

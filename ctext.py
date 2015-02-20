@@ -42,7 +42,7 @@ except :
 os.chdir(mpathcstart)
 locale.setlocale(locale.LC_ALL, '')
 
-__version__ = "0.5.0"
+__version__ = "0.5.4"
 __author__ = 'rholland'
 
 class CalcUTF(object):
@@ -119,7 +119,7 @@ class CalcUTF(object):
         self.pyfile = pyf
         self.sumfile = sumf
         self.fignum = 0
-        self.widthc = 90
+        self.widthc = 80
         self.xtraline = False
 
         # print date at top of calc
