@@ -119,7 +119,7 @@ class CalcUTF(object):
         self.pyfile = pyf
         self.sumfile = sumf
         self.fignum = 0
-        self.widthc = 80
+        self.widthc = cfg.calcwidth
         self.xtraline = False
 
         # print date at top of calc

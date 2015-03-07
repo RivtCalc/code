@@ -1,22 +1,21 @@
 """ oncepy package
 
-The package *oncepy* and the portable module *onceutf.py* take a
-*on-c-e* ASCII model *ddmm.model.txt* as input and return formatted
-structural engineering calculations (calcs) in UTF-8. *oncepy* can
-also return a PDF-LaTeX formatted calculation and can collect
-calcs into project sets.
+The portable module *onceutf.py* and full package *oncepy* take a
+*on-c-e* ASCII calc input file *ffdd.inputname.txt* and return UTF-8 formatted
+structural engineering calculation. *oncepy* can also return a
+PDF-LaTeX formatted calculation and organize calcs into project sets.
 
-The programs write the calc file *calddmm.model.txt* where *ddmm* is
-the model number,  *dd* is the division number, and *mm* is the model
+The programs write the calc file *ffddcalc.inputname.txt* where *ffdd* is
+the calc number,  *ff* is the division folder number, and *dd* is the calc
 designation.
 ::
 
  platforms:
-    Anaconda, Enthought, Pythonxy or a minimum installation (see manual)
-    on Windows, Linux, OSX
+    oncepy and onceutf.py on Windows, Linux, OSX:
+    Anaconda, Enthought, Pythonxy, Pyzo
 
-    onceutf.py: Wakari, PythonAnywhere web platforms
-    onceutf.py: QPython, Pythonista on Android and iOS
+    onceutf.py web-based: Wakari, PythonAnywhere
+    onceutf.py mobile: QPython, DroidEdit on Android, Pythonista on iOS
 
 **oncepy**
 
@@ -25,44 +24,26 @@ directory. From a terminal window in the model or directory type:
 
 .. code:: python
 
-    python -m oncepy ddmm.model.txt (-e or -b)
+    python -m oncepy ffdd.calcname.txt [-t, -b, -o] [-nn]
 
-The -e or -b options echo the calc to a shell (-e) or a Windows
-browser (-b). The -b option is needed when the shell lacks complete UTF-8
-encoding.
+    -t echoes the UTF output to the terminal
+    -b opens the PDF ouptut in the browser
+    -o opens the PDF output in the .txt os-associated program
+
+    -nn is the UTF output line width from 72 to 90 (default is 80)
 
 If the program is started from a directory other than the model or
-project directory, the full path needs to be prepended
-to the model name.
-
-
-**onceutf.py**
-
-*onceutfnnn.py* can be run as a module or script. Copy it and a model file into
-the same directory and start from a console window in that directory:
-
-.. code:: python
-
-    python onceutfnnn.py ddmm.model.txt (-e or -b)
-
-where 'nnn' is the version number (i.e. 044). Alternatively copy
-onceutfnnn.py to Python/Lib/site-packages and run from any directory:
-
-.. code:: python
-
-    python -m onceutfnnn ddmm.model.txt (-e or -b)
-
-Rename onceutfnnn.py to onceutf.py for simpler invocation and compatibility
-with *on-c-e* toolbars and macros for Komodo Edit.
-
-**Windows**
-
-Open a command shell window in a folder in Windows 7 or 8 by
-navigating to the folder using Explorer, hold the shift key,right click,
-click on 'open command window here' in the context menu.
+project directory, the full path must be prepended
+to the calc name.
 
 
 **General**
+
+
+On Windows 7 or 8, open a command shell window in a folder by
+navigating to the folder using Explorer, hold the shift key,right click,
+click on 'open command window here' in the context menu.
+
 
 Change the browser encoding settings if needed as follows:
 ::
@@ -77,17 +58,20 @@ representation in an IDE.  *DejaVu Mono* fonts are recommended.
 
 **Program links**:
 
-**oncepy** program: http://on-c-e.org/programs/
+**oncepy** program:     http://on-c-e.org/programs/
 
-User manual and **onceutf.py** : http://on-c-e.us
+**onceutf.py** program: http://on-c-e.us
 
-Roadmap at Trello: https://on-c-e.info
+User manual:            http://on-c-e.info
 
-DejaVu fonts: http://dejavu-fonts.org/wiki/Main_Page
+Roadmap:                https://on-c-e.net
 
-Source code and documentation: http://on-c-e.github.io/
+Source code:            http://on-c-e.github.io/
 
-Package author: Rod Holland once.pyproject@gmail.com
+DejaVu fonts:           http://dejavu-fonts.org/wiki/Main_Page
+
+author - Rod Holland:   once.pyproject@gmail.com
+
 
 """
 from __future__ import division
@@ -114,41 +98,38 @@ __author__ = 'rholland'
 locale.setlocale(locale.LC_ALL, '')
 
 #------------------------------------------------------------------------------
-def _cmdline(version):
-    """command line help
-    ::
-
-     Prints help with -h switch or error.
-
-    """
+def _cmdline():
+    """command line help"""
     print()
-    print("oncepy  ver:" + version)
+    print("onceutf" + __version__ + ": writes on-c-e UTF calcs")
+    print()
     print("Use:")
-    print("python -m oncepy ddmm.modfile.txt (options)")
-    print("   where dd is the division and mm is the model number")
+    print("python onceutf.py ffdd.calcfile.txt (options)")
+    print("   when onceutf.py is in calc folder")
+    print("         or")
+    print("python -m onceutf ffdd.calcfile.txt (-h, -s, -b, -o) (-nn)")
+    print("   when onceutfnnnn.py is in Python /Lib/site-packages")
+    print()
     print()
     print("options:")
-    print("   -h    prints this prompt")
-    print("   -c    echoes UTF-8 calc to console (stdout)")
-    print("   -b    opens UTF-8 calc in Windows browser")
-    print("         tries the following browsers in order:")
-    print("             start chrome modfile.m.txt ")
-    print("             start firefox modfile.m.txt")
-    print("             start iexplore file:///%CD%/modfile.m.txt")
-    print("   -noclean  leaves PDF intermediate files on disk")
-    print()
-    print("set browser encoding to UTF-8; refer to user manual")
+    print("   -h   prints this prompt")
+    print("   -nn  set UTF-8 calc width (72 to 90 characters - 80 default)")
+    print("   -t   echoes UTF-8 calc to terminal (stdout)")
+    print("   -o   opens UTF-8 calc in operating system associated program")
+    print("   -b   opens UTF-8 calc in Windows browser")
+    print("        trying the following commands in order:")
+    print("             start chrome ddff.calcfile.txt ")
+    print("             start firefox ddff.calcfile.txt")
+    print("             start iexplore file:///%CD%/ddff.calcfile.txt")
+    print("        set browser encoding to UTF-8; refer to user manual")
     print()
     print("outputs:")
-    print("   logddmm.model.txt")
+    print("   _calclog.calcfile.txt")
     print()
     print("if no errors then outputs:")
-    print("     ddmm.modfile.py     (Python equation file")
-    print("     calddmm.modfile.txt (UTF-8 calc")
-    print("     sumddmm.modfile.txt (calculation summary)")
-    print("if option selected in model or project file:")
-    print("     calddmm.modfile.pdf (PDF calc")
-    print("     project.pdf (PDF project calc)")
+    print("   ffddcalc.calcfile.txt (UTF-8 calc")
+    print("   _equations.py (IPython and database input)")
+
 
 def _outterm(echoflag, calctyp):
     """-e, -b or -p flag echoes calc to console or browser
@@ -304,72 +285,42 @@ if __name__ == '__main__':                  # start program
         sys.exit(1)
 
     _cleanflag = 1
-    if len(oCfg.sysargv) < 2:               # check command line input
-        _cmdline(__version__)
-        mpath = os.getcwd()
-        print("  ")
-        print("current working directory: " + mpath)
-        print("  ")
-        userinput = raw_input("enter model name and arguments [or 'q' to quit] : ").split()
-        if userinput[0] == 'q' :
-            sys.exit(0)
-        try:
-            mfile = os.path.basename(userinput[0]) # model name
-            mpath = os.path.dirname(userinput[0])  # model path
-            if len(mpath) == 0:
-                mpath = os.getcwd()
-            os.chdir(mpath)                       # set model directory as pwd
-            f2 = open(mfile,'r')                  # does model exist in cur dir
-            f2.close()
-
-            if '-e' in userinput:
-                _echoflag = 'e'
-            elif '-b' in userinput:
-                _echoflag = 'b'
-            elif '-p' in userinput:
-                _echoflag = 'p'
-
-        except:
-            try:
-                projdiv = mfile.strip()[0:2]      # look for model below proj dir
-                mpath = glob.glob(mpath + "/" + projdiv + "*")[0]
-                os.chdir(mpath)
-                f2 = open(mfile,'r')               # does model exist in cur dir
-                f2.close()
-            except IOError:
-                _ew.errwrite(sys.argv[1] + ' not found', 1)
-                sys.exit(1)
-    else:
-        try:
-            mfile = os.path.basename(sys.argv[1]) # model name
-            mpath = os.path.dirname(sys.argv[1])  # model path
-            if len(mpath) == 0:
-                mpath = os.getcwd()
-            os.chdir(mpath)                       # set model directory as pwd
-            f2 = open(mfile,'r')                  # does model exist in cur dir
-            f2.close()
-
-            if len(oCfg.sysargv) > 2:             # echo flag
-                if '-e' in oCfg.sysargv:
-                    _echoflag = 'e'
-                elif '-b' in oCfg.sysargv:
-                    _echoflag = 'b'
-                elif '-p' in oCfg.sysargv:
-                    _echoflag = 'p'
-
-        except:
-            try:
-                projdiv = mfile.strip()[0:2]      # look for model below proj dir
-                mpath = glob.glob(mpath + "/" + projdiv + "*")[0]
-                os.chdir(mpath)
-                f2 = open(mfile,'r')         # does model exist in cur dir
-                f2.close()
-            except IOError:
-                _ew.errwrite(sys.argv[1] + ' not found', 1)
-                sys.exit(1)
-
-    if len(oCfg.sysargv) > 2 and '-noclean' in sys.argv:
+    if '-noclean' in sys.argv:
         _cleanflag = 0                       # set clean aux files flag
+
+    try:
+        mfile = os.path.basename(sys.argv[1])  # model name
+        mpath = os.path.dirname(sys.argv[1])   # model path
+        if len(mpath) == 0:
+            mpath = os.getcwd()
+        os.chdir(mpath)                       # set model directory as pwd
+        f2 = open(mfile, 'r')                 # does model exist in cur dir
+        f2.close()
+
+        if len(oCfg.sysargv) > 2:             # echo flag
+            if '-t' in oCfg.sysargv:
+                _echoflag = 't'
+            elif '-b' in oCfg.sysargv:
+                _echoflag = 'b'
+            elif '-o' in oCfg.sysargv:
+                _echoflag = 'o'
+
+        for _w1 in oCfg.sysargv:
+            try:
+                oCfg.calcwidth = int(_w1[1:].strip())
+            except:
+                pass
+        _ew.errwrite('< UTF calc width = ' + str(oCfg.calcwidth) + ' >', 1)
+
+    except IOError:
+        _ew.errwrite(sys.argv[1] + ' not found', 1)
+        sys.exit(1)
+
+#            projdiv = mfile.strip()[0:2]      # look for model below proj dir
+#            mpath = glob.glob(mpath + "/" + projdiv + "*")[0]
+#            os.chdir(mpath)
+#            f2 = open(mfile,'r')              # does model exist in cur dir
+#            f2.close()
 
 
     os.chdir(mpath)
@@ -392,7 +343,7 @@ if __name__ == '__main__':                  # start program
                 break
                 #_startproj()
 
-    rstfile = oCfg.mfile.replace('.txt', '.rst') # list of PDF auxiliary files
+    rstfile = oCfg.mfile.replace('.txt', '.rst')  # list of PDF auxiliary files
     texfile = oCfg.mfile.replace('.txt', '.tex')
     auxfile = oCfg.mfile.replace('.txt', '.aux')
     outfile = oCfg.mfile.replace('.txt', '.out')
@@ -444,9 +395,9 @@ if __name__ == '__main__':                  # start program
     calcf2, pyf2, sumf2, pdff2 = modinit2.gen_filenames()     # generate filenames
 
     try:
-        if _echoflag == 'e' or _echoflag == 'b':
+        if _echoflag == 't' or _echoflag == 'b':
             _outterm(_echoflag, calcf2)
-        elif _echoflag == 'p':
+        elif _echoflag == 'o':
             _outterm(_echoflag, pdff2)
     except:
         pass

@@ -25,3 +25,6 @@ unitfile = 'built-in'
 # file in local folder overrides project folder
 stylefile = 'built-in'
 stylepath = '/'
+
+# utf line width
+calcwidth = 80
