@@ -474,6 +474,7 @@ class CalcUTF(object):
             set_printoptions(precision=3)
             Unum.VALUE_FORMAT = "%.3f"
 
+
         #print('array dval', dval)
         # table heading
         tmp = int(self.widthc-2) * '-'
@@ -506,6 +507,72 @@ class CalcUTF(object):
         except:
             pass
 
+
+        # evaluate equation and array variables - keep units
+        for k1 in self.odict:
+            if k1[0] != '_' or k1[0:2] == '_a':
+                    try:
+                        exec(self.odict[k1][3].strip())
+                    except:
+                        pass
+                    try:
+                        exec(self.odict[k1][4].strip())
+                    except:
+                        pass
+                    try:
+                        exec(self.odict[k1][1].strip())
+                    except:
+                        pass
+            #print(k1, eval(k1))
+
+        # write explicit table
+        if len(str(vect[2])) == 0 and len(str(vect[3])) == 0:
+            ops = [' - ',' + ',' * ',' / ']
+            _z1 = vect[0].split('=')[0].strip()
+            cmd_str1 = _z1 + ' = array(' + vect[1] +')'
+            exec(cmd_str1)
+
+            cunit = dval[7]
+            print('cunit', cunit)
+            _rc = eval(_z1).tolist()
+
+            # evaluate variables with units
+            for inx in ndindex(eval(_z1).shape):
+                print(21, type(_rc[inx[0]][inx[1]]),_rc[inx[0]][inx[1]] )
+                try:
+                    _fltn2a = _rc[inx[0]][inx[1]]
+                    _fltn2b = _fltn2a.asUnit(eval(cunit))
+                    _fltn2c = _fltn2b.asNumber()
+                    _rc[inx[0]][inx[1]] = str(_fltn2c)
+                except:
+                    pass
+
+            # evaluate numbers
+            for inx in ndindex(eval(_z1).shape):
+                try:
+                    _fltn1 = float(_rc[inx[0]][inx[1]])
+                    _rc[inx[0]][inx[1]] = _fltn1
+                except:
+                    pass
+
+            # evaluate expressions
+            for inx in ndindex(eval(_z1).shape):
+                for _k in ops:
+                    if _k in str(_rc[inx[0]][inx[1]]) :
+                        _fltn2 = _rc[inx[0]][inx[1]]
+                        _rc[inx[0]][inx[1]] = eval(_fltn2)
+                        break
+
+            # print table
+            table2 = tabulate
+            fltf = "." + eformat.strip() + "f"
+            ptable = table2.tabulate(_rc[1:], _rc[0], 'rst', floatfmt=fltf)
+            nstr = pretty(ptable, use_unicode=True, num_columns=92)
+            self._prt_utf(nstr, 1)
+            tmp = int(self.widthc-1) * '-'
+            self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
+            return
+
         # evaluate equation and array variables - strip units
         for k1 in self.odict:
             if k1[0] != '_' or k1[0:2] == '_a':
@@ -533,7 +600,6 @@ class CalcUTF(object):
 
         # imported table
         if len(str(vect[1])) == 0:
-
             _a = eval(vect[0])
             # print table
             table2 = tabulate
@@ -544,39 +610,6 @@ class CalcUTF(object):
             tmp = int(self.widthc-1) * '-'
             self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
 
-        # explicit table
-        elif len(str(vect[2])) == 0 and len(str(vect[3])) == 0:
-            ops = [' - ',' + ',' * ',' / ']
-            _z1 = vect[0].split('=')[0].strip()
-            cmd_str1 = _z1 + ' = array(' + vect[1] +')'
-            #print(cmd_str1)
-            exec(cmd_str1)
-
-            _rc = eval(_z1).tolist()
-            # evaluate numbers
-            for inx in ndindex(eval(_z1).shape):
-                try:
-                    _fltn1 = float(_rc[inx[0]][inx[1]])
-                    _rc[inx[0]][inx[1]] = _fltn1
-                except:
-                    pass
-                #print('chk1', inx, _a[inx[0]][inx[1]])
-
-            # evaluate expressions
-            for inx in ndindex(eval(_z1).shape):
-                for _k in ops:
-                        if _k in str(_rc[inx[0]][inx[1]]) :
-                            _fltn2 = _rc[inx[0]][inx[1]]
-                            _rc[inx[0]][inx[1]] = eval(_fltn2)
-                            break
-            # print table
-            table2 = tabulate
-            flt1 = "." + eformat.strip() + "f"
-            ptable = table2.tabulate(_rc[1:], _rc[0], 'rst', floatfmt=flt1)
-            nstr = pretty(ptable, use_unicode=True, num_columns=92)
-            self._prt_utf(nstr, 1)
-            tmp = int(self.widthc-1) * '-'
-            self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
 
         # single row vector - 1D table
         elif len(str(vect[3])) == 0 and len(str(vect[0])) != 0:
@@ -708,6 +741,7 @@ class CalcUTF(object):
             self._prt_utf(nstr, 1)
             tmp = int(self.widthc-1) * '-'
             self._prt_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
+
 
     def _prt_func(self, dval):
         """Print functions to UTF-8.

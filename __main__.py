@@ -139,7 +139,7 @@ def _outterm(echoflag, calctyp):
 
     """
     # onceweb modified
-    if echoflag == 'e':
+    if echoflag == 't':
         print()
         print("|======================  "
                 "echo calc  =====================|")
@@ -161,7 +161,7 @@ def _outterm(echoflag, calctyp):
                     os.system("start iexplore file:///%CD%/" + calctyp)
                 except OSError:
                     pass
-    elif echoflag == 'p':
+    elif echoflag == 'o':
         try:
             subprocess.Popen(calctyp, shell=True)
         except OSError:
@@ -305,6 +305,7 @@ if __name__ == '__main__':                  # start program
             elif '-o' in oCfg.sysargv:
                 _echoflag = 'o'
 
+        print('echoflag', _echoflag)
         for _w1 in oCfg.sysargv:
             try:
                 oCfg.calcwidth = int(_w1[1:].strip())

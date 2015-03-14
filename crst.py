@@ -559,6 +559,70 @@ class CalcRST(object):
         except:
             pass
 
+        # evaluate equation and array variables - keep units
+        for k1 in self.odict:
+            if k1[0] != '_' or k1[0:2] == '_a':
+                    try:
+                        exec(self.odict[k1][3].strip())
+                    except:
+                        pass
+                    try:
+                        exec(self.odict[k1][4].strip())
+                    except:
+                        pass
+                    try:
+                        exec(self.odict[k1][1].strip())
+                    except:
+                        pass
+            #print(k1, eval(k1))
+
+        # write explicit table
+        if len(str(vect[2])) == 0 and len(str(vect[3])) == 0:
+            ops = [' - ',' + ',' * ',' / ']
+            _z1 = vect[0].split('=')[0].strip()
+            cmd_str1 = _z1 + ' = array(' + vect[1] +')'
+            exec(cmd_str1)
+
+            cunit = dval[7]
+            print('cunit', cunit)
+            _rc = eval(_z1).tolist()
+
+            # evaluate variables with units
+            for inx in ndindex(eval(_z1).shape):
+                print(21, type(_rc[inx[0]][inx[1]]),_rc[inx[0]][inx[1]] )
+                try:
+                    _fltn2a = _rc[inx[0]][inx[1]]
+                    _fltn2b = _fltn2a.asUnit(eval(cunit))
+                    _fltn2c = _fltn2b.asNumber()
+                    _rc[inx[0]][inx[1]] = str(_fltn2c)
+                except:
+                    pass
+
+            # evaluate numbers
+            for inx in ndindex(eval(_z1).shape):
+                try:
+                    _fltn1 = float(_rc[inx[0]][inx[1]])
+                    _rc[inx[0]][inx[1]] = _fltn1
+                except:
+                    pass
+
+            # evaluate expressions
+            for inx in ndindex(eval(_z1).shape):
+                for _k in ops:
+                    if _k in str(_rc[inx[0]][inx[1]]) :
+                        _fltn2 = _rc[inx[0]][inx[1]]
+                        _rc[inx[0]][inx[1]] = eval(_fltn2)
+                        break
+
+            # print table
+            table2 = tabulate
+            fltf = "." + eformat.strip() + "f"
+            ptable = table2.tabulate(_rc[1:], _rc[0], 'rst', floatfmt=fltf)
+            print(ptable, file=self.rf1)
+            print('  ', file=self.rf1)
+            return
+
+
         # evaluate variables - strip units for arrays
         for k1 in self.odict:
             #print('k1', k1)
@@ -921,9 +985,9 @@ class CalcRST(object):
             print(".. raw:: latex", file=self.rf1)
             print('  ', file=self.rf1)
             print('   \\hfill\\text{' + ref3 + '}', file=self.rf1)
-            print('   \\begin{flushleft}', file=self.rf1)
-            print('  ', file=self.rf1)
-            print('   \\end{flushleft}', file=self.rf1)
+            #print('   \\begin{flushleft}', file=self.rf1)
+            #print('  ', file=self.rf1)
+            #print('   \\end{flushleft}', file=self.rf1)
             print('  ', file=self.rf1)
         # draw horizontal line
         #print(".. raw:: latex", file=self.rf1)
@@ -945,7 +1009,7 @@ class CalcRST(object):
                 print('  ', file=self.rf1)
                 print(".. raw:: latex", file=self.rf1)
                 print('  ', file=self.rf1)
-                print('   \\vspace{5mm}', file=self.rf1)
+                print('   \\vspace{3mm}', file=self.rf1)
                 print('  ', file=self.rf1)
                 print('.. math:: ', file=self.rf1)
                 print('  ', file=self.rf1)
@@ -971,7 +1035,7 @@ class CalcRST(object):
                     latexrep = latex(symeq, mul_symbol="dot")
                     #print('latex', latexrep)
                     switch1 = []
-                    # rewrite latex equation withbraces
+                    # rewrite latex equation with braces
                     for _n in symat:
                         newlatex1 = str(_n).split('__')
                         if len(newlatex1) == 2:
@@ -984,7 +1048,6 @@ class CalcRST(object):
                         newlatex1 = ''.join(newlatex1)
                         newlatex1 = newlatex1.replace('~d~', '__{')
                         newlatex1 = newlatex1.replace('~s~', '_{')
-                        #symeq1 = symeq1.subs(_n, symbols(newlatex1))
                         switch1.append([str(_n), newlatex1])
                     # substitute values
                     for _n in switch1:
