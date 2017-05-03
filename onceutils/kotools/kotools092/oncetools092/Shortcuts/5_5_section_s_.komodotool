@@ -1,0 +1,15 @@
+{
+  "keyboard_shortcut": "Ctrl+6", 
+  "name": "5.5  section  [ s ]", 
+  "language": "", 
+  "value": [
+    "[s] !@#_currentPos!@#_anchor"
+  ], 
+  "set_selection": "true", 
+  "version": "1.1.5", 
+  "treat_as_ejs": "false", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/circle-small.svg", 
+  "type": "snippet", 
+  "indent_relative": "false", 
+  "auto_abbreviation": "false"
+}

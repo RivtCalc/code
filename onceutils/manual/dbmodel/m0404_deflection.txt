@@ -1,0 +1,72 @@
+[s] Example 0301 - beam deflection
+
+    Table of tube bending deflections as a function of span and depth
+    when analyzed as a simply supported classical beam with uniform
+    distributed load.
+
+        #- 01 insert figure
+
+[s] Materials and Geometry
+    Calculate tube moment of inertia for an initial condition and a range of
+    depths.  Neglect radii at corners.
+
+    **6061-T6 Aluminum**
+    [t] elastic modulus  | E_0 = 10000*KSI
+
+    **Tube Dimensions**
+    [t] tube width       | b_0 = 5*IN
+    [t] wall thickness   | t_0 = .125*IN
+
+    **Design Load and Span**
+    [t] trial clear span          | span = 6*FT
+    [t] trial tube depth          | d_0 = 9*IN
+    [t] uniform distributed load  | omega_1 = 0.1*KIP/IN
+
+    [e] Moment of inertia  #- 22
+            I_9 = (b_0*(d_0**3)-(b_0 - 2*t_0)*(d_0 - 2*t_0)**3) / 12
+
+    [a] Table I_x (in4) - variables: depth (in)   #- 20
+            d_n = arange(9,14,1)
+            I_n = (b_0*(d_n**3)-(b_0 - 2*t_0)*(d_n - 2*t_0)**3) / 12
+
+[s] Evaluate Deflections
+    Evaluate beam deflections for an initial I and span and then a range of values.
+
+    **Check an initial case**
+    [t]  initial I      | I_1 = 35*IN**4
+    [t]  initial span   | span_1 = 10*FT
+
+    [e] beam deflection under uniform load    #- 23
+            delta_1 = 5 * omega_1 * span_1**4 / (384 * E_0 * I_1)
+
+    [a] Table Deflections (in) - variables: span (in), I (in4)   #- 24
+            I_2 = arange(33,83,10)
+            span_2 = arange(6,16,2)*12
+            delta_2 = 5 *omega_1 * span_2**4 / (384 * E_0 * I_2)
+
+#page
+
+    [a] Table :  spreadsheet array   #- 25
+       a2 =[
+           ['E [kips/in2]', 'UDL [kips/in]',  'span [in]', 'I [in4]',     'deflection [in]'],
+           [29000,      0.1,    180.0,   40.0, '5 * _cr[1][1]*_cr[1][2]**4/(384*_cr[1][0]*_cr[1][3])'],
+           [29000,      0.1,    260.0,   60.0, '5 * _cr[2][1]*_cr[2][2]**4/(384*_cr[2][0]*_cr[2][3])'],
+           ]
+
+
+
+#- formateq | 2,2  | 1.5
+#- 22  | 2,2   | IN**4    | 2
+#- 20  | 2,2   | depth    |
+#- 23  | 2,2   | IN       | 3
+#- 24  | 2,2   | I        | span
+#- 25  | 2,2   |          |
+
+#- fileop
+#- 01 | f | tube.png | Tube geometry | 85 |
+
+# This file contains a on-c-e public domain template (the template).
+# The template is distributed under the CCO 1.0 Public Domain Dedication
+# at http://creativecommons.org/publicdomain/zero/1.0/
+# The template is not a structural design calculation.
+# The template user assumes sole responsibility for all model inputs and results.

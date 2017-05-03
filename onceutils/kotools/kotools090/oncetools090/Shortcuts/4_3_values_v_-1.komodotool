@@ -1,0 +1,16 @@
+{
+  "keyboard_shortcut": "Ctrl+3", 
+  "name": "4.3    values  [ v ]      ", 
+  "language": "", 
+  "value": [
+    "    [v] !@#_currentPos!@#_anchor", 
+    "\t\t |"
+  ], 
+  "set_selection": "true", 
+  "version": "1.1.5", 
+  "auto_abbreviation": "false", 
+  "indent_relative": "false", 
+  "type": "snippet", 
+  "treat_as_ejs": "false", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/circle-small.svg"
+}

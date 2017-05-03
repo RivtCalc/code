@@ -1,0 +1,16 @@
+{
+  "keyboard_shortcut": "Ctrl+0", 
+  "name": "4.0   start new page     #-   page", 
+  "language": "", 
+  "value": [
+    "#- page", 
+    "!@#_currentPos!@#_anchor"
+  ], 
+  "set_selection": "false", 
+  "version": "1.1.5", 
+  "treat_as_ejs": "false", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/circle-small.svg", 
+  "type": "snippet", 
+  "indent_relative": "false", 
+  "auto_abbreviation": "false"
+}

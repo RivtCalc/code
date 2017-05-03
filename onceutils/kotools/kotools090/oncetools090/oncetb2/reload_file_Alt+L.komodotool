@@ -1,0 +1,32 @@
+{
+  "keyboard_shortcut": "Alt+L", 
+  "name": "reload file    Alt+L", 
+  "language": "JavaScript", 
+  "trigger_enabled": false, 
+  "value": [
+    "/**", 
+    " * Close and reload tab while keeping cursor on", 
+    " * current line number.", 
+    " * ", 
+    " * @author Emmanuel VA\u00cfSSE <evaisse@gmail.com>", 
+    " * @version 1.0", 
+    " */", 
+    "", 
+    "var view = ko.views.manager.currentView;", 
+    "", 
+    "if (view) {", 
+    "    var currentURI = view.koDoc.file.URI,", 
+    "        scimoz = ko.views.manager.currentView.scimoz,", 
+    "        currentLine = scimoz.lineFromPosition(scimoz.currentPos);", 
+    "    // now close and re-open", 
+    "    view.close();", 
+    "    ko.open.URI(currentURI+\"#\"+currentLine);", 
+    "}"
+  ], 
+  "trigger": "trigger_postopen", 
+  "rank": 100, 
+  "version": "1.1.5", 
+  "async": false, 
+  "type": "macro", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/loop4.svg"
+}

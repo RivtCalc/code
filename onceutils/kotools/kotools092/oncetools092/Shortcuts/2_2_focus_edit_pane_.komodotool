@@ -1,0 +1,16 @@
+{
+  "keyboard_shortcut": "Ctrl+Shift+E", 
+  "name": "2.2 focus edit pane    ", 
+  "language": "JavaScript", 
+  "trigger_enabled": false, 
+  "value": [
+    "komodo.assertMacroVersion(3);", 
+    "ko.commands.doCommand('cmd_focusEditor');"
+  ], 
+  "trigger": "trigger_postopen", 
+  "rank": 100, 
+  "version": "1.1.5", 
+  "async": false, 
+  "type": "macro", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/circle-small.svg"
+}

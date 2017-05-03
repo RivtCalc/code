@@ -1,0 +1,16 @@
+{
+  "keyboard_shortcut": "Alt+X", 
+  "name": "3.4 expand all folds", 
+  "language": "JavaScript", 
+  "trigger_enabled": false, 
+  "value": [
+    "komodo.assertMacroVersion(3);", 
+    "ko.commands.doCommand('cmd_foldExpandAll');"
+  ], 
+  "trigger": "trigger_postopen", 
+  "rank": 100, 
+  "version": "1.1.5", 
+  "async": false, 
+  "type": "macro", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/menu10.svg"
+}

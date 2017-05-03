@@ -1,0 +1,22 @@
+{
+  "keyboard_shortcut": "Ctrl+R", 
+  "name": "4.2 csv to reST", 
+  "language": "JavaScript", 
+  "trigger": "trigger_postopen", 
+  "value": [
+    "//check that file is a model", 
+    "", 
+    "komodo.assertMacroVersion(3);", 
+    "if (komodo.view) { komodo.view.setFocus(); }", 
+    "kocalc = ko.views.manager.currentView.koDoc.file", 
+    "kocalcfile = kocalc.baseName", 
+    "", 
+    "ko.commands.doCommand('cmd_toolsRunCommand')"
+  ], 
+  "version": "1.1.5", 
+  "rank": 100, 
+  "trigger_enabled": false, 
+  "async": 1, 
+  "type": "macro", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/enter5.svg"
+}

@@ -1,0 +1,103 @@
+#- 
+
+[s] Section 4 includes printed PDF calcs, UTF calcs and model files, grouped in that order, for each example. The latest files including the IPython
+   files, function files, summary files and log files can be downloaded from once-db for each example at http://on-c-e.org
+
+  00_Basic: 0001.basic.txtDemonstrates: Sections, terms, equations, reST
+  , tables
+  01_Basic_latex: 0101.base_latex.txt
+   Sections
+  , terms, equations, raw LaTeX, reST, symbolic equations, tables 
+
+  02_IsoBearing: 0201.bearing.txt
+   Figures, complex equations, DC ratio checks
+  03_Deflection: 0301.deflection.txtFigures, arrays, equation expansion options
+  04_Seismic:  
+  0401.bldg_info.txtterm lists, inline reStructuredText
+  0402.seismic.txtbuilt-in math functions0403.seismic.txtsub-models, symbolic expressions0404.frame.txtsections, array0405.brace.txtDC checks
+  05_Dynamics:0501.eigenvector.txtExternal functions, plotting, linear algebra library.
+  06_OpenSees:  0601.truss.txtRead, edit, file operations for external programs and data
+  07_Matrix:  0701.stiffness.txtExternal functions, plotting, linear algebra library
+
+
+[s]  - basic template summary #- toc
+  This model calculates the mid-span beam moment
+  under uniformly distributed (UDL) floor loads.
+
+  #- 01 insert beam figure
+
+  operation examples:
+      - [s] section
+      - [y] sympy and LaTeX symbolic expresssions
+      - [t] term
+      - [e] equation
+      - [#-] format and file operations
+
+  reST markup examples:
+      - lists, **bold**, *italic*
+      - tables
+      - raw latex
+
+#page
+
+
+[s] Beam Loads and geometry
+  Dead and live load contributions to beam UDL
+
+  **ASCE 7 - 05 Load Effects**
+
+  =============   ==============================================
+  Equation No.    Load Combination
+  =============   ==============================================
+  16-1            1.4(D+F)
+  16-2            1.2(D+F+T) + 1.6(L+H) + 0.5(Lr or S or R)
+  16-3            1.2(D+F+T) + 1.6(Lr or S or R) + (f1L or 0.8W)
+  =============   ==============================================
+
+  **Dead loads**
+  [t] joists          | D_1 =   3.8*PSF
+  [t] plywood         | D_2 =   2.1*PSF
+  [t] partitions      | D_3 =  10.0*PSF
+  [t] fixed machinery | D_4 =   0.5*KLF
+
+  **Live loads**
+  [t] ASCE7-O5        | L_1 = 40*PSF
+
+  **Beam tributary width and span**
+  [t] distance between beams  | w_1 = 2*FT
+  [t] beam span               | l_1 = 14*FT
+
+[s] Maximum bending moment
+
+  [e] Total UDL factored dead load    #- 01
+      DL_1 = 1.2 * (w_1 *(D_1 + D_2 + D_3) + D_4)
+
+  [e] Total UDL factored live load    #- 01
+      LL_1 = 1.6 * w_1 * L_1
+
+  [e] factored UDL    #- 01
+      omega_1 = DL_1 + LL_1
+
+  [e] Bending moment at mid-span    #- 02
+      M_1 = omega_1 * l_1**2 / 8
+
+[s] Symbolic rendering using sympy or LaTeX
+
+  Equation rendered from **SymPy**
+  [y] p | sigma = M*z / I
+
+  Equation rendered from **LaTeX** (expresssion copied from Wikipedia HTML source)
+  [y] x | \sigma = \frac{Mz}{I} = -zE ~ \frac{\mathrm{d}^2 w}{\mathrm{d} x^2}
+
+  #- formateq  | 3,3  | 1.5
+  #- 01  | 2,2  | KLF     | 2
+  #- 02  | 2,1  | KIP*FT  | 3
+
+  #- fileop
+  #- 01 | f | beam.png | Simply supported beam | 50 |
+
+  # This file contains a on-c-e public domain template (the template).
+  # The template is distributed under the CCO 1.0 Public Domain Dedication
+  # at http://creativecommons.org/publicdomain/zero/1.0/
+  # The template is not a structural design calculation.
+  # The template user assumes sole responsibility for all inputs and results.

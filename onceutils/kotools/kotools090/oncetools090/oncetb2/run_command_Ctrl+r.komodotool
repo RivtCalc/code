@@ -1,0 +1,26 @@
+{
+  "keyboard_shortcut": "", 
+  "name": "run command    Ctrl+r", 
+  "language": "JavaScript", 
+  "trigger": "trigger_postopen", 
+  "value": [
+    "//check that file is a model", 
+    "", 
+    "komodo.assertMacroVersion(3);", 
+    "if (komodo.view) { komodo.view.setFocus(); }", 
+    "kocalc = ko.views.manager.currentView.koDoc.file", 
+    "kocalcfile = kocalc.baseName", 
+    "", 
+    "ko.commands.doCommand('cmd_save')", 
+    "_part = komodo.findPart('macro', '3.6 run command')", 
+    "", 
+    "if (!_part) {alert(\"Could not find a macro called 'run command' when executing macro\");}", 
+    "ko.projects.invokePart(_part);"
+  ], 
+  "version": "1.1.5", 
+  "rank": 100, 
+  "trigger_enabled": false, 
+  "async": 1, 
+  "type": "macro", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/enter5.svg"
+}

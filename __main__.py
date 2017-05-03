@@ -1,31 +1,32 @@
 #!
 
 """ on-c-e
-The program is wwritten in pure Python and produces formatted, searchable
-calculation documents that are suitable for structural engineering collaboration
+The program is written in pure Python 3 and produces formatted, searchable
+calculation documents that are suitable for engineering collaboration, review
 and construction permit packages. 
 
-The program takes a **on-c-e** markup ASCII input file with a filename of the
-form *mrrcc_modelname.txt* and returns a UTF-8 formatted calculation file
+The program takes a **on-c-e** markup ASCII text input file with a filename of
+the form *mrrcc_modelname.txt* and returns a UTF-8 formatted calculation file
 *crrcc_modelname.txt* and an optional PDF-LaTeX formatted file (including
 graphics) *crrcc.modelname.pdf* if **Tex Live** is installed;
- where **rrcc** is the calculation number made up of a report 
- **rr** and calculation **cc** section number reference.
+ where **rrcc** is the calculation number made up of a report section
+ **rr** and  subsection **cc**.
 
+The program takes a text file tagged with **on-c-e** markup as input, referred to
+as a model, and processes it through various Python libraries into formatted
+text or PDF calculation files, referred to as calcs.  . The primary libraries are
+**sympy**, **docutils** and **LaTeX** libraries 
+
+The program also outputs a Python file that can 
 All calcs and supporting files for a project are contained in a project folder
-with the following required subfolders: *calc, image, scrpt, table, temp*.
-The subfolders are created by the program if they do not exist.  The *model*
-subfolder must exist for the program to run. 
+with the following required subfolders: *dbmodel, dbcalc, dbscrpt, dbtable,
+image,  reprt, temp*. The subfolders are created by the program if they do
+not exist.  The *dbmodel* subfolder contains **on-c-e** models. 
 
-The program takes text files tagged with **on-c-e** markup as input, referred to
-as models, and processes them through **sympy**, **docutils** and
-**LaTeX** libraries into formatted text or PDF calculation files, referred to as
-calcs.
-
-OS Platforms: Windows, Linux, OSX, iOS (Pythonista), Android (QPython3)
+Desktop OS: Windows, Linux, OSX,
+Mobile / Platform: iOS / Pythonista), Android / PyDroid (Python 2)
 Recommended IDE: Komodo X or Komodo Edit X 
-Compatible IDE: Notepad++, Atom 
-Interactive: Python shell, IPython, Jupyter 
+Compatible IDE: Notepad++, Atom,  
 
 **Test the installation**
 Copy the **on-c-e** program folder to the *python/Lib/site-packages* folder and

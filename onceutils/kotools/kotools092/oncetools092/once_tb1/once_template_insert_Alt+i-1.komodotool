@@ -1,0 +1,19 @@
+{
+  "keyboard_shortcut": "", 
+  "name": "once template insert   Alt+i", 
+  "language": "JavaScript", 
+  "trigger_enabled": false, 
+  "value": [
+    "komodo.assertMacroVersion(3);", 
+    "if (komodo.view) { komodo.view.setFocus(); }", 
+    "_part = komodo.findPart('snippet', '2.8 insert model template');", 
+    "ko.projects.invokePart(_part);", 
+    "ko.commands.doCommand('cmd_focusEditor')"
+  ], 
+  "trigger": "trigger_postopen", 
+  "rank": 100, 
+  "version": "1.1.5", 
+  "async": false, 
+  "type": "macro", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/file4.svg"
+}

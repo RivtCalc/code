@@ -1,0 +1,18 @@
+{
+  "keyboard_shortcut": "", 
+  "name": "remote file run  Alt+r", 
+  "language": "JavaScript", 
+  "trigger_enabled": false, 
+  "value": [
+    "// Macro recorded on: Tue Jan 17 2017 22:40:01 GMT-0800 (Pacific Standard Time)", 
+    "komodo.assertMacroVersion(3);", 
+    "if (komodo.view) { komodo.view.setFocus(); }", 
+    "ko.commands.doMacro('1.4 run remote file')"
+  ], 
+  "trigger": "trigger_postopen", 
+  "rank": 100, 
+  "version": "1.1.5", 
+  "async": false, 
+  "type": "macro", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/tree5.svg"
+}
