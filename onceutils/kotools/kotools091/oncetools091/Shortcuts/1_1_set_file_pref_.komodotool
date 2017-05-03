@@ -1,0 +1,18 @@
+{
+  "keyboard_shortcut": "Ctrl+Shift+Q", 
+  "name": "1.1 set_file_pref ", 
+  "language": "JavaScript", 
+  "trigger": "trigger_postopen", 
+  "value": [
+    "// Macro recorded on: Sun Nov 23 2014 11:29:17 GMT-0800 (Pacific Standard Time)", 
+    "komodo.assertMacroVersion(3);", 
+    "if (komodo.view) { komodo.view.setFocus(); }", 
+    "ko.commands.doCommand('cmd_editPrefsCurrent')"
+  ], 
+  "version": "1.1.5", 
+  "rank": 100, 
+  "trigger_enabled": false, 
+  "async": false, 
+  "type": "macro", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/circle-small.svg"
+}

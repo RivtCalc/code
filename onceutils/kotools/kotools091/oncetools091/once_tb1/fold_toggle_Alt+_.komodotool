@@ -1,0 +1,18 @@
+{
+  "keyboard_shortcut": "", 
+  "name": "fold toggle Alt+.", 
+  "language": "JavaScript", 
+  "trigger_enabled": false, 
+  "value": [
+    "ko.commands.doCommand('cmd_save')", 
+    "_part = komodo.findPart('macro', '3.2 toggle fold')", 
+    "if (!_part) {alert(\"Could not find a command called when executing macro\");}", 
+    "ko.projects.invokePart(_part);"
+  ], 
+  "trigger": "trigger_postopen", 
+  "rank": 100, 
+  "version": "1.1.5", 
+  "async": false, 
+  "type": "macro", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/align-center-vertical.svg"
+}

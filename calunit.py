@@ -5,9 +5,7 @@ import os
 import importlib.util
 from once import config as cfg
 unum_path = os.path.join(cfg.opath,'unum','__init__.py')
-print("opath", cfg.opath, unum_path)
 spec = importlib.util.spec_from_file_location("unum", unum_path)
-print('spec', spec)
 unum = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(unum)
 Unum = unum.Unum

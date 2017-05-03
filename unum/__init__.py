@@ -170,7 +170,7 @@ class Unum(object):
             result.normalize()
         return result
         
-    def asUnit(self, other):
+    def asU(self, other):
         """Return a Unum with this Unum's value and the units of the given Unum.
         
         Raises IncompatibleUnitsError if self can't be converted to other.
@@ -506,4 +506,4 @@ class Unum(object):
 # Maintain API compatibility with Unum 4 and lower.
 # "as" became a reserved word in 2.5, so we can't use it.
 if sys.version_info < (2, 5):
-    setattr(Unum, "as", Unum.asUnit)
+    setattr(Unum, "as", Unum.asU)

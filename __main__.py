@@ -80,8 +80,8 @@ __author__ = 'rholland'
 
                                                         
 if __name__ == '__main__': 
-    print(sys.argv)
     cfg.sysargv = sys.argv                               # read command line
+    #print(sys.argv)
     try:
         _mfile = cfg.mfile = sys.argv[1].strip()         # model name
         _mpath = cfg.mpath = os.getcwd()                 # model path

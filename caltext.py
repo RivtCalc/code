@@ -484,7 +484,7 @@ class CalcUTF(object):
         elif typev == Unum:
             exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
             if len(cunit) > 0:
-                tmp = eval(var0).asUnit(eval(cunit))
+                tmp = eval(var0).asU(eval(cunit))
             else:
                 tmp = eval(var0)
             tmp1 = tmp.strUnit()
@@ -580,7 +580,7 @@ class CalcUTF(object):
                 print(21, type(_rc[inx[0]][inx[1]]),_rc[inx[0]][inx[1]] )
                 try:
                     _fltn2a = _rc[inx[0]][inx[1]]
-                    _fltn2b = _fltn2a.asUnit(eval(cunit))
+                    _fltn2b = _fltn2a.asU(eval(cunit))
                     _fltn2c = _fltn2b.asNumber()
                     _rc[inx[0]][inx[1]] = str(_fltn2c)
                 except:
@@ -856,13 +856,19 @@ class CalcUTF(object):
                 'from sympy import *\n'
                 'from numpy import *\n'
                 'import numpy.linalg as LA\n'
-                'from once.calunit import *\n')
+                'import importlib.util\n'
+                'import once.config as cfg\n')
                                 
+        str2a = ('pypath = os.path.dirname(sys.executable)\n'
+                'oncedir = os.path.join(pypath,"Lib","site-packages","once")\n'
+                'cfg.opath = oncedir\n'
+                'from once.calunit import *\n')
+
         vlist1 = []
         vlist2 = []
         str3a = str(os.getcwd()).replace("\\", "\\\\")
         str3 = "sys.path.append('" + str3a + "')"
-        importstr = str1 + str2 + str3
+        importstr = str1 + str2 + str2a + str3
         pyfile1.write(importstr + 2*"\n")
         pyfile1.write("# begin equations" + "\n")
         _vardef =[]
@@ -907,15 +913,20 @@ class CalcUTF(object):
 
         str5 = ('\ndef vlist(vlistx = vlist1, vlisty= vlist2):\n'
                 '   """Utility function for interactively listing once\n'
-                '      variable values. Variables are stored in vlist1.  Type\n'
-                '      vlist() to list summary after executing equation script\n'
+                '      variable values. Variables are stored in vlist1 and'
+                '      definitions in vlist2. Type vlist()\n'
+                '      to list updated variable summary after executing\n'
+                '      calc Python script\n'
                 '   """\n\n'
                 '   for lsti in zip(vlistx, vlisty):\n'
                 '       item1 = eval(str(lsti[0]))\n'
                 '       def1 = lsti[1]\n'
                 '       cncat1 = str(lsti[0]) + " = " + str(item1) + " "*30\n'
-                '       print(cncat1[:25] + "# " + def1)\n'
+                '       print(cncat1[:25] + "# " + def1)\n\n'
+                'if __name__ == "__main__":\n'
+                '       vlist()'
                 '       \n\n')
+        
         pyfile1.write(str5 + "\n")
         pyfile1.close()
         

@@ -1,0 +1,15 @@
+{
+  "keyboard_shortcut": "Ctrl+\\", 
+  "name": "5.8  stop   #- stop", 
+  "language": "Text", 
+  "value": [
+    "#- stop!@#_currentPos!@#_anchor"
+  ], 
+  "set_selection": "false", 
+  "version": "1.1.5", 
+  "auto_abbreviation": "false", 
+  "indent_relative": "false", 
+  "type": "snippet", 
+  "treat_as_ejs": "false", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/circle-small.svg"
+}

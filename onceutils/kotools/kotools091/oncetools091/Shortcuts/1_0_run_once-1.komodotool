@@ -1,0 +1,19 @@
+{
+  "insertOutput": 0, 
+  "parseRegex": "", 
+  "doNotOpenOutputWindow": 0, 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/checkbox-unchecked2.svg", 
+  "keyboard_shortcut": "Ctrl+Space", 
+  "name": "1.0 run once", 
+  "operateOnSelection": 0, 
+  "value": [
+    "%(python3) -m once \"%f\" "
+  ], 
+  "parseOutput": 0, 
+  "version": "1.1.5", 
+  "env": "", 
+  "showParsedOutputList": 0, 
+  "type": "command", 
+  "cwd": "%D", 
+  "runIn": "command-output-window"
+}

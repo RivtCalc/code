@@ -1,0 +1,16 @@
+{
+  "keyboard_shortcut": "", 
+  "name": "5.7 page   #- page", 
+  "language": "Text", 
+  "value": [
+    "#- page", 
+    "!@#_currentPos!@#_anchor"
+  ], 
+  "set_selection": "false", 
+  "version": "1.1.5", 
+  "auto_abbreviation": "false", 
+  "indent_relative": "false", 
+  "type": "snippet", 
+  "treat_as_ejs": "false", 
+  "icon": "koicon://ko-svg/chrome/icomoon/skin/circle-small.svg"
+}

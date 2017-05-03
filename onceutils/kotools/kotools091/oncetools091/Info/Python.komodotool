@@ -1,0 +1,11 @@
+{
+  "keyboard_shortcut": "", 
+  "name": "Python", 
+  "url": "http://docs.python.org/2/", 
+  "value": [
+    "http://docs.python.org/2/"
+  ], 
+  "version": "1.1.5", 
+  "type": "URL", 
+  "icon": "chrome://icomoon/skin/icons/info2.png"
+}
