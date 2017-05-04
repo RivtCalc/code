@@ -51,12 +51,12 @@ class CalcRST(object):
             _v + line number - 4 - [v] value            
             _e + line number - 7 - [e] equation
             _t + line number - 9 - [t] table
-            _s + line number - 3 - [s] sections
+            _s + line number - 3 - [s] sectionsm,kl
             _~ + line number - 1 - blank line
             _x + line number - 2 - pass-through text
             _y + line number - 2 - value heading
             _lt              - 2 - license text [licensetext]
-            _cl              - 1 - control line
+            _#              - 1 - control line
     
     
             [r]    p0   |   p1     |   p2    |   p3   |    p4   |   p5    
@@ -156,12 +156,10 @@ class CalcRST(object):
             if self.xtraline:
                 self._rst_blnk()
         
-        #_rst_defterms()                        # add term definitions
-        
-        for _i2 in self.odict:                  # add calc license
-            if _i2 == '_lt':
-                self._rst_txt(self.odict[_i2],0)
+        if '_lt' in self.odict:                  # add calc license
+            self._rst_txt(self.odict[_i2],0)
         #for _i in self.odict: print(i, self.odict[i])
+        self._rst_terms()                         # add term definitions
         self._rst_blnk()
         self._rst_txt(['  **[end of calc]**'])  # end calc
         self.rf1.close()                          # close rst file
@@ -169,8 +167,6 @@ class CalcRST(object):
 
     def _rst_txt(self, txt):
         """Print pass-through text.
-        ::
-
           arguments:
             txt (string): text that is not part of an tag
 
@@ -227,8 +223,6 @@ class CalcRST(object):
     
     def _rst_ins(self, dval2):
         """Insert file data into or from reST        
-       
-        ::       
             
             [i]      p0    |   p1     |   p2      |   p3   |   p4         
                     'fig'     file       caption     size     location
@@ -274,8 +268,6 @@ class CalcRST(object):
             
     def _rst_val1(self, dval2):
         """Print value description to reST.
-        ::        
-                         
             key: values        
             _y :  p0                | p1
                  block description    eqnum       
@@ -295,8 +287,6 @@ class CalcRST(object):
 
     def _rst_val2(self, dval2):
         """Print values to reST.
-        ::
-
             key: values    
             _v :   p0  |   p1  |  p2      |    p3            
                  var     expr     statemnt   descrip     
@@ -335,8 +325,6 @@ class CalcRST(object):
 
     def _rst_eq(self, dval):
         """Print equation to reST.
-        ::
-             
             key : _e + line number  
             value:  p0  |  p1     |  p2   |   p3    |  p4  | p5   |  p6  |  p7       
                     var   expr      state    descrip   dec1  dec2   unit   eqnum
@@ -479,7 +467,7 @@ class CalcRST(object):
             print1 = 2
             exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
             if len(eunit) > 0:
-                tmp = eval(var0).asUnit(eval(eunit))
+                tmp = eval(var0).asU(eval(eunit))
             else:
                 tmp = eval(var0)
             tmp1 = tmp.strUnit()
@@ -532,8 +520,6 @@ class CalcRST(object):
         
     def _rst_table(self, dval):
         """Print table to reStructuredText.
-        ::
-
             _t + line number - 9 - [t] table
             
             [t]   p0 |  p1  |  p2  |  p3  |  p4    |   p5   | p6   | p7  | p8
@@ -624,7 +610,7 @@ class CalcRST(object):
                 print(21, type(_rc[inx[0]][inx[1]]),_rc[inx[0]][inx[1]] )
                 try:
                     _fltn2a = _rc[inx[0]][inx[1]]
-                    _fltn2b = _fltn2a.asUnit(eval(cunit))
+                    _fltn2b = _fltn2a.asU(eval(cunit))
                     _fltn2c = _fltn2b.asNumber()
                     _rc[inx[0]][inx[1]] = str(_fltn2c)
                 except:
@@ -879,45 +865,58 @@ class CalcRST(object):
         print(' ', file=self.rf1)
 
     
-    def _rst_defterms(self):
+    def _rst_terms(self):
         """Print section with term definitions to reST
+      
+            key: values    
+            _v :   p0  |   p1  |  p2      |    p3            
+                 var     expr     statemnt   descrip     
+
+            key : _e  
+            value:  p0  |  p1     |  p2   |   p3    |  p4  | p5   |  p6  |  p7       
+                    var   expr      state    descrip   dec1  dec2   unit   eqnu 
         
-        ::
-    
-           _s :    p0         |       p1      |   p2        
-                  left string    calc number     sect num   
-    
-    
-      .. math:: 
-  `
-    \begin{align}
-    \bm{A}                &= \textrm{tributary area}\\
-    \bm{M_t_o_r}          &= \textrm{wind moment about panel center }\\
-    \bm{T_0}              &= \textrm{short period spectral cap }\\
-    \bm{T_S}              &= \textrm{long period spectral cap}\\
-    \end{align}
-  `        
         """
-    
-        
-        tleft = dval[0].strip()
-        tright = dval[1].strip() + dval[2].strip()
-        print(' ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print(' ', file=self.rf1)
-        print('   \\vspace{3mm}', file=self.rf1)
-        print(' ', file=self.rf1)
-        print(' ', file=self.rf1)
-        print(tleft.strip() + "aaxbb " + tright.strip(),file=self.rf1)
-        print("-" * self.widthp, file=self.rf1)
-        print(' ', file=self.rf1)
-        print(' ', file=self.rf1)
-        print(".. raw:: latex", file=self.rf1)
-        print(' ', file=self.rf1)
-        print('   \\vspace{1mm}', file=self.rf1)
-        print(' ', file=self.rf1)
-
-
+        taglist =[]
+        for _i in self.odict:
+            mtag = _i[0:2]
+            taglist.append(mtag)
+        if ('_v' or '_e') in taglist:        
+            tleft = "AST Variables and Definitions"
+            print(' ', file=self.rf1)
+            print(".. raw:: latex", file=self.rf1)
+            print(' ', file=self.rf1)
+            print('   \\vspace{3mm}', file=self.rf1)
+            print(' ', file=self.rf1)
+            print(' ', file=self.rf1)
+            print(tleft.strip(),file=self.rf1)
+            print("-" * self.widthp, file=self.rf1)
+            print(' ', file=self.rf1)
+            print(' ', file=self.rf1)
+            print(".. math::", file=self.rf1) 
+            print(' ', file=self.rf1)            
+            print('  \\begin{align}', file=self.rf1)
+            cnt = 0
+            for _i in self.odict:            # execute dictionary line by line
+                if _i[0:2] in ['_v','_e']:
+                    cnt += 1
+                    if cnt == 35:
+                        print('  \\end{align}', file=self.rf1)
+                        print(' ', file=self.rf1)
+                        print(' ', file=self.rf1)
+                        print(".. math::", file=self.rf1) 
+                        print(' ', file=self.rf1)            
+                        print('  \\begin{align}', file=self.rf1)
+                        cnt = 0
+                    mvals = self.odict[_i]
+                    varstring1 = "  \\bm{" + str(mvals[0]) + "} "
+                    varstring2 = "&= \\textrm{" + str(mvals[3]) + "}\\\\"
+                    print(varstring1 + varstring2, file=self.rf1)
+                    #print('rstmtag', mtag, _i, mvals, mvals[0])
+            print('  \\end{align}', file=self.rf1)
+            print(' ', file=self.rf1)
+        else:
+            pass
 
 
 class CalcPDF(object):

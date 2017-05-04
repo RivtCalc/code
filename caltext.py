@@ -1,6 +1,4 @@
 #! python
-from __future__ import division
-from __future__ import print_function
 import codecs
 import datetime
 import sys
@@ -40,7 +38,7 @@ class CalcUTF(object):
             _~ + line number - 1 - blank line
             _x + line number - 2 - pass-through text
             _y + line number - 2 - value heading
-            _c               - 1 - control line
+            _#               - 1 - control line
             _lt              - 2 - license text [licensetext]
     
             [r]    p0   |   p1     |   p2    |   p3   |    p4   |   p5    
@@ -102,8 +100,8 @@ class CalcUTF(object):
 
         """
         _dt = datetime.datetime
-        self._write_utf(str(_dt.now()) + "      on-c-e version: " + __version__
-                        , 0, 0)
+        self._write_utf(str(_dt.now()) + "      on-c-e version: " +
+                        __version__, 0, 0)
 
         if cfg.stocflag:
             _sects1 = []
@@ -111,7 +109,7 @@ class CalcUTF(object):
                 if _dkey[0:2] == '_s':
                     _sval1 = self.odict[_dkey]
                     _sects1.append(str(_sval1[2]) + ' ' + str(_sval1[0]))
-            self._write_utf('\n    Calc Sections', 0, 1)
+            self._write_utf('\n        Calc Sections', 0, 1)
             self._write_utf('    =============', 0, 1)
             for _sect1 in _sects1:
                 self._write_utf('    '+ _sect1, 0, 1)
@@ -119,22 +117,33 @@ class CalcUTF(object):
             self._write_utf('\n', 0, 0)
 
         for _i in self.odict:
-            self.xtraline = True
             mtag = _i[0:2]
             mvals = self.odict[_i]
             #print('rmtag', mtag, _i, self.odict[_i])
             if self.odict[_i][0].strip() == '#- stop':
                 sys.exit(1)
+            if mtag == '_#':
+                self.xtraline = False
+                continue
+            if mtag == '_~': 
+                self._prt_blnk()
+                self.xtraline = False
+                continue
             if mtag ==   '_r':                # execute dictionary line by line
                 self._prt_run(self.odict[_i])
+                self.xtraline = False
             elif mtag == '_i':
                 self._prt_ins(self.odict[_i])
+                self.xtraline = False
             elif mtag == '_v':
                 self._prt_val2(self.odict[_i])
+                self.xtraline = False
             elif mtag == '_e':
                 self._prt_eq(self.odict[_i])
+                self.xtraline = True
             elif mtag == '_t':
                 self._prt_table(self.odict[_i])
+                self.xtraline = True
             elif mtag == '_s':
                 self._prt_sect(self.odict[_i])
                 self.xtraline = False
@@ -146,11 +155,6 @@ class CalcUTF(object):
                 self.xtraline = False
             else:
                 pass
-            if mtag == '_c': 
-                continue
-            if mtag == '_~': 
-                self._prt_blnk()
-                continue
             if self.xtraline:
                 self._prt_blnk()   
         for _i2 in self.odict:                  # add calc license
@@ -162,7 +166,7 @@ class CalcUTF(object):
         #for _i in self.odict: print(i, self.odict[i])
 
     def get_odict(self):
-        """ return model dictionary
+        """Return model dictionary
         
         """
         return self.odict
@@ -174,34 +178,29 @@ class CalcUTF(object):
         self._write_utf(' ', 0, 0)
 
     def _prt_txt(self, txt):
-        """Print pass-through text.
+        """Print or strip pass-through text.
         
-        ::
-
-            arguments:
-                txt (string): text that is not part of an operation
+           txt (string): text that is not part of an operation
 
         """
-
-        if txt[0][0] == '|' : self._write_utf(txt[0], 1, 0) 
-        elif txt[0][0] == '`' : self._write_utf(" ", 1, 0)
+        if txt[0].strip() == '|' : return
+        elif txt[0].strip() == "::" : return                        
+        elif txt[0].strip() == '`' : return
+        elif txt[0][2:4] == ".." : return                        
+        elif txt[0][0] == '|' : self._write_utf(txt[0], 1, 0) 
         elif txt[0][2] == "\\" : self._write_utf(txt[0], 1, 0)                
-        elif txt[0][2] == "::" : self._write_utf(txt[0], 1, 0)                        
         else: self._write_utf(txt[0], 1, 0)
         
     def _write_utf(self, mentry, pp, indent):
         """Write model text to utf-8 encoded file.
         
-        ::
-
-           arguments:
-                mentry (string): text 
-                pp (int): pretty print flag
-                indent (int): indent flag
+            mentry (string): text 
+            pp (int): pretty print flag
+            indent (int): indent flag
             
         """
-        if indent: mentry = " "*4 + mentry
         if pp: mentry = pretty(mentry, use_unicode=True, num_columns=92)
+        if indent: mentry = " "*4 + mentry
         print(mentry, file=self.cfile)
         
     def _prt_run(self, dval):
@@ -376,9 +375,9 @@ class CalcUTF(object):
         shift = int(self.widthc / 2.5)
         ref = dval[3].strip().ljust(shift)
         if ptype == ndarray or ptype == list or ptype == tuple:
-            self._write_utf(" "*2 + ref + " | " + state,  0, 0)
+            self._write_utf(" "*2 + ref + " | " + state,  0, 1)
         else:
-            self._write_utf(" "*2 + ref + " | " + state,  1, 0)
+            self._write_utf(" "*2 + ref + " | " + state,  1, 1)
 
     def _prt_eq(self, dval):
         """print equations.
@@ -870,7 +869,6 @@ class CalcUTF(object):
         str3 = "sys.path.append('" + str3a + "')"
         importstr = str1 + str2 + str2a + str3
         pyfile1.write(importstr + 2*"\n")
-        pyfile1.write("# begin equations" + "\n")
         _vardef =[]
         for k1 in self.odict:               # write values and equations
             if k1[0:2] == '_e' or k1[0:2] == '_v':

@@ -1,5 +1,4 @@
-#!
-
+#! python
 """ on-c-e
 The program is written in pure Python 3 and produces formatted, searchable
 calculation documents that are suitable for engineering collaboration, review
@@ -48,23 +47,23 @@ which will display help. Next type
 which writes the built-in example model *m0101_example.txt*
 to the project folder and runs it.
 
-**Program links**
-contact:                    once.pyproject@gmail.com
-overview:                   http://structurelabs.com/once
-program and source docs:    http://on-c-e.github.io/
-database:                   http://on-c-e.net
-English forum:              http://zero-construction-productivity-growth.net
-Brazil forum:               http://on-c-e-br.net
-Japan forum:                http://on-c-e-jp.net
-India forum:                http://on-c-e-in.net
-China forum:                http://on-c-e-cn.net
-Mexico forum:               http://on-c-e-mx.net
-**Other links**
-Python distribution:        https://www.continuum.io/downloads
-Komodo IDE:                 https://www.activestate.com/komodo-ide
-Komodo Edit:                https://www.activestate.com/komodo-edit
-DejaVu fonts:               http://dejavu-fonts.org/wiki/Main_Page
-Tex Live (LaTex):           https://www.tug.org/texlive/
+**Links**
+overview:               http://structurelabs.com/once
+program and source:     http://on-c-e.github.io
+email support:          once.pyproject@gmail.com
+interactive support:    http://www.pythonanywhere.com    
+cloud database:         http://drive.google.com
+Komodo IDE:             https://activestate.com/komodo-ide
+Komodo Edit:            https://activestate.com/komodo-edit
+DejaVu fonts:           https://dejavu-fonts.github.io
+Tex Live (LaTex):       https://tug.org/texlive
+**Google Group Forums**
+English:                http://0-productivity-growth.net
+Brazil:                 http://on-c-e-br.net
+Japan:                  http://on-c-e-jp.net
+India:                  http://on-c-e-in.net
+China:                  http://on-c-e-cn.net
+Mexico:                 http://on-c-e-mx.net
 """
 
 from __future__ import division, print_function
@@ -90,9 +89,10 @@ if __name__ == '__main__':
         _f2 = open(_mfile, 'r')                          # does model exist
         _f2.close()
     except:                                              # run a utility script
+        "< run utility script >"
         try:
-            if '-s' == sys.argv[1].strip():
-                _spath = os.path.join(oncedir, "calscripts")
+            if sys.argv[1].strip() == '-s':
+                _spath = os.path.join(cfg.opath, "calscripts")
                 shellcmd = str(sys.argv[2])
                 _scpath = os.path.join(_spath, shellcmd)
                 shellcmd2 = "python " + _scpath 
@@ -167,6 +167,13 @@ if __name__ == '__main__':
             os.system(pdffilex)
         except:
             _el.logwrite("< pdf calc file could not be opened >", vbos)
+
+    if cfg.openflagutf:                                 # check open UTF flag 
+        try:
+            utffilex = os.path.join(_ppath, _cpath, _cfileutf)
+            os.system(utffilex)
+        except:
+            _el.logwrite("< txt calc file could not be opened >", vbos)
 
     calstart._variablesummary()                          # echo calc results
     _el.logwrite("< end of once program >", 1)

@@ -102,8 +102,8 @@ def run():
     '''
     cwd1 = os.getcwd()                  
     os.chdir("..")
-    cwd2 = os.getcwd()
-    path2 = os.path.join(cwd2, "table")
+    proj_root = os.getcwd()
+    path2 = os.path.join(proj_root, "dbtable")
     os.chdir(path2)
     list1 = glob.glob('*.csv')
     #print(list1)

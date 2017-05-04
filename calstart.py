@@ -1,7 +1,4 @@
 #! python
-
-from __future__ import division
-from __future__ import print_function
 import subprocess
 import datetime
 import locale
@@ -110,9 +107,12 @@ def _paramline(mline1):
         if 'openpdf' in mline2: cfg.openflagpdf = 1
         if 'opentxt' in mline2: cfg.openflagutf = 1
         if 'verbose' in mline2: cfg.verboseflag = 1
-        if 'width'   in mline2: cfg.calcwidth = str(mline2[mline2.index
-                                                           ('width')+1])
+        if 'stoc'    in mline2: cfg.stocflag = 1
+        if 'width'   in mline2: pass
         if 'margins' in mline2: pass
+        for _y in mline2:
+            if _y.strip()[0:5] == 'title':
+                cfg.rsectname = _y.strip()[6:] 
     else:
         pass
     
