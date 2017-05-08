@@ -1,4 +1,4 @@
-# on-c-e configuration file is modified by the program - do not change
+# on-c-e configuration file - modified by the program - do not change
 
 import os
 oncepath = os.path.abspath(__file__)
@@ -18,7 +18,6 @@ ipath = ''    # image folder
 xpath = ''    # temp folder
 rpath = ''    # report folder
 logpath = ''  # log (temp) folder
-#kpath = ''    # package folder
 
 # file names
 mfile = ''
@@ -31,12 +30,6 @@ texfile = ''
 texfile2 = ''
 logfile = ''
 
-# default decimal places
-defaultdec = '3,3'
-
-# UTF line width
-calcwidth = 80
-
 # flags
 pdfflag = 0         # write PDF 
 echoflag = 0        # echo output to terminal
@@ -48,6 +41,8 @@ verboseflag = 0     # write logging to standard out
 stocflag = 0        # write section table of contents
 
 # variables
-varevaled = ""     # list of model variables
-rsectname = "\n\nContents1"    # default table of contents heading
-
+defaultdec = '3,3'  # default decimal places
+calcwidth = 80      # UTF line width
+varevaled = ""      # list of model variables
+calctitle = '\n\nModel Title' # default model title
+pagemargin = '1.0in,0.75in,0.9in,1.0in'  # pdf page margins

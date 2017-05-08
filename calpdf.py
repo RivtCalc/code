@@ -82,8 +82,8 @@ class CalcRST(object):
             
             [s]   p0          | p1         |        p2    |   p3           
                   left string    calc number     sect num   toc flag
-
     """
+
 
     def __init__(self, odict1):
         """Initialize parameters for UTF calc.
@@ -111,6 +111,7 @@ class CalcRST(object):
         self.prfilename = ''
         self.previous = ''
         self.literalflag = 0
+
 
     def gen_rst(self):
         """ Parse model dictionary and write rst file.
@@ -165,6 +166,7 @@ class CalcRST(object):
         self.rf1.close()                          # close rst file
         self.el.logwrite("< reST file written >", self.vbos)
 
+
     def _rst_txt(self, txt):
         """Print pass-through text.
           arguments:
@@ -193,6 +195,7 @@ class CalcRST(object):
             print(txt[0][2:].rstrip(), file=self.rf1)
             self.xtraline = True
 
+
     def _rst_blnk(self):
         """Print blank line.
 
@@ -211,6 +214,7 @@ class CalcRST(object):
             #print('.. ', file=self.rf1)
             #print('   ', file=self.rf1)
 
+
     def _rst_run(self, dval2):
 
         """        
@@ -220,6 +224,7 @@ class CalcRST(object):
                         'py'     script      arg1      arg2      arg3     arg4     
         """
         pass
+
     
     def _rst_ins(self, dval2):
         """Insert file data into or from reST        
@@ -265,6 +270,7 @@ class CalcRST(object):
             print('   ' + var2, file=self.rf1)
             print(' ', file=self.rf1)
             self.el.logwrite("< figure "+fname+" added to TeX >", self.vbos)
+
             
     def _rst_val1(self, dval2):
         """Print value description to reST.
@@ -285,8 +291,10 @@ class CalcRST(object):
         print('   \\hfill\\textbf{'+descrip+ ' ' +eqnum +'}', file=self.rf1)
         print('  ', file=self.rf1)
 
+
     def _rst_val2(self, dval2):
-        """Print values to reST.
+        """Print values to reST:
+        
             key: values    
             _v :   p0  |   p1  |  p2      |    p3            
                  var     expr     statemnt   descrip     
@@ -323,8 +331,10 @@ class CalcRST(object):
         print('  ', file=self.rf1)
         print('  ', file=self.rf1)
 
+
     def _rst_eq(self, dval):
-        """Print equation to reST.
+        """Print equation to reST:
+        
             key : _e + line number  
             value:  p0  |  p1     |  p2   |   p3    |  p4  | p5   |  p6  |  p7       
                     var   expr      state    descrip   dec1  dec2   unit   eqnum
@@ -517,9 +527,11 @@ class CalcRST(object):
         print('  ', file=self.rf1)
         print('   \\vspace{8mm}', file=self.rf1)
         print('  ', file=self.rf1)
+
         
     def _rst_table(self, dval):
-        """Print table to reStructuredText.
+        """Print table to reStructuredText:
+        
             _t + line number - 9 - [t] table
             
             [t]   p0 |  p1  |  p2  |  p3  |  p4    |   p5   | p6   | p7  | p8
@@ -837,6 +849,7 @@ class CalcRST(object):
             print(ptable, file=self.rf1)
             print('  ', file=self.rf1)
 
+
     def _rst_sect(self, dval):
         """Print section title to reST.
         
@@ -845,8 +858,7 @@ class CalcRST(object):
            _s :    p0         |       p1      |   p2        
                   left string    calc number     sect num   
        
-        """
-        
+        """        
         tleft = dval[0].strip()
         tright = dval[1].strip() + dval[2].strip()
         print(' ', file=self.rf1)
@@ -866,7 +878,7 @@ class CalcRST(object):
 
     
     def _rst_terms(self):
-        """Print section with term definitions to reST
+        """Print section with term definitions to reST:
       
             key: values    
             _v :   p0  |   p1  |  p2      |    p3            
@@ -939,7 +951,7 @@ class CalcPDF(object):
         self.rfile = cfg.rstfile
         self.texfile = cfg.texfile
         self.rpath = cfg.rpath
-        self.rsectname = cfg.rsectname
+        self.calctitle = cfg.calctitle
         self.texfile2 = os.path.join(cfg.xpath, self.texfile)
         self.auxfile =  os.path.join(cfg.xpath, cfg.mbase + '.aux')
         self.outfile =  os.path.join(cfg.xpath, cfg.mbase + '.out')
@@ -975,7 +987,7 @@ class CalcPDF(object):
         tex1 = "".join([pythoncall, rstexec
                         ,
                         " --documentclass=report ",
-                        " --documentoptions=12pt,notitle",
+                        " --documentoptions=12pt,notitle,letterpaper",
                         " --stylesheet=",
                         fixstylepath + " ", self.rfile + " ", self.texfile2])
         self.el.logwrite("tex call:\n" + tex1, self.vbos)
@@ -988,9 +1000,9 @@ class CalcPDF(object):
         
         self.mod_tex(self.texfile2)
 
+
     def mod_tex(self, tfile):
-        """Modify TeX file to avoid problems with escapes.
-        ::
+        """Modify TeX file to avoid problems with escapes:
 
             - Modifies the marker "aaxbb " inserted by on-c-e with
               \\hfill which is not handled by reST.
@@ -1007,20 +1019,19 @@ class CalcPDF(object):
             texf = texf.replace("""\\maketitle""", '')
             texf = texf.replace("""\\title{\\phantomsection%""",
                                 """\\renewcommand{\contentsname}{""" +
-                                self.rsectname + "}\n" +
+                                self.calctitle + "}\n" +
                                 """\\begin{document}""" + "\n" +
                                 """\\tableofcontents"""
                                 """\\chapter{%""")
         else:
             texf = texf.replace("""\\begin{document}""",
                                 """\\renewcommand{\contentsname}{""" +
-                                self.rsectname + "}\n" +
+                                self.calctitle + "}\n" +
                                 """\\begin{document}""" + "\n" +
-                                """\\tableofcontents""")
-        
-        
+                                """\\tableofcontents""")    
         with open (tfile, 'w') as texout:
             print(texf, file=texout)
+
 
     def gen_pdf(self):
         """Write PDF file from tex file.
@@ -1031,15 +1042,14 @@ class CalcPDF(object):
             os.remove(os.path.join(self.ppath,self.pdffile))
         pdf1 ='latexmk -xelatex -quiet -f '+os.path.join(self.xpath,self.texfile)
         #print("pdf call:  ", pdf1)
+        self.el.logwrite("< PDF calc written >", self.vbos)    
         os.system(pdf1)
-        
         pdfname = self.pdffile
         pdfname = list(pdfname)
         pdfname[0]='m'
         pdfname2 = "".join(pdfname)
         pdfftemp = os.path.join(self.xpath, pdfname2)
         pdffnew = os.path.join(self.cpath, self.pdffile)
-        self.el.logwrite("< PDF calc written >", self.vbos)    
         try:
             os.remove(pdffnew)
         except:
@@ -1048,8 +1058,6 @@ class CalcPDF(object):
             os.rename(pdfftemp, pdffnew)
         except:    
             self.el.logwrite("< PDF calc not moved from temp >", 1)
-
-
         tocname2 = pdfname2.replace('.pdf','.toc')
         toctemp = os.path.join(self.xpath, tocname2)
         tocnew = os.path.join(self.rpath, tocname2)
@@ -1058,12 +1066,39 @@ class CalcPDF(object):
         except:    
             self.el.logwrite("< TOC not moved from temp >", 1)
 
-            
-        texname2 = pdfname2.replace('.pdf','.tex')
-        textemp = os.path.join(self.xpath, texname2)
-        texnew = os.path.join(self.rpath, texname2)
-        try:
-            shutil.copyfile(textemp, texnew)
-        except:    
-            self.el.logwrite("< TEX not moved from temp >", 1)
 
+    def reprt_list(self):
+        """Append calc name to reportmerge.txt
+        
+        """
+        try: 
+            filen1 = os.path.join(self.rpath, "reportmerge.txt")
+            print(filen1)
+            file1 = open(filen1, 'r')
+            mergelist = file1.readlines()
+            file1.close()
+            mergelist2 = mergelist[:]
+        except OSError:
+            print('< reportmerge.txt file not found in reprt folder >')
+            return
+        calnum1 = self.pdffile[0:5]
+        file2 = open(filen1, 'w')
+        newstr1 = 'c | ' +  self.pdffile  + ' | ' + self.calctitle
+        for itm1 in mergelist:
+            if calnum1 in itm1:
+                indx1 = mergelist2.index(itm1)
+                mergelist2[indx1] = newstr1
+                for j1 in mergelist2: file2.write(j1)
+                file2.close()
+                return
+        mergelist2.append("\n" + newstr1)
+        for j1 in mergelist2: file2.write(j1)
+        file2.close()
+        return
+                
+            
+            
+        
+            
+            
+            

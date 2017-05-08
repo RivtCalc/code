@@ -109,10 +109,13 @@ def _paramline(mline1):
         if 'verbose' in mline2: cfg.verboseflag = 1
         if 'stoc'    in mline2: cfg.stocflag = 1
         if 'width'   in mline2: pass
-        if 'margins' in mline2: pass
         for _y in mline2:
             if _y.strip()[0:5] == 'title':
-                cfg.rsectname = _y.strip()[6:] 
+                cfg.calctitle = _y.strip()[6:] 
+        if 'margins' in mline2:
+            if _y.strip()[0:7] == 'margins':
+                cfg.calctitle = _y.strip()[6:] 
+
     else:
         pass
     
@@ -138,13 +141,15 @@ def _gencalc():
     newmod = CalcUTF(mdict)                         #5 generate UTF calc
     newmod._gen_utf()                                                                    
     newmod._write_py()                              #5 write Python script            
-    _el.logwrite("< ipython script written >", vbos)                          
+    _el.logwrite("< python script written >", vbos)                          
     _el.logwrite("< pdfflag setting = " + str(cfg.pdfflag) +" >", vbos)        
     if int(cfg.pdfflag):                            #6 check for PDF parameter                                       # generate reST file
         rstout1 = CalcRST(mdict)                          
         rstout1.gen_rst()                           
         pdfout1 = CalcPDF()                         #6 generate TeX file                 
-        pdfout1.gen_tex()                           
+        pdfout1.gen_tex()
+        pdfout1.reprt_list()                        #6 update reportmerge file
+        _el.logwrite("< reportmerge.txt file updated >", 1)        
         os.chdir(once.__path__[0])                  #6 check LaTeX install
         f4 = open('once.sty')
         f4.close()
