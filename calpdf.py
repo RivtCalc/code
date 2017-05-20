@@ -123,13 +123,18 @@ class CalcRST(object):
             mtag = _i[0:2]
             mvals = self.odict[_i]
             #print('rstmtag', mtag, _i, mvals, mvals[0])
-            if mvals[2:9] == '#- page':
+            if mvals[2:9] == '#- page':                 #- add page break
                 print(' ', file=self.rf1)
                 print(".. raw:: latex", file=self.rf1)
                 print(' ', file=self.rf1)
                 print('  \\newpage', file=self.rf1)
                 print(' ', file=self.rf1)
                 self.el.logwrite("pdf new page", self.vbos)
+            if mvals[2:4] == '#-':
+                if isinstance(str(mvals.strip())[-1], int):       # add spaces
+                    _numspace = eval(mvals.strip()[-1])
+                    for _i in range(_numspace):
+                        self._rst_blank()
             if mtag ==   '_r':                
                 self._rst_run(self.odict[_i])
             elif mtag == '_i':
@@ -210,9 +215,6 @@ class CalcRST(object):
             print('   \\vspace{3mm}', file=self.rf1)
             print('  ', file=self.rf1)
             print('  ', file=self.rf1)
-            #print('   ', file=self.rf1)
-            #print('.. ', file=self.rf1)
-            #print('   ', file=self.rf1)
 
 
     def _rst_run(self, dval2):
@@ -1004,10 +1006,10 @@ class CalcPDF(object):
     def mod_tex(self, tfile):
         """Modify TeX file to avoid problems with escapes:
 
-            - Modifies the marker "aaxbb " inserted by on-c-e with
-              \\hfill which is not handled by reST.
+            - Modifies the marker "aaxbb " inserted by once with
+              \\hfill which is not handled well by reST.
             - Deletes inputenc package
-            - Modifies title section
+            - Modifies title section and adds table of contents
             
         """
         with open(tfile, 'r') as texin:

@@ -20,21 +20,20 @@ rpath = ''    # report folder
 logpath = ''  # log (temp) folder
 
 # file names
-mfile = ''
-mbase = ''
-cfileutf = ''
-cfilepdf = ''
-cfilepy = ''
-rstfile = ''
-texfile = ''
-texfile2 = ''
-logfile = ''
+mfile = ''    # model file name 
+mbase = ''    # model file base
+cfileutf = '' # utf calc file
+cfilepdf = '' # pdf calc file
+cfilepy = ''  # python model file
+rstfile = ''  # rst file
+texfile = ''  # tex file
+texfile2 = '' # tex file with full path
+logfile = ''  # once log file
 
 # flags
 pdfflag = 0         # write PDF 
 echoflag = 0        # echo output to terminal
 cleanflag = 0       # do not clean temporary latex files
-projectflag = 0     # compile project
 openflagpdf = 0     # open calc PDF
 openflagutf = 0     # open calc UTF
 verboseflag = 0     # write logging to standard out
@@ -45,4 +44,4 @@ defaultdec = '3,3'  # default decimal places
 calcwidth = 80      # UTF line width
 varevaled = ""      # list of model variables
 calctitle = '\n\nModel Title' # default model title
-pagemargin = '1.0in,0.75in,0.9in,1.0in'  # pdf page margins
+pdfmargin = '1.0in,0.75in,0.9in,1.0in'  # pdf page margins

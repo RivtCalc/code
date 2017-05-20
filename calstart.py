@@ -12,16 +12,19 @@ from once.caltext import *
 from once.calcheck import ModCheck
 from once.calpdf import *
 from sympy.core.cache import *
-#from once.calproj import *
-
+script_path = os.path.join(cfg.opath,'scripts')
+sys.path.append(script_path)
+import csv2rst
 __version__ = "0.9.0"
 __author__ = 'rholland'
 #locale.setlocale(locale.LC_ALL, '')
 
 def cmdlinehelp():
-    """command line help"""
+    """command line help
+    
+    """
     print()
-    print("To run on-c-e at the command line in the model folder, type:")
+    print("Run once at the command line in the model folder with:")
     print("     python -m once mrrcc_modelname.txt")
     print("where mrrcc_modelname.txt is a model file in the folder")
     print("and **rrcc** is the model number")
@@ -33,9 +36,9 @@ def cmdlinehelp():
     print("     crrcc_modelname.txt (UTF-8 calc)")
     print("     crrcc_modelname.py (interactive Python inputs)")
     print("     crrcc_modelname.calc.pdf(optional)")
-    print("where rrcc is the calculation (or model) number.")
+    print("where rrcc is the calculation and model number.")
     print("The program also writes table, log and other intermediate files")
-    print("to the table and temp subfolder")
+    print("to the table and temp subfolder.")
     print()
     print("To run a built-in example file from the model  folder, type:")
     print("     python -m once -test")
@@ -49,18 +52,14 @@ def cmdlinehelp():
 
 def _filesummary():
     """file name summary table
-    ::
-
-        log the file name summary
 
     """
-
     _el = ModCheck()
     filesum1 = ("File and Path Summary\n"
                 "====================="
                 "\nproject path :\n    {}\n"    
                 "\nmodel file :\n    {}\n"
-                "\nipython file :\n    {}\n"
+                "\npython file :\n    {}\n"
                 "\nutf and pdf calcs :\n    {} \n"
                 "\nlog file :\n    {}").format(cfg.ppath.strip(), cfg.mfile,
                                         ".../script/" + cfg.cfilepy, 
@@ -69,11 +68,8 @@ def _filesummary():
     _el.logwrite(filesum1, 1)
 
 def _variablesummary():
-    """variable summary
-    ::
-
-        write variable summary to output
-
+    """variable summary table
+    
     """
     
     print("Variable Summary")
@@ -82,20 +78,18 @@ def _variablesummary():
 
 def _paramline(mline1):
     """set calc level parameter flags
-    ::
-    
        first line of model may include the following flags
        #- pdf, echo, project, openpdf, opentxt, name:calcname,
           width:nn, margins:top:bottom:left:right, verbose, noclean 
+
     """
-    
     cfg.pdfflag = 0
     cfg.cleanflag = 1
     cfg.projectflag = 0
     cfg.openflag = 0
     cfg.echoflag = 0
     cfg.calcwidth = 80
-    cfg.pdfmargins = [.5,1,]
+    cfg.pdfmargins = '1.0in,0.75in,0.9in,1.0in'
     if mline1[0:2] == "#-":
         mline2 = mline1[2:].strip('\n').split(',')
         mline2 = [x.strip(' ') for x in mline2]
@@ -109,55 +103,169 @@ def _paramline(mline1):
         if 'verbose' in mline2: cfg.verboseflag = 1
         if 'stoc'    in mline2: cfg.stocflag = 1
         if 'width'   in mline2: pass
-        for _y in mline2:
-            if _y.strip()[0:5] == 'title':
-                cfg.calctitle = _y.strip()[6:] 
-        if 'margins' in mline2:
-            if _y.strip()[0:7] == 'margins':
-                cfg.calctitle = _y.strip()[6:] 
-
+        for param in mline2:
+            if param.strip()[0:5] == 'title':
+                cfg.calctitle = param.strip()[6:] 
+        for param in mline2:
+            if param.strip()[0:7] == 'margins':
+                cfg.pdfmargins = param.strip()[6:] 
     else:
         pass
+
+def _genxmodel(mfile, mpath):
+    """insert some [i] tags and rewrite expanded model
+            [i]  p0   |    p1      |    p2      |   p4       |  p5         
+                'txt'   text file    ('literal') ('b'),('i')   (indent)
+                'mod'   model file     ('e')      
+                'csv'    csv file     ('wrap')
+
+            [v] p0   |  p1    |    p2     |    p3      
+                var    expr     statemnt     descrip 
     
+            [e] p0  |  p1   |  p2   |   p3    |  p4 | p5   |  p6  |  p7       
+                var    expr   statemt  descrip  dec1  dec2   unit   eqnum
+                
+    """
+    ppath = os.path.split(mpath)[0]                        # project path
+    tpath = os.path.join(ppath, "dbtable")                # table path
+    try:                                                    # set calc number                                                                                        
+       cnum = int(mfile[1:5])
+       calcnum = '[' + str(cnum) + ']'
+       divcnum = str(calcnum)[0:2]
+       modnum  = str(calcnum)[2:4]
+    except:
+       calcnum = '[0101]'
+       divnum  = '01'
+       modnum  = '01'        
+    mpar = ['txt', 'mod', 'csv']
+    mtags = ['[v]', '[e]']
+    blockflag = 0
+    vblock = ""
+    eblock = ""
+    with open(mfile, 'r') as modfile1:                      # read model lines
+       model1 = modfile.readlines()
+    for aline in model1:                                    # val block        
+        if blockflag:
+            vblock += aline
+            if len(aline.strip()) == 0:
+                blockflag = 0
+            continue
+        if aline[0:5].strip == '[v]':
+            vblock += aline
+            blockflag = 1        
+    blockflag = 0
+    for aline in model1:                                    # val and equ block        
+        if blockflag:
+            eblock += aline
+            if len(aline.strip()) == 0:
+                blockflag = 0
+            continue
+        if aline[0:5].strip == '[v]':
+            eblock += aline
+            blockflag = 1        
+        elif aline[0:5].strip == '[e]':
+            eblock += aline
+            blockflag = 1
+        else:
+            pass
+
+    with open(mfile, 'w') as modfile2:                      # write new model
+        for aline in model1:
+            if blockflag:                                   # write v or eq
+                if len(aline.strip()) == 0:
+                    blockflag = 0
+                modfile2.write(aline)
+                continue
+            if aline[0:5].strip() != '[i]':                 # write orig line
+                modfile2.write(aline)
+                continue
+            elif aline[0:5].strip() == '[i]':
+                alinev = aline.split('|')
+                if alinev[1].strip()[0:3] not in mpar:     # write orig line
+                    modfile2.write(aline)
+                    continue
+                elif alinev[0][5:].strip()[0:3] == 'txt':  # find [i] text
+                    newaline = "# " + aline                # convert to comment
+                    modfile2.write(newaline)                
+                    textfile = alinev[1].strip()
+                    textpath = os.path.join(tpath, textfile)
+                    with open(testpath,'r') as text1:       # open text file
+                        text1v = text1.readlines()
+                    if alinev[2].strip()[0:3] == 'lit':
+                        for bline1 in text1v:               # insert text
+                            bline2 = "  |" + bline1
+                            modfile2.write(bline2) 
+                    else:
+                        for bline1 in text1v:               # insert text
+                            bline2 = "  " + bline1
+                            modfile2.write(bline2) 
+                elif alinev[0][5:].strip()[0:3] == 'csv':   # find [i] csv
+                    newaline = "# " + aline
+                    modfile2.write(newaline)                # convert to comment
+                    csvfile = alinev[1].strip()
+                    csvpath = os.path.join(tpath, csvfile)
+                    rsttab = _run(csvpath,(0,0,0))
+                    rsttabv = rsttab.split("\n")                        
+                    rsttab2 ="\n"
+                    for _i in rsttabv:
+                        rsttab2 += "  " + _i + "\n"
+                    modfile2.write(rsttab2)                 # insert table
+                elif alinev[0][5:].strip()[0:3] == 'mod':   # find [i] model
+                    newaline = "# " + aline                 # convert to comment
+                    modfile2.write(newaline)                
+                    if alinev[2].strip() != 'e':            # value section
+                        vtitle = "[s] Values from model " + calcnum +"\n\n"                        
+                        modfile2.write(vtitle)
+                        modfile2.write(vblock)
+                    elif alinev[2].strip() == 'e':          # val and eq section
+                        etitle = "[s] Values and equations from model " +
+                                        calcnum + "\n\n"                        
+                            modfile2.write(etitle)
+                            modfile2.write(eblock)
+                    else:
+                        pass
+                else:
+                    modfile2.write(aline)                   # write orig line
+
 def _gencalc():
     """ execute program
-    ::
-        1. read the main model
-        2. read sub-models if included
-        3. build the operations ordered dictionary
-        4. if there are sub-models include their [v], [e], [t] 
-        5. execute the dictionary and write the utf-8 calc and Python file
-        6. if the pdf parameter is provided re-execute and write the PDF calc
+        0. insert [i] data into model (see _genxmodel())
+        1. read the expanded model 
+        2. build the operations ordered dictionary
+        3. execute the dictionary and write the utf-8 calc and Python file
+        4. if the pdf flag is set re-execute xmodel and write the PDF calc
+        5. write variable summary to stdout
+    
     """
-    vbos = cfg.verboseflag
+    vbos = cfg.verboseflag                          # set verbose echo flag
     _el = ModCheck()
     _dt = datetime.datetime
     with open(os.path.join(cfg.cpath, cfg.cfileutf),'w') as f2:
-        f2.write(str(_dt.now()) + "      on-c-e version: " + __version__ )
-    _mdict = ModDict()                              
-    _mdict._build_mdict()                           #2 generate model dict
+        f2.write(str(_dt.now()) + "      once version: " + __version__ )
+    _mdict = ModDict()                              #1 read model                              
+    _mdict._build_mdict()                           #2 build dictionary
     mdict = {}
     mdict = _mdict.get_mdict()
-    newmod = CalcUTF(mdict)                         #5 generate UTF calc
+    newmod = CalcUTF(mdict)                         #4 generate UTF calc
     newmod._gen_utf()                                                                    
-    newmod._write_py()                              #5 write Python script            
+    newmod._write_py()                              #4 write Python script            
     _el.logwrite("< python script written >", vbos)                          
     _el.logwrite("< pdfflag setting = " + str(cfg.pdfflag) +" >", vbos)        
-    if int(cfg.pdfflag):                            #6 check for PDF parameter                                       # generate reST file
+    if int(cfg.pdfflag):                            #5 check for PDF parameter                                       # generate reST file
         rstout1 = CalcRST(mdict)                          
         rstout1.gen_rst()                           
-        pdfout1 = CalcPDF()                         #6 generate TeX file                 
+        pdfout1 = CalcPDF()                         #5 generate TeX file                 
         pdfout1.gen_tex()
-        pdfout1.reprt_list()                        #6 update reportmerge file
+        pdfout1.reprt_list()                        #5 update reportmerge file
         _el.logwrite("< reportmerge.txt file updated >", 1)        
-        os.chdir(once.__path__[0])                  #6 check LaTeX install
+        os.chdir(once.__path__[0])                  #5 check LaTeX install
         f4 = open('once.sty')
         f4.close()
         os.chdir(cfg.ppath)
         _el.logwrite("< style file found >", vbos)
         os.system('latex --version')                
         _el.logwrite("< Tex Live installation found>", vbos)
-        pdfout1.gen_pdf()                           #6 generate PDF calc
+        pdfout1.gen_pdf()                           #5 generate PDF calc
     os.chdir(cfg.ppath)
-    return mdict    
+    return mdict                                    #6 return mdict for summary
         

@@ -11,12 +11,12 @@ spec.loader.exec_module(unum)
 Unum = unum.Unum
 
 def ceval(ipycells):
-    """Utility function for Jupyter cell
-       Compact formating of notebook cell output
-       At top of ipython notebook use "from once.calunit import *"
+    """Utility function for Jupyter 
+       Compact format for notebook cell output
+       In Jupyter notebook use "from once.calunit import *"
+       
        ipycells: list of cells to format and evaluate
     """
-    
     for i in ipycells:
         for j in i.split('\n') :
             try:                                 #print comments
@@ -25,8 +25,6 @@ def ceval(ipycells):
                     continue
             except:
                 pass
-            
-    
             try:                                 #print equations
                 in0 = str(j)
                 exec(in0)
@@ -34,7 +32,6 @@ def ceval(ipycells):
                 print(in0 + ' => ' + str(result))
             except:
                 pass
-
 
 Unum.UNIT_FORMAT = "%s"
 Unum.UNIT_INDENT = " "

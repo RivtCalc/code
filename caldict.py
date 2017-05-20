@@ -13,12 +13,18 @@ __author__ = 'rholland'
 
 class ModDict(object):
     """Return an ordered dictionary of model operations.
-    1[s]
     
      methods:
         get_mdict()
         _build_mdict()  # model operations dictionary
-    
+        _build_mdict
+        _tag_e
+        _tag_i
+        _tag_lt
+        _tag_r
+        _tag_s
+        _tag_t
+        _tag_v    
     """
     def __init__(self):
         """Assemble dictionaries from models and sub-models
@@ -32,18 +38,16 @@ class ModDict(object):
         self.ppath = cfg.ppath
         self.mpathfile = os.path.join(self.mpath, self.mfile)
         with open(self.mpathfile, 'r') as modfile:
-            self.mainmod = modfile.readlines()
-        if self.mainmod[0][0:2]== '#-':
-            self.mainmod = self.mainmod[1:]
-        #print(self.mainmod)
+            self.model = modfile.readlines()
+        if self.model[0][0:2]== '#-':
+            self.model = self.model[1:]
+        #print(self.model)
         self.mtags = ['#- ', '[r]', '[i]', '[v]', '[e]','[t]', '[s]']
-        self.subtags =  ['[v]', '[e]']
-        # initialize section and equation labels
         self.cnt = 0
         self.snum = self.snumchk = self.enum = 0
         self.dec1 = cfg.defaultdec                                                                                   
-        try:                                             # calc and div number                                                                                        
-            self.cnum = self.mfile[1:5]
+        try:                                             # set calc number                                                                                        
+            self.cnum = int(self.mfile[1:5])
             self.calcnum = str(self.cnum)
             self.divcnum = str(self.calcnum)[0:2]
             self.modnum = str(self.calcnum)[2:4]
@@ -58,9 +62,7 @@ class ModDict(object):
         """
         return self.mdict
     
-    def _sub_model(self):
-        pass
-    
+        
     def _build_mdict(self):
         """Build model dictionary.
         1[s]
@@ -72,11 +74,11 @@ class ModDict(object):
          at the beginning of a line are not stored.
     
         Operation keys, number of parameters and tags:
-            _r + line number - 7 - [r] run 
+            _r + line number - 6 - [r] run 
             _i + line number - 6 - [i] insert
             _v + line number - 4 - [v] value            
-            _e + line number - 7 - [e] equation
-            _t + line number - 9 - [t] table
+            _e + line number - 8 - [e] equation
+            _t + line number - 8 - [t] table
             _s + line number - 3 - [s] sections
             _y + line number - 2 - value heading
             _~ + line number - 1 - blank line
@@ -85,45 +87,45 @@ class ModDict(object):
             _lt              - 2 - license text [licensetext]
     
     
-            [r]    p0   |   p1     |   p2    |   p3   |    p4   |   p5    
-                  'os'     command     arg1      arg2      arg3     arg4 
-                  'py'     script      arg1      arg2      arg3     arg4     
+            [r]  p0   |   p1     |   p2    |   p3   |    p4   |   p5    
+                'os'     command     arg1      arg2      arg3     arg4 
+                'py'     script      arg1      arg2      arg3     arg4     
                  
-            [i]    p0   |   p1     |  p2      |   p4      |   p5         
-                  'fg'     figure     caption    size       location
-                  'tx'     text     
-                  'md'     model
-                  'fn'     function   var name   reference 
-                  'rd'     file       var name   vector or table
-                  'wr'     file       var name
+            [i]  p0   |   p1      |  p2         |   p4      |   p5         
+                'fig'   fig file    caption       size        location
+                'fun'   mod file    func 1       func 2       func 3  
+                'txt'  text file    wrap/literal   b,i        indent
+                'csv'    csv        rst / doc      len          
+                'mod'    model      rivets  
+                'dat'    file       var name      rows       cols   
                         
-            [v]   p0  |  p1   |    p2    |    p3              
-                  var    expr   statemnt    descrip 
+            [v] p0   |  p1    |    p2     |    p3              
+                var    expr     statemnt     descrip 
     
-            [e]  p0  |  p1   |  p2   |   p3    |  p4 | p5   |  p6  |  p7       
-                 var    expr   statemt  descrip  dec1  dec2   unit   eqnum
+            [e] p0  |  p1   |  p2   |   p3    |  p4 | p5   |  p6  |  p7       
+                var    expr   statemt  descrip  dec1  dec2   unit   eqnum
  
             
-            [t]   p0 |  p1  |  p2  |  p3  |  p4    |   p5   | p6   | p7  | p8
-                  var  expr  state1  desc   range1   range2   dec1   un1   un2
+            [t] p0 |  p1   |  p2    |  p3  |  p4     |   p5   | p6   | p7 
+                var  state1  state2   desc   outfile    dec1   un1    un2
             
-            [s]   p0          | p1   |       p2    |   p3     |  p4       
-                  left string        calc number     sect num   toc flag        
+            [s] p0     | p1        |  p2                 
+                title   calc num     sect num           
         """
         il = ' '  # current line in model
         ip = ' '  # accumulator for multi-line operations
         pend = ' '
         pendlist = [ 'v', 'e']
         mtag = ' '
-        for il in self.mainmod:
+        for il in self.model:
             self.cnt += 1
             ils = il.strip()
             #print('ils',ils, len(ils))
-            if len(ils) == 0:  mtag = '_~'                      # blank line           
+            if len(ils) == 0:  mtag = '_~'              # blank line           
             elif '# ' in ils[0:3]:
-                continue     # comment or folding marker
-            elif ils[:3] in self.mtags: mtag = ils[:3]          # tag
-            else: mtag = '_x'                                   # text                                          
+                continue     # comment
+            elif ils[:3] in self.mtags: mtag = ils[:3]  # registered tag
+            else: mtag = '_x'                           # text                                          
             if pend in pendlist:
                 if mtag == '_~':   # end accumulator
                     if pend == 'v': self._tag_v(ip)
@@ -246,13 +248,12 @@ class ModDict(object):
         eqnum = ' [' + str(self.snum) + '.' + str(self.enum) + ']'
         key1 = '_y' + str(self.cnt)     # write block description
         blkdesc = linev[0].split('[v]')
-        eqnum = ' [' + str(self.snum) + '.' + str(self.enum) + ']'
         self.mdict[key1] = [ blkdesc[1], eqnum ]
         for valx in linev[1:]:
             if len(valx) > 0:
                 self.cnt += 1    
                 key2 = '_v' + str(self.cnt)
-                state1, ref1 = valx.split('#-')
+                state1, ref1 = valx.split('|')
                 var1 = state1.split("=")[0].strip()
                 expr1 = state1.split("=")[1].strip()
                 self.mdict[key2] = [var1, expr1, state1.strip(), ref1.strip()]
@@ -273,14 +274,17 @@ class ModDict(object):
             self.snumchk = self.snum
         eqnum = ' [' + str(self.snum) + '.' + str(self.enum) + ']'
         linev = block.splitlines()        # break lines into list 
-        line1 = linev[0].split("#-")
+        line1 = linev[0].split("|")
         ref = line1[0].split('[e]')[1]
         try:
-            decs, unit = line1[1].split('|')
+            decs = line1[1].strip()
         except:
             decs = cfg.defaultdec
-            unit = ' '
         dec1, dec2 = decs.split(',')    
+        try:
+            unit = line1[2].strip()
+        except:
+            unit = ' '
         state1 = linev[1].strip()
         expr1 = state1.split("=")[1].strip()
         var1 = state1.split("=")[0].strip()

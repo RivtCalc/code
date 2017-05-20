@@ -120,7 +120,7 @@ class CalcUTF(object):
             mtag = _i[0:2]
             mvals = self.odict[_i]
             #print('rmtag', mtag, _i, self.odict[_i])
-            if self.odict[_i][0].strip() == '#- stop':
+            if mvals[0].strip() == '#- stop':
                 sys.exit(1)
             if mtag == '_#':
                 self.xtraline = False
@@ -139,6 +139,7 @@ class CalcUTF(object):
                 self._prt_val2(self.odict[_i])
                 self.xtraline = False
             elif mtag == '_e':
+                #print('_e', self.odict[_i])
                 self._prt_eq(self.odict[_i])
                 self.xtraline = True
             elif mtag == '_t':
@@ -846,7 +847,7 @@ class CalcUTF(object):
         str1 =  ('"""\nThis file contains Python equations from the '
                 'on-c-e model \n\n  '+ self.mfile + '\n'
                 '\nFor interactive analysis open the file\n'
-                'in an interactive e.g. \n'
+                'in an IDE executable shell e.g. Pyzo,\n'
                 'Spyder, Jupyter Notebook or Komodo IDE \n'
                 '""" \n')
          
@@ -858,16 +859,16 @@ class CalcUTF(object):
                 'import importlib.util\n'
                 'import once.config as cfg\n')
                                 
-        str2a = ('pypath = os.path.dirname(sys.executable)\n'
-                'oncedir = os.path.join(pypath,"Lib","site-packages","once")\n'
-                'cfg.opath = oncedir\n'
-                'from once.calunit import *\n')
+#        str2a = ('pypath = os.path.dirname(sys.executable)\n'
+#                'oncedir = os.path.join(pypath,"Lib","site-packages","once")\n'
+#                'cfg.opath = oncedir\n'
+#                'from once.calunit import *\n')
 
         vlist1 = []
         vlist2 = []
         str3a = str(os.getcwd()).replace("\\", "\\\\")
         str3 = "sys.path.append('" + str3a + "')"
-        importstr = str1 + str2 + str2a + str3
+        importstr = str1 + str2  + str3
         pyfile1.write(importstr + 2*"\n")
         _vardef =[]
         for k1 in self.odict:               # write values and equations
@@ -929,6 +930,7 @@ class CalcUTF(object):
         pyfile1.close()
         
         for lsti in zip(vlist1, vlist2):
+            #print(lsti)
             item1 = eval(str(lsti[0]))
             def1 = lsti[1]
             cncat1 = str(lsti[0]) + " = " + str(item1) + " "*40
