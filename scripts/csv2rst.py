@@ -79,7 +79,7 @@ def _process(in_=None, out=None, title=None):
     _separate(sizes, out)
 
 def _run(csvfile, width):
-    """convert csv file to rst table with same base file name.
+    """convert csv file to rst table with same base file name
     
     """
     cwd1 = os.getcwd()                  
@@ -93,7 +93,7 @@ def _run(csvfile, width):
     # write tables to files and terminal
     fileout1 = csvfile.replace('.csv','.rst')           
     with open(fileout1, 'w') as file1: 
-        _process(filex, out = file1, title=title)
+        _process(csvfile, out = file1, title=title)
     with open(fileout1, 'r') as file2:
         rsttab = file2.read()
     return rsttab

@@ -148,7 +148,7 @@ if __name__ == '__main__':
         calstart._paramline(readlines1[0])              # write config flags 
     os.chdir(_ppath)                                    # set project path
     sys.path.append(_ppath)
-    calstart._genxmodel(_mfile, _ppath)                 # expand model file
+    calstart._genxmodel(_mfile, _mpath)                 # expand model file
     mdict1 = calstart._gencalc()                        # run calc   
                                 # on return clean up and echo result summaries
     vbos = cfg.verboseflag

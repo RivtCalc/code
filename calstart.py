@@ -114,21 +114,23 @@ def _paramline(mline1):
 
 def _genxmodel(mfile, mpath):
     """insert some [i] tags and rewrite expanded model
-            [i]  p0   |    p1      |    p2      |   p4       |  p5         
-                'txt'   text file    ('literal') ('b'),('i')   (indent)
+            [i]  p0   |    p1      |   p2       |   p4       |  p5         
+                'txt'   text file   ('literal')  ('b'),('i')   (indent)
                 'mod'   model file     ('e')      
                 'csv'    csv file     ('wrap')
 
             [v] p0   |  p1    |    p2     |    p3      
                 var    expr     statemnt     descrip 
     
-            [e] p0  |  p1   |  p2   |   p3    |  p4 | p5   |  p6  |  p7       
-                var    expr   statemt  descrip  dec1  dec2   unit   eqnum
+            [e] p0  |  p1   |  p2    |   p3    |  p4 | p5   |  p6  |  p7       
+                var    expr   statemt  descrip  dec1   dec2   unit   eqnum
                 
     """
     ppath = os.path.split(mpath)[0]                        # project path
-    tpath = os.path.join(ppath, "dbtable")                # table path
-    try:                                                    # set calc number                                                                                        
+    #print('model path', mpath)
+    #print('project path', ppath)
+    tpath = os.path.join(ppath, 'dbtable')                 # table path
+    try:                                                   # set calc number                                                                                        
        cnum = int(mfile[1:5])
        calcnum = '[' + str(cnum) + ']'
        divcnum = str(calcnum)[0:2]
@@ -137,13 +139,13 @@ def _genxmodel(mfile, mpath):
        calcnum = '[0101]'
        divnum  = '01'
        modnum  = '01'        
-    mpar = ['txt', 'mod', 'csv']
     mtags = ['[v]', '[e]']
     blockflag = 0
     vblock = ""
     eblock = ""
+    os.chdir(mpath)
     with open(mfile, 'r') as modfile1:                      # read model lines
-       model1 = modfile.readlines()
+       model1 = modfile1.readlines()
     for aline in model1:                                    # val block        
         if blockflag:
             vblock += aline
@@ -168,7 +170,6 @@ def _genxmodel(mfile, mpath):
             blockflag = 1
         else:
             pass
-
     with open(mfile, 'w') as modfile2:                      # write new model
         for aline in model1:
             if blockflag:                                   # write v or eq
@@ -179,53 +180,58 @@ def _genxmodel(mfile, mpath):
             if aline[0:5].strip() != '[i]':                 # write orig line
                 modfile2.write(aline)
                 continue
-            elif aline[0:5].strip() == '[i]':
+            if aline[0:5].strip() == '[i]':
                 alinev = aline.split('|')
-                if alinev[1].strip()[0:3] not in mpar:     # write orig line
-                    modfile2.write(aline)
-                    continue
-                elif alinev[0][5:].strip()[0:3] == 'txt':  # find [i] text
-                    newaline = "# " + aline                # convert to comment
-                    modfile2.write(newaline)                
+                if 'txt' in alinev[0]:              # find [i] txt
+                    newaline = "  #" + aline
+                    modfile2.write(newaline)        # convert comment
                     textfile = alinev[1].strip()
                     textpath = os.path.join(tpath, textfile)
-                    with open(testpath,'r') as text1:       # open text file
+                    with open(textpath,'r') as text1:   # open text file
                         text1v = text1.readlines()
                     if alinev[2].strip()[0:3] == 'lit':
-                        for bline1 in text1v:               # insert text
-                            bline2 = "  |" + bline1
+                        modfile2.write('\n  ::') 
+                        modfile2.write('\n  ` \n') 
+                        for bline1 in text1v:       # insert lit text
+                            bline2 = "    |" + bline1
                             modfile2.write(bline2) 
+                        modfile2.write('  `\n')                     
                     else:
-                        for bline1 in text1v:               # insert text
+                        modfile2.write('\n') 
+                        for bline1 in text1v:       # insert text
                             bline2 = "  " + bline1
                             modfile2.write(bline2) 
-                elif alinev[0][5:].strip()[0:3] == 'csv':   # find [i] csv
-                    newaline = "# " + aline
-                    modfile2.write(newaline)                # convert to comment
+                    continue
+                elif 'csv' in alinev[0]:            # find [i] csv
+                    newaline = "  #" + aline
+                    modfile2.write(newaline)        # convert comment
                     csvfile = alinev[1].strip()
                     csvpath = os.path.join(tpath, csvfile)
-                    rsttab = _run(csvpath,(0,0,0))
+                    rsttab = csv2rst._run(csvpath,(0,0,0))
                     rsttabv = rsttab.split("\n")                        
                     rsttab2 ="\n"
                     for _i in rsttabv:
                         rsttab2 += "  " + _i + "\n"
-                    modfile2.write(rsttab2)                 # insert table
-                elif alinev[0][5:].strip()[0:3] == 'mod':   # find [i] model
-                    newaline = "# " + aline                 # convert to comment
+                    modfile2.write(rsttab2)          # insert table
+                    continue
+                elif 'mod' in alinev[0]:   # find [i] model
+                    newaline = "# " + aline          # convert comment
                     modfile2.write(newaline)                
-                    if alinev[2].strip() != 'e':            # value section
+                    if alinev[2].strip() != 'e':     # value section
                         vtitle = "[s] Values from model " + calcnum +"\n\n"                        
                         modfile2.write(vtitle)
                         modfile2.write(vblock)
-                    elif alinev[2].strip() == 'e':          # val and eq section
-                        etitle = "[s] Values and equations from model " +
-                                        calcnum + "\n\n"                        
-                            modfile2.write(etitle)
-                            modfile2.write(eblock)
-                    else:
-                        pass
+                    elif alinev[2].strip() == 'e':   # val and eq section
+                        etitle = ("[s] Values and equations from model " +
+                                        calcnum + "\n\n")                        
+                        modfile2.write(etitle)
+                        modfile2.write(eblock)
                 else:
-                    modfile2.write(aline)                   # write orig line
+                    modfile2.write(aline)
+            else:
+                modfile2.write(aline)                   # write orig line
+
+    print("< model file expanded and rewritten")
 
 def _gencalc():
     """ execute program
