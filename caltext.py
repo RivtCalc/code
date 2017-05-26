@@ -155,7 +155,7 @@ class CalcUTF(object):
                 self._prt_val1(self.odict[_i])
                 self.xtraline = False
             else:
-                pass
+                pASs
             if self.xtraline:
                 self._prt_blnk()   
         for _i2 in self.odict:                  # add calc license
@@ -179,7 +179,7 @@ class CalcUTF(object):
         self._write_utf(' ', 0, 0)
 
     def _prt_txt(self, txt):
-        """Print or strip pass-through text.
+        """Print or strip pASs-through text.
         
            txt (string): text that is not part of an operation
 
@@ -381,15 +381,13 @@ class CalcUTF(object):
             self._write_utf(" "*2 + ref + " | " + state,  1, 1)
 
     def _prt_eq(self, dval):
-        """print equations.
-        ::
-            
+        """ print equations.
             key : _e + line number  
             value:  p0  |  p1     |  p2   |   p3    |  p4  | p5   |  p6  |  p7       
                      var   expr    state    descrip   dec1  dec2   unit   eqnum
         
         """   
-        try:                                    # set decimal format
+        try:                                                # set decimal format
             eformat, rformat = str(dval[4]).strip(), str(dval[5]).strip()
             exec("set_printoptions(precision=" + eformat.strip() + ")")
             exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
@@ -401,28 +399,28 @@ class CalcUTF(object):
         cunit = dval[6].strip()
         var0  =  dval[0].strip()
         #print('dval_e', dval
-        for k1 in self.odict:                   # evaluate values and equations
+        for k1 in self.odict:                               # evaluate 
             if k1[0:2] in ['_v','_e']:
                     try: exec(self.odict[k1][2].strip())
                     except: pass       
-        tmp = int(self.widthc-2) * '-'          # print horizontal line
+        tmp = int(self.widthc-2) * '-'                      # print line
         self._write_utf(" ", 0, 0)
         self._write_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 1, 0)
         self._write_utf((dval[3] + "  " + dval[7]).rjust(self.widthc-1), 0, 0)
         self._write_utf(" ", 0, 0)
-        for _j in self.odict:                   # print symbolic form
+        for _j in self.odict:                               # symbolic form
             if _j[0:2] in ['_v','_e']:
                 #print(str(self.odict[_j][0]))
                 varsym(str(self.odict[_j][0]))
         try:
-            symeq = sympify(dval[1].strip())    # try sympy processing
+            symeq = sympify(dval[1].strip())                # sympy form
             self._write_utf(symeq, 1, 0)
             self._write_utf(" ", 0, 0)
             self._write_utf(" ", 0, 0)
         except:
-            self._write_utf(dval[1], 1, 0)      # otherwise write ASCII form
+            self._write_utf(dval[1], 1, 0)                  # ASCII form
             self._write_utf(" ", 0, 0)
-        try:                                    # substitute values                            
+        try:                                                # substitute                            
             symat = symeq.atoms(Symbol)
             for _n2 in symat:
                 evlen = len((eval(_n2.__str__())).__str__())  # get var length
@@ -484,7 +482,7 @@ class CalcUTF(object):
         elif typev == Unum:
             exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
             if len(cunit) > 0:
-                tmp = eval(var0).asU(eval(cunit))
+                tmp = eval(var0).au(eval(cunit))
             else:
                 tmp = eval(var0)
             tmp1 = tmp.strUnit()
@@ -580,7 +578,7 @@ class CalcUTF(object):
                 print(21, type(_rc[inx[0]][inx[1]]),_rc[inx[0]][inx[1]] )
                 try:
                     _fltn2a = _rc[inx[0]][inx[1]]
-                    _fltn2b = _fltn2a.asU(eval(cunit))
+                    _fltn2b = _fltn2a.au(eval(cunit))
                     _fltn2c = _fltn2b.asNumber()
                     _rc[inx[0]][inx[1]] = str(_fltn2c)
                 except:

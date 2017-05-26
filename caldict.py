@@ -115,7 +115,7 @@ class ModDict(object):
         il = ' '  # current line in model
         ip = ' '  # accumulator for multi-line operations
         pend = ' '
-        pendlist = [ 'v', 'e']
+        pendlist = [ 'v', 'e', 't']
         mtag = ' '
         for il in self.model:
             self.cnt += 1
@@ -130,7 +130,7 @@ class ModDict(object):
                 if mtag == '_~':   # end accumulator
                     if pend == 'v': self._tag_v(ip)
                     if pend == 'e': self._tag_e(ip)
-                    #if pend == 't': self._tag_t(ip)
+                    if pend == 't': self._tag_t(ip)
                     ip = ' '                            # reset accumulator
                     pend = ' '
                     mkey = '_~' + str(self.cnt)
@@ -174,14 +174,13 @@ class ModDict(object):
         #for il in self.mdict: print(self.mdict[il])
     
     def _tag_r(self, block):
-        """Add [r] run
-        1[s]
-    
-         key:
-         values:
+        """ add [r] run
+            key:
+            values:
             [r]   p0 |   p1   |   p2     |   p3    |   p4   |    p5   |   p6    
                         'os'     command     arg1      arg2      arg3     arg4 
                         'py'     script      arg1      arg2      arg3     arg4        
+        
         """
         self.enum += 1
         if self.snum > self.snumchk:
@@ -199,18 +198,14 @@ class ModDict(object):
         self.mdict[mkey] = ['[f]', fname, var2, ref, enumb]
     
     def _tag_i(self, linep):
-        """Add [i] insert
-        1[s]
-
+        """ add insert [i]
             key: _i           
             Dictionary Value:
                  p0    |  p1    |   p2     |  p3     |   p4            
-                'fig'     figure   caption   size   location
-                'tex'     text     
-                'mod'     model
-                'fun'     function   var name   reference 
-                'rea'     file       var name   vector or table
-                'wri'     file       var nam             
+                'fig'     file   caption     size      location
+                'fun'     file   var name   reference 
+                'rea'     file   var name   
+                'wri'     file   var name             
         """
         # set dictionary values
         lp = (linep.strip())[3:].split('|')
@@ -224,17 +219,13 @@ class ModDict(object):
         self.mdict[mkey] = [lp0, lp1, lp2, lp3, lp4]    
     
     def _tag_v(self, block):
-        """add [v] values
-
-        1[s]
-    
+        """ add values [v]
             arg1: block description 
             arg2: var = value   #- description
             
             key: values    
             _y :  p0                | p1
                  block description    eqnum
-
             _v :   p0  |   p1  |  p2      |    p3            
                  var    expr     statemnt   descrip     
         
@@ -247,9 +238,10 @@ class ModDict(object):
             self.snumchk = self.snum
         eqnum = ' [' + str(self.snum) + '.' + str(self.enum) + ']'
         key1 = '_y' + str(self.cnt)     # write block description
-        blkdesc = linev[0].split('[v]')
-        self.mdict[key1] = [ blkdesc[1], eqnum ]
+        blkdesc = linev[0][5:].strip()
+        self.mdict[key1] = [ blkdesc, eqnum ]
         for valx in linev[1:]:
+            #print('valx', valx)
             if len(valx) > 0:
                 self.cnt += 1    
                 key2 = '_v' + str(self.cnt)
@@ -259,13 +251,11 @@ class ModDict(object):
                 self.mdict[key2] = [var1, expr1, state1.strip(), ref1.strip()]
     
     def _tag_e(self, block):
-        """add [e] equation
-    
-        1[s]
-        
+        """ add equation [e]
             key : _e + line number  
-            value:  p0  |  p1   |  p2   |   p3    |  p4 | p5   |  p6  |  p7       
-                var    expr   statemt  descrip  dec1  dec2  unit  eqnum
+            value:  p0  |  p1   |  p2   |   p3    |  p4  | p5   |  p6  |  p7       
+                   var    expr   statemt  descrip   dec1  dec2   unit   eqnum
+        
         """
         #print('eblock',block)
         self.enum += 1                   # reset equation number at new section
@@ -293,70 +283,48 @@ class ModDict(object):
         self.mdict[key1] = [var1, expr1, state1, ref1, dec1, dec2, unit, eqnum]
       
     def _tag_t(self, block):
-        """ add [t] table
+        """ add table [t]
+            key : _t + line number  
+            values:  p0 |  p1   |  p2    |  p3   |  p4   |  p5    |  p6  | p7   
+                    dat    var    state1   desc    expr     dec    unit   eqnum
         
-        1[s]
-        
-            key: 
-            values: 
-            [t]   p0 |  p1  |  p2  |  p3  |  p4    |   p5   | p6   | p7  | p8
-                 00var  state1  desc   range1   range2   dec1   un1   un2
-        """
-        # reset equation number at new section
-        self.enum += 1
-        if self.snum > self.snumchk:
-            self.enum = 1
-            self.snumchk = self.snum
-        ivect = block.strip().splitlines()
-        # read format
-        try:
-            ref, fnum = ivect[0][3:].split("#-")
-            fnum = str(self.modnum) + fnum.strip()
-        except:
-            ref = ivect[0][3:]
-            fnum = str(self.modnum) + '01'
-        decs, unts, opt = self.fdict[fnum]
-        try:
-            decs.split(',')
-        except:
-            decs = self.fdict['default'][1]
-        enumb = ' [' + str(self.snum) + '.' + str(self.enum) + '] '
-        ref = ref.strip()
-        rng1 = rng2 = state = expr = ''
-        mkey = '_a' + str(self.cnt)
-        arrayblock = ivect[1:]
-        # imported table
-        if '=' not in arrayblock[0]:
-            state = arrayblock[0].strip()
-        # explicit table
-        elif '=' in arrayblock[0] and '=' not in arrayblock[1]:
-            _k = ''
-            state1 = [_i.strip()[:] + _k for _i in arrayblock]
-            state2 = ''.join(state1)
-            expr = state2.split("=")[1].strip()
-            state = state2
-        # vector from range
-        elif len(arrayblock) == 2:
-            rng1 = arrayblock[0]
-            state = arrayblock[1]
-            expr = state.split("=")[1].strip()
-        # table from ranges
-        elif len(arrayblock) == 3:
-            rng1 = arrayblock[0]
-            rng2 = arrayblock[1]
-            state = arrayblock[2]
-            expr = state.split("=")[1].strip()
-        # set dictionary values
-        self.mdict[mkey] = ['[a]', state, expr, rng1, rng2, ref,
-                          decs, unts, opt, '[' + self.modnum + ']', enumb]
+        """              
+        pass
+        #print('tblock',block)
+        # self.enum += 1                   # reset equation number at new section
+        # if self.snum > self.snumchk:
+        #     self.enum = 1
+        #     self.snumchk = self.snum
+        # eqnum = ' [' + str(self.snum) + '.' + str(self.enum) + ']'
+        # linev = block.splitlines()        # break lines into list 
+        # line1 = linev[0].split("|")
+        # ref = line1[0].split('[t]')[1]
+        # try:
+        #     dec1 = line1[2].strip()
+        # except:
+        #     decs = cfg.defaultdec
+        # dec1, dec2 = decs.split(',')    
+        # try:
+        #     unit = line1[3].strip()
+        # except:
+        #     unit = ' '
+        # epxr1 = ' '
+        # state1 = ' '
+        # var1 = ' '
+        # type1 = line1[1].strip()
+        # if type1 == 'dat':
+        #     pass
+        # 
+        # state1 = linev[1].strip()
+        # expr1 = state1.split("=")[1].strip()
+        # var1 = state1.split("=")[0].strip()
+        # ref1 = ref.strip()
+        # key1 = '_e' + str(self.cnt)
+        # self.mdict[key1] = [type1, var1, state1, ref1, expr1, dec1, unit, eqnum]
         #print(state)
     
     def _tag_s(self, line):
-        """Add [s] section
-        1[s]
-    
-            arg: section description
-    
+        """ add [s] section
             key : value            
             _s :    p0         |       p1      |   p2     
                   left string    calc number     sect num   

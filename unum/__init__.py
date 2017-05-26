@@ -1,6 +1,5 @@
 """Main Unum module.
 
-# TODO: consider alternatives to unum and see how they compare.
 """
 import sys
 
@@ -170,11 +169,12 @@ class Unum(object):
             result.normalize()
         return result
         
-    def asU(self, other):
+    def au(self, other):
         """Return a Unum with this Unum's value and the units of the given Unum.
         
         Raises IncompatibleUnitsError if self can't be converted to other.
         Raises NonBasicUnitError if other isn't a basic unit.
+        Same as asUnit
         """
         other = Unum.coerceToUnum(other)
         if (other._value == 0) or (other != Unum(other._unit, 1)):
@@ -184,6 +184,21 @@ class Unum(object):
         res._normal = True
         return res
     
+    def asUnit(self, other):
+        """Return a Unum with this Unum's value and the units of the given Unum.
+        
+        Raises IncompatibleUnitsError if self can't be converted to other.
+        Raises NonBasicUnitError if other isn't a basic unit.
+        same as au
+        """
+        other = Unum.coerceToUnum(other)
+        if (other._value == 0) or (other != Unum(other._unit, 1)):
+            raise NonBasicUnitError(other)
+        s, o = self.matchUnits(other)
+        res = Unum(other._unit, s._value / o._value)
+        res._normal = True
+        return res
+
     def replaced(self, u, conv_unum):
         """Return a Unum with the string u replaced by the Unum conv_unum. 
         

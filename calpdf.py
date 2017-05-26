@@ -479,7 +479,7 @@ class CalcRST(object):
             print1 = 2
             exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
             if len(eunit) > 0:
-                tmp = eval(var0).asU(eval(eunit))
+                tmp = eval(var0).au(eval(eunit))
             else:
                 tmp = eval(var0)
             tmp1 = tmp.strUnit()
@@ -624,7 +624,7 @@ class CalcRST(object):
                 print(21, type(_rc[inx[0]][inx[1]]),_rc[inx[0]][inx[1]] )
                 try:
                     _fltn2a = _rc[inx[0]][inx[1]]
-                    _fltn2b = _fltn2a.asU(eval(cunit))
+                    _fltn2b = _fltn2a.au(eval(cunit))
                     _fltn2c = _fltn2b.asNumber()
                     _rc[inx[0]][inx[1]] = str(_fltn2c)
                 except:
@@ -1016,21 +1016,22 @@ class CalcPDF(object):
             texf = texin.read()
         texf = texf.replace("""inputenc""", """ """)
         texf = texf.replace("aaxbb ", """\\hfill""")
-        if texf.find("phantom") > -1:
-            texf = texf.replace("""\\begin{document}""", '')
-            texf = texf.replace("""\\maketitle""", '')
-            texf = texf.replace("""\\title{\\phantomsection%""",
-                                """\\renewcommand{\contentsname}{""" +
-                                self.calctitle + "}\n" +
-                                """\\begin{document}""" + "\n" +
-                                """\\tableofcontents"""
-                                """\\chapter{%""")
-        else:
-            texf = texf.replace("""\\begin{document}""",
-                                """\\renewcommand{\contentsname}{""" +
-                                self.calctitle + "}\n" +
-                                """\\begin{document}""" + "\n" +
-                                """\\tableofcontents""")    
+        # if texf.find("phantom") > -1:
+        #     texf = texf.replace("""\\begin{document}""", '')
+        #     texf = texf.replace("""\\maketitle""", '')
+        #     texf = texf.replace("""\\title{\\phantomsection%""",
+        #                         """\\renewcommand{\contentsname}{""" +
+        #                         self.calctitle + "}\n" +
+        #                         """\\begin{document}""" + "\n" +
+        #                         """\\tableofcontents"""
+        #                         """\\chapter{%""")
+        texf = texf.replace("""\\begin{document}""",
+                            """\\renewcommand{\contentsname}{""" +
+                            self.calctitle + "}\n" +
+                            """\\begin{document}""" + "\n" +
+                            """\\tableofcontents""" +
+                            """\\listoftables""" +
+                            """\\listoffigures""")    
         with open (tfile, 'w') as texout:
             print(texf, file=texout)
 
