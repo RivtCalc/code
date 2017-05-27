@@ -1,7 +1,7 @@
 #! python
 
-"""Run script from model folder. Reads all toc files in the reprt folder  
-   and writes the toc PDF to the reprt folder.
+"""Run script from model folder. Reads all toc files in the *reprt* folder  
+   and writes the toc PDF to the same folder.
    use: python -m once -s reporttoc.py
    """
 

@@ -111,6 +111,8 @@ class CalcRST(object):
         self.prfilename = ''
         self.previous = ''
         self.literalflag = 0
+        self.lastsect = ''
+        self.lastcalcnumber = ''
 
 
     def gen_rst(self):
@@ -165,7 +167,7 @@ class CalcRST(object):
         if '_lt' in self.odict:                  # add calc license
             self._rst_txt(self.odict[_i2],0)
         #for _i in self.odict: print(i, self.odict[i])
-        self._rst_terms()                         # add term definitions
+        self._rst_terms()                       # add term definitions
         self._rst_blnk()
         self._rst_txt(['  **[end of calc]**'])  # end calc
         self.rf1.close()                          # close rst file
@@ -863,6 +865,8 @@ class CalcRST(object):
         """        
         tleft = dval[0].strip()
         tright = dval[1].strip() + dval[2].strip()
+        self.lastsect = int(dval[2].strip()[1:-1])
+        self.lastcalcnumber = dval[1].strip()
         print(' ', file=self.rf1)
         print(".. raw:: latex", file=self.rf1)
         print(' ', file=self.rf1)
@@ -897,13 +901,14 @@ class CalcRST(object):
             taglist.append(mtag)
         if ('_v' or '_e') in taglist:        
             tleft = "AST Variables and Definitions"
+            tright = self.lastcalcnumber + '['+str(self.lastsect+1)+']'
             print(' ', file=self.rf1)
             print(".. raw:: latex", file=self.rf1)
             print(' ', file=self.rf1)
             print('   \\vspace{3mm}', file=self.rf1)
             print(' ', file=self.rf1)
             print(' ', file=self.rf1)
-            print(tleft.strip(),file=self.rf1)
+            print(tleft.strip() + "aaxbb " + tright.strip(),file=self.rf1)
             print("-" * self.widthp, file=self.rf1)
             print(' ', file=self.rf1)
             print(' ', file=self.rf1)
@@ -998,39 +1003,32 @@ class CalcPDF(object):
             self.el.logwrite("< TeX file written >", self.vbos)
         except:
             print()
-            self.el.logwrite("< error in docutils writer call >", self.vbos)
+            self.el.logwrite("< error in docutils call >", self.vbos)
         
         self.mod_tex(self.texfile2)
 
 
     def mod_tex(self, tfile):
         """Modify TeX file to avoid problems with escapes:
-
-            - Modifies the marker "aaxbb " inserted by once with
-              \\hfill which is not handled well by reST.
-            - Deletes inputenc package
-            - Modifies title section and adds table of contents
+            -  Replace marker "aaxbb " inserted by once with
+              \\hfill (not handled by reST).
+            - Delete inputenc package
+            - Modify title section and add table of contents
             
         """
         with open(tfile, 'r') as texin:
             texf = texin.read()
         texf = texf.replace("""inputenc""", """ """)
         texf = texf.replace("aaxbb ", """\\hfill""")
-        # if texf.find("phantom") > -1:
-        #     texf = texf.replace("""\\begin{document}""", '')
-        #     texf = texf.replace("""\\maketitle""", '')
-        #     texf = texf.replace("""\\title{\\phantomsection%""",
-        #                         """\\renewcommand{\contentsname}{""" +
-        #                         self.calctitle + "}\n" +
-        #                         """\\begin{document}""" + "\n" +
-        #                         """\\tableofcontents"""
-        #                         """\\chapter{%""")
         texf = texf.replace("""\\begin{document}""",
-                            """\\renewcommand{\contentsname}{""" +
-                            self.calctitle + "}\n" +
-                            """\\begin{document}""" + "\n" +
-                            """\\tableofcontents""" +
-                            """\\listoftables""" +
+                            """\\renewcommand{\contentsname}{"""+
+                            self.calctitle + "}\n"+
+                            """\\begin{document}"""+"\n"+
+                            """\\makeatletter"""+
+                            """\\renewcommand\@dotsep{10000}"""+
+                            """\\makeatother"""+
+                            """\\tableofcontents"""+
+                            """\\listoftables"""+
                             """\\listoffigures""")    
         with open (tfile, 'w') as texout:
             print(texf, file=texout)
