@@ -1,3 +1,4 @@
+
 #!
 
 from __future__ import division
@@ -28,6 +29,11 @@ except:
 
 __version__ = "0.9.0"
 __author__ = 'rholland'
+
+
+
+
+
 
 class CalcRST(object):
     """Write PDF file.
@@ -1096,10 +1102,3 @@ class CalcPDF(object):
         for j1 in mergelist2: file2.write(j1)
         file2.close()
         return
-                
-            
-            
-        
-            
-            
-            

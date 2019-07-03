@@ -1,4 +1,4 @@
-**oncepy**
+**rivet**
 ===========
 
 The package *oncepy* and the portable module *onceutf.py* take a
