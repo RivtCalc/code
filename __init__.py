@@ -1,2 +1,2 @@
 #!/usr/bin/env python
-# this file makes on-c-e a package
+# this file makes rivet a package
