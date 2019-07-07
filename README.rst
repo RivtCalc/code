@@ -1,25 +1,50 @@
 **rivet**
 ===========
 
-The package *oncepy* and the portable module *onceutf.py* take a
-*on-c-e* ASCII model *ddmm.model.txt* as input and return formatted
-structural engineering calculations (calcs) in UTF-8. *oncepy* can
-also return a PDF-LaTeX formatted calculation and can collect
-calcs into project sets.
+**r-i-v-e-t** is the language component of **on-c-e** (OpenN Calculation
+Environment), a framework for producing engineering calculation documents.
+**r-i-v-e-t** is intended to improve construction productivity by producing
+design documents that are easier to review and resuse. For an overview of
+**on-c-e** see http://on-c-e.github.io.
 
-The programs write the calc file *calddmm.model.txt* where *ddmm* is
-the model number,  *dd* is the division number, and *mm* is the model
-designation.
-::
+A **r-i-v-e-t** file is a Python file or files that contain
+design calculations using the *rivet* package. Design files
+have names of the form *ddcc_designfilename.py* where dd and cc are two digit
+numbers identifying the division and calculation number respectively.
 
- platforms:
-    Anaconda, Enthought, Pythonxy or a minimum installation (see manual)
-    on Windows, Linux, OSX
+Calcs and supporting files for a project are contained in a project folder
+structure with names as follows:
 
-    onceutf.py: Wakari, PythonAnywhere web platforms
-    onceutf.py: QPython, Pythonista on Android and iOS
+Project Name (chosen by user)
+    |- designs
+        |- figures
+        |- scripts
+        |- tables
+    |- calcs
+        |- txt
+        |- html
+        |- pdf
+        |- temp
+
+Design input files and their required supporting files are stored in the
+design folder and it's respective subfolders. 
+
+The *rivet* package processes and outputs formatted calculations in utf8 text,
+html, and PDF if specified (and LaTeX is installed). Output is saved in the
+respective calcs folder. Output is also sent to std out (terminal) for
+interactive development. The options for output in interactive development
+depend on the editor or IDE used (e.g. VS Code, Pyzo, Komodo etc.). The design
+file can be processed from command line (in the design folder) as follows.
+
+.. code:: python
+
+            python ddcc_designfilename.py
+
+
+Program and documentation are here: http://r-i-v-e-t.github.io.  
 
 **oncepy**
+==========
 
 Unzip and copy the **oncepy** package (folder) to the python/lib/site-packages
 directory. From a terminal window in the model or directory type:
