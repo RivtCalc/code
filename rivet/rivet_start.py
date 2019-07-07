@@ -1,122 +1,77 @@
 #! python
-""" once
-**once** is a component of the **on-c-e** calculation environment for producing
-engineering calculation documents. It is written in pure Python 3 and produces
-formatted, searchable calculation documents suitable for engineering
-collaboration, review and construction permit packages. 
+"""rivet package
 
-The program takes a **once** markup ASCII text input file with a filename of
-the form *mrrcc_modelname.txt* and returns a UTF-8 formatted calculation file
-*crrcc_modelname.txt* and an optional PDF-LaTeX formatted file with 
-graphics) *crrcc.modelname.pdf* if **Tex Live** is installed;
- where **rrcc** is the calculation number made up of report section
- **rr** and  subsection **cc**.
+**r-i-v-e-t** is the language component of **on-c-e** (OpenN Calculation
+Environment) for producing engineering calculation documents. The objective of
+**r-i-v-e-t** is to improve construction productivity by producing
+design documents that are easier to review and resuse. For an overview of
+**on-c-e** see http://on-c-e.github.io.
 
-The program takes a text file tagged with **on-c-e** markup as input, referred to
-as a model, and processes it through **once** and Python libraries into
-formatted text or PDF calculation files, referred to as calcs. The program also
-outputs a Python script from the model, containing just equations and functions,
-that can be run interactively for rapid design iteration.
+A **r-i-v-e-t** calculation is a Python file or set of files that contain the
+design calculation and import the rivet package. Design files for a project
+have names of the form *ddcc_designfilename.py* where dd and cc are two digit
+numbers identifying the division and calculation number respectively.
 
-All calcs and supporting files for a project are contained in a project folder
-with the following required subfolders: *dbmodel, dbcalc, dbscrpt, dbtable,
-image, reprt, temp*. The subfolders are created by the program if they do not
-exist. The *dbmodel* subfolder contains **on-c-e** models. 
+Calcs and supporting files for a
+project are contained in a project folder structure with names as follows:
 
+Project Name (chosen by user)
+    |- designs
+        |- figures
+        |- scripts
+        |- tables
+    |- calcs
+        |- txt
+        |- html
+        |- pdf
+        |- temp
 
-**Test the installation from the command line**
-Copy the **on-c-e** program folder to the *python/Lib/site-packages* folder and
-open a terminal window in a folder, referred to as the project folder.
-Type the following:
+Design input files and their required supporting files must be stored in the
+design folder and it's respective subfolders. 
+
+The *rivet* package processes and outputs formatted calculations as utf8 text,
+html and PDF if LaTeX is installed when specified. The output for an entire
+file is saved in the calcs folder in the form requested. Output is also sent to
+std out (terminal) for interactive development. The options for output in
+interactive development depend on the editor used (e.g. VS Code, Pyzo, Komodo
+etc.). A design file can be processed from command line (in the design folder)
+as follows.
 
 .. code:: python
 
-            python -m once
+            python ddcc_ userdescrip.py
 
 
-which will display help. Next type
-
-.. code:: python
-
-            python -m once -test
-            
-
-which writes the built-in example model *m0101_example.txt*
-to the project folder and runs it.
-
-**Platforms**
-Desktop OS: Windows, Linux, OSX,
-Mobile / Platform: iOS / Pythonista), Android / PyDroid (Python 2)
-Recommended IDE: Komodo X or Komodo Edit X 
-Compatible IDE: Notepad++, Atom,  
-
-**Links**
-overview:               http://structurelabs.com/once
-program and source:     http://on-c-e.github.io
-email support:          once.pyproject@gmail.com
-interactive support:    http://www.pythonanywhere.com    
-cloud database:         http://drive.google.com
-Komodo IDE:             https://activestate.com/komodo-ide
-Komodo Edit:            https://activestate.com/komodo-edit
-DejaVu fonts:           https://dejavu-fonts.github.io
-Tex Live (LaTex):       https://tug.org/texlive
-**Google Group Forums**
-English:                http://0-productivity-growth.net
-Brazil:                 http://on-c-e-br.net
-Japan:                  http://on-c-e-jp.net
-India:                  http://on-c-e-in.net
-China:                  http://on-c-e-cn.net
-Mexico:                 http://on-c-e-mx.net
+Program and documentation are here: http://r-i-v-e-t.github.io.  
 """
 
-from __future__ import division, print_function
 import sys
 import os
-from once import config as cfg
-from once.calcheck import *
-from once import calstart
+import rivet_report
+import sympy as sy
+import matplotlib.pyplot as pl
+import rivet_report as reprt
+import rivet_config as cfg
+import rivet_check as chk
+from numpy import *
+from pandas import *
+from rivet_units import *
+from rivet_config import *
+from rivet_utf import *
+from rivet_html import *
+from rivet_pdf import *
 
-__version__ = "0.9.0"
-__author__ = 'rholland'
-#locale.setlocale(locale.LC_ALL, '')
 
+__version__ = "0.9.1"
+__author__ = "rholland"
 
-def cmdlinehelp():
-    """command line help
-    
-    """
-    print()
-    print("Run once at the command line in the model folder with:")
-    print("     python -m once mrrcc_modelname.txt")
-    print("where mrrcc_modelname.txt is a model file in the folder")
-    print("and **rrcc** is the model number")
-    print()
-    print("If the model file is omitted or not found in the folder")
-    print("the program prints this prompt")
-    print()    
-    print("If the model is found, calcs are written to the calc folder:")    
-    print("     crrcc_modelname.txt (UTF-8 calc)")
-    print("     crrcc_modelname.py (interactive Python inputs)")
-    print("     crrcc_modelname.calc.pdf(optional)")
-    print("where rrcc is the calculation and model number.")
-    print("The program also writes table, log and other intermediate files")
-    print("to the table and temp subfolder.")
-    print()
-    print("To run a built-in example file from the model  folder, type:")
-    print("     python -m once -test")
-    print("which writes m0000_testmodel.txt to the model folder and runs it.")
-    print()
-    print("-Links-")
-    print("Project overview:        http://structurelabs.com/on-c-e")
-    print("Source code and docs:    http://on-c-e.github.io/")
-    print("Forum:                   http://on-c-e.net")
-    print("Database:                once.pyproject@gmail.com")
+if sys.version_info < (3,7):
+    sys.exit('Minimum required Python version for rivet is 3.7')
 
 def _filesummary():
     """file name summary table
 
     """
-    _el = ModCheck()
     filesum1 = ("File and Path Summary\n"
                 "====================="
                 "\nproject path :\n    {}\n"    
@@ -127,7 +82,7 @@ def _filesummary():
                                         ".../script/" + cfg.cfilepy, 
                                         ".../calc/" + cfg.cfileutf, 
                                         ".../temp/" + cfg.logfile)
-    _el.logwrite(filesum1, 1)
+    chk.logwrite(filesum1, 1)
 
 def _variablesummary():
     """variable summary table
@@ -138,41 +93,46 @@ def _variablesummary():
     print("================")
     print(cfg.varevaled)
 
-def _paramline(mline1):
-    """set calc level parameter flags
-       first line of model may include the following flags
-       #- pdf, echo, project, openpdf, opentxt, name:calcname,
-          width:nn, margins:top:bottom:left:right, verbose, noclean 
-
+def _gencalc():
+    """ execute program
+        0. insert [i] data into model (see _genxmodel())
+        1. read the expanded model 
+        2. build the operations ordered dictionary
+        3. execute the dictionary and write the utf-8 calc and Python file
+        4. if the pdf flag is set re-execute xmodel and write the PDF calc
+        5. write variable summary to stdout
+    
     """
-    cfg.pdfflag = 0
-    cfg.cleanflag = 1
-    cfg.projectflag = 0
-    cfg.openflag = 0
-    cfg.echoflag = 0
-    cfg.calcwidth = 80
-    cfg.pdfmargins = '1.0in,0.75in,0.9in,1.0in'
-    if mline1[0:2] == "#-":
-        mline2 = mline1[2:].strip('\n').split(',')
-        mline2 = [x.strip(' ') for x in mline2]
-        #print('mline2', mline2)
-        if 'pdf'     in mline2: cfg.pdfflag = 1
-        if 'noclean' in mline2: cfg.cleanflag = 0
-        if 'echo'    in mline2: cfg.echoflag = 1
-        if 'project' in mline2: cfg.projectflag = 1
-        if 'openpdf' in mline2: cfg.openflagpdf = 1
-        if 'opentxt' in mline2: cfg.openflagutf = 1
-        if 'verbose' in mline2: cfg.verboseflag = 1
-        if 'stoc'    in mline2: cfg.stocflag = 1
-        if 'width'   in mline2: pass
-        for param in mline2:
-            if param.strip()[0:5] == 'title':
-                cfg.calctitle = param.strip()[6:] 
-        for param in mline2:
-            if param.strip()[0:7] == 'margins':
-                cfg.pdfmargins = param.strip()[6:] 
-    else:
-        pass
+    vbos = cfg.verboseflag                          # set verbose echo flag
+    _dt = datetime.datetime
+    with open(os.path.join(cfg.cpath, cfg.cfileutf),'w') as f2:
+        f2.write(str(_dt.now()) + "      once version: " + __version__ )
+    _mdict = ModDict()                              #1 read model                              
+    _mdict._build_mdict()                           #2 build dictionary
+    mdict = {}
+    mdict = _mdict.get_mdict()
+    newmod = CalcUTF(mdict)                         #4 generate UTF calc
+    newmod._gen_utf()                                                                    
+    newmod._write_py()                              #4 write Python script            
+    _el.logwrite("< python script written >", vbos)                          
+    _el.logwrite("< pdfflag setting = " + str(cfg.pdfflag) +" >", vbos)        
+    if int(cfg.pdfflag):                            #5 check for PDF parameter                                       # generate reST file
+        rstout1 = CalcRST(mdict)                          
+        rstout1.gen_rst()                           
+        pdfout1 = CalcPDF()                         #5 generate TeX file                 
+        pdfout1.gen_tex()
+        pdfout1.reprt_list()                        #5 update reportmerge file
+        _el.logwrite("< reportmerge.txt file updated >", 1)        
+        os.chdir(once.__path__[0])                  #5 check LaTeX install
+        f4 = open('once.sty')
+        f4.close()
+        os.chdir(cfg.ppath)
+        _el.logwrite("< style file found >", vbos)
+        os.system('latex --version')                
+        _el.logwrite("< Tex Live installation found>", vbos)
+        pdfout1.gen_pdf()                           #5 generate PDF calc
+    os.chdir(cfg.ppath)
+    return mdict                                    #6 ret
 
 def _genxmodel(mfile, mpath):
     """ expanded [i] and [t] tags and rewrite model
@@ -192,6 +152,25 @@ def _genxmodel(mfile, mpath):
                 'csv'    text file            desc
 
     """
+    
+# print(sys.argv)
+try:
+    _rivpath = os.path.abspath(__file__)
+    _rivdir = os.path.dirname(_rivpath)
+    _dfile = sys.argv[0].strip()                     # design file name
+    _prjpath = _rivpath.split(_rivdir)[0]            # project path
+    _designbak = _dfile.split('.')[0] +'.bak'
+    #print("model file", _mpath, _mfile)
+    with open(_dfile, 'r') as _f2:                   # write design backup
+         _designbak = _f2.read()
+    with open(_backfile,'w') as _f3:
+        _f3.write(_designbak)
+    print("< design backup file written >")
+except:                                              
+    sys.exit("model or script not found")
+    
+    
+    
     ppath = os.path.split(mpath)[0]                        # project path
     #print('model path', mpath)
     #print('project path', ppath)
@@ -344,45 +323,56 @@ def _genxmodel(mfile, mpath):
 
     print("< model file expanded and rewritten \n")
 
-def _gencalc():
-    """ execute program
-        0. insert [i] data into model (see _genxmodel())
-        1. read the expanded model 
-        2. build the operations ordered dictionary
-        3. execute the dictionary and write the utf-8 calc and Python file
-        4. if the pdf flag is set re-execute xmodel and write the PDF calc
-        5. write variable summary to stdout
-    
-    """
-    vbos = cfg.verboseflag                          # set verbose echo flag
-    _el = ModCheck()
-    _dt = datetime.datetime
-    with open(os.path.join(cfg.cpath, cfg.cfileutf),'w') as f2:
-        f2.write(str(_dt.now()) + "      once version: " + __version__ )
-    _mdict = ModDict()                              #1 read model                              
-    _mdict._build_mdict()                           #2 build dictionary
-    mdict = {}
-    mdict = _mdict.get_mdict()
-    newmod = CalcUTF(mdict)                         #4 generate UTF calc
-    newmod._gen_utf()                                                                    
-    newmod._write_py()                              #4 write Python script            
-    _el.logwrite("< python script written >", vbos)                          
-    _el.logwrite("< pdfflag setting = " + str(cfg.pdfflag) +" >", vbos)        
-    if int(cfg.pdfflag):                            #5 check for PDF parameter                                       # generate reST file
-        rstout1 = CalcRST(mdict)                          
-        rstout1.gen_rst()                           
-        pdfout1 = CalcPDF()                         #5 generate TeX file                 
-        pdfout1.gen_tex()
-        pdfout1.reprt_list()                        #5 update reportmerge file
-        _el.logwrite("< reportmerge.txt file updated >", 1)        
-        os.chdir(once.__path__[0])                  #5 check LaTeX install
-        f4 = open('once.sty')
-        f4.close()
-        os.chdir(cfg.ppath)
-        _el.logwrite("< style file found >", vbos)
-        os.system('latex --version')                
-        _el.logwrite("< Tex Live installation found>", vbos)
-        pdfout1.gen_pdf()                           #5 generate PDF calc
-    os.chdir(cfg.ppath)
-    return mdict                                    #6 return mdict for summary
-        
+cfg.sysargv = sys.argv                               # read command line
+
+
+# run rivet
+_chk = chk.RivetCheck()
+_logwrite = _chk.logstart()                          # start log
+_chk.logwrite("< begin model processing >", 1)
+_filesummary()                                      # write file summary
+with open(_mfile, 'r') as f1:
+    readlines1 = f1.readlines()
+    calstart._paramline(readlines1[0])              # write config flags 
+os.chdir(_ppath)                                    # set project path
+sys.path.append(_ppath)
+_genxmodel(_mfile, _mpath)                          # expand model file
+mdict1 = _gencalc()                                 # run calc   
+
+# on return clean up and echo result summaries
+vbos = cfg.verboseflag
+if cfg.cleanflag:                                   # check noclean flag
+    _el.logwrite("<cleanflag setting = " + str(cfg.cleanflag) + ">", vbos)
+    os.chdir(_tpath)
+    for _i4 in _cleanlist:                            
+        try:
+            os.remove(_i4)
+        except OSError:
+            pass
+    os.chdir(_ppath)
+if cfg.echoflag:                                    # check echo calc flag 
+    _el.logwrite("<echoflag setting = " + str(cfg.echoflag) +">", vbos)
+    try:
+        with open(_cfile, 'r') as file2:
+            for il2 in file2.readlines():
+                print(il2.strip('\n'))
+    except:
+        _el.logwrite("< utf calc file could not be opened >", vbos)    
+if cfg.openflagpdf:                                 # check open PDF flag 
+    try:
+        pdffilex = os.path.join(_ppath, _cpath, _cfilepdf)
+        os.system(pdffilex)
+    except:
+        _el.logwrite("< pdf calc file could not be opened >", vbos)
+
+if cfg.openflagutf:                                 # check open UTF flag 
+    try:
+        utffilex = os.path.join(_ppath, _cpath, _cfileutf)
+        os.system(utffilex)
+    except:
+        _el.logwrite("< txt calc file could not be opened >", vbos)
+
+calstart._variablesummary()                         # echo calc results
+_el.logwrite("< end of once program >", 1)
+_el.logclose()                                      # close log
+                                                    # end of program
