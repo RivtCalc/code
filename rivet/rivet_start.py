@@ -2,18 +2,18 @@
 """rivet package
 
 **r-i-v-e-t** is the language component of **on-c-e** (OpenN Calculation
-Environment) for producing engineering calculation documents. The objective of
-**r-i-v-e-t** is to improve construction productivity by producing
+Environment), a framework for producing engineering calculation documents.
+**r-i-v-e-t** is intended to improve construction productivity by producing
 design documents that are easier to review and resuse. For an overview of
 **on-c-e** see http://on-c-e.github.io.
 
-A **r-i-v-e-t** calculation is a Python file or set of files that contain the
-design calculation and import the rivet package. Design files for a project
+A **r-i-v-e-t** file is a Python file or files that contain
+design calculations using the *rivet* package. Design files
 have names of the form *ddcc_designfilename.py* where dd and cc are two digit
 numbers identifying the division and calculation number respectively.
 
-Calcs and supporting files for a
-project are contained in a project folder structure with names as follows:
+Calcs and supporting files for a project are contained in a project folder
+structure with names as follows:
 
 Project Name (chosen by user)
     |- designs
@@ -26,20 +26,19 @@ Project Name (chosen by user)
         |- pdf
         |- temp
 
-Design input files and their required supporting files must be stored in the
+Design input files and their required supporting files are stored in the
 design folder and it's respective subfolders. 
 
-The *rivet* package processes and outputs formatted calculations as utf8 text,
-html and PDF if LaTeX is installed when specified. The output for an entire
-file is saved in the calcs folder in the form requested. Output is also sent to
-std out (terminal) for interactive development. The options for output in
-interactive development depend on the editor used (e.g. VS Code, Pyzo, Komodo
-etc.). A design file can be processed from command line (in the design folder)
-as follows.
+The *rivet* package processes and outputs formatted calculations in utf8 text,
+html, and PDF if specified (and LaTeX is installed). Output is saved in the
+respective calcs folder. Output is also sent to std out (terminal) for
+interactive development. The options for output in interactive development
+depend on the editor or IDE used (e.g. VS Code, Pyzo, Komodo etc.). The design
+file can be processed from command line (in the design folder) as follows.
 
 .. code:: python
 
-            python ddcc_ userdescrip.py
+            python ddcc_designfilename.py
 
 
 Program and documentation are here: http://r-i-v-e-t.github.io.  
@@ -47,12 +46,11 @@ Program and documentation are here: http://r-i-v-e-t.github.io.
 
 import sys
 import os
-import rivet_report
 import sympy as sy
 import matplotlib.pyplot as pl
-import rivet_report as reprt
-import rivet_config as cfg
-import rivet_check as chk
+from rivet import rivet_report as reprt
+from rivet import rivet_config as cfg
+from rivet import rivet_check as chk
 from numpy import *
 from pandas import *
 from rivet_units import *

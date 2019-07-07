@@ -12,19 +12,21 @@ design calculations using the *rivet* package. Design files
 have names of the form *ddcc_designfilename.py* where dd and cc are two digit
 numbers identifying the division and calculation number respectively.
 
-Calcs and supporting files for a project are contained in a project folder
+Design calculations and supporting files for a project are contained in a project folder
 structure with names as follows:
 
-Project Name (chosen by user)
-    |- designs
-        |- figures
-        |- scripts
-        |- tables
-    |- calcs
-        |- txt
-        |- html
-        |- pdf
-        |- temp
+::
+
+    Project Name (chosen by user)
+        |- designs
+            |- figures
+            |- scripts
+            |- tables
+        |- calcs
+            |- txt
+            |- html
+            |- pdf
+            |- temp
 
 Design input files and their required supporting files are stored in the
 design folder and it's respective subfolders. 

@@ -2,10 +2,12 @@
 
 import os
 import sys
+import rivet
 
 try:
     dfile = sys.argv[0].strip()                 # design file name
-    dpath = os.path.abspath(__file__)           # design file path
+    rivpath = os.path.abspath(rivet.__file__)
+    dpath = os.path.abspath(dfile.__file__)           # design file path
     ddir = os.path.dirname(dpath)
     ppath = dpath.split(ddir)[0]                # project path
     cpath = os.path.join(ppath, 'calcs')

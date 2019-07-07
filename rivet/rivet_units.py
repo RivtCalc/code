@@ -1,10 +1,13 @@
-"""Unum units for on-c-e
+"""Unum units for rivet
+
+    Add new units to end of file
 """
 
 import os
 import importlib.util
-from once import config as cfg
-unum_path = os.path.join(cfg.opath,'unum','__init__.py')
+import rivet.rivet_config as cfg
+
+unum_path = os.path.join(cfg.rivpath,'unum','__init__.py')
 spec = importlib.util.spec_from_file_location("unum", unum_path)
 unum = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(unum)
@@ -47,19 +50,21 @@ HENRY   = unit( 'H'     , WB / A         , 'henry'      )
 CD      = unit("cd", 0, "candela")
 LM      = unit( 'lm'    , CD * SR   , 'lumen'          )
 LX      = unit( 'lx'    , LM / M**2 , 'lux'            )
-# warning : conversion is for relative degree size not actual temperature
 celsius = CELSIUS = unit( 'deg C' , K         , 'degree Celsius' )
 FAHR    = unit('degF', K*9./5 , 'degree Fahrenheit')
+# warning : conversion is for relative degree size not actual temperature
+
+
 # =============== structural engineering units - add here ==============
 # metric
 G   = unit('G', 9.80665 * M/S**2, 'gravity acceleration')
-
 PA  = unit('Pa', N / M**2, 'pascal')
 MPA = unit('MPa', PA*(10**6), 'megapascals')
 KPA = unit('KPa', PA*(10**3), 'kilopascals')
 KN  = unit('KN', N*(10**3), 'kilonewton')
 MN  = unit('MN', N*(10**6), 'meganewton')
 KM  = unit('M', M*(10**3), 'kilometer')
+
 # imperial
 IN      = unit('in', M / 39.370079, 'inch')
 FT      = unit('ft', M / 3.2808399, 'foot')

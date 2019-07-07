@@ -11,7 +11,7 @@ from sympy import var as varsym
 from sympy import printing
 from once.calunit import *
 from once.calcheck import ModCheck
-from once import config as cfg
+import rivet.rivet_config as cfg
 
 __version__ = "0.9.0"
 __author__ = 'rholland@structurelabs.com'
@@ -37,10 +37,6 @@ def _paramline(mline1):
         #print('mline2', mline2)
         if 'pdf'     in mline2: cfg.pdfflag = 1
         if 'noclean' in mline2: cfg.cleanflag = 0
-        if 'echo'    in mline2: cfg.echoflag = 1
-        if 'project' in mline2: cfg.projectflag = 1
-        if 'openpdf' in mline2: cfg.openflagpdf = 1
-        if 'opentxt' in mline2: cfg.openflagutf = 1
         if 'verbose' in mline2: cfg.verboseflag = 1
         if 'stoc'    in mline2: cfg.stocflag = 1
         if 'width'   in mline2: pass
@@ -454,7 +450,7 @@ class CalcUTF(object):
         if indent: mentry = " "*4 + mentry
         print(mentry, file=self.cfile)
         
-    def _prt_run(self, dval):
+    def r__(self, dval):
         """Process run operations.
         ::
 
@@ -606,7 +602,7 @@ class CalcUTF(object):
         self._write_utf((dval[0] + " " + dval[1]).rjust(self.widthc-1), 0, 0)
         self._write_utf(" ", 0, 0)
 
-    def _prt_val2(self, dval):
+    def v__(self, dval):
         """Print terms.
         ::
 
