@@ -1,37 +1,58 @@
 #!
 
-__version__ = "0.3.0"
+import os
+import datetime
+
+__version__ = "0.9.0"
 __author__ = 'rholland'
 
-
-def logstart(self):
-    """delete log file and initialize new file
-
+class CheckRivet:
+    """check rivet syntax and log
+    
+    Arguments:
+        logname {[type]} -- [description]
+    
+    Returns:
+        [type] -- [description]
     """
-    try: os.remove(self.logname)
-    except: pass
-    with open(self.logname, 'w') as el:
-        el.write("< start log: " + str(datetime.datetime.now()) + "  >\n")
-    return self.logname
 
-def logwrite(self, estrg, flg):
-    """write processes to log file, option echo to terminal
+    def __init__(self, logname):
+        
+        self.logname = logname
 
-    """
-    #print('log', estrg)
-    with open(self.logname, 'a') as ef:
-        estrg += '\n'
-        ef.write(estrg)
-    if flg:
-        print(estrg)
 
-def logclose(self):
-    """close log file
+    def logstart(self):
+        """delete log file and initialize new file
 
-    """
-    try:
-        with open(self.logname, 'a') as ef:
-            ef.write("\n< close log: "  + str(datetime.datetime.now()) + " >")
-    except IOError:
-        print('error: log file not closed')
+        """
+        try: os.remove(self.logname)
+        except: pass
+        with open(self.logname, 'w') as lg:
+            lg.write("< start log: " + str(datetime.datetime.now()) + "  >\n")
+        return self.logname
 
+    def logwrite(self, logstrg, flg=0):
+        """write processes to log file, option echo to terminal
+
+        """
+        #print('log', logstrg)
+        with open(self.logname, 'a') as lg:
+            logstrg += '\n'
+            lg.write(logstrg)
+        if flg:
+            print(logstrg)
+
+    def logclose(self):
+        """close log file
+
+        """
+        try:
+            with open(self.logname, 'a') as lg:
+                lg.write("\n< close log: "  + str(datetime.datetime.now()) + " >")
+        except IOError:
+            print('error: problem closing log file')
+
+
+class CheckDesign:
+    pass
+    

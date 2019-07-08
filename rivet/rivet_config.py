@@ -7,7 +7,7 @@ import rivet
 try:
     dfile = sys.argv[0].strip()                 # design file name
     rivpath = os.path.abspath(rivet.__file__)
-    dpath = os.path.abspath(dfile.__file__)           # design file path
+    dpath = os.path.abspath(dfile.__file__)     # design file path
     ddir = os.path.dirname(dpath)
     ppath = dpath.split(ddir)[0]                # project path
     cpath = os.path.join(ppath, 'calcs')
@@ -38,7 +38,7 @@ chtml = ".".join(dbase, 'html')
 cpdf = ".".join(dbase, 'pdf')
 
 trst = ".".join(dbase, 'rst')
-tlog1 = ".".join(dbase, 'log')
+tlog = ".".join(dbase, 'log')
 ttex1 = ".".join(dbase, 'tex')
 
 auxfile =  os.path.join(dbase, '.aux')
