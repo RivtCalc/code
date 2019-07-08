@@ -53,6 +53,35 @@ class CheckRivet:
             print('error: problem closing log file')
 
 
+    def filesummary():
+        """file name summary table
+
+        """
+        filesum1 = ("Path Summary\n"
+                    "============================"
+                    "\nproject path :\n    {}\n"    
+                    "\ndesign file :\n    {}\n"
+                    "\nlog file :\n    {}"
+                    "\ncalc path :\n    {}").format(cfg.ppath.strip(), 
+                                            cfg.dfile, cfg.tlog, cfg.cpath) 
+
+
 class CheckDesign:
-    pass
+    """[summary]
+    """
     
+    
+    def varsummary():
+        """variable summary table
+        
+        """
+        
+        print("Variable Summary")
+        print("================")
+        print(cfg.varevaled)
+
+
+
+
+
+    pass
