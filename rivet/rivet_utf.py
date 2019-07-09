@@ -1,53 +1,11 @@
 #! python
-import codecs
-import datetime
-import sys
-import os
-import pprint as ppr
-from numpy import *
-import numpy.linalg as LA
-from sympy import *
-from sympy import var as varsym
-from sympy import printing
-from once.calunit import *
-from once.calcheck import ModCheck
-import rivet.rivet_config as cfg
+
+import rivet.config as cfg
 
 __version__ = "0.9.0"
 __author__ = 'rholland@structurelabs.com'
 
 
-def _paramline(mline1):
-    """set calc level parameter flags
-       first line of model may include the following flags
-       #- pdf, echo, project, openpdf, opentxt, name:calcname,
-          width:nn, margins:top:bottom:left:right, verbose, noclean 
-
-    """
-    cfg.pdfflag = 0
-    cfg.cleanflag = 1
-    cfg.projectflag = 0
-    cfg.openflag = 0
-    cfg.echoflag = 0
-    cfg.calcwidth = 80
-    cfg.pdfmargins = '1.0in,0.75in,0.9in,1.0in'
-    if mline1[0:2] == "#-":
-        mline2 = mline1[2:].strip('\n').split(',')
-        mline2 = [x.strip(' ') for x in mline2]
-        #print('mline2', mline2)
-        if 'pdf'     in mline2: cfg.pdfflag = 1
-        if 'noclean' in mline2: cfg.cleanflag = 0
-        if 'verbose' in mline2: cfg.verboseflag = 1
-        if 'stoc'    in mline2: cfg.stocflag = 1
-        if 'width'   in mline2: pass
-        for param in mline2:
-            if param.strip()[0:5] == 'title':
-                cfg.calctitle = param.strip()[6:] 
-        for param in mline2:
-            if param.strip()[0:7] == 'margins':
-                cfg.pdfmargins = param.strip()[6:] 
-    else:
-        pass
 
 def _genxmodel(mfile, mpath):
     """ expanded [i] and [t] tags and rewrite model
@@ -261,11 +219,23 @@ def _gencalc():
     os.chdir(cfg.ppath)
     return mdict                                    #6 return mdict for summary
         
+class ExecV:
+    """[summary]
+    """
+    # subsection settings
+    function_flag = ""                       # can be "", f(ile), s(ection)
+    description = "Value Definition"        
+    function_tag = ""                            # can be string or file
+    process = "p"                           # can be p, n, or x
+
+    def __init__(self):
+        
+        pass
 
 
-class CalcUTF(object):
-    """Return UTF-8 calcs
-    ::
+
+class CalcUTF:
+    """Return UTF-8 calcs::
 
         Arguments:
             odict (ordered dict) : model dictionary
@@ -313,9 +283,8 @@ class CalcUTF(object):
                   left string    calc number     sect num   toc flag
     """
 
-    def __init__(self, odict1):
-        """Initialize parameters for UTF calc.
-        ::
+    def __init__(self, sdict1):
+        """Initialize parameters for UTF calc::
 
          Arguments:
             odict1 (dictionary):  model dictionary

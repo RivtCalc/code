@@ -6,6 +6,7 @@ import datetime
 __version__ = "0.9.0"
 __author__ = 'rholland'
 
+
 class CheckRivet:
     """check rivet syntax and log
     
@@ -19,7 +20,6 @@ class CheckRivet:
     def __init__(self, logname):
         
         self.logname = logname
-
 
     def logstart(self):
         """delete log file and initialize new file

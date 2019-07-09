@@ -1,12 +1,13 @@
 """Unum units for rivet
 
-    Add new units to end of file
+    Add new units at end of this file
 """
 
 import os
 import importlib.util
 import rivet.rivet_config as cfg
 
+# load unum from rivet directory
 unum_path = os.path.join(cfg.rivpath,'unum','__init__.py')
 spec = importlib.util.spec_from_file_location("unum", unum_path)
 unum = importlib.util.module_from_spec(spec)
@@ -88,3 +89,8 @@ KLF     = unit('kips/ft', KIPS/FT, 'kips per foot')
 PCF     = unit('pcf', LBF/FT**3, 'pounds per cubic ft')
 HR      = unit('hr', 60*60*S, 'hours')
 MPH     = unit('mph', MILES / HR, 'miles per hour')
+
+
+# ======== define f string variables here ==========================
+
+_int = "\N{INTEGRAL}"

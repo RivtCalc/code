@@ -1,12 +1,18 @@
-# rivet configuration file - modified by the program - do not change
-
 import os
 import sys
 import rivet
 
+"""rivet configuration file
+    
+    first section includes files and paths
+    second section includes format and execution settins
+
+"""
+
+#============= paths and file names - do not modify =================
 try:
+    rivpath = os.path.abspath(rivet.__file__)   # rivet package path
     dfile = sys.argv[0].strip()                 # design file name
-    rivpath = os.path.abspath(rivet.__file__)
     dpath = os.path.abspath(dfile.__file__)     # design file path
     ddir = os.path.dirname(dpath)
     ppath = dpath.split(ddir)[0]                # project path
@@ -47,11 +53,12 @@ texmak2 =  os.path.join(dbase, '.fls')
 texmak3 =  os.path.join(dbase,'.fdb_latexmk')
 cleantemp = (auxfile, outfile, texmak2, texmak3)
 
+#================== default settings ============================== 
+
 # flags
 pdfflag = 0         # write PDF 
 nocleanflag = 0     # do not clean temporary latex files
-verboseflag = 0     # write logging to standard out
-stocflag = 0        # write section table of contents
+verboseflag = 0     # write all logging to standard out
 
 # variables
 defaultdec = '3,3'  # default decimal places
@@ -59,8 +66,4 @@ calcwidth = 80      # UTF line width
 varevaled = ""      # list of model variables
 calctitle = '\n\nModel Title' # default model title
 pdfmargin = '1.0in,0.75in,0.9in,1.0in'  # pdf page margins
-
-
-
-
 
