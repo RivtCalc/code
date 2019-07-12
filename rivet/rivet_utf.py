@@ -223,16 +223,73 @@ class ExecV:
     """[summary]
     """
     # subsection settings
-    function_flag = ""                       # can be "", f(ile), s(ection)
-    description = "Value Definition"        
-    function_tag = ""                            # can be string or file
-    process = "p"                           # can be p, n, or x
-
-    def __init__(self):
+    
+    def __init__(self, vstring):
+        """[summary]
         
+        Arguments:
+            vstring {[type]} -- [description]
+        """
+    
+        self.function_flag = ""                 # par: "", f(ile), s(ection)
+        self.description = "Value Definition"   # par: user string
+        self.function_tag = ""                  # par: "", string, file
+        self.process = "p"                      # par: p(rint), n(o print), 
+                                                # or s(kip execution)
+
+        direct1 = vstring[0].split('|')
+        try:
+            for i in direct1:
+                self.function_flag = i[1]
+                self.description = i[2]
+                self.function_flag = i[3]
+                self.process = i[4]
+        except:
+            pass
+        
+        if self.function_flag == 'f':
+            pass
+
+    def vread():
         pass
 
+    def vformat():
+        pass
 
+    def vlookup():
+        pass
+
+    def vprint():
+        """[summary]
+        """
+        #print('dval_v1', dval)
+        self._write_utf((dval[0] + " " + dval[1]).rjust(self.widthc-1), 0, 0)
+        self._write_utf(" ", 0, 0)
+
+        #print('dval_v2', dval)        
+        exec(dval[2])
+        val1 = eval(dval[1])
+        var1 = dval[2].split('=')[0].strip()
+        state = var1 + ' = ' + str(val1)
+        ptype = type(val1)
+        if ptype == ndarray or ptype == list or ptype == tuple:
+            state = var1 + ' = ' + '\n' + str(val1)
+        shift = int(self.widthc / 2.5)
+        ref = dval[3].strip().ljust(shift)
+        if ptype == ndarray or ptype == list or ptype == tuple:
+            self._write_utf(" "*2 + ref + " | " + state,  0, 1)
+        else:
+            self._write_utf(" "*2 + ref + " | " + state,  1, 1)
+        
+ 
+
+
+
+class ExecE:
+    """[summary]
+    """
+
+    pass
 
 class CalcUTF:
     """Return UTF-8 calcs::
