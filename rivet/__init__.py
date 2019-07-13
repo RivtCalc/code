@@ -1,2 +1,2 @@
 #!/usr/bin/env python
-#load modules on import *
+# folder is a package

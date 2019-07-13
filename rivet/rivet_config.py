@@ -4,12 +4,11 @@ import rivet
 
 """rivet configuration file
     
-    first section includes files and paths
-    second section includes format and execution settins
-
+    First section includes files and paths
+    Second section includes settings
+    Do not modify this file
 """
 
-#============= paths and file names - do not modify =================
 try:
     rivpath = os.path.abspath(rivet.__file__)   # rivet package path
     dfile = sys.argv[0].strip()                 # design file name
@@ -18,7 +17,6 @@ try:
     ppath = dpath.split(ddir)[0]                # project path
     cpath = os.path.join(ppath, 'calcs')
     bakfile = dfile.split('.')[0] +'.bak'
-    #print("model file", _mpath, _mfile)
     with open(dfile, 'r') as f2:                # back up design file
          designbak = f2.read()
     with open(bakfile,'w') as f3:
