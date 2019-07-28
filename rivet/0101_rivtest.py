@@ -10,11 +10,11 @@ i__(
     reference. Sometimes the state of motion asfda asd s fdas sfdfasdfasdf is
     emphasized, as in rotating frame of reference. Sometimes
 
-    | [figure] | filename | caption  | size | [+] |
-    | [figure] | filename | caption  | size |
-    | [insert] | textfile  | [i][b] |
-    | [latex]  | α = \integral(x^2,x,a,b) |
-    | [math]   | asciiformula |
+    |[figure]| filename | caption  | size |[+]|
+    |[figure]| filename | caption  | size |
+    |[insert]| textfile  | [i][b] |
+    |[latex]| α = \integral(x^2,x,a,b) |
+    |[math]| asciiformula |
     """
 )
 
