@@ -1,6 +1,8 @@
-#! python
-#%% section 1
-i__(f"""| function label [s] |
+from rivet import *
+# region 1
+# %% section 1
+i__(
+    f"""| function label [s] |
     |[rivet]| calculation name |[date] [toc] [pdf] [clean]|
 
     The need to distinguish between the various meanings of "frame of
@@ -14,16 +16,17 @@ i__(f"""| function label [s] |
     |[insert]| textfile  | [i][b] |
     |[latex]| α = \integral(x^2,x,a,b) |
     |[math]| asciiformula |
-    """)
+    """
+)
 
-
-r__(f"""| a caption plot [s] [p] | filename [o] |
+r__(
+    f"""| a plot [s] [p] | filename [o] |
     fig, ax1 = plt.subplots()
     t = np.arange(0.01, 10.0, 0.01)
     s1 = np.exp(t)
     ax1.plot(t, s1, 'b-')
     ax1.set_xlabel('time (s)')
-    # Make the y-axis label, ticks and tick labels match the line color.
+    
     ax1.set_ylabel('exp', color='b')
     ax1.tick_params('y', colors='b')
 
@@ -35,9 +38,13 @@ r__(f"""| a caption plot [s] [p] | filename [o] |
 
     fig.tight_layout()
     plt.show()
-    """)
-
-v__(f"""| values abcd |
+    """
+)
+# endregion 1
+# region 2
+# %% section 2
+v__(
+    f"""| values abcd |
     Some text if needed
 
     a11 = 12.23*IN
@@ -48,18 +55,21 @@ v__(f"""| values abcd |
 
     a33 = 14
     description
-    """)
+    """
+)
 
-e__(f"""| equations  abcd |
+e__(
+    f"""| equations  abcd |
     aa2 = a11*4
     equation description | units |2,2|
 
     aa22 = a11*5
     equation description | units |2,2|
-    """)
+    """
+)
 
-#%% section 2
-i__(f"""| some description [s]|
+i__(
+    f"""| some description [s]|
     This is a test γ = 2*Σ of the system and this is a further test
     and another greek letter Γ₂.
 
@@ -71,21 +81,33 @@ i__(f"""| some description [s]|
     The way it transforms to frames considered as related is emphasized as in
     Galilean frame of reference. Sometimes frames are distinguished by the scale of
     their observations, as in macroscopic and microscopic frames of reference.[1]
-    """)
-
-v__(f"""| some values |
+    """
+)
+# endregion 2
+# region 3
+# %% section 3
+v__(
+    f"""| some values |
     gg = 5.4*FT
     height of roof
 
     hh = 12.2
     height of balcony
-    """)
+    """
+)
 
-i__(f"""| text |
+i__(
+    f"""| text |
     this is a one liner 4 γ
-    """)
+    """
+)
 
-e__(f"""| some equations |
+e__(
+    f"""| some equations |
     xx1 = gg + 4
     xx2 = hh + 10
-    """)
+    """
+)
+# endregion 3
+# region 4
+# %% section 4
