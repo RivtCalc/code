@@ -1,4 +1,5 @@
 from rivet import *
+
 # region 1
 # %% section 1
 i__(
@@ -18,7 +19,6 @@ i__(
     |[math]| asciiformula |
     """
 )
-
 r__(
     f"""| a plot [s] [p] | filename [o] |
     fig, ax1 = plt.subplots()
@@ -57,9 +57,10 @@ v__(
     description
     """
 )
-
 e__(
     f"""| equations  abcd |
+    Some introductory text.
+    
     aa2 = a11*4
     equation description | units |2,2|
 
@@ -67,7 +68,6 @@ e__(
     equation description | units |2,2|
     """
 )
-
 i__(
     f"""| some description [s]|
     This is a test γ = 2*Σ of the system and this is a further test
@@ -95,13 +95,11 @@ v__(
     height of balcony
     """
 )
-
 i__(
     f"""| text |
     this is a one liner 4 γ
     """
 )
-
 e__(
     f"""| some equations |
     xx1 = gg + 4
