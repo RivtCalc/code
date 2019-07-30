@@ -1,45 +1,47 @@
 **rivet**
 ===========
 
-This package provides a language for **on-c-e** (OpeN Calculation Environment -
-see http://on-c-e.github.io.), an open source, cross platform framework
-intended to improve construction productivity by establishing a few standard
-engineering design document formats that are easy to read, reuse and extend.
+**r-i-v-e-t** is an example of the calculation language component for **on-c-e**
+(OpeN  Calculation Environment), which produces engineering calculation
+documents. It is written in Python 3 and is designed to improve document reuse
+and review. For an overview of **on-c-e** see http://on-c-e.github.io.
 
-A calculation file in **r-i-v-e-t** is a Python file or files containing design
-calculations that use the *rivet* package. Design file names have the form
-*ddcc_designfilename.py*, where dd and cc are two digit numbers identifying the
-division and calculation number respectively.
+A **r-i-v-e-t** calculation is a Python engineering design file files that
+contain design calculations in the **r-i-v-e-t** format and import the rivet_lib
+library. Design files for a project have names of the form
+*ddcc_designfilename.py* where dd and cc are two digit numbers identifying the
+division and calculation number respectively.  Division numbers apply to
+**r-i-v-e-t**  reports which are organized compilations of calculations.
 
-Calcs and supporting files for a project are contained in a project folder
-structure as follows::
+Design input files and their required supporting files must be stored in the
+proper subfolders of the *designs* folder. Output files are written to the
+*calcs* directory in html, pdf and text (utf) format. To protect against data
+loss the user must set up the project folder structure using the following
+names.  The program will display an error and stop if it does not find the
+proper folder structure and names.
 
-    Project Name (chosen by user)
-        |- designs
-            |- figures
-            |- scripts
-            |- tables
-        |- calcs
-            |- txt
-            |- html
-            |- pdf
-            |- temp
+Project_Name (by user)
+    |- calcs
+        |- pdf
+        |- temp
+        |- txt
+    |- designs
+        |- figures
+        |- scripts
+        |- tables
+    |- reports
+        |- attachments
+        |- html
+        |- temp
 
-Design input files and their required supporting files are stored in the
-design folder and it's respective subfolders. 
-
-The *rivet* package processes and outputs formatted calculations in UTF-8 text,
-HTML, and PDF when specified (and LaTeX is installed). Output is saved in the
-respective calcs folder. Output is also sent to the terminal (std out) for
-interactive calculation development. Interactive output depends on the editor
-or IDE used (e.g. VS Code, Pyzo, Komodo etc.). VS Code or Pyzo are recommended.
-The design file can be processed from command line (in the design folder) as
-follows.
+The *rivet* package processes and outputs formatted calculations.  In the common
+case where calculations are written and edited in interactive  mode,  the
+program is invoked by importing the *rivet_lib* library.  Calculations can also
+be produced by processing an entire design file from the commmand line by invoking the
+rivet package as follows:
 
 .. code:: python
 
-            python ddcc_designfilename.py
+    python rivet ddcc_ userdescrip.py
 
-
-Program and documentation are here: http://r-i-v-e-t.github.io and here
-http://on-c-e.github.io.
+The program and documentation are here: http://r-i-v-e-t.github.io.
