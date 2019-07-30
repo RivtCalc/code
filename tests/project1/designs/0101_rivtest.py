@@ -1,10 +1,12 @@
-from rivet import *
+from rivet.rivet_lib import *
+print(dir())
 
 # region 1
 # %% section 1
 i__(
-    f"""| function label [s] |
-    |[rivet]| calculation name |[date] [toc] [pdf] [clean]|
+    f"""| [s] function/section label | [p];[h];[x] | [o];[i] file name | 
+    |[design]| design name |[date],[pdf],[toc],[clean]| title block file |
+    |[report]| report config file | 
 
     The need to distinguish between the various meanings of "frame of
     reference" has led to a variety of terms. For example, sometimes the type
@@ -12,15 +14,19 @@ i__(
     reference. Sometimes the state of motion asfda asd s fdas sfdfasdfasdf is
     emphasized, as in rotating frame of reference. Sometimes
 
-    |[figure]| filename | caption  | size |[+]|
-    |[figure]| filename | caption  | size |
-    |[insert]| textfile  | [i][b] |
-    |[latex]| α = \integral(x^2,x,a,b) |
-    |[math]| asciiformula |
+    | [figure] | filename | caption  | size |
+    | [figure] | filename | caption  | size |
+    
+    | [text] | textfile  | spaces,[b],[i] |
+    
+    | [latex] | α = \integral(x^2,x,a,b) |
+    
+    | [math] | asciiformula |
     """
 )
+
 r__(
-    f"""| a plot [s] [p] | filename [o] |
+    f"""| a plot | [o] filename  |
     fig, ax1 = plt.subplots()
     t = np.arange(0.01, 10.0, 0.01)
     s1 = np.exp(t)
@@ -40,11 +46,13 @@ r__(
     plt.show()
     """
 )
+
 # endregion 1
 # region 2
 # %% section 2
 v__(
-    f"""| values abcd |
+    f"""
+    | values abcd |
     Some text if needed
 
     a11 = 12.23*IN
@@ -57,6 +65,7 @@ v__(
     description
     """
 )
+
 e__(
     f"""| equations  abcd |
     Some introductory text.
@@ -68,6 +77,7 @@ e__(
     equation description | units |2,2|
     """
 )
+
 i__(
     f"""| some description [s]|
     This is a test γ = 2*Σ of the system and this is a further test
@@ -83,6 +93,7 @@ i__(
     their observations, as in macroscopic and microscopic frames of reference.[1]
     """
 )
+
 # endregion 2
 # region 3
 # %% section 3
@@ -95,17 +106,21 @@ v__(
     height of balcony
     """
 )
+
 i__(
     f"""| text |
     this is a one liner 4 γ
     """
 )
+
 e__(
     f"""| some equations |
     xx1 = gg + 4
     xx2 = hh + 10
     """
 )
+
 # endregion 3
 # region 4
 # %% section 4
+print(var_rivet_dict)

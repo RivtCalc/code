@@ -1,8 +1,8 @@
 #! python
 
 
-import sys
 import os
+import sys
 import sympy as sy
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -10,14 +10,14 @@ from IPython.display import Image, Math, Latex, HTML, display
 from numpy import *
 from pandas import *
 
-import rivet.rivet_utf as _utf
-import rivet.rivet_report as reprt
+# import rivet.rivet_utf as _utf
+# import rivet.rivet_report as reprt
 import rivet.rivet_config as cfg
 import rivet.rivet_check as chk
-from rivet.rivet_units import *
-from rivet.rivet_config import *
-from rivet.rivet_html import *
 
+# from rivet.rivet_units import *
+# from rivet.rivet_config import *
+# from rivet.rivet_html import *
 # from rivet.rivet_pdf import *
 
 __version__ = "0.9.1"
