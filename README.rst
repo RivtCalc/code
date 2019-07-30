@@ -2,7 +2,7 @@
 ==================
 
 The *rivet* package implements the **r-i-v-e-t** calculation language as a
-component for **on-c-e** (**O**\pe**N** **C**\alculation **E**\nvironment),
+component for **on-c-e** (**O**\ pe\ **N** **C**\ alculation **E**\ nvironment),
 which produces engineering calculation documents. It is written in Python and
 designed to improve document reuse and review.  The program and documentation
 are here: https://github.com/r-i-v-e-t .  For an overview of **on-c-e** see
