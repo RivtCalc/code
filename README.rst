@@ -18,7 +18,7 @@ proper subfolders of the *designs* folder. Output files are written to the
 *calcs* directory in html, pdf and text (utf) format. To protect against data
 loss the user must set up the project folder structure using the following
 names.  The program will display an error and stop if it does not find the
-proper folder structure and names.
+proper folder structure and names. ::
 
   Project_Name (by user)
       |- calcs
