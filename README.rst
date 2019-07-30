@@ -20,19 +20,19 @@ loss the user must set up the project folder structure using the following
 names.  The program will display an error and stop if it does not find the
 proper folder structure and names.
 
-Project_Name (by user)
-    |- calcs
-        |- pdf
-        |- temp
-        |- txt
-    |- designs
-        |- figures
-        |- scripts
-        |- tables
-    |- reports
-        |- attachments
-        |- html
-        |- temp
+  Project_Name (by user)
+      |- calcs
+          |- pdf
+          |- temp
+          |- txt
+      |- designs
+          |- figures
+          |- scripts
+          |- tables
+      |- reports
+          |- attachments
+          |- html
+          |- temp
 
 The *rivet* package processes and outputs formatted calculations.  In the common
 case where calculations are written and edited in interactive  mode,  the
