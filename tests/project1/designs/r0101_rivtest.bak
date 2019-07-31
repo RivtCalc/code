@@ -1,4 +1,4 @@
-from rivet.rivet_lib import *
+from rivet.rivet_lib import *; setfiles(os.path.realpath(__file__))
 print(dir())
 
 # region 1
