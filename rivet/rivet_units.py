@@ -19,7 +19,7 @@ Unum.UNIT_INDENT = " "
 Unum.VALUE_FORMAT = "%.3f"
 unit = Unum.unit
 
-# =============== standard SI units ===============
+# =============== standard SI units - do not modify ===============
 M = unit("m", 0, "meter")
 NM = unit("nm", 10**-9 * M, "nanometer")
 UM = unit("um", 10**-6 * M, "micrometer")
@@ -54,9 +54,9 @@ LX      = unit( 'lx'    , LM / M**2 , 'lux'            )
 celsius = CELSIUS = unit( 'deg C' , K         , 'degree Celsius' )
 FAHR    = unit('degF', K*9./5 , 'degree Fahrenheit')
 # warning : conversion is for relative degree size not actual temperature
+# ================ do not modify above =================================
 
-
-# =============== structural engineering units - add here ==============
+# =========== add structural engineering units here ==============
 # metric
 G   = unit('G', 9.80665 * M/S**2, 'gravity acceleration')
 PA  = unit('Pa', N / M**2, 'pascal')
@@ -90,7 +90,6 @@ PCF     = unit('pcf', LBF/FT**3, 'pounds per cubic ft')
 HR      = unit('hr', 60*60*S, 'hours')
 MPH     = unit('mph', MILES / HR, 'miles per hour')
 
-
-# ======== define f string variables here ==========================
+# ======== add f string variables here ==========================
 
 _int = "\N{INTEGRAL}"

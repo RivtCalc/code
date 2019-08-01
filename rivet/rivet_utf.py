@@ -16,24 +16,7 @@ class ExecV:
         Args:
             vlist (list): [description]
         """
-        self.function_flag = ""                 # par: "", f(ile), s(ection)
-        self.description = "Value Definition"   # par: user string
-        self.function_tag = ""                  # par: "", string, file
-        self.process = "p"                      # par: p(rint), n(o print), 
-                                                # s(kip execution)
 
-        callv1 = vlist[0].split('|')
-        try:
-            for i in callv1:
-                self.function_flag = i[1]
-                self.description = i[2]
-                self.function_flag = i[3]
-                self.process = i[4]
-        except:
-            pass
-        
-        if self.function_flag == 'f':
-            pass
 
     def vread(self,x):
         pass

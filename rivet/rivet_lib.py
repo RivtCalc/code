@@ -1,7 +1,17 @@
 #! python
 """rivet_lib
-    defines the primary r-i-v-e-t function calls and file paths
+    The module processes the r-i-v-e-t language and sets files and paths
 
+    The language includes five types of f-strings where each type of string is
+    evaluated by a function. The first line of each f-string can be a settings
+    string.
+
+    r__() : string of python code 
+    i__() : string that inserts text and images
+    v__() : string that defines values
+    e__() : string that defines equations
+    t__() : string that defines tabls and plots
+    
 """
 
 import os
@@ -29,10 +39,10 @@ __author__ = "rholland"
 if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
-var_rivet_dict = {}
+var_rivet_dict = {}     # global calc variable dictionary
 
 def setfiles(_designfile):
-    """[summary]
+    """set paths and files
     
     Arguments:
         _designfile {[type]} -- [description]
@@ -91,9 +101,14 @@ def setfiles(_designfile):
 # check config file and folder structure and start log
 #_chk1 = chk.CheckRivet(cfg.tlog)
 #_chk1.logstart()
-#_chk1.logwrite("< begin model processing >", 1)
+#_chk1.logwrite("< begin model processing >", 1
+# )
 
-def r__(_fstr):
+def r__(fstr):
+    """run python code
+
+    """
+    settings = string_sets(fstr)
     fstr1 = _fstr.split("\n", 1)
     fstr2 = fstr1[1].splitlines()
     for i in fstr2:
@@ -101,13 +116,23 @@ def r__(_fstr):
     return var_rivet_dict.update(locals())
 
 
-def i__(_fstr):
-    print(_fstr)
+def i__(fstr):
+    """process insert string (text and figures)
+    
+    """
+    settings = string_sets(fstr)
+
+    print(fstr)
 
 
-def v__(_fstr):
+def v__(fstr):
+    """process value string
+
+    """
+    settings = string_sets(fstr)
     vlist = _fstr.split("\n")
     vfunc = _utf.ExecV(vlist)
+    callv1 = vlist[0].split('|')
     if vfunc.process == "s":
         return
     for i in vlist:
@@ -118,8 +143,12 @@ def v__(_fstr):
     return var_rivet_dict.update(locals())
 
 
-def e__(_fstr):
-    for j in _fstr.split("\n"):
+def e__(fstr):
+    """process equation string
+    
+    """
+    settings = string_sets(fstr)
+    for j in fstr.split("\n"):
         if len(j.strip()) > 0:
             if "=" in j:
                 k = j.split("=")[1]
@@ -131,8 +160,54 @@ def e__(_fstr):
     return var_rivet_dict.update(locals())
 
 
-def t__(_fstr):
+def t__(fstr):
+    """process table string
+    
+    """
+    settings = string_sets(fstr)
     return var_rivet_dict.update(locals())
 
 
+def string_sets(first_line):
+    """evaluate string settings
+    
+    """
+
+    new_str = first_line
+    section_flg = 0
+    str_descrip = " " 
+    prt_state = 0  
+    str_source = "" 
+    source_flg = 0
+
+    splt_string = first_line.split('|')
+    if len(splt_string) > 1:
+        try:
+            for i in splt_string:        
+                start = i[0].find("[s]") 
+                if start > -1:
+                    section_flg = 1
+                    str_descrip = i[0][start+3:].strip()
+                else:
+                    str_descrip = i[0].strip()
+
+                chk_flg = i[1].strip()
+                if chk_flg == "[p]":
+                    prt_state = 0
+                elif chk_flg == "[h]":
+                    prt_state = 1
+                elif chk_flg == "[x]":
+                    prt_state = 2
+        
+                start = i[2].find("[i]") 
+                if start > -1:
+                    source_flg = 1
+                    str_source = i[0][start+3:].strip()
+                else:
+                    str_source = i[2].strip()
+        except:
+            pass
+
+    return [new_str, section_flg, str_descrip, prt_state, 
+                str_source, source_flg]
 

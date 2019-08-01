@@ -1,10 +1,10 @@
 from rivet.rivet_lib import *; setfiles(os.path.realpath(__file__))
-print(dir())
+
 
 # region 1
 # %% section 1
 i__(
-    f"""| [s] function/section label | [p];[h];[x] | [o];[i] file name | 
+    f"""| [s] function/section label | [p];[h];[x] | [i] file name | 
     |[design]| design name |[date],[pdf],[toc],[clean]| title block file |
     |[report]| report config file | 
 

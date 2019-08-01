@@ -1,9 +1,7 @@
-"""rivet configuration file
+"""rivet configuration and defaults file
 
-    do not modify
 """
-
-
+#======================= do not modify  =====================
 designfile = ""
 rivetpath = ""
 designpath = ""
@@ -37,6 +35,9 @@ outfile = ""
 texmak2 = ""
 texmak3 = ""
 cleantemp = ""
+#======================= do not modify above this line ==============
+
+#====== default values below may be modified ========================
 
 # flags and variables
 pdfflag = 0
