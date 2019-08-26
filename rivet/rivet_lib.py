@@ -14,9 +14,12 @@
     
 """
 
-import os
 import sys
+import os
+import inspect
+import __main__ as main
 import sympy as sy
+from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from IPython.display import Image, Math, Latex, HTML, display
@@ -39,18 +42,20 @@ __author__ = "rholland"
 if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
-var_rivet_dict = {}     # global calc variable dictionary
+global_rivet_dict = {}
+designfile = main.__file__
+print('design file ', designfile)
 
-def setfiles(_designfile):
+def setfiles(designfile):
     """set paths and files
     
     Arguments:
         _designfile {[type]} -- [description]
     """
-    cfg.designfile = _designfile
+    cfg.designfile = designfile
     
     try:
-        cfg.rivetpath = os.path.dirname("rivet.rivetcfg.lib")
+        cfg.rivetpath = os.path.dirname("rivet.rivet_cfg")
         cfg.designpath = os.path.dirname(cfg.designfile)
         cfg.designname = os.path.basename(cfg.designfile)
         cfg.projpath = os.path.dirname(cfg.designpath)
@@ -72,7 +77,6 @@ def setfiles(_designfile):
     cfg.rpath = os.path.join(cfg.calcpath, "pdf")
     cfg.upath = os.path.join(cfg.calcpath, "txt")
     cfg.xpath = os.path.join(cfg.calcpath, "temp")
-
     # calc file names
     cfg.designbase = cfg.designname.split(".")[0]
     cfg.ctxt = ".".join([cfg.designbase, "txt"])
@@ -80,7 +84,6 @@ def setfiles(_designfile):
     cfg.cpdf = ".".join([cfg.designbase, "pdf"])
     cfg.trst = ".".join([cfg.designbase, "rst"])
     cfg.tlog = ".".join([cfg.designbase, "log"])
-
     # laTex file names
     cfg.ttex1 = ".".join([cfg.designbase, "tex"])
     cfg.auxfile = os.path.join(cfg.designbase, ".aux")
@@ -88,7 +91,6 @@ def setfiles(_designfile):
     cfg.texmak2 = os.path.join(cfg.designbase, ".fls")
     cfg.texmak3 = os.path.join(cfg.designbase, ".fdbcfg.latexmk")
     cfg.cleantemp = (cfg.auxfile, cfg.outfile, cfg.texmak2, cfg.texmak3)
-
     # flags and variables
     cfg.pdfflag = 0
     cfg.nocleanflag = 0
@@ -103,70 +105,6 @@ def setfiles(_designfile):
 #_chk1.logstart()
 #_chk1.logwrite("< begin model processing >", 1
 # )
-
-def r__(fstr):
-    """run python code
-
-    """
-    settings = string_sets(fstr)
-    fstr1 = _fstr.split("\n", 1)
-    fstr2 = fstr1[1].splitlines()
-    for i in fstr2:
-        exec(i.strip())
-    return var_rivet_dict.update(locals())
-
-
-def i__(fstr):
-    """process insert string (text and figures)
-    
-    """
-    settings = string_sets(fstr)
-
-    print(fstr)
-
-
-def v__(fstr):
-    """process value string
-
-    """
-    settings = string_sets(fstr)
-    vlist = _fstr.split("\n")
-    vfunc = _utf.ExecV(vlist)
-    callv1 = vlist[0].split('|')
-    if vfunc.process == "s":
-        return
-    for i in vlist:
-        if "=" in i:
-            exec(i.strip())
-    globals().update(locals())
-    vfunc.vprint()
-    return var_rivet_dict.update(locals())
-
-
-def e__(fstr):
-    """process equation string
-    
-    """
-    settings = string_sets(fstr)
-    for j in fstr.split("\n"):
-        if len(j.strip()) > 0:
-            if "=" in j:
-                k = j.split("=")[1]
-                nstr3 = str(j) + " = " + str(eval(k))
-                print(nstr3)
-                exec(j.strip(), globals())
-            else:
-                print(j)
-    return var_rivet_dict.update(locals())
-
-
-def t__(fstr):
-    """process table string
-    
-    """
-    settings = string_sets(fstr)
-    return var_rivet_dict.update(locals())
-
 
 def string_sets(first_line):
     """evaluate string settings
@@ -210,4 +148,111 @@ def string_sets(first_line):
 
     return [new_str, section_flg, str_descrip, prt_state, 
                 str_source, source_flg]
+
+def scriptinfo():
+    '''
+    Returns a dictionary with information about the running top level Python
+    script:
+   
+        dir:    directory containing script or compiled executable
+        name:   name of script or executable
+        source: name of source code file
+
+    "name" and "source" are identical if and only if running interpreted code.
+    When running code compiled by py2exe or cx_freeze, "source" contains
+    the name of the originating Python script.
+    If compiled by PyInstaller, "source" contains no meaningful information.
+    '''
+
+    # scan through call stack for caller information
+    for teil in inspect.stack():
+        # skip system calls
+        if teil[1].startswith("<"):
+            continue
+        if teil[1].upper().startswith(sys.exec_prefix.upper()):
+            continue
+        trc = teil[1]
+        
+    # trc contains highest level calling script name
+    # check if we have been compiled
+    if getattr(sys, 'frozen', False):
+        scriptdir, scriptname = os.path.split(sys.executable)
+        return {"dir": scriptdir,
+                "name": scriptname,
+                "source": trc}
+
+    # from here on, we are in the interpreted case
+    scriptdir, trc = os.path.split(trc)
+    # if trc did not contain directory information,
+    # the current working directory is what we need
+    if not scriptdir:
+        scriptdir = os.getcwd()
+
+    scr_dict ={"name": trc,
+               "source": trc,
+               "dir": scriptdir}
+    return scr_dict
+
+def r__(fstr):
+    """run python code
+
+    """
+    settings = string_sets(fstr)
+    fstr1 = fstr.split("\n", 1)
+    fstr2 = fstr1[1].splitlines()
+    for i in fstr2:
+        exec(i.strip())
+    return global_rivet_dict.update(locals())
+
+
+def i__(fstr):
+    """process insert string (text and figures)
+    
+    """
+    #settings = string_sets(fstr)
+
+    print(fstr)
+
+
+def v__(fstr):
+    """process value string
+
+    """
+    settings = string_sets(fstr)
+    vlist = fstr.split("\n")
+    vfunc = _utf.ExecV(vlist)
+    callv1 = vlist[0].split('|')
+    if vfunc.process == "s":
+        return
+    for i in vlist:
+        if "=" in i:
+            exec(i.strip())
+    globals().update(locals())
+    vfunc.vprint()
+    return global_rivet_dict.update(locals())
+
+
+def e__(fstr):
+    """process equation string
+    
+    """
+    settings = string_sets(fstr)
+    for j in fstr.split("\n"):
+        if len(j.strip()) > 0:
+            if "=" in j:
+                k = j.split("=")[1]
+                nstr3 = str(j) + " = " + str(eval(k))
+                print(nstr3)
+                exec(j.strip(), globals())
+            else:
+                print(j)
+    return global_rivet_dict.update(locals())
+
+
+def t__(fstr):
+    """process table string
+    
+    """
+    settings = string_sets(fstr)
+    return global_rivet_dict.update(locals())
 
