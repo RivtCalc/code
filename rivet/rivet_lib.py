@@ -28,7 +28,7 @@ from pandas import *
 
 import rivet.rivet_cfg as cfg
 import rivet.rivet_check as chk
-import rivet.rivet_utf as _utf
+import rivet.rivet_utf as utf
 
 # import rivet.rivet_report as reprt
 # from rivet.rivet_units import *
@@ -110,7 +110,6 @@ def string_sets(first_line):
     """evaluate string settings
     
     """
-
     new_str = first_line
     section_flg = 0
     str_descrip = " " 
@@ -129,12 +128,12 @@ def string_sets(first_line):
                 else:
                     str_descrip = i[0].strip()
 
-                chk_flg = i[1].strip()
-                if chk_flg == "[p]":
+                exec_flg = i[1].strip()
+                if exec_flg == "[p]":
                     prt_state = 0
-                elif chk_flg == "[h]":
+                elif exec_flg == "[h]":
                     prt_state = 1
-                elif chk_flg == "[x]":
+                elif exec_flg == "[x]":
                     prt_state = 2
         
                 start = i[2].find("[i]") 
@@ -149,94 +148,50 @@ def string_sets(first_line):
     return [new_str, section_flg, str_descrip, prt_state, 
                 str_source, source_flg]
 
-def scriptinfo():
-    '''
-    Returns a dictionary with information about the running top level Python
-    script:
-   
-        dir:    directory containing script or compiled executable
-        name:   name of script or executable
-        source: name of source code file
-
-    "name" and "source" are identical if and only if running interpreted code.
-    When running code compiled by py2exe or cx_freeze, "source" contains
-    the name of the originating Python script.
-    If compiled by PyInstaller, "source" contains no meaningful information.
-    '''
-
-    # scan through call stack for caller information
-    for teil in inspect.stack():
-        # skip system calls
-        if teil[1].startswith("<"):
-            continue
-        if teil[1].upper().startswith(sys.exec_prefix.upper()):
-            continue
-        trc = teil[1]
-        
-    # trc contains highest level calling script name
-    # check if we have been compiled
-    if getattr(sys, 'frozen', False):
-        scriptdir, scriptname = os.path.split(sys.executable)
-        return {"dir": scriptdir,
-                "name": scriptname,
-                "source": trc}
-
-    # from here on, we are in the interpreted case
-    scriptdir, trc = os.path.split(trc)
-    # if trc did not contain directory information,
-    # the current working directory is what we need
-    if not scriptdir:
-        scriptdir = os.getcwd()
-
-    scr_dict ={"name": trc,
-               "source": trc,
-               "dir": scriptdir}
-    return scr_dict
-
 def r__(fstr):
     """run python code
 
     """
-    settings = string_sets(fstr)
     fstr1 = fstr.split("\n", 1)
+    settings = string_sets(fstr1[0])
     fstr2 = fstr1[1].splitlines()
     for i in fstr2:
         exec(i.strip())
     return global_rivet_dict.update(locals())
 
-
 def i__(fstr):
-    """process insert string (text and figures)
+    """evaluate an insert string (text and figures)
     
     """
-    #settings = string_sets(fstr)
-
-    print(fstr)
-
+    fstr1 = fstr.split("\n", 1)
+    settings = string_sets(fstr1[0])
+    fstr2 = fstr1[1].splitlines()
+    print("\n".join(fstr2))
 
 def v__(fstr):
-    """process value string
+    """evaluate a value string
 
     """
-    settings = string_sets(fstr)
-    vlist = fstr.split("\n")
-    vfunc = _utf.ExecV(vlist)
-    callv1 = vlist[0].split('|')
-    if vfunc.process == "s":
+    fstr1 = fstr.split("\n", 1)
+    settings = string_sets(fstr1[0])
+    fstr2 = fstr1[1].splitlines()
+    if settings[3] == 2:
         return
-    for i in vlist:
+    veval = utf.ExecV(fstr2)
+    veval.vprint()
+    
+    for i in fstr2:
         if "=" in i:
             exec(i.strip())
     globals().update(locals())
-    vfunc.vprint()
     return global_rivet_dict.update(locals())
 
-
 def e__(fstr):
-    """process equation string
+    """evaluate an equation string
     
     """
-    settings = string_sets(fstr)
+    settings = string_sets(fstr[0])
+    callv1 = vlist[0].split('|')
     for j in fstr.split("\n"):
         if len(j.strip()) > 0:
             if "=" in j:
@@ -248,11 +203,10 @@ def e__(fstr):
                 print(j)
     return global_rivet_dict.update(locals())
 
-
 def t__(fstr):
-    """process table string
+    """evaluate a table string
     
     """
-    settings = string_sets(fstr)
+    settings = string_sets(fstr[0])
     return global_rivet_dict.update(locals())
 

@@ -17,18 +17,6 @@ class ExecV:
             vlist (list): [description]
         """
 
-
-    def vread(self,x):
-        pass
-
-    def vformat(self,y):
-        pass
-
-    def vlookup(self, q : float):
-
-        pass
-
-        return "asdf"
         
     def vprint(self):
         """[summary]
@@ -36,9 +24,6 @@ class ExecV:
         #print('dval_v1', dval)
         self._write_utf((dval[0] + " " + dval[1]).rjust(self.widthc-1), 0, 0)
         self._write_utf(" ", 0, 0)
-
-        #print('dval_v2', dval)        
-        exec(dval[2])
         val1 = eval(dval[1])
         var1 = dval[2].split('=')[0].strip()
         state = var1 + ' = ' + str(val1)
@@ -52,10 +37,6 @@ class ExecV:
         else:
             self._write_utf(" "*2 + ref + " | " + state,  1, 1)
         
- 
-
-
-
 class ExecE:
     """[summary]
     """
