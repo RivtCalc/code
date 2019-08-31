@@ -1,16 +1,16 @@
 #! python
 """rivet_lib
-    The module processes the r-i-v-e-t language and sets files and paths
+    Processes the r-i-v-e-t design file to a calc and sets files and paths
 
     The language includes five types of f-strings where each type of string is
     evaluated by a function. The first line of each f-string can be a settings
     string.
 
     r__() : string of python code 
-    i__() : string that inserts text and images
-    v__() : string that defines values
-    e__() : string that defines equations
-    t__() : string that defines tabls and plots
+    i__() : string inserts text and images
+    v__() : string defines calculation values
+    e__() : string defines calculation equations
+    t__() : string inserts tables and plots
     
 """
 
@@ -18,17 +18,20 @@ import sys
 import os
 import inspect
 import __main__ as main
-import sympy as sy
 from pathlib import Path
+
+import sympy as sy
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from IPython.display import Image, Math, Latex, HTML, display
 from numpy import *
 from pandas import *
 
-import rivet.rivet_cfg as cfg
-import rivet.rivet_check as chk
-import rivet.rivet_utf as utf
+import rivet.rivet_check as _chk
+import rivet.rivet_utf as _utf
+#import rivet.rivet_pdf as _pdf
+#import rivet.rivet_rst as _rst
+#import rivet.rivet_units as _units
 
 # import rivet.rivet_report as reprt
 # from rivet.rivet_units import *
@@ -43,154 +46,179 @@ if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
 global_rivet_dict = {}
+eqnum, sectnum = 0, 0
 designfile = main.__file__
+_designfile = designfile
 print('design file ', designfile)
 
-def setfiles(designfile):
-    """set paths and files
-    
-    Arguments:
-        _designfile {[type]} -- [description]
-    """
-    cfg.designfile = designfile
-    
-    try:
-        cfg.rivetpath = os.path.dirname("rivet.rivet_cfg")
-        cfg.designpath = os.path.dirname(cfg.designfile)
-        cfg.designname = os.path.basename(cfg.designfile)
-        cfg.projpath = os.path.dirname(cfg.designpath)
-        cfg.calcpath = os.path.join(cfg.projpath, "calcs")
-        cfg.bakfile = cfg.designfile.split(".")[0] + ".bak"
-        with open(cfg.designfile, "r") as f2:
-            cfg.designbak = f2.read()
-        with open(cfg.bakfile, "w") as f3:
-            f3.write(cfg.designbak)
-        print("< folders checked and design file backup written >")
-    except:
-        sys.exit("folders and files not found - program stopped")
+# set up files and folders
+try:
+    _rivetpath = os.path.dirname("rivet.rivet_cfg")
+    _designpath = os.path.dirname(_designfile)
+    _designname = os.path.basename(_designfile)
+    _projpath = os.path.dirname(_designpath)
+    _calcpath = os.path.join(_projpath, "calcs")
+    _bakfile = _designfile.split(".")[0] + ".bak"
+    with open(_designfile, "r") as f2:
+        _designbak = f2.read()
+    with open(_bakfile, "w") as f3:
+        f3.write(_designbak)
+    print("< folders checked and design file backup written >")
+except:
+    sys.exit("< required folders and files not found - program stopped >")
 
-    # design paths
-    cfg.fpath = os.path.join(cfg.designpath, "figures")
-    cfg.spath = os.path.join(cfg.designpath, "scripts")
-    cfg.tpath = os.path.join(cfg.designpath, "table")
-    # calc paths
-    cfg.rpath = os.path.join(cfg.calcpath, "pdf")
-    cfg.upath = os.path.join(cfg.calcpath, "txt")
-    cfg.xpath = os.path.join(cfg.calcpath, "temp")
-    # calc file names
-    cfg.designbase = cfg.designname.split(".")[0]
-    cfg.ctxt = ".".join([cfg.designbase, "txt"])
-    cfg.chtml = ".".join([cfg.designbase, "html"])
-    cfg.cpdf = ".".join([cfg.designbase, "pdf"])
-    cfg.trst = ".".join([cfg.designbase, "rst"])
-    cfg.tlog = ".".join([cfg.designbase, "log"])
-    # laTex file names
-    cfg.ttex1 = ".".join([cfg.designbase, "tex"])
-    cfg.auxfile = os.path.join(cfg.designbase, ".aux")
-    cfg.outfile = os.path.join(cfg.designbase, ".out")
-    cfg.texmak2 = os.path.join(cfg.designbase, ".fls")
-    cfg.texmak3 = os.path.join(cfg.designbase, ".fdbcfg.latexmk")
-    cfg.cleantemp = (cfg.auxfile, cfg.outfile, cfg.texmak2, cfg.texmak3)
-    # flags and variables
-    cfg.pdfflag = 0
-    cfg.nocleanflag = 0
-    cfg.verboseflag = 0
-    cfg.defaultdec = "3,3"
-    cfg.calcwidth = 80
-    cfg.calctitle = "\n\nModel Title"  # default model title
-    cfg.pdfmargin = "1.0in,0.75in,0.9in,1.0in"
+# design paths
+_spath = os.path.join(_designpath, "scripts")
+_tpath = os.path.join(_designpath, "table")
+# calc paths
+_rpath = os.path.join(_calcpath, "pdf")
+_upath = os.path.join(_calcpath, "txt")
+_xpath = os.path.join(_calcpath, "temp")
+_fpath = os.path.join(_calcpath, "figures")
+_hpath = os.path.join(_calcpath, "html")
+# calc file names
+_designbase = _designname.split(".")[0]
+_ctxt = ".".join([_designbase, "txt"])
+_cpdf = ".".join([_designbase, "pdf"])
+_chtml = ".".join([_designbase, "html"])
+_trst = ".".join([_designbase, "rst"])
+_tlog = ".".join([_designbase, "log"])
+# laTex file names
+_ttex1 = ".".join([_designbase, "tex"])
+_auxfile = os.path.join(_designbase, ".aux")
+_outfile = os.path.join(_designbase, ".out")
+_texmak2 = os.path.join(_designbase, ".fls")
+_texmak3 = os.path.join(_designbase, ".fdb_latexmk")
+_cleantemp = (_auxfile, _outfile, _texmak2, _texmak3)
+# flags and variables
+_pdfflag = 0
+_nocleanflag = 0
+_verboseflag = 0
+_defaultdec = "3,3"
+_calcwidth = 80
+_calctitle = "\n\nModel Title"  # default model title
+_pdfmargin = "1.0in,0.75in,0.9in,1.0in"
 
+# start checks and logs
 # check config file and folder structure and start log
-#_chk1 = chk.CheckRivet(cfg.tlog)
+#_chk1 = chk.CheckRivet(_tlog)
 #_chk1.logstart()
 #_chk1.logwrite("< begin model processing >", 1
-# )
 
-def string_sets(first_line):
-    """evaluate string settings
+# report and design settings
+with open(_designfile, 'r') as _df1:
+     _dflist = _df1.readlines()
+     for dfline in _dflist:
+         if "|[design]|" in dfline:
+             design_settings = dfline.split("|")
+         if "|[report]|" in dfline:
+             report_settings = dfline.split("|")
+
+
+def _string_settings(first_line):
+    """process string settings
+
+    Method is called for each design string 
     
     """
-    new_str = first_line
-    section_flg = 0
-    str_descrip = " " 
+    section_flg = -1
+    design_descrip = " " 
+    exec_flg = -1
     prt_state = 0  
+    source_flg = -1
     str_source = "" 
-    source_flg = 0
 
     splt_string = first_line.split('|')
-    if len(splt_string) > 1:
+    if len(splt_string) > 0:
         try:
             for i in splt_string:        
-                start = i[0].find("[s]") 
-                if start > -1:
-                    section_flg = 1
-                    str_descrip = i[0][start+3:].strip()
+                section_flg = i[0].find("[s]") 
+                if section_flg > -1:
+                    design_descrip = i[0][section_flg+3:].strip()
                 else:
-                    str_descrip = i[0].strip()
+                    design_descrip = i[0].strip()
 
-                exec_flg = i[1].strip()
-                if exec_flg == "[p]":
-                    prt_state = 0
-                elif exec_flg == "[h]":
+                exec_flg = i[1]
+                if exec_flg.strip() == "[h]":
                     prt_state = 1
-                elif exec_flg == "[x]":
+                elif exec_flg.strip() == "[x]":
                     prt_state = 2
         
-                start = i[2].find("[i]") 
-                if start > -1:
-                    source_flg = 1
-                    str_source = i[0][start+3:].strip()
-                else:
+                source = i[2] 
+                if len(source).strip() > 0:
                     str_source = i[2].strip()
+                else:
+                    str_source = ""
         except:
             pass
-
-    return [new_str, section_flg, str_descrip, prt_state, 
-                str_source, source_flg]
+            
+    return [section_flg, design_descrip, prt_state, str_source]
 
 def r__(fstr):
     """run python code
 
     """
+    global eqnum, sectnum
     fstr1 = fstr.split("\n", 1)
-    settings = string_sets(fstr1[0])
+    settings = _string_settings(fstr1[0])
+    
     fstr2 = fstr1[1].splitlines()
     for i in fstr2:
         exec(i.strip())
-    return global_rivet_dict.update(locals())
+    
+    global_rivet_dict.update(locals())
 
 def i__(fstr):
-    """evaluate an insert string (text and figures)
+    """process insert string
     
     """
+    global eqnum, sectnum
     fstr1 = fstr.split("\n", 1)
-    settings = string_sets(fstr1[0])
-    fstr2 = fstr1[1].splitlines()
-    print("\n".join(fstr2))
-
-def v__(fstr):
-    """evaluate a value string
-
-    """
-    fstr1 = fstr.split("\n", 1)
-    settings = string_sets(fstr1[0])
-    fstr2 = fstr1[1].splitlines()
-    if settings[3] == 2:
+    settings = _string_settings(fstr1[0])
+    if settings[2] == 2:
         return
-    veval = utf.ExecV(fstr2)
-    veval.vprint()
+
+    if settings[0] > 0:
+        sectnum += 1
+
+    fstr2 = fstr1[1].splitlines()
     
-    for i in fstr2:
-        if "=" in i:
-            exec(i.strip())
-    globals().update(locals())
-    return global_rivet_dict.update(locals())
+    if settings[2] == 0:
+        for i in fstr2:
+            print(i)
+
+    global_rivet_dict.update(locals())
+
+def v__(fstr, ):
+    """process value string
+
+    """
+    global eqnum, sectnum
+    fstr1 = fstr.split("\n", 1)
+    str_set = _string_settings(fstr1[0])
+    
+    if str_set[2] == 2:
+        return
+
+    fstr2 = fstr1[1].splitlines()
+    vproc = utf.ExecV(fstr2, eqnum, sectnum, settings)
+    global_rivet_dict.update(vproc[0])
+    
+    if str_set[2] == 0:
+        if str_set[0] > 0:
+            sectnum += 1
+        for i in (vproc[1]):
+            print(i)
+        if "pdf" in design_settings[0]:
+            
+    
 
 def e__(fstr):
-    """evaluate an equation string
+    """process equation string
     
     """
-    settings = string_sets(fstr[0])
+    global eqnum, sectnum
+    settings = _string_settings(fstr[0])
     callv1 = vlist[0].split('|')
     for j in fstr.split("\n"):
         if len(j.strip()) > 0:
@@ -204,9 +232,11 @@ def e__(fstr):
     return global_rivet_dict.update(locals())
 
 def t__(fstr):
-    """evaluate a table string
+    """process table string
     
     """
-    settings = string_sets(fstr[0])
+    global eqnum, sectnum
+    settings = _string_setting(fstr[0])
+
     return global_rivet_dict.update(locals())
 

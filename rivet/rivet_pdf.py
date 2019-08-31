@@ -1,16 +1,8 @@
-#!
-
 from __future__ import division
 from __future__ import print_function
 from collections import OrderedDict
-import os
-from numpy import *
-from once.calcheck import ModCheck
 import once.config as cfg
-
-__version__ = "0.9.0"
-__author__ = 'rholland'
-
+import os
 
 class CalcPDF(object):
     """write PDF calc from rst file
@@ -171,4 +163,47 @@ class CalcPDF(object):
         file2.close()
         return
 
+class ProjStart(object):
+    """Compile calcs into a project calc set - not started"""
 
+    def __init__(self):
+        """ Construct lists and dictionaries of project calc data
+        ::
+        
+          **methods**
+          build_pdict() constructs the proj calc data dictionary
+          build_plist() constructs the proj calc division list
+        
+          pdf=
+          always
+          never
+          asneeded
+        """
+        # files
+
+
+        # method tags
+        plist = ['[p]', '[#] pformat' '[#]', '[~]']
+        self.ptags = plist
+        self.pd = OrderedDict()
+
+
+    def build_pdict(self):
+        """constructs the project data dictionary
+
+        """
+        pass
+
+
+    def build_plist(self):
+        """ constructs the proj calc division list
+
+        """
+
+        pass
+
+
+class WritePcalc(object):
+    """ Write the project PDF calc """
+
+    pass

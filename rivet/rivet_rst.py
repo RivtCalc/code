@@ -1,6 +1,5 @@
 
 #!
-
 from __future__ import division
 from __future__ import print_function
 import codecs
@@ -29,7 +28,6 @@ except:
 
 __version__ = "0.9.0"
 __author__ = 'rholland'
-
 
 
 class CalcRST(object):
