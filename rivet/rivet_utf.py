@@ -11,79 +11,45 @@ class ExecV:
     """[summary]
     """
 
-    def __init__(self, vlist : list, enum : int, snum : int, slist : list):
+    def __init__(self, vlist : list):
         """
-        Globals:
-            enum (int):  equation number 
-            snum (int):  section number
-        
+
         Args:
             vlist (list): list of lines in value string
             slist (list): list of parameters in value settings
+            sectnum (int):  section number
         """
 
         self.vlist = vlist
-        self.sline1 = ""
-        descrip_flag = 0
- 
-        if slist[0] > -1:
-            sline()
-        if slist[2] == 0:
-            vutf()
-        #self.mdict[key1] = [ blkdesc, eqnum ]
             
-
-    def sline(self):
-        """compose section line
-        """
-        self.enum += 1                   
-        if self.snum > self.snumchk:
-            self.enum = 1
-            self.snumchk = self.snum
-        eqnum = ' [' + str(self.snum) + '.' + str(self.enum) + ']'
-
     def vutf(self):
         """compose utf calc string for values
 
         Return:
+            vcalc:
+            local_dict:
 
         """
-        
-        for vline in self.vlist():
-        #print(vline)
-            if "=" in vline:
+        vcalc = []
+        descrip_flag = 0
+        vcalc_temp = ""
+        for vline in self.vlist:
+            print(vline)
+            if len(vline.strip()) == 0:
+                vcalc.append("\n")
+            elif descrip_flag == 1:
+                vcalc.append(vcalc_temp + " | " + vline)
+                vcalc_temp = ""
+                descrip_flag = 0
+            elif "=" in vline:
                 descrip_flag = 1
-                var1 = vline.split('=')[0].strip()
-                
-                continue
-            if descrip_flag == 1:
-                self.vline1 = self.vline1 + " | " + vline + "\n"
-                continue
-            self.vline1 = self.vline1  + vline + "\n"
+                exec(vline.strip())
+                vcalc_temp = vline.strip()
+            else:
+                vcalc.append(vline.strip() + "\n")
 
-
-            state1, ref1 = valx.split('|')
-            var1 = state1.split("=")[0].strip()
-            expr1 = state1.split("=")[1].strip()
-            self.mdict[key2] = [var1, expr1, state1.strip(), ref1.strip()]
-       
-       
-       
-        #print('dval_v1', dval)
-        self._write_utf((dval[0] + " " + dval[1]).rjust(self.widthc-1), 0, 0)
-        self._write_utf(" ", 0, 0)
-        val1 = eval(dval[1])
-        
-        state = var1 + ' = ' + str(val1)
-        ptype = type(val1)
-        if ptype == ndarray or ptype == list or ptype == tuple:
-            state = var1 + ' = ' + '\n' + str(val1)
-        shift = int(self.widthc / 2.5)
-        ref = dval[3].strip().ljust(shift)
-        if ptype == ndarray or ptype == list or ptype == tuple:
-            self._write_utf(" "*2 + ref + " | " + state,  0, 1)
-        else:
-            self._write_utf(" "*2 + ref + " | " + state,  1, 1)
+        local_dict = locals()
+        return [local_dict, vcalc]
         
     def vrst(self):
         """compose rst calc string for values
@@ -91,6 +57,7 @@ class ExecV:
         Return:
 
         """
+        pass
 
 
 class ExecE:

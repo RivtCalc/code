@@ -208,7 +208,7 @@ def v__(fstr):
         vcalc = _utf.ExecV(fstr2)
         vdict1, vcalc1 = vcalc.vutf()
         global_rivet_dict.update(vdict1)
-        if str_set[0] > -1:
+        if slist[0] > -1:
             print("section: ", sectnum )
         for i in vcalc1:
             print(i)
