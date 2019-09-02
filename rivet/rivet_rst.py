@@ -30,7 +30,7 @@ __version__ = "0.9.0"
 __author__ = 'rholland'
 
 
-class CalcRST(object):
+class ExecRST(object):
     """Write PDF file.
     ::
 
@@ -114,7 +114,6 @@ class CalcRST(object):
         self.literalflag = 0
         self.lastsect = ''
         self.lastcalcnumber = ''
-
 
     def gen_rst(self):
         """ Parse model dictionary and write rst file.
@@ -276,7 +275,14 @@ class CalcRST(object):
             print(' ', file=self.rf1)
             self.el.logwrite("< figure "+fname+" added to TeX >", self.vbos)
 
-            
+       def vrst(self):
+        """compose rst calc string for values
+
+        Return:
+
+        """
+        pass
+
     def _rst_val1(self, dval2):
         """Print value description to reST.
             key: values        

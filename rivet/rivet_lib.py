@@ -209,17 +209,36 @@ def v__(fstr):
         vdict1, vcalc1 = vcalc.vutf()
         global_rivet_dict.update(vdict1)
         if str_set[0] > -1:
-            print("section: ", sectnum )
+            print("========== section: ", sectnum )
         for i in vcalc1:
             print(i)
-    if "pdf" or "html" in design_settings[0]:
-        rst_file = _rst.Write_rst()
-            
+   
 def e__(fstr):
     """process equation string
+
+    Globals
     
     """
     global eqnum, sectnum
+    fstr1 = fstr.split("\n", 1)
+    fstr2 = fstr1[1].splitlines()
+    str_set = _string_settings(fstr1[0])
+    
+    if str_set[2] == 2:
+        return
+    if str_set[2] == 1:
+        ecalc = _utf.ExecE(fstr2)
+        edict1, ecalc1 = ecalc.vutf()
+        global_rivet_dict.update(edict1)
+        return
+    if str_set[2] == 0:
+        ecalc = _utf.ExecE(fstr2)
+        edict1, ecalc1 = ecalc.eutf()
+        global_rivet_dict.update(edict1)
+        if str_set[0] > -1:
+            print("========= section: ", sectnum )
+        for i in vcalc1:
+            print(i)
     settings = _string_settings(fstr[0])
     callv1 = vlist[0].split('|')
     for j in fstr.split("\n"):

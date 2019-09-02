@@ -7,16 +7,18 @@ __version__ = "0.9.0"
 __author__ = 'rholland@structurelabs.com'
       
 
-class ExecV:
-    """[summary]
-    """
+class ExecI:
+    """Processes insert strings
 
+    Returns utf calcs 
+    """
+ 
     def __init__(self, vlist : list):
         """
 
         Args:
-            vlist (list): list of lines in value string
-            slist (list): list of parameters in value settings
+            slist (list): list of input parameters in string settings
+            vlist (list): list of input lines in value string
             sectnum (int):  section number
         """
 
@@ -26,15 +28,15 @@ class ExecV:
         """compose utf calc string for values
 
         Return:
-            vcalc:
-            local_dict:
-
+            vcalc (list): list of calculated strings
+            local_dict (list): local() dictionary
         """
         vcalc = []
-        descrip_flag = 0
         vcalc_temp = ""
+        descrip_flag = 0
+
         for vline in self.vlist:
-            print(vline)
+            #print(vline)
             if len(vline.strip()) == 0:
                 vcalc.append("\n")
             elif descrip_flag == 1:
@@ -42,29 +44,159 @@ class ExecV:
                 vcalc_temp = ""
                 descrip_flag = 0
             elif "=" in vline:
-                descrip_flag = 1
                 exec(vline.strip())
                 vcalc_temp = vline.strip()
+                descrip_flag = 1
+            else:
+                vcalc.append(vline.strip() + "\n")
+
+        local_dict = locals()
+        return [local_dict, vcalc]
+
+class ExecV:
+    """Processes value strings
+
+    Returns utf calcs 
+    """
+ 
+    def __init__(self, vlist : list):
+        """
+
+        Args:
+            slist (list): list of string settings
+            vlist (list): list of input lines in value string
+            sectnum (int):  section number
+        """
+
+        self.vlist = vlist
+            
+    def vutf(self):
+        """compose utf calc string for values
+
+        Return:
+            vcalc (list): list of calculated strings
+            local_dict (list): local() dictionary
+        """
+        vcalc = []
+        vcalc_temp = ""
+        descrip_flag = 0
+
+        for vline in self.vlist:
+            #print(vline)
+            if descrip_flag == 1:
+                if len(vline.strip()) == 0: vline = "\n"
+                vcalc.append(vcalc_temp + " | " + vline)
+                vcalc_temp = ""
+                descrip_flag = 0
+            elif "=" in vline:
+                exec(vline.strip())
+                vcalc_temp = vline.strip()
+                descrip_flag = 1
             else:
                 vcalc.append(vline.strip() + "\n")
 
         local_dict = locals()
         return [local_dict, vcalc]
         
-    def vrst(self):
-        """compose rst calc string for values
-
-        Return:
-
-        """
-        pass
-
 
 class ExecE:
-    """[summary]
-    """
+    """Processes equation strings
 
-    pass
+    Returns utf calcs 
+    """
+ 
+    def __init__(self, elist : list):
+        """
+
+        Args:
+            slist (list): list string settings
+            elist (list): list of input lines in equation string
+            sectnum (int):  section number
+        """
+
+        self.elist = elist
+            
+    def eutf(self):
+        """compose utf calc string for equation
+        Return:
+            ecalc (list): list of calculated equation lines
+            local_dict (list): local() dictionary
+        """
+        ecalc = []
+        ecalc_temp = ""
+        descrip_flag = 0
+
+        for eline in self.elist:
+            #print(eline)
+            if descrip_flag == 1:
+                if "|" in eline:
+                    eline1 = eline.split("|")
+                    eline = eline1[0]
+                    unit1 = eline1[1]
+                    sigfigs = eline1[2]
+                if len(eline.strip()) == 0: eline = "\n"
+                vcalc.append(eline + "\n" + ecalc_temp)
+                vcalc_temp = ""
+                descrip_flag = 0
+            elif "=" in eline:
+                exec(eline.strip())
+                ecalc_temp = eline.strip()
+                descrip_flag = 1
+            else:
+                vcalc.append(eline.strip() + "\n")
+
+        local_dict = locals()
+        return [local_dict, ecalc]
+        
+class ExecT:
+    """Processes table strings
+
+    Returns utf calcs 
+    """
+ 
+    def __init__(self, tlist : list):
+        """
+
+        Args:
+            slist (list): list of input parameters in string settings
+            tlist (list): list of input lines in table string
+            sectnum (int):  section number
+        """
+
+        self.tlist = tlist
+            
+    def tutf(self):
+        """compose utf calc string for equations
+
+        Return:
+            ecalc (list): list of calculated equation lines
+            local_dict (list): local() dictionary
+        """
+        vcalc = []
+        vcalc_temp = ""
+        descrip_flag = 0
+
+        for vline in self.vlist:
+            #print(vline)
+            if len(vline.strip()) == 0:
+                vcalc.append("\n")
+            elif descrip_flag == 1:
+                vcalc.append(vcalc_temp + " | " + vline)
+                vcalc_temp = ""
+                descrip_flag = 0
+            elif "=" in vline:
+                exec(vline.strip())
+                vcalc_temp = vline.strip()
+                descrip_flag = 1
+            else:
+                vcalc.append(vline.strip() + "\n")
+
+        local_dict = locals()
+        return [local_dict, vcalc]
+
+
+
+
 
 def _genxmodel(mfile, mpath):
     """ expanded [i] and [t] tags and rewrite model
