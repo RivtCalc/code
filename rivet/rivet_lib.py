@@ -130,7 +130,7 @@ def _string_settings(first_line):
     splt_string = first_line.split('|')
     #print(splt_string)
     splt_string += [" "," "," "," "]
-    print(splt_string)
+    #print(splt_string)
     i = splt_string
     section_flg = i[1].find("[s]")
     if section_flg > -1:
@@ -153,7 +153,7 @@ def _string_settings(first_line):
     else:
         str_source = ""
 
-    print(exec_flg) 
+    #print(exec_flg) 
     return [exec_flg, section_flg, design_descrip, str_source]
 
 def r__(fstr):
