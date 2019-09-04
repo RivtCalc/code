@@ -118,41 +118,43 @@ with open(_designfile, 'r') as _df1:
 def _string_settings(first_line):
     """process string settings
 
-    Method is called for each design string 
+    This method is called for each design string 
     
     """
+    exec_flg = 0
     section_flg = -1
-    design_descrip = " " 
-    exec_flg = -1
-    prt_state = 0  
     source_flg = -1
+    design_descrip = " " 
     str_source = "" 
-
+    #print(first_line)
     splt_string = first_line.split('|')
-    if len(splt_string) > 0:
-        try:
-            for i in splt_string:        
-                section_flg = i[0].find("[s]") 
-                if section_flg > -1:
-                    design_descrip = i[0][section_flg+3:].strip()
-                else:
-                    design_descrip = i[0].strip()
+    #print(splt_string)
+    splt_string += [" "," "," "," "]
+    print(splt_string)
+    i = splt_string
+    section_flg = i[1].find("[s]")
+    if section_flg > -1:
+        design_descrip = i[0].replace("[s]","").strip()
+    
+    exec_flg1 = i[1].find("[h]")
+    if exec_flg1 == -1:
+        exec_flg = 0
+    else:
+        design_descrip = i[0].replace("[h]","").strip()                
+        exec_flg = 1
+    exec_flg2 = i[1].find("[x]") 
+    if exec_flg2 == -1:
+        exec_flg = exec_flg
+    else:
+        design_descrip = i[0].replace("[x]","").strip()
+        exec_flg = 2
+    if len(i[2]) > 0:
+        str_source = i[2].strip()
+    else:
+        str_source = ""
 
-                exec_flg = i[1]
-                if exec_flg.strip() == "[h]":
-                    prt_state = 1
-                elif exec_flg.strip() == "[x]":
-                    prt_state = 2
-        
-                source = i[2] 
-                if len(source).strip() > 0:
-                    str_source = i[2].strip()
-                else:
-                    str_source = ""
-        except:
-            pass
-            
-    return [section_flg, design_descrip, prt_state, str_source]
+    print(exec_flg) 
+    return [exec_flg, section_flg, design_descrip, str_source]
 
 def r__(fstr):
     """run python code
@@ -161,10 +163,16 @@ def r__(fstr):
     global eqnum, sectnum
     fstr1 = fstr.split("\n", 1)
     fstr2 = fstr1[1].splitlines()
-    settings = _string_settings(fstr1[0])
-    for i in fstr2:
-        exec(i.strip())
-    
+    str_set = _string_settings(fstr1[0])
+    if str_set[0] == 2:
+        return
+    if str_set[0] == 0:
+        if str_set[1] > -1:
+            sectnum += 1
+            print("========== section: ", sectnum )
+        for i in fstr2:
+            exec(i.strip())
+
     global_rivet_dict.update(locals())
 
 def i__(fstr):
@@ -174,12 +182,13 @@ def i__(fstr):
     global eqnum, sectnum
     fstr1 = fstr.split("\n", 1)
     fstr2 = fstr1[1].splitlines()
-    settings = _string_settings(fstr1[0])
-    if settings[2] == 2:
+    str_set = _string_settings(fstr1[0])
+    if str_set[0] == 2:
         return
-    if settings[0] > 0:
-        sectnum += 1
-    if settings[2] == 0:
+    if str_set[0] == 0:
+        if str_set[1] > -1:
+            sectnum += 1
+            print("========== section: ", sectnum )
         for i in fstr2:
             print(i)
 
@@ -194,18 +203,19 @@ def v__(fstr):
     fstr2 = fstr1[1].splitlines()
     str_set = _string_settings(fstr1[0])
     
-    if str_set[2] == 2:
+    if str_set[0] == 2:
         return
-    if str_set[2] == 1:
+    if str_set[0] == 1:
         vcalc = _utf.ExecV(fstr2, global_rivet_dict)
         vdict1, vcalc1 = vcalc.vutf()
         global_rivet_dict.update(vdict1)
         return
-    if str_set[2] == 0:
+    if str_set[0] == 0:
         vcalc = _utf.ExecV(fstr2, global_rivet_dict)
         vdict1, vcalc1 = vcalc.vutf()
         global_rivet_dict.update(vdict1)
-        if str_set[0] > -1:
+        if str_set[1] > -1:
+            sectnum += 1
             print("========== section: ", sectnum )
         for i in vcalc1:
             print(i)

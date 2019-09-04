@@ -79,22 +79,23 @@ class ExecV:
             local_dict (list): local() dictionary
         """
         vcalc = []
-        vcalc_temp = ""
+        vcalc_eq = ""
         descrip_flag = 0
 
         for vline in self.vlist:
             #print(vline)
             if descrip_flag == 1:
-                if len(vline.strip()) == 0: vline = "\n"
-                vcalc.append(vcalc_temp + " | " + vline)
-                vcalc_temp = ""
+                if len(vline.strip()) == 0: 
+                    vline = "\n"
+                vcalc.append(vcalc_eq + " | " + vline.strip())
+                vcalc_eq = ""
                 descrip_flag = 0
             elif "=" in vline:
                 exec(vline.strip())
-                vcalc_temp = vline.strip()
+                vcalc_eq = vline
                 descrip_flag = 1
             else:
-                vcalc.append(vline.strip() + "\n")
+                vcalc.append(vline.rstrip() + "\n")
 
         local_dict = locals()
         return [local_dict, vcalc]
