@@ -105,6 +105,7 @@ _pdfmargin = "1.0in,0.75in,0.9in,1.0in"
 #_chk1.logstart()
 #_chk1.logwrite("< begin model processing >", 1
 
+
 # design and report settings
 with open(_designfile, 'r') as _df1:
      _dflist = _df1.readlines()
@@ -159,9 +160,8 @@ def r__(fstr):
     """
     global eqnum, sectnum
     fstr1 = fstr.split("\n", 1)
-    settings = _string_settings(fstr1[0])
-    
     fstr2 = fstr1[1].splitlines()
+    settings = _string_settings(fstr1[0])
     for i in fstr2:
         exec(i.strip())
     
@@ -173,15 +173,12 @@ def i__(fstr):
     """
     global eqnum, sectnum
     fstr1 = fstr.split("\n", 1)
+    fstr2 = fstr1[1].splitlines()
     settings = _string_settings(fstr1[0])
     if settings[2] == 2:
         return
-
     if settings[0] > 0:
         sectnum += 1
-
-    fstr2 = fstr1[1].splitlines()
-    
     if settings[2] == 0:
         for i in fstr2:
             print(i)
@@ -200,24 +197,24 @@ def v__(fstr):
     if str_set[2] == 2:
         return
     if str_set[2] == 1:
-        vcalc = _utf.ExecV(fstr2)
+        vcalc = _utf.ExecV(fstr2, global_rivet_dict)
         vdict1, vcalc1 = vcalc.vutf()
         global_rivet_dict.update(vdict1)
         return
     if str_set[2] == 0:
-        vcalc = _utf.ExecV(fstr2)
+        vcalc = _utf.ExecV(fstr2, global_rivet_dict)
         vdict1, vcalc1 = vcalc.vutf()
         global_rivet_dict.update(vdict1)
         if str_set[0] > -1:
             print("========== section: ", sectnum )
         for i in vcalc1:
             print(i)
+
    
 def e__(fstr):
     """process equation string
 
-    Globals
-    
+
     """
     global eqnum, sectnum
     fstr1 = fstr.split("\n", 1)
@@ -227,37 +224,27 @@ def e__(fstr):
     if str_set[2] == 2:
         return
     if str_set[2] == 1:
-        ecalc = _utf.ExecE(fstr2)
+        ecalc = _utf.ExecE(fstr2, global_rivet_dict)
         edict1, ecalc1 = ecalc.vutf()
         global_rivet_dict.update(edict1)
         return
     if str_set[2] == 0:
-        ecalc = _utf.ExecE(fstr2)
+        ecalc = _utf.ExecE(fstr2, global_rivet_dict)
         edict1, ecalc1 = ecalc.eutf()
         global_rivet_dict.update(edict1)
         if str_set[0] > -1:
             print("========= section: ", sectnum )
-        for i in vcalc1:
+        for i in ecalc1:
             print(i)
-    settings = _string_settings(fstr[0])
-    callv1 = vlist[0].split('|')
-    for j in fstr.split("\n"):
-        if len(j.strip()) > 0:
-            if "=" in j:
-                k = j.split("=")[1]
-                nstr3 = str(j) + " = " + str(eval(k))
-                print(nstr3)
-                exec(j.strip(), globals())
-            else:
-                print(j)
-    return global_rivet_dict.update(locals())
+    
 
 def t__(fstr):
     """process table string
     
     """
-    global eqnum, sectnum
-    settings = _string_setting(fstr[0])
 
-    return global_rivet_dict.update(locals())
+    global eqnum, sectnum
+    settings = _string_settings(fstr[0])
+
+    global_rivet_dict.update(locals())
 

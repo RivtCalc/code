@@ -59,7 +59,7 @@ class ExecV:
     Returns utf calcs 
     """
  
-    def __init__(self, vlist : list):
+    def __init__(self, vlist : list, global1):
         """
 
         Args:
@@ -69,6 +69,7 @@ class ExecV:
         """
 
         self.vlist = vlist
+        globals().update(global1)
             
     def vutf(self):
         """compose utf calc string for values
@@ -105,7 +106,7 @@ class ExecE:
     Returns utf calcs 
     """
  
-    def __init__(self, elist : list):
+    def __init__(self, elist : list, global1):
         """
 
         Args:
@@ -115,6 +116,7 @@ class ExecE:
         """
 
         self.elist = elist
+        globals().update(global1)
             
     def eutf(self):
         """compose utf calc string for equation
@@ -123,27 +125,31 @@ class ExecE:
             local_dict (list): local() dictionary
         """
         ecalc = []
-        ecalc_temp = ""
+        ecalc_eq = ""
+        ecalc_ans = ""
         descrip_flag = 0
 
         for eline in self.elist:
             #print(eline)
             if descrip_flag == 1:
+                if len(eline.strip()) == 0: 
+                    eline = "\n"
                 if "|" in eline:
                     eline1 = eline.split("|")
                     eline = eline1[0]
                     unit1 = eline1[1]
                     sigfigs = eline1[2]
-                if len(eline.strip()) == 0: eline = "\n"
-                vcalc.append(eline + "\n" + ecalc_temp)
-                vcalc_temp = ""
+                dep_var, ind_var = ecalc_eq.split("=")
+                ecalc_ans = str(dep_var) + " = " + str(eval(ind_var))
+                ecalc.append(eline + "\n" + ecalc_eq + "\n" + ecalc_ans)
+                ecalc_temp = ""
                 descrip_flag = 0
             elif "=" in eline:
                 exec(eline.strip())
-                ecalc_temp = eline.strip()
+                ecalc_eq = eline.strip()
                 descrip_flag = 1
             else:
-                vcalc.append(eline.strip() + "\n")
+                ecalc.append(eline.strip() + "\n")
 
         local_dict = locals()
         return [local_dict, ecalc]
