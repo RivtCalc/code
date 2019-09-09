@@ -20,12 +20,12 @@ import inspect
 import __main__ as main
 from pathlib import Path
 
+from numpy import *
+import pandas as pd
 import sympy as sy
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from IPython.display import Image, Math, Latex, HTML, display
-from numpy import *
-from pandas import *
 
 import rivet.rivet_check as _chk
 import rivet.rivet_utf as _utf
@@ -135,7 +135,6 @@ def _string_settings(first_line):
     section_flg = i[1].find("[s]")
     if section_flg > -1:
         design_descrip = i[0].replace("[s]","").strip()
-    
     exec_flg1 = i[1].find("[h]")
     if exec_flg1 == -1:
         exec_flg = 0
