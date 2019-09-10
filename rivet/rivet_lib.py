@@ -47,7 +47,11 @@ if sys.version_info < (3, 7):
 
 global_rivet_dict = {}
 eqnum, sectnum = 0, 0
-designfile = main.__file__
+
+try: 
+    designfile = main.__file__
+except:
+    designfile = __file__
 _designfile = designfile
 print('design file ', designfile)
 
@@ -219,25 +223,24 @@ def v__(fstr):
         for i in vcalc1:
             print(i)
 
-   
 def e__(fstr):
     """process equation string
-
 
     """
     global eqnum, sectnum
     fstr1 = fstr.split("\n", 1)
     fstr2 = fstr1[1].splitlines()
     str_set = _string_settings(fstr1[0])
+    print('equation', str_set)
     
-    if str_set[2] == 2:
+    if str_set[0] == 2:
         return
-    if str_set[2] == 1:
+    if str_set[0] == 1:
         ecalc = _utf.ExecE(fstr2, global_rivet_dict)
-        edict1, ecalc1 = ecalc.vutf()
+        edict1, ecalc1 = ecalc.eutf()
         global_rivet_dict.update(edict1)
         return
-    if str_set[2] == 0:
+    if str_set[0] == 0:
         ecalc = _utf.ExecE(fstr2, global_rivet_dict)
         edict1, ecalc1 = ecalc.eutf()
         global_rivet_dict.update(edict1)

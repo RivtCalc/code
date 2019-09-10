@@ -56,16 +56,14 @@ class ExecI:
 class ExecV:
     """Processes value strings
 
-    Returns utf calcs 
+    Returns utf value calcs 
     """
  
     def __init__(self, vlist : list, global1):
         """
 
         Args:
-            slist (list): list of string settings
             vlist (list): list of input lines in value string
-            sectnum (int):  section number
         """
 
         self.vlist = vlist
@@ -104,23 +102,21 @@ class ExecV:
 class ExecE:
     """Processes equation strings
 
-    Returns utf calcs 
+    Returns utf equation calcs 
     """
  
     def __init__(self, elist : list, global1):
         """
 
         Args:
-            slist (list): list string settings
             elist (list): list of input lines in equation string
-            sectnum (int):  section number
         """
-
         self.elist = elist
         globals().update(global1)
             
     def eutf(self):
         """compose utf calc string for equation
+        
         Return:
             ecalc (list): list of calculated equation lines
             local_dict (list): local() dictionary
@@ -129,7 +125,6 @@ class ExecE:
         ecalc_eq = ""
         ecalc_ans = ""
         descrip_flag = 0
-
         for eline in self.elist:
             #print(eline)
             if descrip_flag == 1:
@@ -143,7 +138,7 @@ class ExecE:
                 dep_var, ind_var = ecalc_eq.split("=")
                 ecalc_ans = str(dep_var) + " = " + str(eval(ind_var))
                 ecalc.append(eline + "\n" + ecalc_eq + "\n" + ecalc_ans)
-                ecalc_temp = ""
+                ecalc_eq = ""
                 descrip_flag = 0
             elif "=" in eline:
                 exec(eline.strip())
