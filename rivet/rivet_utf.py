@@ -6,6 +6,23 @@ import sys
 __version__ = "0.9.0"
 __author__ = 'rholland@structurelabs.com'
       
+class ExecR:
+    """Processes insert strings
+
+    Returns utf calcs 
+    """
+ 
+    def __init__(self, vlist : list):
+        """
+
+        Args:
+            slist (list): list of input parameters in string settings
+            vlist (list): list of input lines in value string
+            sectnum (int):  section number
+        """
+
+        self.vlist = vlist
+
 
 class ExecI:
     """Processes insert strings
@@ -52,6 +69,7 @@ class ExecI:
 
         local_dict = locals()
         return [local_dict, vcalc]
+
 
 class ExecV:
     """Processes value strings
@@ -149,7 +167,8 @@ class ExecE:
 
         local_dict = locals()
         return [local_dict, ecalc]
-        
+
+
 class ExecT:
     """Processes table strings
 
@@ -198,7 +217,7 @@ class ExecT:
 
 
 
-
+#------------------------------------------------------------------
 
 def _genxmodel(mfile, mpath):
     """ expanded [i] and [t] tags and rewrite model

@@ -12,21 +12,17 @@
 \usepackage{gensymb}
 \usepackage[normalem]{ulem}
 \usepackage{etoolbox}
-%% math font
-\setmonofont{DejaVu Sans Mono}[Scale=0.8]
-\DeclareMathSizes{12}{13}{11}{11}
-%% margins
-\usepackage{geometry}
+%% page size and margins
+\usepackage[pass,paperwidth=8.5in,paperheight=11in]{geometry}
 \geometry{hmargin={1.0in,0.75in},vmargin={0.9in,1.0in}}
 \setlength{\parindent}{0in}
 %% pagestyle plain - table of contents
-\fancypagestyle{plain}{%
+\fancypagestyle{plain}
 \fancyhf{}
 \filename@parse{\currfilename}
 \fancyfoot[C]{model: \filename@base .txt \hfill \today\ }
 \renewcommand\headrulewidth{0pt}
 \renewcommand\footrulewidth{1pt}
-}
 %% pagestyle fancy - calculation
 %% header
 \pagestyle{fancy}
@@ -56,4 +52,6 @@
  {\large}
  [\vspace{2mm}\titlerule]
 \titlespacing*{\section}{0pt}{-40pt}{12pt}
-
+%% math font
+\setmonofont{DejaVu Sans Mono}[Scale=0.8]
+\DeclareMathSizes{12}{13}{11}{11}
