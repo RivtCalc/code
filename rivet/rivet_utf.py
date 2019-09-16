@@ -98,14 +98,14 @@ class ExecV:
 
         for vline in self.vlist:
             #print(vline)
-            if "#|" in vline:
+            if "|" in vline:
                 vcalc_eq = ""
-                vline1 = vline.split("#|")
+                vline1 = vline.split("|")
                 vcalc_eq = vline1[0].strip() 
                 exec(vcalc_eq)
                 vcalc.append(vcalc_eq + " | " + vline1[1].strip("|"))
             else:
-                vcalc.append(vline.rstrip() + "\n")
+                vcalc.append(vline.rstrip())
 
         local_dict = locals()
         return [local_dict, vcalc]
@@ -143,10 +143,10 @@ class ExecE:
             #print(eline)
             if len(eline.strip()) == 0 :
                 ecalc.append("\n")
-            elif eline.strip()[0] == "|":
+            elif "|" in eline:
                 descrip_flag = 1
                 eline1 = (eline.strip()).split("|") + pad
-                descrip2, unit2, sigfig2 = eline1[1:4]
+                descrip2, unit2, sigfig2 = eline1[0:3]
                 ecalc.append(descrip2.strip())
                 #print("descrip", eline1)
             elif "=" in eline:
