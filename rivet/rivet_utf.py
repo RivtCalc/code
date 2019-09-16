@@ -1,5 +1,4 @@
 #! python
-
 import os
 import sys
 
@@ -7,7 +6,7 @@ __version__ = "0.9.0"
 __author__ = 'rholland@structurelabs.com'
       
 class ExecR:
-    """Processes insert strings
+    """Process insert strings
 
     Returns utf calcs 
     """
@@ -25,7 +24,7 @@ class ExecR:
 
 
 class ExecI:
-    """Processes insert strings
+    """Process insert strings
 
     Returns utf calcs 
     """
@@ -72,7 +71,7 @@ class ExecI:
 
 
 class ExecV:
-    """Processes value strings
+    """Process value strings
 
     Returns utf value calcs 
     """
@@ -96,20 +95,15 @@ class ExecV:
         """
         vcalc = []
         vcalc_eq = ""
-        descrip_flag = 0
 
         for vline in self.vlist:
             #print(vline)
-            if descrip_flag == 1:
-                if len(vline.strip()) == 0: 
-                    vline = "\n"
-                vcalc.append(vcalc_eq + " | " + vline.strip())
+            if "#|" in vline:
                 vcalc_eq = ""
-                descrip_flag = 0
-            elif "=" in vline:
-                exec(vline.strip())
-                vcalc_eq = vline
-                descrip_flag = 1
+                vline1 = vline.split("#|")
+                vcalc_eq = vline1[0].strip() 
+                exec(vcalc_eq)
+                vcalc.append(vcalc_eq + " | " + vline1[1].strip("|"))
             else:
                 vcalc.append(vline.rstrip() + "\n")
 
@@ -118,7 +112,7 @@ class ExecV:
         
 
 class ExecE:
-    """Processes equation strings
+    """Process equation strings
 
     Returns utf equation calcs 
     """
@@ -143,34 +137,36 @@ class ExecE:
         ecalc_eq = ""
         ecalc_ans = ""
         descrip_flag = 0
+        descrip1, unit1, sigfig1 = "equation", "", [2,2] 
+        pad = ["","","",""]
         for eline in self.elist:
             #print(eline)
-            if descrip_flag == 1:
-                if len(eline.strip()) == 0: 
-                    eline = "\n"
-                if "|" in eline:
-                    eline1 = eline.split("|")
-                    eline = eline1[0]
-                    unit1 = eline1[1]
-                    sigfigs = eline1[2]
-                dep_var, ind_var = ecalc_eq.split("=")
-                ecalc_ans = str(dep_var) + " = " + str(eval(ind_var))
-                ecalc.append(eline + "\n" + ecalc_eq + "\n" + ecalc_ans)
-                ecalc_eq = ""
-                descrip_flag = 0
-            elif "=" in eline:
-                exec(eline.strip())
-                ecalc_eq = eline.strip()
+            if len(eline.strip()) == 0 :
+                ecalc.append("\n")
+            elif eline.strip()[0] == "|":
                 descrip_flag = 1
+                eline1 = (eline.strip()).split("|") + pad
+                descrip2, unit2, sigfig2 = eline1[1:4]
+                ecalc.append(descrip2.strip())
+                #print("descrip", eline1)
+            elif "=" in eline:
+                ecalc_eq = eline.strip()
+                if descrip_flag == 0:
+                    descrip2, unit2, sigfig2 = descrip1, unit1, sigfig1
+                exec(ecalc_eq)
+                dep_var, ind_var = ecalc_eq.split("=")
+                ecalc_ans = str(dep_var).strip() + " = " + str(eval(ind_var)).strip()
+                ecalc.append(ecalc_eq + "\n" + ecalc_ans)
+                ecalc_eq = ""
             else:
-                ecalc.append(eline.strip() + "\n")
+                ecalc.append(eline.strip())
 
         local_dict = locals()
         return [local_dict, ecalc]
 
 
 class ExecT:
-    """Processes table strings
+    """Process table strings
 
     Returns utf calcs 
     """
@@ -214,7 +210,6 @@ class ExecT:
 
         local_dict = locals()
         return [local_dict, vcalc]
-
 
 
 #------------------------------------------------------------------
