@@ -20,12 +20,12 @@ import inspect
 import __main__ as main
 from pathlib import Path
 
+from numpy import *
+import pandas as pd
 import sympy as sy
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from IPython.display import Image, Math, Latex, HTML, display
-from numpy import *
-from pandas import *
 
 import rivet.rivet_check as _chk
 import rivet.rivet_utf as _utf
@@ -47,7 +47,11 @@ if sys.version_info < (3, 7):
 
 global_rivet_dict = {}
 eqnum, sectnum = 0, 0
-designfile = main.__file__
+
+try: 
+    designfile = main.__file__
+except:
+    designfile = __file__
 _designfile = designfile
 print('design file ', designfile)
 
@@ -116,9 +120,9 @@ with open(_designfile, 'r') as _df1:
              report_settings = dfline.split("|")
 
 def _string_settings(first_line):
-    """process string settings
+    """prarse design string settings line
 
-    This method is called for each design string 
+    Method called for each design string. 
     
     """
     exec_flg = 0
@@ -130,12 +134,14 @@ def _string_settings(first_line):
     splt_string = first_line.split('|')
     #print(splt_string)
     splt_string += [" "," "," "," "]
-    print(splt_string)
+    #print(splt_string)
     i = splt_string
-    section_flg = i[1].find("[s]")
+    section_flg = i[1].find("]")
     if section_flg > -1:
-        design_descrip = i[0].replace("[s]","").strip()
-    
+        design_descrip = i[0][section_flg:].strip()
+        sect_num = i[0][:section_flg].strip()
+        sect_num = sect_num.strip("]")
+        sect_num = sect_num.strip("[")
     exec_flg1 = i[1].find("[h]")
     if exec_flg1 == -1:
         exec_flg = 0
@@ -153,8 +159,8 @@ def _string_settings(first_line):
     else:
         str_source = ""
 
-    print(exec_flg) 
-    return [exec_flg, section_flg, design_descrip, str_source]
+    #print(exec_flg) 
+    return [exec_flg, sect_num, design_descrip, str_source]
 
 def r__(fstr):
     """run python code
@@ -163,20 +169,19 @@ def r__(fstr):
     global eqnum, sectnum
     fstr1 = fstr.split("\n", 1)
     fstr2 = fstr1[1].splitlines()
-    settings = _string_settings(fstr1[0])
+    str_set = _string_settings(fstr1[0])
     if str_set[0] == 2:
         return
     if str_set[0] == 0:
         if str_set[1] > -1:
-            sectnum += 1
-            print("========== section: ", sectnum )
+            print("========== section: " + str(str_set[1]))
         for i in fstr2:
             exec(i.strip())
 
     global_rivet_dict.update(locals())
 
 def i__(fstr):
-    """process insert string
+    """evaluate insert string
     
     """
     global eqnum, sectnum
@@ -188,14 +193,14 @@ def i__(fstr):
     if str_set[0] == 0:
         if str_set[1] > -1:
             sectnum += 1
-            print("========== section: ", sectnum )
+            print("========== section: " + str(str_set[1]))
         for i in fstr2:
             print(i)
 
     global_rivet_dict.update(locals())
 
 def v__(fstr):
-    """process value string
+    """evaluate value string
 
     """
     global eqnum, sectnum
@@ -216,40 +221,39 @@ def v__(fstr):
         global_rivet_dict.update(vdict1)
         if str_set[1] > -1:
             sectnum += 1
-            print("========== section: ", sectnum )
+            print("========== section: " + str(str_set[1]))
         for i in vcalc1:
             print(i)
 
-   
 def e__(fstr):
-    """process equation string
-
+    """evaluate equation string
 
     """
     global eqnum, sectnum
     fstr1 = fstr.split("\n", 1)
     fstr2 = fstr1[1].splitlines()
     str_set = _string_settings(fstr1[0])
+    print('equation', str_set)
     
-    if str_set[2] == 2:
+    if str_set[0] == 2:
         return
-    if str_set[2] == 1:
+    if str_set[0] == 1:
         ecalc = _utf.ExecE(fstr2, global_rivet_dict)
-        edict1, ecalc1 = ecalc.vutf()
+        edict1, ecalc1 = ecalc.eutf()
         global_rivet_dict.update(edict1)
         return
-    if str_set[2] == 0:
+    if str_set[0] == 0:
         ecalc = _utf.ExecE(fstr2, global_rivet_dict)
         edict1, ecalc1 = ecalc.eutf()
         global_rivet_dict.update(edict1)
         if str_set[0] > -1:
-            print("========= section: ", sectnum )
+            print("========= section: " + str(str_set[1]))
         for i in ecalc1:
             print(i)
     
 
 def t__(fstr):
-    """process table string
+    """evaluate table string
     
     """
 
