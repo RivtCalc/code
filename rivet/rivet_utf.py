@@ -40,31 +40,31 @@ class ExecI:
 
         self.vlist = vlist
             
-    def vutf(self):
+    def iutf(self):
         """compose utf calc string for values
 
         Return:
             vcalc (list): list of calculated strings
             local_dict (list): local() dictionary
         """
-        vcalc = []
-        vcalc_temp = ""
+        icalc = []
+        icalc_temp = ""
         descrip_flag = 0
 
-        for vline in self.vlist:
+        for iline in self.vlist:
             #print(vline)
-            if len(vline.strip()) == 0:
-                vcalc.append("\n")
+            if len(iline.strip()) == 0:
+                icalc.append("\n")
             elif descrip_flag == 1:
-                vcalc.append(vcalc_temp + " | " + vline)
-                vcalc_temp = ""
+                icalc.append(icalc_temp + " | " + iline)
+                icalc_temp = ""
                 descrip_flag = 0
             elif "=" in vline:
-                exec(vline.strip())
-                vcalc_temp = vline.strip()
+                exec(iline.strip())
+                icalc_temp = iline.strip()
                 descrip_flag = 1
             else:
-                vcalc.append(vline.strip() + "\n")
+                icalc.append(iline.strip() + "\n")
 
         local_dict = locals()
         return [local_dict, vcalc]
@@ -105,7 +105,7 @@ class ExecV:
                 exec(vcalc_eq)
                 vcalc.append(vcalc_eq + " | " + vline1[1].strip("|"))
             else:
-                vcalc.append(vline.rstrip())
+                vcalc.append(vline.strip())
 
         local_dict = locals()
         return [local_dict, vcalc]
@@ -156,7 +156,8 @@ class ExecE:
                 exec(ecalc_eq)
                 dep_var, ind_var = ecalc_eq.split("=")
                 ecalc_ans = str(dep_var).strip() + " = " + str(eval(ind_var)).strip()
-                ecalc.append(ecalc_eq + "\n" + ecalc_ans)
+                ecalc.append(ecalc_eq)
+                ecalc.append(ecalc_ans)
                 ecalc_eq = ""
             else:
                 ecalc.append(eline.strip())
@@ -599,18 +600,7 @@ class CalcUTF:
         elif txt[0][0] == '|' : self._write_utf(txt[0], 1, 0) 
         elif txt[0][2] == "\\" : self._write_utf(txt[0], 1, 0)                
         else: self._write_utf(txt[0], 1, 0)
-        
-    def _write_utf(self, mentry, pp, indent):
-        """Write model text to utf-8 encoded file.
-        
-            mentry (string): text 
-            pp (int): pretty print flag
-            indent (int): indent flag
-            
-        """
-        if pp: mentry = pretty(mentry, use_unicode=True, num_columns=92)
-        if indent: mentry = " "*4 + mentry
-        print(mentry, file=self.cfile)
+    
         
     def r__(self, dval):
         """Process run operations.
@@ -1154,21 +1144,6 @@ class CalcUTF:
             self._write_utf(nstr, 1)
             tmp = int(self.widthc-1) * '-'
             self._write_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 0)
-
-    def _prt_sect(self, dval):
-        """Print sections to UTF-8.
-        ::
-
-            key : value            
-            _s :    p0         |       p1      |   p2       
-                  left string    calc number     sect num   
-        
-        """
-        self._write_utf('='*self.widthc, 0, 0)
-        self._write_utf(" " + dval[0] + ((dval[1])+dval[2]).rjust(self.widthc -
-                                               len(dval[0])-2), 1, 0)
-        self._write_utf('='*self.widthc, 0, 0)
-
 
     def _prt_func(self, dval):
         """Print functions to UTF-8.
