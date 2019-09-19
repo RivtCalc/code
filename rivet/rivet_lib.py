@@ -48,64 +48,56 @@ if sys.version_info < (3, 7):
 # set up folders, files and dictionaries
 global_rivet_dict = {}
 
-def ad_paths(_settings):
-    _path_dict = {
-    "adpath" : _settings["path"],
-    "adfile" : _ad_set["file"],
-    "rivetpath" : os.path.dirname("rivet.rivet_lib.py"),
-    "projpath" : os.chdir(os.pardir),
-    "reptpath" : os.path.join(_projpath, "reports"),
-    }
-    ad_folders = {
-    "spath" :  os.path.join(ad_paths["adpath"], "scripts"),
-    "tpath" :  os.path.join(ad_paths["adpath"], "table"),
-    "upath" :  os.path.join(ad_paths["adpath"], "txt"),
-    "rpath" :  os.path.join(ad_paths["reptpath"], "pdf"),
-    "xpath" :  os.path.join(ad_paths["reptpath"], "temp"),
-    "fpath" :  os.path.join(ad_paths["reptpath"], "figures"),
-    "hpath" :  os.path.join(ad_paths["reptpath"], "html"),
-    "adbase" : ad_set["adfile"].split(".")[0]
-    }    
-    ad_files = {    
-    "ctxt" :  ".".join(["adbase"], "txt"),
-    "cpdf" :  ".".join(["adbase"], "pdf"),
-    "chtml" :  ".".join(["adbase"], "html"),
-    "trst" :  ".".join(["adbase"], "rst"),
-    "tlog" :  ".".join(["adbase"], "log"),
-    "ttex1" :  ".".join(["adbase"], "tex"),
-    "auxfile" : ".".join(["adbase"], ".aux"),
-    "outfile" :  ".".path.join(["adbase"], ".out"),
-    "texmak2" :  ".".path.join(["adbase"], ".fls"),
-    "texmak3" :  ".".path.join(["adbase"], ".fdb_latexmk")
-    }
+ad_init = {
+"adpath" : main._set["path"],
+"adfile" : main._set["file"],
+"rivetpath" : os.path.dirname("rivet.rivet_lib.py"),
+"projpath" : os.pardir,
+"reptpath" : os.path.join(os.pardir, "reports")
+}
+ad_fold = {
+"adbase": ad_init["adfile"].split(".")[0],
+"spath": os.path.join(ad_init["adpath"], "scripts"),
+"tpath": os.path.join(ad_init["adpath"], "table"),
+"upath": os.path.join(ad_init["adpath"], "txt"),
+"rpath": os.path.join(ad_init["reptpath"], "pdf"),
+"xpath": os.path.join(ad_init["reptpath"], "temp"),
+"fpath": os.path.join(ad_init["reptpath"], "figures"),
+"hpath": os.path.join(ad_init["reptpath"], "html"),
+}    
+ad_file = {    
+"ctxt":  ".".join((ad_fold["adbase"], "txt")),
+"cpdf":  ".".join((ad_fold["adbase"], "pdf")),
+"chtml":  ".".join((ad_fold["adbase"], "html")),
+"trst":  ".".join((ad_fold["adbase"], "rst")),
+"tlog":  ".".join((ad_fold["adbase"], "log")),
+"ttex1":  ".".join((ad_fold["adbase"], "tex")),
+"auxfile": ".".join((ad_fold["adbase"], ".aux")),
+"outfile":  ".".join((ad_fold["adbase"], ".out")),
+"texmak2":  ".".join((ad_fold["adbase"], ".fls")),
+"texmak3":  ".".join((ad_fold["adbase"], ".fdb_latexmk")),
+"bakfile": ".".join((ad_fold["adbase"], ".bak"))
+}
 
-return _path_dict, _settings
+ad_par = {
+    "clean":  (ad_file["auxfile"],
+             ad_file["outfile"]),
+    "pdf": (0,"margins"), 
+    "title" : "Model Title"    
+}
 
-def ad_flags():
-    _cleantemp =  (ad_files["auxfile"],
-                        outfile,   
-                        texmak2, 
-                        texmak3
-                        )
-    _pdfflag = 0
-    _nocleanflag = 0
-    _verboseflag = 0
-    _defaultdec = "3,3"
-    _calcwidth = 80
-    _calctitle = "\n\nModel Title"  # default model title
-    _pdfmargin = "1.0in,0.75in,0.9in,1.0in"
-    _calcnum = _designbase[1:5]
-    _bakfile = _adfile.split(".")[0] + ".bak"
-
-_adfile = _path_dict["adfile"]
-with open(_adfile, "r") as f2:
-    _adbak = f2.read()
-with open(_bakfile, "w") as f3:
-    f3.write(_adbak)
-print("\n\nad file : ", _adfile)
-print("checks : folders checked; ad file backup written", "\n\n")
-
-
+_adfile = ad_init["adfile"]
+_adpath = ad_init["adpath"]
+_adfull = os.path.join(_adpath,_adfile)
+_adbak = os.path.join(_adpath,ad_file["bakfile"])
+_calcnum = _adfile[1:5]
+_calcwidth = 80
+with open(_adfull, "r") as f2:
+    adbak = f2.read()
+with open(_adbak, "w") as f3:
+    f3.write(adbak)
+print("\n\npath: ", _adpath, ";", _adfile)
+print("checks: folders checked ; ad file backup written", "\n\n")
 # start checks and logs
 #_chk1 = chk.CheckRivet(_tlog)
 #_chk1.logstart()
@@ -141,12 +133,12 @@ def _string_settings(first_line):
     #print(exec_flg) 
     return [exec_flg, sect_num, design_descrip]
 
-def _prt_sect(settings):
+def _prt_sect(sets):
     """Print sections to UTF-8.
     
     """
-    sect_num = settings[1]
-    descrip = settings[2]
+    sect_num = sets[1]
+    descrip = sets[2]
     print('=' * _calcwidth)
     _write_utf('=' * _calcwidth, 0, 0)
     descrip1 = " " +  descrip + (_calcnum + "-" +
@@ -166,7 +158,7 @@ def _write_utf(pline, pp, indent):
         indent (int): indent flag
         
     """
-    f1 = open(_ctxt, 'a')
+    f1 = open(ad_file["ctxt"], 'a')
     if pp: pline = sy.pretty(pline, use_unicode=True, num_columns=80)
     if indent: pline = " "*4 + pline
     print(pline, file = f1)
