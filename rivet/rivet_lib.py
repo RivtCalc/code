@@ -154,9 +154,19 @@ def _write_utf(pline, pp, indent):
     elif txt[0][2:4] == ".." : return                        
     elif txt[0][0] == '|' : self._write_utf(txt[0], 1, 0) 
     elif txt[0][2] == "\\" : self._write_utf(txt[0], 1, 0)                
-    else: self._write_utf(txt[0], 1, 0)
+    else: _write_utf(txt[0], 1, 0)
+
+def _write_code(str1, set1):
+    """ format and write python string in r__() to _utf
+    
+    Args:
+        str1 ([type]): [description]
+        set1 ([type]): [description]
+    """
+    pass
 
 def _write_rst(pline, pp, indent):
+    
     pdf_files = {    
         "ttex1":  ".".join((ad_fold["adbase"], "tex")),
         "auxfile": ".".join((ad_fold["adbase"], ".aux")),
@@ -164,7 +174,6 @@ def _write_rst(pline, pp, indent):
         "texmak2":  ".".join((ad_fold["adbase"], ".fls")),
         "texmak3":  ".".join((ad_fold["adbase"], ".fdb_latexmk"))
     }
-    pass
 
 def _write_py(self):
     """ write executable python code to file
@@ -210,8 +219,7 @@ def _write_py(self):
             '       vlist()'
             '       \n\n')
 
-    pyfile1.write('#\n# variables\nvlist1 = ' + str4 + '\n')
-    pyfile1.write('#\n# variable definitions\nvlist2 = ' + str4a + '\n')
+    _adfile.write('#\n# variables\nvlist1 = ' + str4 + '\n')
     
 def r__(fstr: string):
     """ evaluate and format a rivet-string of python code
@@ -219,17 +227,15 @@ def r__(fstr: string):
     Args:
         fstr (string): [description]
     """
-    
     fstr1 = fstr.split("\n", 1)
     fstr2 = fstr1[1].splitlines()
     str_set = _riv_strset(fstr1[0])
     if str_set[0] == 2:
         return
+    for i in fstr2:
+        exec(i.strip())
     if str_set[0] == 0:
-        if int(str_set[1]) > -1:
-            _write_utf(str_set)
-        for i in fstr2:
-            exec(i.strip())
+        _write_code(fstr2, str_set)
 
     equation_list.update()
     rivet_dict.update(locals())
@@ -243,13 +249,11 @@ def i__(fstr: string):
     str_set = _riv_strset(fstr1[0])
     if str_set[0] == 2:
         return
+    icalc = _utf.Iexec_u(fstr2, rivet_dict)
+    idict1, icalc1 = icalc.vutf()
+    rivet_dict.update(idict1)
     if str_set[0] == 0:
-        if int(str_set[1]) > -1:
-            _write_utf(str_set)
-        for i in fstr2:
-            print(i.strip())
-
-    rivet_dict.update(locals())
+        _write_utf(icalc1, str_set)    
 
 def v__(fstr: string):
     """evaluate and format a rivet-string of values
@@ -258,62 +262,41 @@ def v__(fstr: string):
     fstr1 = fstr.split("\n", 1)
     fstr2 = fstr1[1].splitlines()
     str_set = _riv_strset(fstr1[0])
-    
     if str_set[0] == 2:
         return
-    if str_set[0] == 1:
-        vcalc = _utf.Vexec_u(fstr2, rivet_dict)
-        vdict1, vcalc1 = vcalc.vutf()
-        rivet_dict.update(vdict1)
-        return
+    vcalc = _utf.Vexec_u(fstr2, rivet_dict)
+    vdict1, vcalc1 = vcalc.vutf()
+    rivet_dict.update(vdict1)
     if str_set[0] == 0:
-        vcalc = _utf.Vxec_u(fstr2, rivet_dict)
-        vdict1, vcalc1 = vcalc.vutf()
-        rivet_dict.update(vdict1)
-        if int(str_set[1]) > -1:
-            _write_utf(str_set)            
-        for i in vcalc1:
-            if "=" in i:
-                print(" "*4 + i)
-            else:
-                print(i)
+        _write_utf(vcalc1, str_set)            
 
 def e__(fstr: string):
-    """evaluate equation string
+    """evaluate and format a rivet-string of equations
 
     """
     fstr1 = fstr.split("\n", 1)
     fstr2 = fstr1[1].splitlines()
     str_set = _riv_strset(fstr1[0])
-    #print('equation', str_set)
-    
     if str_set[0] == 2:
         return
-    if str_set[0] == 1:
-        ecalc = _utf.Exec_u(fstr2, rivet_dict)
-        edict1, ecalc1 = ecalc.eutf()
-        rivet_dict.update(edict1)
-        return
+    ecalc = _utf.Eexec_u(fstr2, rivet_dict)
+    edict1, ecalc1 = ecalc.eutf()
+    rivet_dict.update(edict1)
     if str_set[0] == 0:
-        ecalc = _utf.Exec_u(fstr2, rivet_dict)
-        edict1, ecalc1 = ecalc.eutf()
-        rivet_dict.update(edict1)
-        if int(str_set[1]) > -1:
-            _write_utf(str_set)
-        for i in ecalc1:
-            if "=" in i:
-                print(" "*4 + i)
-            else:
-                print(i)
+        _write_utf(ecalc1, str_set)   
 
 def t__(fstr: string):
-    """evaluate table string
+    """evaluate and format a rivet-string of tables
     
     """
-
-    global eqnum, sectnum
-    settings = _riv_strset(fstr[0])
-
-    rivet_dict.update(locals())
-
+    fstr1 = fstr.split("\n", 1)
+    fstr2 = fstr1[1].splitlines()
+    str_set = _riv_strset(fstr1[0])
+    if str_set[0] == 2:
+        return
+    tcalc = _utf.Texec_u(fstr2, rivet_dict)
+    tdict1, tcalc1 = tcalc.tutf()
+    rivet_dict.update(tdict1)
+    if str_set[0] == 0:
+        _write_utf(tcalc1, str_set)   
 
