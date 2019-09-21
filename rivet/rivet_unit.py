@@ -5,7 +5,6 @@
 
 import os
 import importlib.util
-import rivet.rivet_config as cfg
 
 # load unum from rivet directory
 unum_path = os.path.join(cfg.rivpath,'unum','__init__.py')
