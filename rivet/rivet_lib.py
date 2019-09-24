@@ -16,7 +16,6 @@
         _write_utf(string): write utf8 formatted string to stdout and calc-file
         _write_rst(string): write rst formatted string to calc-file
         _write_py(string): write equations and values to python file
-    
 """
 
 import sys
@@ -67,9 +66,6 @@ ad_fold = {
 }    
 ad_file = {    
 "ctxt":  ".".join((ad_fold["adbase"], "txt")),
-"cpdf":  ".".join((ad_fold["adbase"], "pdf")),
-"chtml":  ".".join((ad_fold["adbase"], "html")),
-"trst":  ".".join((ad_fold["adbase"], "rst")),
 "tlog":  ".".join((ad_fold["adbase"], "log"))
 }
 with open(_adfull, "r") as f2:
@@ -83,14 +79,14 @@ print("checks: folders checked; ad-file backup written to report/temp folder", "
 #_chk1 = chk.CheckRivet(_tlog)
 #_chk1.logstart()
 #_chk1.logwrite("< begin model processing >", 1
-# os.chdir(once.__path__[0])                  #5 check LaTeX install
+# os.chdir(once.__path__[0])
 # f4 = open('once.sty')
 # f4.close()
 # os.chdir(cfg.ppath)
 # _el.logwrite("< style file found >", vbos)
 # os.system('latex --version')                
 # _el.logwrite("< Tex Live installation found>", vbos)
-# pdfout1.gen_pdf()                           #5 generate PDF calc
+# pdfout1.gen_pdf() 
 
 def _riv_strset(line1: string) -> list:
     """ parse rivet-string settings
@@ -122,7 +118,7 @@ def _riv_strset(line1: string) -> list:
     #print(exec_flg) 
     return [exec_flg, sect_num, str_descrip]
 
-def _write_utf(pline, pp, indent):
+def _write_utf(rivstring, sets, pprt):
     """ write model text to utf-8 encoded file.
     
     Args:
@@ -131,43 +127,36 @@ def _write_utf(pline, pp, indent):
         indent (int): indent flag
          
     """
+    rivstring1 = []
     sect_num = sets[1]
     descrip = sets[2]
-    print('=' * _calcwidth)
-    _write_utf('=' * _calcwidth, 0, 0)
-    descrip1 = " " +  descrip + (_calcnum + "-" +
-        sect_num).rjust(_calcwidth - len(descrip) - 2)
-    print(descrip1)
-    _write_utf(descrip1, 1, 0)
-    print('=' * _calcwidth)
-    _write_utf('=' * _calcwidth, 0, 0)
+    if sect_num > -1:
+        rivstring1.append('=' * _calcwidth)
+        descrip1 = " " +  descrip + (_calcnum + "-" +
+            sect_num).rjust(_calcwidth - len(descrip) - 2)
+        rivstring1.append('=' * _calcwidth)
     
-    f1 = open(ad_file["ctxt"], 'a')
-    if pp: pline = sy.pretty(pline, use_unicode=True, num_columns=80)
-    if indent: pline = " "*4 + pline
-    print(pline, file = f1)
+    rivstring2 = rivstring1 + rivstring
+    f1 = open(_adfull, 'a')
+    if pprt: 
+        rivstring2 = sy.pretty(rivstring2, use_unicode=True, num_columns=80)
+    f1.write(rivstring2)
     f1.close()
-
-    if txt[0].strip() == '|' : return
-    elif txt[0].strip() == "::" : return                        
-    elif txt[0].strip() == '`' : return
-    elif txt[0][2:4] == ".." : return                        
-    elif txt[0][0] == '|' : self._write_utf(txt[0], 1, 0) 
-    elif txt[0][2] == "\\" : self._write_utf(txt[0], 1, 0)                
-    else: _write_utf(txt[0], 1, 0)
-
-def _write_code(str1, set1):
-    """ format and write python string in r__() to _utf
-    
-    Args:
-        str1 ([type]): [description]
-        set1 ([type]): [description]
-    """
-    pass
+    print(rivstring2)
 
 def _write_rst(pline, pp, indent):
+    """[summary]
     
-    pdf_files = {    
+    Args:
+        pline ([type]): [description]
+        pp ([type]): [description]
+        indent ([type]): [description]
+    """
+    
+    pdf_files = {
+        "cpdf":  ".".join((ad_fold["adbase"], "pdf")),
+        "chtml":  ".".join((ad_fold["adbase"], "html")),
+        "trst":  ".".join((ad_fold["adbase"], "rst")),    
         "ttex1":  ".".join((ad_fold["adbase"], "tex")),
         "auxfile": ".".join((ad_fold["adbase"], ".aux")),
         "outfile":  ".".join((ad_fold["adbase"], ".out")),
@@ -180,123 +169,105 @@ def _write_py(self):
  
         Write imports, values, equations and function to Python file. This file
         contains the executable ad-file without the explanatory text or
-        formatting.
-        
+        formatting.    
     """
-    str1 =  ('"""\nThis file contains Python equations from the '
-            'on-c-e model \n\n  '+ self.mfile + '\n'
-            '\nFor interactive analysis open the file\n'
-            'in an IDE executable shell e.g. Pyzo,\n'
-            'Spyder, Jupyter Notebook or Komodo IDE \n'
-            '""" \n')
-        
-    str2 =  ('import os\n'
-            'import sys\n'
-            'from sympy import *\n'
-            'from numpy import *\n'
-            'import numpy.linalg as LA\n'
-            'import importlib.util\n'
-            'import once.config as cfg\n')
-                            
-    str2a = ('pypath = os.path.dirname(sys.executable)\n'
-            'oncedir = os.path.join(pypath,"Lib","site-packages","once")\n'
-            'cfg.opath = oncedir\n'
-            'from once.calunit import *\n')
+    str1 =  ("""\nThis file contains Python equations from the
+            on-c-e model \n\n  '+ self.mfile + '\n
+            \nFor interactive analysis open the file\n
+            in an IDE executable shell e.g. Pyzo,\n
+            Spyder, Jupyter Notebook or Komodo IDE \n
+            import os\n
+            import sys\n
+            from sympy import *\n
+            from numpy import *\n
+            import numpy.linalg as LA\n
+            import importlib.util\n
+            import once.config as cfg\n     
+            \ndef vlist(vlistx = vlist1, vlisty= vlist2):\n
+            Utility function for interactively listing once\n
+            variable values. Variables are stored in vlist1 and
+            definitions in vlist2. Type vlist()\n
+            to list updated variable summary after executing\n
+            calc Python script\n\n\n
+            for lsti in zip(vlistx, vlisty):\n
+                item1 = eval(str(lsti[0]))\n
+                def1 = lsti[1]\n
+                cncat1 = str(lsti[0]) + " = " + str(item1) + " "*30\n
+                print(cncat1[:25] + "# " + def1)\n\n
+            if __name__ == "__main__":\n
+                   vlist()\n\n""")
 
-    str5 = ('\ndef vlist(vlistx = vlist1, vlisty= vlist2):\n'
-            '   """Utility function for interactively listing once\n'
-            '      variable values. Variables are stored in vlist1 and'
-            '      definitions in vlist2. Type vlist()\n'
-            '      to list updated variable summary after executing\n'
-            '      calc Python script\n'
-            '   """\n\n'
-            '   for lsti in zip(vlistx, vlisty):\n'
-            '       item1 = eval(str(lsti[0]))\n'
-            '       def1 = lsti[1]\n'
-            '       cncat1 = str(lsti[0]) + " = " + str(item1) + " "*30\n'
-            '       print(cncat1[:25] + "# " + def1)\n\n'
-            'if __name__ == "__main__":\n'
-            '       vlist()'
-            '       \n\n')
-
-    _adfile.write('#\n# variables\nvlist1 = ' + str4 + '\n')
+    _adfile.write("#\n#")
     
+def _parse_rivset(fstr: string):
+    
+    fstr1 = fstr.split("\n", 1)
+    fstr2 = fstr1[1].splitlines()
+    str_set = _riv_strset(fstr1[0])
+    
+    return str_set, fstr2
+
 def r__(fstr: string):
     """ evaluate and format a rivet-string of python code
     
     Args:
         fstr (string): [description]
     """
-    fstr1 = fstr.split("\n", 1)
-    fstr2 = fstr1[1].splitlines()
-    str_set = _riv_strset(fstr1[0])
-    if str_set[0] == 2:
-        return
-    for i in fstr2:
-        exec(i.strip())
-    if str_set[0] == 0:
-        _write_code(fstr2, str_set)
-
-    equation_list.update()
-    rivet_dict.update(locals())
+    str_set, fstr2 = _parse_rivset(fstr)
+    if str_set[0] == 2: return
+    calc = _utf.Rexec_u(fstr2, rivet_dict)
+    dict1, calc1, equ1 = calc.r_utf()
+    if str_set[0] == 0: _write_utf(calc1)
+    equation_list.append(equ1)
+    rivet_dict.update(dict1)
 
 def i__(fstr: string):
     """ evaluate and format a rivet-string of text and images
     
     """
-    fstr1 = fstr.split("\n", 1)
-    fstr2 = fstr1[1].splitlines()
-    str_set = _riv_strset(fstr1[0])
-    if str_set[0] == 2:
-        return
-    icalc = _utf.Iexec_u(fstr2, rivet_dict)
-    idict1, icalc1 = icalc.vutf()
-    rivet_dict.update(idict1)
-    if str_set[0] == 0:
-        _write_utf(icalc1, str_set)    
+    str_set, fstr2 = _parse_rivset(fstr)
+    if str_set[0] == 2: return
+    calc = _utf.Iexec_u(fstr2, rivet_dict)
+    dict1, calc1, equ1 = calc.i_utf()
+    pprt = 1
+    indent = 4
+    if str_set[0] == 0: _write_utf(calc1, str_set, pprt, indent)
+    equation_list.append(equ1)
+    rivet_dict.update(dict1)
 
 def v__(fstr: string):
     """evaluate and format a rivet-string of values
 
     """
-    fstr1 = fstr.split("\n", 1)
-    fstr2 = fstr1[1].splitlines()
-    str_set = _riv_strset(fstr1[0])
-    if str_set[0] == 2:
-        return
-    vcalc = _utf.Vexec_u(fstr2, rivet_dict)
-    vdict1, vcalc1 = vcalc.vutf()
-    rivet_dict.update(vdict1)
-    if str_set[0] == 0:
-        _write_utf(vcalc1, str_set)            
+    str_set, fstr2 = _parse_rivset(fstr)
+    if str_set[0] == 2: return
+    calc = _utf.Vexec_u(fstr2, rivet_dict)
+    dict1, calc1, equ1 = calc.v_utf()
+    if str_set[0] == 0: _write_utf(calc1)
+    equation_list.append(equ1)
+    rivet_dict.update(dict1)    
 
 def e__(fstr: string):
     """evaluate and format a rivet-string of equations
 
     """
-    fstr1 = fstr.split("\n", 1)
-    fstr2 = fstr1[1].splitlines()
-    str_set = _riv_strset(fstr1[0])
-    if str_set[0] == 2:
-        return
-    ecalc = _utf.Eexec_u(fstr2, rivet_dict)
-    edict1, ecalc1 = ecalc.eutf()
-    rivet_dict.update(edict1)
-    if str_set[0] == 0:
-        _write_utf(ecalc1, str_set)   
+    str_set, fstr2 = _parse_rivset(fstr)
+    if str_set[0] == 2: return
+    calc = _utf.Eexec_u(fstr2, rivet_dict)
+    dict1, calc1, equ1 = calc.e_utf()
+    if str_set[0] == 0: _write_utf(calc1)
+    equation_list.append(equ1)
+    rivet_dict.update(dict1)
 
 def t__(fstr: string):
     """evaluate and format a rivet-string of tables
     
     """
-    fstr1 = fstr.split("\n", 1)
-    fstr2 = fstr1[1].splitlines()
-    str_set = _riv_strset(fstr1[0])
-    if str_set[0] == 2:
-        return
-    tcalc = _utf.Texec_u(fstr2, rivet_dict)
-    tdict1, tcalc1 = tcalc.tutf()
-    rivet_dict.update(tdict1)
-    if str_set[0] == 0:
-        _write_utf(tcalc1, str_set)   
+    str_set, fstr2 = _parse_rivset(fstr)
+    if str_set[0] == 2: return
+    calc = _utf.Texec_u(fstr2, rivet_dict)
+    dict1, calc1, equ1 = calc.t_utf()
+    if str_set[0] == 0: _write_utf(calc1)
+    equation_list.append(equ1)
+    rivet_dict.update(dict1)
 

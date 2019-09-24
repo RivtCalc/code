@@ -22,14 +22,22 @@ class Rexec_u:
 
         self.vlist = vlist
 
+    def r_utf(self):
+        """compose utf calc string for values
+
+        Return:
+            vcalc (list): list of calculated strings
+            local_dict (list): local() dictionary
+        """
+        pass
 
 class Iexec_u:
     """Process insert strings
 
-    Returns utf calcs 
+       Return formatted utf calcs 
     """
  
-    def __init__(self, vlist : list):
+    def __init__(self, ilist : list):
         """
 
         Args:
@@ -38,121 +46,15 @@ class Iexec_u:
             sectnum (int):  section number
         """
 
-        self.vlist = vlist
+        self.ilist = ilist
             
-    def iutf(self):
-        """compose utf calc string for values
 
-        Return:
-            vcalc (list): list of calculated strings
-            local_dict (list): local() dictionary
-        """
-        icalc = []
-        icalc_temp = ""
-        descrip_flag = 0
-
-        for iline in self.vlist:
-            #print(vline)
-            if len(iline.strip()) == 0:
-                icalc.append("\n")
-            elif descrip_flag == 1:
-                icalc.append(icalc_temp + " | " + iline)
-                icalc_temp = ""
-                descrip_flag = 0
-            elif "=" in vline:
-                exec(iline.strip())
-                icalc_temp = iline.strip()
-                descrip_flag = 1
-            else:
-                icalc.append(iline.strip() + "\n")
-
-        local_dict = locals()
-        return [local_dict, vcalc]
-
-
-    def _prt_ins(self, dval):
-        """Insert file data into or from UTF calc        
+    def utf_fig():
         
-        ::       
-            
-            [i]      p0    |   p1     |   p2      |   p3   |   p4         
-                    'fig'     file       caption     size     location
-                    'text'    file       reference        
-                    'lit'     file       reference
-                    'csv'     file       
-                    'mod'     file      
-                    'func'    file       var name   reference 
-                    'read'    file       var name   vector or table
-                    'write'   file       var name
-                    'app'     file       var name
-
-            only the first three letters of p0 are read
-            
-        """
-                            
-        option = dval[0].strip()[0:3]
-        fname1 = dval[1].strip()
-        caption1 = dval[2].strip()
-
-        if option == 'fig':
-            self._write_utf("figure | " + fname1 + " | " + caption1, 0, 1)
-
-        if option == 'text':
-                # insert file from text into model, do not process
-            with open(fpath, 'r') as f1:
-                txstrng = f1.readlines()
-            if var1.strip() != '':
-                instxt = eval('txstrng[' + var1.strip() + ']')
-                instxt = ''.join(instxt)
-            else:
-                instxt = ''.join(txstrng)
-
-            self._write_utf(instxt, 0)
-
-            link1 = "< text inserted from file: " + str(fpath) + " >"
-            self.ew.errwrite(link1, 1)
-            self.ew.errwrite('', 0)
-
-        elif option == 'write':
-            # write data to file, replace if exists
-            sep1 = var2
-            if sep1 == '':
-                sep1 = ','
-            elif sep1 == '*':
-                sep1 = " "
-
-            format1 = var3
-            if format1 == '':
-                format1 = '%s'
-
-            file1 = open(fp, 'w')
-            var11 = array(var1)
-            var11.tofile(file1, sep=sep1, format=format1)
-            file1.close()
-            link1 = "< write variable " + var1 + " to file: " \
-                    + str(fp) + ">"
-            self.ew.errwrite(link1, 0)
-
-        elif option == 'w+':
-            # append data to file
-            sep1 = var2
-            if sep1 == '':
-                sep1 = ','
-            elif sep1 == '*':
-                sep1 = " "
-
-            format1 = var3
-            if format1 == '':
-                format1 = '%s'
-
-            file1 = open(fp, 'a')
-            var11 = array(var1)
-            var11.tofile(file1, sep=sep1, format=format1)
-            file1.close()
-            link1 = "< append variable " + var1 + " to file: " \
-                    + str(fp) + ">"
-            self.ew.errwrite(link1, 0)
-
+        
+        
+        _write_utf("figure | " + fname1 + " | " + caption1, 0, 1)
+        
         elif option == 'figure':
             # insert figure reference in utf-8 document
             self.fignum += 1
@@ -164,93 +66,109 @@ class Iexec_u:
             self._write_utf(link2, 1)
             self._write_utf(" ", 0)
 
-        elif option == 'model':
-            # this option is handled in ModDicts.__init__
-            # comodels are always processed first, regardless of location
-            pass
+        
+        pass
 
-        # absolute path specified for the following options
-        elif option == 'read':
-            self._prt_read(dval)
+    def utf_txt():
+        
 
+
+        if option == 'text':
+            # insert file from text into model, do not process
+        with open(fpath, 'r') as f1:
+            txstrng = f1.readlines()
+        if var1.strip() != '':
+            instxt = eval('txstrng[' + var1.strip() + ']')
+            instxt = ''.join(instxt)
         else:
-            pass
+            instxt = ''.join(txstrng)
+
+        self._write_utf(instxt, 0)
+
+        link1 = "< text inserted from file: " + str(fpath) + " >"
+        self.ew.errwrite(link1, 1)
+        self.ew.errwrite('', 0)
+        
 
 
-                elif 'csv' in alinev[0]:                    # find [i] csv
-                    newaline = "  #" + aline
-                    modfile2.write(newaline)                # convert comment
-                    csvfile = alinev[1].strip()
-                    csvpath = os.path.join(tpath, csvfile)
-                    rsttab = csv2rst._run(csvpath,(0,0,0))
-                    rsttabv = rsttab.split("\n")                        
-                    rsttab2 ="\n"
-                    for _i in rsttabv:
-                        rsttab2 += "  " + _i + "\n"
-                    modfile2.write(rsttab2)                 # insert table
-                    continue
-                elif 'mod' in alinev[0]:                    # find [i] model
-                    newaline = "# " + aline                 # convert comment
-                    modfile2.write(newaline)                
-                    if alinev[2].strip() != 'e':            # [v] tag
-                        vtitle = "[s] Values from model " + calcnum +"\n\n"                        
-                        modfile2.write(vtitle)
-                        modfile2.write(vblock)
-                    elif alinev[2].strip() == 'e':          # [v] and [e] tags
-                        etitle = ("[s] Values and equations from model " +
-                                        calcnum + "\n\n")                        
-                        modfile2.write(etitle)
-                        modfile2.write(vblock)                        
-                        modfile2.write(eblock)
-                else:
-                    modfile2.write(aline)
-            elif mtag1 == '[t]':
-                alinev = aline.split('|')
-                if 'txt' in alinev[1]:                      # find [t] txt
-                    newaline = "  #" + aline
-                    modfile2.write(newaline)                # convert comment
-                    textfile = alinev[2].strip()
-                    textpath = os.path.join(tpath, textfile)
-                    with open(textpath,'r') as text1:       # open text file
-                        text1v = text1.readlines()
-                    modfile2.write('\n  .. table:: ' +
-                                   alinev[0][5:].strip()) 
-                    #modfile2.write('\n     :widths: auto') 
-                    #modfile2.write('\n     :align: center') 
-                    modfile2.write('\n  `') 
-                    if alinev[2].strip()[0:3] == 'lit':
-                        for bline1 in text1v:               # insert lit text
-                            bline2 = "    |" + bline1
-                            modfile2.write(bline2) 
-                        modfile2.write('  `\n')                     
-                    else:
-                        modfile2.write('\n') 
-                        for bline1 in text1v:               # insert text
-                            bline2 = "    " + bline1
-                            modfile2.write(bline2) 
-                    continue
-                elif 'csv' in alinev[1]:                    # find [t] csv
-                    newaline = "  #" + aline
-                    modfile2.write(newaline)                # convert comment
-                    modfile2.write('\n  .. table:: ' +
-                                   alinev[0][5:].strip()) 
-                    #modfile2.write('\n     :widths: auto') 
-                    #modfile2.write('\n     :align: center') 
-                    modfile2.write('\n  `') 
-                    csvfile = alinev[2].strip()
-                    csvpath = os.path.join(tpath, csvfile)
-                    rsttab = csv2rst._run(csvpath,(0,0,0))
-                    rsttabv = rsttab.split("\n")                        
-                    rsttab2 ="\n"
-                    for _i in rsttabv:
-                        rsttab2 += "    " + _i + "\n"
-                    modfile2.write(rsttab2)                 # insert table
-                    modfile2.write('  `\n')                     
-                    continue
-                else:
-                    modfile2.write(aline)
+    def utf_tex():
+        
+        
+        pass
+
+    
+    
+    def utf_csv():
+        
+        elif 'csv' in alinev[0]:                    # find [i] csv
+            newaline = "  #" + aline
+            modfile2.write(newaline)                # convert comment
+            csvfile = alinev[1].strip()
+            csvpath = os.path.join(tpath, csvfile)
+            rsttab = csv2rst._run(csvpath,(0,0,0))
+            rsttabv = rsttab.split("\n")                        
+            rsttab2 ="\n"
+            for _i in rsttabv:
+                rsttab2 += "  " + _i + "\n"
+            modfile2.write(rsttab2)                 # insert table
+            continue
+
+        elif 'csv' in alinev[1]:                    # find [t] csv
+            newaline = "  #" + aline
+            modfile2.write(newaline)                # convert comment
+            modfile2.write('\n  .. table:: ' +
+                            alinev[0][5:].strip()) 
+            #modfile2.write('\n     :widths: auto') 
+            #modfile2.write('\n     :align: center') 
+            modfile2.write('\n  `') 
+            csvfile = alinev[2].strip()
+            csvpath = os.path.join(tpath, csvfile)
+            rsttab = csv2rst._run(csvpath,(0,0,0))
+            rsttabv = rsttab.split("\n")                        
+            rsttab2 ="\n"
+            for _i in rsttabv:
+                rsttab2 += "    " + _i + "\n"
+            modfile2.write(rsttab2)                 # insert table
+
+
+    def utf_line():
+        pass
+
+    def i_utf(self):
+        """compose utf calc string for values
+
+        Return:
+            vcalc (list): list of calculated strings
+            local_dict (list): local() dictionary
+        
+                    'fig'     file       caption     size     location
+                    'text'    file       reference        
+                    'csv'     file       
+                    'func'    file       var name   reference 
+        """
+        icalc = []
+        icalc_temp = ""
+
+        for iline in self.ilist:
+            #print(iline)
+            iline1 = iline.strip()
+            if iline1 == 0:
+                icalc.append("\n")
+            if iline.strip[0] == "|":
+                pass
             else:
-                modfile2.write(aline)                   # write orig line
+                icalc.append(iline1)
+
+        return  icalc
+
+        if txt[0].strip() == '|' : return
+        elif txt[0].strip() == "::" : return                        
+        elif txt[0].strip() == '`' : return
+        elif txt[0][2:4] == ".." : return                        
+        elif txt[0][0] == '|' : self._write_utf(txt[0], 1, 0) 
+        elif txt[0][2] == "\\" : self._write_utf(txt[0], 1, 0)                
+        else: _write_utf(txt[0], 1, 0)
+                            
 
 
 
@@ -273,7 +191,7 @@ class Vexec_u:
         self.vlist = vlist
         globals().update(global1)
             
-    def vutf(self):
+    def v_utf(self):
         """compose utf calc string for values
 
         Return:
@@ -304,7 +222,7 @@ class Eexec_u:
     Returns utf equation calcs 
     """
  
-    def __init__(self, elist : list, global1):
+    def __init__(self, elist: list, global1: dict):
         """
 
         Args:
@@ -313,7 +231,7 @@ class Eexec_u:
         self.elist = elist
         globals().update(global1)
             
-    def eutf(self):
+    def e_utf(self):
         """compose utf calc string for equation
         
         Return:
@@ -351,11 +269,6 @@ class Eexec_u:
 
         local_dict = locals()
         return [local_dict, ecalc]
-
-
-
-
-
 
     def _prt_eq(self, dval):
         """ print equations.
@@ -485,8 +398,6 @@ class Eexec_u:
         self._write_utf(" ", 0, 0)
 
 
-
-
 class Texec_u:
     """Process table strings
 
@@ -504,7 +415,7 @@ class Texec_u:
 
         self.tlist = tlist
             
-    def tutf(self):
+    def t_utf(self):
         """compose utf calc string for equations
 
         Return:
