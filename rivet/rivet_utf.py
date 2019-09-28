@@ -20,7 +20,7 @@ class Rexec_u:
             sectnum (int):  section number
         """
 
-        self.vlist = vlist
+        self.rlist = rlist
 
     def r_utf(self):
         """compose utf calc string for values
@@ -37,7 +37,7 @@ class Iexec_u:
        Return formatted utf calcs 
     """
  
-    def __init__(self, ilist : list):
+    def __init__(self, ilist: list, idict: dict, folders: dict, opt: dict ):
         """
 
         Args:
@@ -47,34 +47,42 @@ class Iexec_u:
         """
 
         self.ilist = ilist
-            
+        self.folders = folders
+        self.idict = idict
+        self.opt = opt
+        self.icalc = []
 
-    def utf_fig():
-        
-        
-        
-        _write_utf("figure | " + fname1 + " | " + caption1, 0, 1)
-        
-        elif option == 'figure':
-            # insert figure reference in utf-8 document
-            self.fignum += 1
-            link1 = "< insert figure " + str(self.fignum) + '. ' \
-                    + " file: " + str(fpath) + '>'
-            self.ew.errwrite(link1, 0)
-            link2 = "Figure " + str(self.fignum) + '. ' + var1 \
-                    + " <file: " + str(fpath) + " >"
-            self._write_utf(link2, 1)
-            self._write_utf(" ", 0)
+    def i_line(self):
+        self.icalc.append("\n" + "=" * _calcwidth + "\n")
 
+    def i_str(self) -> tuple[dict, list]:
+        """ compose utf calc string from insert-string
         
-        pass
+        Returns:
+            tuple[dict, list]: locals dict, list of calc strings
+        """
+        icalc_temp = ""
+        for iline in self.ilist:
+            #print(iline)
+            iline1 = iline.strip()
+            if len(iline1) == 0:
+                icalc.append("\n")
+                continue
+            if iline1[0] == "|":
+                if ".txt" in iline1: i_txt()
+                elif ".jpg" in iline1: i_fig(iline1)
+                elif ".png" in iline1: i_fig(iline1)
+                elif ".tex" in iline1: i_tex()
+                elif ".rst" in iline1: i_csv()
+                elif ".csv" in iline1: i_csv()
+            else:
+                self.icalc.append(iline1)
 
-    def utf_txt():
-        
+        return locals(), icalc
 
-
-        if option == 'text':
-            # insert file from text into model, do not process
+    def i_txt(self, iline1):
+        """insert file from text into model
+        """
         with open(fpath, 'r') as f1:
             txstrng = f1.readlines()
         if var1.strip() != '':
@@ -88,17 +96,22 @@ class Iexec_u:
         link1 = "< text inserted from file: " + str(fpath) + " >"
         self.ew.errwrite(link1, 1)
         self.ew.errwrite('', 0)
-        
 
+    def i_fig(self, iline1):
+        """ insert figure reference in utf calc
+        """        
+        self.fignum += 1
+        link1 = "< insert figure " + str(self.fignum) + '. ' \
+                + " file: " + str(fpath) + '>'
+        link2 = "Figure " + str(self.fignum) + '. ' + var1 \
+                + " <file: " + str(fpath) + " >"
+        self.icalc.append(link2)
 
-    def utf_tex():
         
-        
+    def i_tex(self,iline1):
         pass
-
     
-    
-    def utf_csv():
+    def i_csv(self, iline1):
         
         elif 'csv' in alinev[0]:                    # find [i] csv
             newaline = "  #" + aline
@@ -112,68 +125,6 @@ class Iexec_u:
                 rsttab2 += "  " + _i + "\n"
             modfile2.write(rsttab2)                 # insert table
             continue
-
-        elif 'csv' in alinev[1]:                    # find [t] csv
-            newaline = "  #" + aline
-            modfile2.write(newaline)                # convert comment
-            modfile2.write('\n  .. table:: ' +
-                            alinev[0][5:].strip()) 
-            #modfile2.write('\n     :widths: auto') 
-            #modfile2.write('\n     :align: center') 
-            modfile2.write('\n  `') 
-            csvfile = alinev[2].strip()
-            csvpath = os.path.join(tpath, csvfile)
-            rsttab = csv2rst._run(csvpath,(0,0,0))
-            rsttabv = rsttab.split("\n")                        
-            rsttab2 ="\n"
-            for _i in rsttabv:
-                rsttab2 += "    " + _i + "\n"
-            modfile2.write(rsttab2)                 # insert table
-
-
-    def utf_line():
-        pass
-
-    def i_utf(self):
-        """compose utf calc string for values
-
-        Return:
-            vcalc (list): list of calculated strings
-            local_dict (list): local() dictionary
-        
-                    'fig'     file       caption     size     location
-                    'text'    file       reference        
-                    'csv'     file       
-                    'func'    file       var name   reference 
-        """
-        icalc = []
-        icalc_temp = ""
-
-        for iline in self.ilist:
-            #print(iline)
-            iline1 = iline.strip()
-            if iline1 == 0:
-                icalc.append("\n")
-            if iline.strip[0] == "|":
-                pass
-            else:
-                icalc.append(iline1)
-
-        return  icalc
-
-        if txt[0].strip() == '|' : return
-        elif txt[0].strip() == "::" : return                        
-        elif txt[0].strip() == '`' : return
-        elif txt[0][2:4] == ".." : return                        
-        elif txt[0][0] == '|' : self._write_utf(txt[0], 1, 0) 
-        elif txt[0][2] == "\\" : self._write_utf(txt[0], 1, 0)                
-        else: _write_utf(txt[0], 1, 0)
-                            
-
-
-
-
-
 
 class Vexec_u:
     """Process value strings
@@ -212,8 +163,7 @@ class Vexec_u:
             else:
                 vcalc.append(vline.strip())
 
-        local_dict = locals()
-        return [local_dict, vcalc]
+        return [locals(), vcalc]
         
 
 class Eexec_u:
