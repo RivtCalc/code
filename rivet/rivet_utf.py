@@ -1,12 +1,16 @@
 #! python
 import os
 import sys
+import csv
+import textwrap
+from tabulate import tabulate 
+from typing import List, Set, Dict, Tuple, Optional
 
 __version__ = "0.9.0"
 __author__ = 'rholland@structurelabs.com'
       
 class Rexec_u:
-    """Process insert strings
+    """Process run-strings
 
     Returns utf calcs 
     """
@@ -32,25 +36,27 @@ class Rexec_u:
         pass
 
 class Iexec_u:
-    """Process insert strings
-
-       Return formatted utf calcs 
-    """
- 
-    def __init__(self, ilist: list, idict: dict, folders: dict, opt: dict ):
-        """
+    """Process insert-strings
 
         Args:
             slist (list): list of input parameters in string settings
             vlist (list): list of input lines in value string
             sectnum (int):  section number
-        """
+
+       Return formatted utf calcs 
+    """
+ 
+    def __init__(self, ilist: List[str], 
+                  rivet_dict: Dict, 
+                     folders: Dict[str,str], 
+                      strset: Dict):
 
         self.ilist = ilist
         self.folders = folders
-        self.idict = idict
+        self.gdict = gdict
         self.opt = opt
         self.icalc = []
+        self.maxcolwidth = strset["maxcolwidth"]
 
     def i_line(self):
         self.icalc.append("\n" + "=" * _calcwidth + "\n")
@@ -72,9 +78,9 @@ class Iexec_u:
                 if ".txt" in iline1: i_txt()
                 elif ".jpg" in iline1: i_fig(iline1)
                 elif ".png" in iline1: i_fig(iline1)
-                elif ".tex" in iline1: i_tex()
-                elif ".rst" in iline1: i_csv()
-                elif ".csv" in iline1: i_csv()
+                elif ".tex" in iline1: i_tex(iline1)
+                elif ".rst" in iline1: i_csv(iline1.split("|"))
+                elif ".csv" in iline1: i_csv(iline1.split("|"))
             else:
                 self.icalc.append(iline1)
 
@@ -111,20 +117,27 @@ class Iexec_u:
     def i_tex(self,iline1):
         pass
     
-    def i_csv(self, iline1):
-        
-        elif 'csv' in alinev[0]:                    # find [i] csv
-            newaline = "  #" + aline
-            modfile2.write(newaline)                # convert comment
-            csvfile = alinev[1].strip()
-            csvpath = os.path.join(tpath, csvfile)
-            rsttab = csv2rst._run(csvpath,(0,0,0))
-            rsttabv = rsttab.split("\n")                        
-            rsttab2 ="\n"
-            for _i in rsttabv:
-                rsttab2 += "  " + _i + "\n"
-            modfile2.write(rsttab2)                 # insert table
-            continue
+    def i_csv(self, iline1,maxwidth):
+        if ".rst" in iline1[1]:
+            rstfile = os.path.join(self.folders["tpath"], iline1[1].strip())
+            with open(rstfile,'r') as rstf1:
+                rstf2 = rstf1.read
+            self.icalc.append(rstf2)
+        elif ".csv" in iline1[1]:
+            csvfile = os.path.join(self.folders["tpath"], iline1[1].strip())
+            with open(csvfile,'r') as csvf1:
+                read1 = csv.reader(csvf1)
+            parse1 = []
+            for row in read1:
+                for i in range(len(row)):
+                    templist = textwrap.wrap(row[i], self.maxwidth) 
+                    row[i] = """\n""".join(templist)
+                    #row[i] = row[i].replace(" ","""\n""")
+                parse1.append(row)
+            rstout = tabulate(parse1, tablefmt="grid", headers="firstrow")            
+            self.icalc.append(rstout)
+        else:
+            return
 
 class Vexec_u:
     """Process value strings
@@ -132,7 +145,7 @@ class Vexec_u:
     Returns utf value calcs 
     """
  
-    def __init__(self, vlist : list, global1):
+    def __init__(self, vlist: List, global1: Dict):
         """
 
         Args:
