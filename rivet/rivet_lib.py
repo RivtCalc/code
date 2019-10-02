@@ -48,8 +48,8 @@ if sys.version_info < (3, 7):
 _rivfile = __main__.fileset["file"]
 _rivbase = __main__.fileset["file"].split(".")[0]
 _rivpath = __main__.fileset["path"]
-_rivfull = os.path.join(_rivpath,_rivfile)
-_rivbak = os.path.join(_rivpath,_rivfile.split(".")[0]+".bak")
+_rivfull = Path(_rivpath / _rivfile)
+_rivbak = Path(_rivpath / _rivfile.split(".")[0]+".bak")
 _txtfile =  ".".join((_rivbase, "txt"))
 _logfile =  ".".join((_rivbase, "log"))
 _rivetpath = os.path.dirname("rivet.rivet_lib.py")
@@ -58,13 +58,13 @@ _opt = __main__.fileset["opt"]
 
 _folders = {
 "reptpath" : os.path.join(os.pardir, "reports"),
-"spath": os.path.join(_rivpath, "scripts"),
-"tpath": os.path.join(_rivpath["adpath"], "table"),
-"upath": os.path.join(_rivpath["adpath"], "txt"),
-"rpath": os.path.join(_rivpath["reptpath"], "pdf"),
-"xpath": os.path.join(_rivpath["reptpath"], "temp"),
-"fpath": os.path.join(_rivpath["reptpath"], "figures"),
-"hpath": os.path.join(_rivpath["reptpath"], "html")
+"spath": Path(_rivpath / "scripts"),
+"tpath": Path(_rivpath["adpath"] / "table"),
+"upath": Path(_rivpath["adpath"] / "txt"),
+"rpath": Path(_rivpath["reptpath"] / "pdf"),
+"xpath": Path(_rivpath["reptpath"] / "temp"),
+"fpath": Path(_rivpath["reptpath"] / "figures"),
+"hpath": Path(_rivpath["reptpath"] / "html")
 }    
 
 rivet_dict = {}
@@ -94,7 +94,7 @@ print("checks: folders checked; file backup written to temp folder", "\n\n")
 # _el.logwrite("< Tex Live installation found>", vbos)
 # pdfout1.gen_pdf() 
 
-def _riv_strset(line1: string) -> Tuple[int,str,str]:
+def _riv_strset(line1: string) -> Tuple(str, str, int, List[int]):
     """ parse rivet-string settings
     
     Args:
@@ -104,48 +104,25 @@ def _riv_strset(line1: string) -> Tuple[int,str,str]:
         Tuple[int,str,str]: exec flag, str description, str type
     """
     #print(line1)
-    exec_flg  = -1; sect_num  = -1
-    str_descrip  = " "; str_type = " "
+    _strnum = [_opt[4], -1, 0, 0]
+    sect_num = _strnum[1]
+    exec_flg  = -1 
+    str_descrip  = " "
+    str_type = " "
     line2 = line1.split("|")[1]
     str_type = line2[0].strip()
-    sect_num = line2.find("]")
+    sect_num = line2.find("]]")
     if sect_num > -1:
         str_descrip = line2[sect_num + 1:].strip()
         sect_num = line2[sect_num-2:sect_num]
-        sect_num = sect_num.strip("]").strip("[")
-        _strset[1] = sect_num
-        _strset[2] = 0
-        _strset[3] = 0
+        sect_num = sect_num.strip("]]").strip("[[")
+        _strnum[1] = sect_num
     if "--hide" in line2:
         exec_flg = 1
         str_descrip = line2[0].replace("--hide","").strip()                
     else:
         exec_flg = 0
-    return [exec_flg, str_descrip, str_type]
-
-def _write_utf(rivstring: List[str]):
-    """ write model text to utf-8 encoded file.
-    
-    Args:
-        mentry (string): text 
-        pp (int): pretty print flag
-        indent (int): indent flag
-         
-    """
-    rivstring1 = []
-    sect_num = _strset[1]
-    descrip = _strset[2]
-    _calcwidth = int(_opt[0])
-    if sect_num > -1:
-        rivstring1.append('=' * _calcwidth)
-        descrip1 = " " +  descrip + (_calcnum + "-" +
-            sect_num).rjust(_calcwidth - len(descrip) - 2)
-        rivstring1.append('=' * _calcwidth)
-    rivstring2 = rivstring1 + rivstring
-    f1 = open(_rivfull, 'a')
-    f1.write(rivstring2)
-    f1.close()
-    print(rivstring2)
+    return [str_type, str_descrip, exec_flg, _strnum]
 
 def _write_rst(pline, pp, indent):
     """[summary]
@@ -155,7 +132,6 @@ def _write_rst(pline, pp, indent):
         pp ([type]): [description]
         indent ([type]): [description]
     """
-    
     pdf_files = {
         "cpdf":  ".".join((_rivbase, "pdf")),
         "chtml":  ".".join((_rivbase, "html")),
@@ -201,6 +177,30 @@ def _write_py(self):
             if __name__ == "__main__":\n
                    vlist()\n\n""")
     _rivfile.write("\n")
+
+def _write_utf(rivstring: List[str], _strset: List[str]):
+    """ write model text to utf-8 encoded file.
+    
+    Args:
+        mentry (string): text 
+        pp (int): pretty print flag
+        indent (int): indent flag
+         
+    """
+    rivstring1 = []
+    sect_num = int(_strset[3][1])
+    descrip = _strset[2]
+    _calcwidth = int(_strset[3][0])
+    if sect_num > -1:
+        rivstring1.append('=' * _calcwidth)
+        descrip1 = " " +  descrip + (_calcnum + "-" +
+            sect_num).rjust(_calcwidth - len(descrip) - 2)
+        rivstring1.append('=' * _calcwidth)
+    rivstring2 = rivstring1 + rivstring
+    f1 = open(_rivfull, 'a')
+    f1.write(rivstring2)
+    f1.close()
+    print(rivstring2)
     
 def r__(fstr: string):
     """ evaluate and format a rivet-string
@@ -211,11 +211,11 @@ def r__(fstr: string):
     fstr1 = fstr.split("\n", 1)
     fstr2 = fstr1[1].splitlines()
     _strset = _riv_strset(fstr1[0])
-    if _strset[3] == "r": rs__(_strset, fstr2)
-    elif _strset[3] == "i": is__(_strset, fstr2)
-    elif _strset[3] == "v": vs__(_strset, fstr2)
-    elif _strset[3] == "e": es__(_strset, fstr2)
-    elif _strset[3] == "t": ts__(_strset, fstr2)
+    if _strset[0] == "r": rs__(_strset, fstr2)
+    elif _strset[0] == "i": is__(_strset, fstr2)
+    elif _strset[0] == "v": vs__(_strset, fstr2)
+    elif _strset[0] == "e": es__(_strset, fstr2)
+    elif _strset[0] == "t": ts__(_strset, fstr2)
     else:
         print(fstr2, " < rivet string type not found >")
     
@@ -226,7 +226,6 @@ def rs__(_strset: List[int], fstr2: List[str]):
     Args:
         fstr (string): [description]
     """
-
     calc = _utf.Rexec_u(fstr2, rivet_dict)
     dict1, calc1, equ1 = calc.r_utf()
 
@@ -240,10 +239,10 @@ def is__(_strset: List[int], fstr2: List[str]):
     """ format a rivet-string of text and images
     
     """
-    calc = _utf.Iexec_u(fstr2, rivet_dict, _folders,  _strset)
+    calc = _utf.Iexec_u(fstr2, rivet_dict, _folders, _strset)
     dict1, calc1, equ1 = calc.i_utf()
     
-    if _strset[0] == 0: 
+    if _strset[3] == 0: 
         _write_utf(calc1, _strset)
     
     equation_list.append(equ1)

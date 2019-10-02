@@ -3,6 +3,8 @@ import os
 import sys
 import csv
 import textwrap
+import subprocess
+import pandas as pd
 from tabulate import tabulate 
 from typing import List, Set, Dict, Tuple, Optional
 
@@ -49,17 +51,17 @@ class Iexec_u:
     def __init__(self, ilist: List[str], 
                   rivet_dict: Dict, 
                      folders: Dict[str,str], 
-                      strset: Dict):
+                      strset: List[str,str,int,list]):
 
         self.ilist = ilist
         self.folders = folders
         self.gdict = gdict
         self.opt = opt
         self.icalc = []
-        self.maxcolwidth = strset["maxcolwidth"]
+        self.maxwidth = strset[4][0]
 
     def i_line(self):
-        self.icalc.append("\n" + "=" * _calcwidth + "\n")
+        self.icalc.append("\n" + "=" * self.maxwidth + "\n")
 
     def i_str(self) -> tuple[dict, list]:
         """ compose utf calc string from insert-string
@@ -78,7 +80,8 @@ class Iexec_u:
                 if ".txt" in iline1: i_txt()
                 elif ".jpg" in iline1: i_fig(iline1)
                 elif ".png" in iline1: i_fig(iline1)
-                elif ".tex" in iline1: i_tex(iline1)
+                elif  "["   in iline1: i_tex(iline1)
+                elif  "\\"  in iline1: i_tex(iline1)
                 elif ".rst" in iline1: i_csv(iline1.split("|"))
                 elif ".csv" in iline1: i_csv(iline1.split("|"))
             else:
@@ -113,10 +116,23 @@ class Iexec_u:
                 + " <file: " + str(fpath) + " >"
         self.icalc.append(link2)
 
-        
     def i_tex(self,iline1):
-        pass
-    
+        if "\\" in iline1:
+            try:
+                asciiform = subprocess.Popen(['perl', 'tex2uni.pl', iline1[1:]], 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.STDOUT)
+            except:
+                print("perl or tex2uni.pl not found - see user manual page x")
+        if "[" in iline1:            
+            try:
+                eq_df = pd.read_csv("_spath/equations.csv", skiprows = 1)
+                rows = iline1.split("|")[1]
+                for row in rows:
+                    self.icalc.append(eq_df['ascii'][row] + "\n")
+            except:
+                pass
+
     def i_csv(self, iline1,maxwidth):
         if ".rst" in iline1[1]:
             rstfile = os.path.join(self.folders["tpath"], iline1[1].strip())
@@ -130,9 +146,8 @@ class Iexec_u:
             parse1 = []
             for row in read1:
                 for i in range(len(row)):
-                    templist = textwrap.wrap(row[i], self.maxwidth) 
+                    templist = textwrap.wrap(row[i], self.maxcol) 
                     row[i] = """\n""".join(templist)
-                    #row[i] = row[i].replace(" ","""\n""")
                 parse1.append(row)
             rstout = tabulate(parse1, tablefmt="grid", headers="firstrow")            
             self.icalc.append(rstout)
