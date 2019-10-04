@@ -6,7 +6,9 @@ import textwrap
 import subprocess
 import pandas as pd
 from tabulate import tabulate 
+from pathlib import Path
 from typing import List, Set, Dict, Tuple, Optional
+
 
 __version__ = "0.9.0"
 __author__ = 'rholland@structurelabs.com'
@@ -17,7 +19,7 @@ class Rexec_u:
     Returns utf calcs 
     """
  
-    def __init__(self, vlist : list):
+    def __init__(self, rlist : list):
         """
 
         Args:
@@ -48,22 +50,21 @@ class Iexec_u:
        Return formatted utf calcs 
     """
  
-    def __init__(self, ilist: List[str], 
-                  rivet_dict: Dict, 
-                     folders: Dict[str,str], 
-                      strset: List[str,str,int,list]):
+    def __init__(self, ilist: list, rivet_dict: dict, \
+                     folders: dict, strnum: list):
 
+        self.icalc = []
         self.ilist = ilist
         self.folders = folders
-        self.gdict = gdict
-        self.opt = opt
-        self.icalc = []
-        self.maxwidth = strset[4][0]
+        self.maxwidth = strnum[0]
+        self.sectnum = strnum[1]
+        self.eqnum = strnum[2]
+        self.fignum = strnum[3]
 
     def i_line(self):
         self.icalc.append("\n" + "=" * self.maxwidth + "\n")
 
-    def i_str(self) -> tuple[dict, list]:
+    def i_str(self) -> Tuple[dict, list]:
         """ compose utf calc string from insert-string
         
         Returns:
@@ -74,47 +75,43 @@ class Iexec_u:
             #print(iline)
             iline1 = iline.strip()
             if len(iline1) == 0:
-                icalc.append("\n")
+                self.icalc.append("\n")
                 continue
             if iline1[0] == "|":
-                if ".txt" in iline1: i_txt()
-                elif ".jpg" in iline1: i_fig(iline1)
-                elif ".png" in iline1: i_fig(iline1)
-                elif  "["   in iline1: i_tex(iline1)
-                elif  "\\"  in iline1: i_tex(iline1)
-                elif ".rst" in iline1: i_csv(iline1.split("|"))
-                elif ".csv" in iline1: i_csv(iline1.split("|"))
+                if ".txt" in iline1: self.i_txt()
+                elif ".jpg" in iline1: self.i_fig(iline1)
+                elif ".png" in iline1: self.i_fig(iline1)
+                elif  "["   in iline1: self.i_tex(iline1)
+                elif  "\\"  in iline1: self.i_tex(iline1)
+                elif ".rst" in iline1: self.i_csv(iline1.split("|"))
+                elif ".csv" in iline1: self.i_csv(iline1.split("|"))
             else:
                 self.icalc.append(iline1)
 
-        return locals(), icalc
+        eq1 = []
+        return locals(), icalc, eq1
 
     def i_txt(self, iline1):
-        """insert file from text into model
+        """insert text file into insert string
+
         """
-        with open(fpath, 'r') as f1:
-            txstrng = f1.readlines()
-        if var1.strip() != '':
-            instxt = eval('txstrng[' + var1.strip() + ']')
-            instxt = ''.join(instxt)
-        else:
-            instxt = ''.join(txstrng)
+        iline1 = iline1.split("|")
+        txtp1 = Path(self.folders["tpath"], "/", iline1[2])
+        with open(txtp1, 'r') as txtf1:
+            txtstrng1 = txtf1.read()
 
-        self._write_utf(instxt, 0)
-
-        link1 = "< text inserted from file: " + str(fpath) + " >"
-        self.ew.errwrite(link1, 1)
-        self.ew.errwrite('', 0)
+        self.icalc.append(txtstrng1)
 
     def i_fig(self, iline1):
         """ insert figure reference in utf calc
-        """        
+        """ 
         self.fignum += 1
-        link1 = "< insert figure " + str(self.fignum) + '. ' \
-                + " file: " + str(fpath) + '>'
-        link2 = "Figure " + str(self.fignum) + '. ' + var1 \
-                + " <file: " + str(fpath) + " >"
-        self.icalc.append(link2)
+        iline1 = iline1.split("|")  
+        caption1 = "  " + iline1[2].split("[[")[0]
+        ref1 = ("Figure " + str(self.sectnum) + '.' + str(self.fignum)  
+                + caption1 + "\nfile: " + str(self.folders["fpath"]))
+        
+        self.icalc.append(ref1)
 
     def i_tex(self,iline1):
         if "\\" in iline1:
@@ -126,9 +123,13 @@ class Iexec_u:
                 print("perl or tex2uni.pl not found - see user manual page x")
         if "[" in iline1:            
             try:
-                eq_df = pd.read_csv("_spath/equations.csv", skiprows = 1)
+                eq_df = pd.read_csv(self.folders["spath"], skiprows = 1)
                 rows = iline1.split("|")[1]
                 for row in rows:
+                    if "code" in iline1.split("|")[2]:
+                        self.icalc.append(eq_df['code'][row] + 
+                                " : " + eq_df['label'][row] + "\n")    
+                    
                     self.icalc.append(eq_df['ascii'][row] + "\n")
             except:
                 pass
@@ -139,6 +140,7 @@ class Iexec_u:
             with open(rstfile,'r') as rstf1:
                 rstf2 = rstf1.read
             self.icalc.append(rstf2)
+        
         elif ".csv" in iline1[1]:
             csvfile = os.path.join(self.folders["tpath"], iline1[1].strip())
             with open(csvfile,'r') as csvf1:
@@ -150,6 +152,7 @@ class Iexec_u:
                     row[i] = """\n""".join(templist)
                 parse1.append(row)
             rstout = tabulate(parse1, tablefmt="grid", headers="firstrow")            
+            
             self.icalc.append(rstout)
         else:
             return

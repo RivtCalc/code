@@ -5,12 +5,15 @@
 
 import os
 import importlib.util
+from pathlib import Path, PurePath
 
 # load unum from rivet directory
-unum_path = os.path.join(cfg.rivpath,'unum','__init__.py')
-spec = importlib.util.spec_from_file_location("unum", unum_path)
-unum = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(unum)
+spec1 = importlib.util.find_spec("rivet")
+rivetpath1 = Path(spec1.origin).parent
+unum_path = Path(rivetpath1 / 'unum' / '__init__.py')
+spec2 = importlib.util.spec_from_file_location("unum", unum_path)
+unum = importlib.util.module_from_spec(spec2)
+spec2.loader.exec_module(unum)
 Unum = unum.Unum
 
 Unum.UNIT_FORMAT = "%s"

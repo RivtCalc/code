@@ -7,11 +7,11 @@
     formatting.
     
     Methods:
-        r__(fstring): run a string of python code 
-        i__(fstring): evaluate a string with text and images
-        v__(fstring): evaluate a string with values
-        e__(fstring): evaluate a string with equations
-        t__(fstring): evaluate a string with tables and plots
+        r__(fstring): run python code 
+        i__(fstring): evaluate text and images
+        v__(fstring): evaluate values
+        e__(fstring): evaluate equations
+        t__(fstring): evaluate tables and plots
         _riv_strset(dictionary): set evaluation and formatting parameters
         _write_utf(string): write utf8 formatted string to stdout and calc-file
         _write_rst(string): write rst formatted string to calc-file
@@ -23,62 +23,58 @@ import sys
 from pathlib import Path
 from typing import List, Set, Dict, Tuple, Optional
 
+from numpy import *
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy.linalg as la
 import pandas as pd
-import rivet.rivet_check as _chk
-import rivet.rivet_utf as _utf
 import sympy as sy
 from IPython.display import HTML, Image, Latex, Math, display
-from numpy import *
+import rivet.rivet_check as _chk
+import rivet.rivet_utf as _utf
 from rivet.rivet_unit import *
-
-import __main__
-
 #import rivet.rivet_rst as _rst
 #import rivet.rivet_reprt as _reprt
+
+import __main__
 
 __version__ = "0.9.1"
 __author__ = "rholland"
 if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
-# set up folders, files and dictionaries
-_rivfile = __main__.fileset["file"]
-_rivbase = __main__.fileset["file"].split(".")[0]
-_rivpath = __main__.fileset["path"]
-_rivfull = Path(_rivpath / _rivfile)
-_rivbak = Path(_rivpath / _rivfile.split(".")[0]+".bak")
+# set up files, folders and dictionaries
+_rivfull = Path(__main__.__file__)
+_rivfile = Path(__main__.__file__).name
+_rivbase = (Path(_rivfull).name).split(".py")[0]
+_rivpath = Path(_rivfull).parent
+_projpath = Path(_rivfull).parent.parent
+_rivbak = Path(_rivpath / str(_rivbase + "bak"))
 _txtfile =  ".".join((_rivbase, "txt"))
 _logfile =  ".".join((_rivbase, "log"))
 _rivetpath = os.path.dirname("rivet.rivet_lib.py")
-_projpath = os.pardir
-_opt = __main__.fileset["opt"]
-
 _folders = {
-"reptpath" : os.path.join(os.pardir, "reports"),
 "spath": Path(_rivpath / "scripts"),
-"tpath": Path(_rivpath["adpath"] / "table"),
-"upath": Path(_rivpath["adpath"] / "txt"),
-"rpath": Path(_rivpath["reptpath"] / "pdf"),
-"xpath": Path(_rivpath["reptpath"] / "temp"),
-"fpath": Path(_rivpath["reptpath"] / "figures"),
-"hpath": Path(_rivpath["reptpath"] / "html")
+"tpath": Path(_rivpath / "table"),
+"rpath": Path(_projpath / "pdf"),
+"xpath": Path(_projpath / "temp"),
+"fpath": Path(_projpath / "figures"),
+"hpath": Path(_projpath / "html"),
+"reptpath": Path(_projpath / "reports")
 }    
-
-rivet_dict = {}
-equation_list = []
-_calcnum = _rivbase[:3]
+rivdat: dict = {"test" : 1}
+rivet: dict = {}
+equations: list = []
+_calcnum: int = _rivbase[:3]
 _calcwidth = 80; _sectnum = 0; _eqnum = 0; _fignum = 0
-_strset =[_calcwidth, _sectnum, _eqnum, _fignum]
 
 # initial checks on input
 with open(_rivfull, "r") as f2:
     adbak = f2.read()
 with open(_rivbak, "w") as f3:
     f3.write(adbak)
-print("\n\npath: ", _rivpath, "; ", _rivfile)
+print("\n\nfile: ", _rivfile)
+print("path: ", _rivpath)
 print("checks: folders checked; file backup written to temp folder", "\n\n")
 
 # start checks and logs
@@ -94,7 +90,7 @@ print("checks: folders checked; file backup written to temp folder", "\n\n")
 # _el.logwrite("< Tex Live installation found>", vbos)
 # pdfout1.gen_pdf() 
 
-def _riv_strset(line1: string) -> Tuple(str, str, int, List[int]):
+def _riv_strset(line1: str) -> tuple:
     """ parse rivet-string settings
     
     Args:
@@ -104,8 +100,12 @@ def _riv_strset(line1: string) -> Tuple(str, str, int, List[int]):
         Tuple[int,str,str]: exec flag, str description, str type
     """
     #print(line1)
-    _strnum = [_opt[4], -1, 0, 0]
-    sect_num = _strnum[1]
+
+    opt = rivdat["opt"]
+    strnum: list = [int(opt[1]), -1, 0, 0]
+    sect_num = strnum[1]
+    eq_num = strnum[2]
+    fig_num =strnum[3]
     exec_flg  = -1 
     str_descrip  = " "
     str_type = " "
@@ -116,13 +116,13 @@ def _riv_strset(line1: string) -> Tuple(str, str, int, List[int]):
         str_descrip = line2[sect_num + 1:].strip()
         sect_num = line2[sect_num-2:sect_num]
         sect_num = sect_num.strip("]]").strip("[[")
-        _strnum[1] = sect_num
+        strnum[1] = sect_num
     if "--hide" in line2:
         exec_flg = 1
         str_descrip = line2[0].replace("--hide","").strip()                
     else:
         exec_flg = 0
-    return [str_type, str_descrip, exec_flg, _strnum]
+    return [str_type, str_descrip, exec_flg, strnum]
 
 def _write_rst(pline, pp, indent):
     """[summary]
@@ -178,7 +178,7 @@ def _write_py(self):
                    vlist()\n\n""")
     _rivfile.write("\n")
 
-def _write_utf(rivstring: List[str], _strset: List[str]):
+def _write_utf(rivstring: List[str], strset: list):
     """ write model text to utf-8 encoded file.
     
     Args:
@@ -188,99 +188,106 @@ def _write_utf(rivstring: List[str], _strset: List[str]):
          
     """
     rivstring1 = []
-    sect_num = int(_strset[3][1])
-    descrip = _strset[2]
-    _calcwidth = int(_strset[3][0])
+    sect_num = int(strset[3][1])
+    descrip = strset[2]
+    calcwidth = int(strset[3][0])
     if sect_num > -1:
-        rivstring1.append('=' * _calcwidth)
+        rivstring1.append('=' * calcwidth)
         descrip1 = " " +  descrip + (_calcnum + "-" +
-            sect_num).rjust(_calcwidth - len(descrip) - 2)
-        rivstring1.append('=' * _calcwidth)
+            sect_num).rjust(calcwidth - len(descrip) - 2)
+        rivstring1.append('=' * calcwidth)
     rivstring2 = rivstring1 + rivstring
-    f1 = open(_rivfull, 'a')
-    f1.write(rivstring2)
-    f1.close()
-    print(rivstring2)
+    with open(Path(_rivpath / _txtfile), 'a') as f1:
+        f1.writelines(rivstring2)
+    print(*rivstring2, sep="\n")
     
-def r__(fstr: string):
-    """ evaluate and format a rivet-string
+def r__(fstr: str):
+    """ select rivet-string type
     
     Args:
         fstr (string): [description]
     """
-    fstr1 = fstr.split("\n", 1)
-    fstr2 = fstr1[1].splitlines()
-    _strset = _riv_strset(fstr1[0])
-    if _strset[0] == "r": rs__(_strset, fstr2)
-    elif _strset[0] == "i": is__(_strset, fstr2)
-    elif _strset[0] == "v": vs__(_strset, fstr2)
-    elif _strset[0] == "e": es__(_strset, fstr2)
-    elif _strset[0] == "t": ts__(_strset, fstr2)
+    global rivdat
+    fstr1 = fstr.split("\n", 1)[0]
+    fstr2 = fstr.split("\n", 1)[1]
+    if fstr1[0] == "r": rs__(fstr1, fstr2)
+    elif fstr1[0] == "i": is__(fstr1, fstr2)
+    elif fstr1[0] == "v": vs__(fstr1, fstr2)
+    elif fstr1[0] == "e": es__(frstr1, fstr2)
+    elif fstr1[0] == "t": ts__(fstr1, fstr2)
     else:
-        print(fstr2, " < rivet string type not found >")
+        print(" < rivet string " + str(fstr1[0]) + " type not found >")
     
-
-def rs__(_strset: List[int], fstr2: List[str]):
+def rs__(fstr1: str, fstr2: str):
     """ execute and format a rivet-string of python code
     
     Args:
         fstr (string): [description]
     """
-    calc = _utf.Rexec_u(fstr2, rivet_dict)
-    dict1, calc1, equ1 = calc.r_utf()
+    global rivdat
+    fstr3 = "".join(fstr2.split("\n"))
+    fstr3 = fstr3.replace(" ","") 
+    exec(fstr3, globals())
+    strset = _riv_strset(fstr1)
+    #calc = _utf.Rexec_u(fstr2.split("\n"))
+    #dict1, calc1, equ1 = calc.r_utf()
 
-    if _strset[0] == 0: 
-        _write_utf(calc1, _strset)
+    if strset[2] == 0: _write_utf(fstr2.split("\n"), strset)
 
-    equation_list.append(equ1)
-    rivet_dict.update(dict1)
+    #equations.append(equ1)
+    #rivet.update(dict1)
+    #globals.update(dict1)
 
-def is__(_strset: List[int], fstr2: List[str]):
+def is__(fstr1: str, fstr2: str):
     """ format a rivet-string of text and images
     
     """
-    calc = _utf.Iexec_u(fstr2, rivet_dict, _folders, _strset)
-    dict1, calc1, equ1 = calc.i_utf()
+    strset = _riv_strset(fstr1)
+    calc = _utf.Iexec_u(fstr2.split("\n"), rivet, _folders, strset[3])
+    dict1, calc1, equ1 = calc.i_str()
     
-    if _strset[3] == 0: 
-        _write_utf(calc1, _strset)
+    if strset[2] == 0: _write_utf(calc1, strset)
     
-    equation_list.append(equ1)
-    rivet_dict.update(dict1)
+    equations.append(equ1)
+    rivet.update(dict1)
+    globals.update(dict1)
 
-def vs__(_strset: List[int], fstr2: List[str]):
+def vs__(fstr1: str, fstr2: List[str]):
     """evaluate and format a rivet-string of values
 
     """
-    calc = _utf.Vexec_u(fstr2, rivet_dict, _folders,  _strset)
+    strset = _riv_strset(fstr1)
+    calc = _utf.Vexec_u(fstr2.split("\n"), rivet, _folders,  strset)
     dict1, calc1, equ1 = calc.v_utf()
     
-    if _strset[0] == 0: 
-        _write_utf(calc1)
+    if fstr1[0] == 0: _write_utf(calc1)
     
-    equation_list.append(equ1)
-    rivet_dict.update(dict1)    
+    equations.append(equ1)
+    rivet.update(dict1)    
+    globals.update(dict1)
 
-def es__(_strset: List[int], fstr2: List[str]):
+def es__(fstr1: str, fstr2: List[str]):
     """evaluate and format a rivet-string of equations
 
     """
 
-    if _strset[0] == 2: return
-    calc = _utf.Eexec_u(fstr2, rivet_dict)
+    if fstr1[0] == 2: return
+    calc = _utf.Eexec_u(fstr2.split("\n"), rivet)
     dict1, calc1, equ1 = calc.e_utf()
-    if _strset[0] == 0: _write_utf(calc1)
-    equation_list.append(equ1)
-    rivet_dict.update(dict1)
+    if fstr1[0] == 0: _write_utf(calc1)
+    equations.append(equ1)
+    rivet.update(dict1)
+    globals.update(dict1)
 
-def ts__(_strset: List[int], fstr2: List[str]):
+def ts__(fstr1: str, fstr2: List[str]):
     """evaluate and format a rivet-string of tables
     
     """
 
-    if _strset[0] == 2: return
-    calc = _utf.Texec_u(fstr2, rivet_dict)
+    if fstr1[0] == 2: return
+    calc = _utf.Texec_u(fstr2.split("\n"), rivet)
     dict1, calc1, equ1 = calc.t_utf()
-    if _strset[0] == 0: _write_utf(calc1)
-    equation_list.append(equ1)
-    rivet_dict.update(dict1)
+    if fstr1[0] == 0: _write_utf(calc1)
+    equations.append(equ1)
+    rivet.update(dict1)
+    globals.update(dict1)
