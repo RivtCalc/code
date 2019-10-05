@@ -49,13 +49,13 @@ _rivfile = Path(__main__.__file__).name
 _rivbase = (Path(_rivfull).name).split(".py")[0]
 _rivpath = Path(_rivfull).parent
 _projpath = Path(_rivfull).parent.parent
-_rivbak = Path(_rivpath / str(_rivbase + "bak"))
+_rivbak = Path(_rivpath / str(_rivbase + ".bak"))
 _txtfile =  ".".join((_rivbase, "txt"))
 _logfile =  ".".join((_rivbase, "log"))
 _rivetpath = os.path.dirname("rivet.rivet_lib.py")
 _folders = {
 "spath": Path(_rivpath / "scripts"),
-"tpath": Path(_rivpath / "table"),
+"tpath": Path(_rivpath / "tables"),
 "rpath": Path(_projpath / "pdf"),
 "xpath": Path(_projpath / "temp"),
 "fpath": Path(_projpath / "figures"),
@@ -70,25 +70,16 @@ _calcwidth = 80; _sectnum = 0; _eqnum = 0; _fignum = 0
 
 # initial checks on input
 with open(_rivfull, "r") as f2:
-    adbak = f2.read()
+    designbak = f2.read()
 with open(_rivbak, "w") as f3:
-    f3.write(adbak)
+    f3.write(designbak)
 print("\n\nfile: ", _rivfile)
 print("path: ", _rivpath)
 print("checks: folders checked; file backup written to temp folder", "\n\n")
 
-# start checks and logs
-#_chk1 = chk.CheckRivet(_tlog)
-#_chk1.logstart()
-#_chk1.logwrite("< begin model processing >", 1
-# os.chdir(once.__path__[0])
-# f4 = open('once.sty')
-# f4.close()
-# os.chdir(cfg.ppath)
-# _el.logwrite("< style file found >", vbos)
-# os.system('latex --version')                
-# _el.logwrite("< Tex Live installation found>", vbos)
-# pdfout1.gen_pdf() 
+def _logs():
+    #_chk1 = _chk.CheckRivet(_tlog)
+    pass
 
 def _riv_strset(line1: str) -> tuple:
     """ parse rivet-string settings
@@ -97,18 +88,16 @@ def _riv_strset(line1: str) -> tuple:
         line1 (string): rivet-string settings (from first line)
     
     Returns:
-        Tuple[int,str,str]: exec flag, str description, str type
+        tuple: exec flag, str description, str type
     """
     #print(line1)
-
     opt = rivdat["opt"]
-    strnum: list = [int(opt[1]), -1, 0, 0]
+    strnum = [int(opt[1]), -1, 0, 0]
     sect_num = strnum[1]
     eq_num = strnum[2]
     fig_num =strnum[3]
+    str_descrip = " "
     exec_flg  = -1 
-    str_descrip  = " "
-    str_type = " "
     line2 = line1.split("|")[1]
     str_type = line2[0].strip()
     sect_num = line2.find("]]")
@@ -123,6 +112,21 @@ def _riv_strset(line1: str) -> tuple:
     else:
         exec_flg = 0
     return [str_type, str_descrip, exec_flg, strnum]
+
+def _write_py(self):
+    """ write rivet independent python file
+ 
+        Write an executable Python file without rivet_lib dependencies 
+        but with other imports, values, and equations while excluding
+        explanatory text and formatting.  Useful for extensions of analysis 
+        and design and importing design information into other rivet files.      
+    """
+    str1 =  ("""\nThis file contains Python equations 
+            from the rivet design file 
+            for lsti in zip(vlistx, vlisty)
+            if __name__ == "__main__":\n
+            vlist()\n\n""")
+    _rivfile.write("\n")
 
 def _write_rst(pline, pp, indent):
     """[summary]
@@ -142,41 +146,6 @@ def _write_rst(pline, pp, indent):
         "texmak2":  ".".join((_rivbase, ".fls")),
         "texmak3":  ".".join((_rivbase, ".fdb_latexmk"))
     }
-
-def _write_py(self):
-    """ write rivet independent python file
- 
-        Write an executable Python file without rivet_lib dependencies 
-        but with other imports, values, and equations while excluding
-        explanatory text and formatting.  Useful for extensions of analysis 
-        and design and importing design information into other rivet files.      
-    """
-    str1 =  ("""\nThis file contains Python equations from the
-            on-c-e model \n\n  '+ self.mfile + '\n
-            \nFor interactive analysis open the file\n
-            in an IDE executable shell e.g. Pyzo,\n
-            Spyder, Jupyter Notebook or Komodo IDE \n
-            import os\n
-            import sys\n
-            from sympy import *\n
-            from numpy import *\n
-            import numpy.linalg as LA\n
-            import importlib.util\n
-            import once.config as cfg\n     
-            \ndef vlist(vlistx = vlist1, vlisty= vlist2):\n
-            Utility function for interactively listing once\n
-            variable values. Variables are stored in vlist1 and
-            definitions in vlist2. Type vlist()\n
-            to list updated variable summary after executing\n
-            calc Python script\n\n\n
-            for lsti in zip(vlistx, vlisty):\n
-                item1 = eval(str(lsti[0]))\n
-                def1 = lsti[1]\n
-                cncat1 = str(lsti[0]) + " = " + str(item1) + " "*30\n
-                print(cncat1[:25] + "# " + def1)\n\n
-            if __name__ == "__main__":\n
-                   vlist()\n\n""")
-    _rivfile.write("\n")
 
 def _write_utf(rivstring: List[str], strset: list):
     """ write model text to utf-8 encoded file.

@@ -78,7 +78,7 @@ class Iexec_u:
                 self.icalc.append("\n")
                 continue
             if iline1[0] == "|":
-                if ".txt" in iline1: self.i_txt()
+                if ".txt" in iline1: self.i_txt(iline1)
                 elif ".jpg" in iline1: self.i_fig(iline1)
                 elif ".png" in iline1: self.i_fig(iline1)
                 elif  "["   in iline1: self.i_tex(iline1)
@@ -96,8 +96,8 @@ class Iexec_u:
 
         """
         iline1 = iline1.split("|")
-        txtp1 = Path(self.folders["tpath"], "/", iline1[2])
-        with open(txtp1, 'r') as txtf1:
+        txt1 = Path(self.folders["tpath"] /  iline1[1].strip())
+        with open(txt1, 'r') as txtf1:
             txtstrng1 = txtf1.read()
 
         self.icalc.append(txtstrng1)
