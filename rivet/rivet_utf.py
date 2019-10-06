@@ -8,36 +8,12 @@ import pandas as pd
 from tabulate import tabulate 
 from pathlib import Path
 from typing import List, Set, Dict, Tuple, Optional
+from io import StringIO
 
 
 __version__ = "0.9.0"
 __author__ = 'rholland@structurelabs.com'
       
-class Rexec_u:
-    """Process run-strings
-
-    Returns utf calcs 
-    """
- 
-    def __init__(self, rlist : list):
-        """
-
-        Args:
-            slist (list): list of input parameters in string settings
-            vlist (list): list of input lines in value string
-            sectnum (int):  section number
-        """
-
-        self.rlist = rlist
-
-    def r_utf(self):
-        """compose utf calc string for values
-
-        Return:
-            vcalc (list): list of calculated strings
-            local_dict (list): local() dictionary
-        """
-        pass
 
 class Iexec_u:
     """Process insert-strings
@@ -49,7 +25,7 @@ class Iexec_u:
 
        Return formatted utf calcs 
     """
- 
+
     def __init__(self, ilist: list, rivet_dict: dict, \
                      folders: dict, strnum: list):
 
@@ -61,9 +37,6 @@ class Iexec_u:
         self.eqnum = strnum[2]
         self.fignum = strnum[3]
 
-    def i_line(self):
-        self.icalc.append("\n" + "=" * self.maxwidth + "\n")
-
     def i_str(self) -> Tuple[dict, list]:
         """ compose utf calc string from insert-string
         
@@ -73,23 +46,28 @@ class Iexec_u:
         icalc_temp = ""
         for iline in self.ilist:
             #print(iline)
-            iline1 = iline.strip()
-            if len(iline1) == 0:
+            iline1 = iline[4:]
+            if len(iline1.strip()) == 0:
                 self.icalc.append("\n")
                 continue
             if iline1[0] == "|":
                 if ".txt" in iline1: self.i_txt(iline1)
-                elif ".jpg" in iline1: self.i_fig(iline1)
-                elif ".png" in iline1: self.i_fig(iline1)
-                elif  "["   in iline1: self.i_tex(iline1)
-                elif  "\\"  in iline1: self.i_tex(iline1)
-                elif ".rst" in iline1: self.i_csv(iline1.split("|"))
-                elif ".csv" in iline1: self.i_csv(iline1.split("|"))
+                if ".jpg" in iline1: self.i_fig(iline1)
+                if ".png" in iline1: self.i_fig(iline1)
+                if  "["   in iline1: self.i_tex(iline1)
+                if  "\\"  in iline1: self.i_tex(iline1)
+                if ".rst" in iline1: self.i_rst(iline1)
+                if ".csv" in iline1: self.i_csv(iline1)
+                if "line" in iline1: self.i_line()
+                else: pass
             else:
                 self.icalc.append(iline1)
 
         eq1 = []
-        return locals(), icalc, eq1
+        return locals(), self.icalc, eq1
+
+    def i_line(self):
+        self.icalc.append("\n" + "=" * self.maxwidth + "\n")
 
     def i_txt(self, iline1):
         """insert text file into insert string
@@ -129,33 +107,37 @@ class Iexec_u:
                     if "code" in iline1.split("|")[2]:
                         self.icalc.append(eq_df['code'][row] + 
                                 " : " + eq_df['label'][row] + "\n")    
-                    
                     self.icalc.append(eq_df['ascii'][row] + "\n")
             except:
                 pass
 
-    def i_csv(self, iline1,maxwidth):
-        if ".rst" in iline1[1]:
-            rstfile = os.path.join(self.folders["tpath"], iline1[1].strip())
-            with open(rstfile,'r') as rstf1:
-                rstf2 = rstf1.read
-            self.icalc.append(rstf2)
-        
-        elif ".csv" in iline1[1]:
-            csvfile = os.path.join(self.folders["tpath"], iline1[1].strip())
-            with open(csvfile,'r') as csvf1:
-                read1 = csv.reader(csvf1)
-            parse1 = []
+    def i_rst(self, iline1):
+        iline1 = iline1.split("|")
+        rstfile = os.path.join(self.folders["tpath"], iline1[1].strip())
+        with open(rstfile,'r') as rstf1: 
+            rstf2 = rstf1.read()
+        self.icalc.append(rstf2)
+
+    def i_csv(self, iline1):
+        iline1 = iline1.split("|")
+        maxcol =  iline1[2].split("[")[1].strip("]")
+        csvfile = os.path.join(self.folders["tpath"], iline1[1].strip())
+        parse1 = []
+        with open(csvfile,'r') as csvf1:
+            read1 = csv.reader(csvf1)
             for row in read1:
                 for i in range(len(row)):
-                    templist = textwrap.wrap(row[i], self.maxcol) 
+                    templist = textwrap.wrap(row[i], int(maxcol)) 
                     row[i] = """\n""".join(templist)
                 parse1.append(row)
-            rstout = tabulate(parse1, tablefmt="grid", headers="firstrow")            
-            
-            self.icalc.append(rstout)
-        else:
-            return
+        
+        old_stdout = sys.stdout
+        output = StringIO()
+        output.write(tabulate(parse1, tablefmt="grid", headers="firstrow"))            
+        rstout = output.getvalue()
+        sys.stdout = old_stdout
+
+        self.icalc.append(rstout)
 
 class Vexec_u:
     """Process value strings
@@ -163,38 +145,50 @@ class Vexec_u:
     Returns utf value calcs 
     """
  
-    def __init__(self, vlist: List, global1: Dict):
+    def __init__(self, vlist: list, rivet_dict: dict, \
+                     folders: dict, strnum: list):    
+        
         """
 
         Args:
             vlist (list): list of input lines in value string
         """
 
+        self.vcalc = []
         self.vlist = vlist
-        globals().update(global1)
+        self.folders = folders
+        self.maxwidth = strnum[0]
+        self.sectnum = strnum[1]
+        self.eqnum = strnum[2]
+        self.fignum = strnum[3]
             
-    def v_utf(self):
+    def v_str(self):
         """compose utf calc string for values
 
         Return:
             vcalc (list): list of calculated strings
             local_dict (list): local() dictionary
         """
-        vcalc = []
-        vcalc_eq = ""
 
         for vline in self.vlist:
-            #print(vline)
-            if "|" in vline:
+            vline1 = vline[4:]
+            if len(vline1.strip()) == 0:
+                    self.vcalc.append("\n")
+                    continue
+            if "|" == vline1[0]:
+                self.vcalc.append(vline1)
+                continue
+            if "|" in vline1:
                 vcalc_eq = ""
-                vline1 = vline.split("|")
-                vcalc_eq = vline1[0].strip() 
+                vline2 = vline1.split("|")
+                vcalc_eq = vline2[0].strip() 
                 exec(vcalc_eq)
-                vcalc.append(vcalc_eq + " | " + vline1[1].strip("|"))
+                self.vcalc.append(vcalc_eq + " | " + vline2[1])
             else:
-                vcalc.append(vline.strip())
+                self.vcalc.append(vline1)
 
-        return [locals(), vcalc]
+        eq1 = []
+        return locals(), self.vcalc, eq1
         
 
 class Eexec_u:

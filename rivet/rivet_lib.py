@@ -102,7 +102,7 @@ def _riv_strset(line1: str) -> tuple:
     str_type = line2[0].strip()
     sect_num = line2.find("]]")
     if sect_num > -1:
-        str_descrip = line2[sect_num + 1:].strip()
+        str_descrip = line2[sect_num + 2:].strip()
         sect_num = line2[sect_num-2:sect_num]
         sect_num = sect_num.strip("]]").strip("[[")
         strnum[1] = sect_num
@@ -156,20 +156,22 @@ def _write_utf(rivstring: List[str], strset: list):
         indent (int): indent flag
          
     """
-    rivstring1 = []
+    rivstr1 = []
     sect_num = int(strset[3][1])
-    descrip = strset[2]
+    descrip = strset[1]
     calcwidth = int(strset[3][0])
     if sect_num > -1:
-        rivstring1.append('=' * calcwidth)
-        descrip1 = " " +  descrip + (_calcnum + "-" +
-            sect_num).rjust(calcwidth - len(descrip) - 2)
-        rivstring1.append('=' * calcwidth)
-    rivstring2 = rivstring1 + rivstring
-    with open(Path(_rivpath / _txtfile), 'a') as f1:
-        f1.writelines(rivstring2)
-    print(*rivstring2, sep="\n")
-    
+        rivstr1.append('=' * calcwidth)
+        descrip1 = " " +  descrip + (str(_calcnum) + "-" +
+            str(sect_num)).rjust(calcwidth - len(descrip) - 2)
+        rivstr1.append(descrip1)
+        rivstr1.append('=' * calcwidth)
+    rivstr2 = rivstr1 + rivstring
+    with open(Path(_rivpath / _txtfile), 'w+b') as f1:
+        rivstr3 = "\n".join(rivstr2)
+        f1.write(rivstr3.encode("UTF-8"))
+    print(*rivstr2, sep="\n")
+
 def r__(fstr: str):
     """ select rivet-string type
     
@@ -182,7 +184,7 @@ def r__(fstr: str):
     if fstr1[0] == "r": rs__(fstr1, fstr2)
     elif fstr1[0] == "i": is__(fstr1, fstr2)
     elif fstr1[0] == "v": vs__(fstr1, fstr2)
-    elif fstr1[0] == "e": es__(frstr1, fstr2)
+    elif fstr1[0] == "e": es__(fstr1, fstr2)
     elif fstr1[0] == "t": ts__(fstr1, fstr2)
     else:
         print(" < rivet string " + str(fstr1[0]) + " type not found >")
@@ -194,12 +196,10 @@ def rs__(fstr1: str, fstr2: str):
         fstr (string): [description]
     """
     global rivdat
-    fstr3 = "".join(fstr2.split("\n"))
-    fstr3 = fstr3.replace(" ","") 
+    fstr3 = ("".join(fstr2.split("\n"))).replace(" ","")
     exec(fstr3, globals())
+    
     strset = _riv_strset(fstr1)
-    #calc = _utf.Rexec_u(fstr2.split("\n"))
-    #dict1, calc1, equ1 = calc.r_utf()
 
     if strset[2] == 0: _write_utf(fstr2.split("\n"), strset)
 
@@ -219,21 +219,21 @@ def is__(fstr1: str, fstr2: str):
     
     equations.append(equ1)
     rivet.update(dict1)
-    globals.update(dict1)
+    globals().update(dict1)
 
-def vs__(fstr1: str, fstr2: List[str]):
+def vs__(fstr1: str, fstr2: str):
     """evaluate and format a rivet-string of values
 
     """
     strset = _riv_strset(fstr1)
-    calc = _utf.Vexec_u(fstr2.split("\n"), rivet, _folders,  strset)
-    dict1, calc1, equ1 = calc.v_utf()
-    
-    if fstr1[0] == 0: _write_utf(calc1)
+    calc = _utf.Vexec_u(fstr2.split("\n"), rivet, _folders,  strset[3])
+    dict1, calc1, equ1 = calc.v_str()
+
+    if strset[2] == 0: _write_utf(calc1, strset)
     
     equations.append(equ1)
     rivet.update(dict1)    
-    globals.update(dict1)
+    globals().update(dict1)
 
 def es__(fstr1: str, fstr2: List[str]):
     """evaluate and format a rivet-string of equations
@@ -246,7 +246,7 @@ def es__(fstr1: str, fstr2: List[str]):
     if fstr1[0] == 0: _write_utf(calc1)
     equations.append(equ1)
     rivet.update(dict1)
-    globals.update(dict1)
+    globals().update(dict1)
 
 def ts__(fstr1: str, fstr2: List[str]):
     """evaluate and format a rivet-string of tables
@@ -259,4 +259,4 @@ def ts__(fstr1: str, fstr2: List[str]):
     if fstr1[0] == 0: _write_utf(calc1)
     equations.append(equ1)
     rivet.update(dict1)
-    globals.update(dict1)
+    globals().update(dict1)
