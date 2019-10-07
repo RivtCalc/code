@@ -123,6 +123,20 @@ class Iexec_u:
 
     def i_csv(self, iline1):
         iline1 = iline1.split("|")
+        if "_eq" in iline1[0]:
+            ifile1 = iline[1].strip()
+            rowcol1 = iline[2].strip().split(",")
+            index1 = rowcol1[0].strip()
+            label1 = rowcol1[1].strip()
+            col1 = rowcol1[2].strip()
+            csvfile1 = os.path.join(self.folders["tpath"], vfile1)
+            df = pd.read_csv(csvfile1, index_col =index1)
+            data1 = df.loc([label1],[col1])
+            val1 = col1 + " = " + str(data1)
+            val2 = val1 +  " | " + label1
+            exec(val1)
+            self.vcalc.append("\n" + val2 + "\n")
+            continue
         maxcol =  iline1[2].split("[")[1].strip("]")
         csvfile = os.path.join(self.folders["tpath"], iline1[1].strip())
         parse1 = []
@@ -176,8 +190,8 @@ class Vexec_u:
         for vline in self.vlist:
             vline1 = vline[4:]
             if len(vline1.strip()) == 0:
-                    self.vcalc.append("\n")
-                    continue
+                self.vcalc.append("\n")
+                continue
             if "|" == vline1[0]:
                 vline1 = vline1.split("|")
                 vfile1 = vline[1].strip()
