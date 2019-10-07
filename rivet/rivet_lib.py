@@ -1,9 +1,10 @@
 #! python
 """rivet_lib - evaluate and format a rivet-string
 
-    Exposes a single function which takes string argument,
+    Exposes a function which takes string argument,
     where the first line
     
+    Exposes a dictionary that 
     Methods:
         r__(str): processes the rivet string, where the first 
             character in the first line sets the string type
@@ -23,11 +24,11 @@ from pathlib import Path
 from typing import List, Set, Dict, Tuple, Optional
 
 from numpy import *
-import matplotlib.image as mpimg
-import matplotlib.pyplot as plt
 import numpy.linalg as la
 import pandas as pd
 import sympy as sy
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
 from IPython.display import HTML, Image, Latex, Math, display
 import rivet.rivet_check as _chk
 import rivet.rivet_utf as _utf
