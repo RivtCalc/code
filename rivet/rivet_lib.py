@@ -1,23 +1,22 @@
 #! python
-"""rivet_lib - evaluate and format rivet-strings
+"""rivet_lib - evaluate and format a rivet-string
 
-    Specifies five functions. Each function takes a syntax specfic f-string.
-    The first line of each f-string includes process parameters for the string.
-    Strings are written to txt, rst, html or pdf files after evaluation and
-    formatting.
+    Exposes a single function which takes string argument,
+    where the first line
     
     Methods:
-        r__(fstring): run python code 
-        i__(fstring): evaluate text and images
-        v__(fstring): evaluate values
-        e__(fstring): evaluate equations
-        t__(fstring): evaluate tables and plots
-        _riv_strset(dictionary): set evaluation and formatting parameters
-        _write_utf(string): write utf8 formatted string to stdout and calc-file
-        _write_rst(string): write rst formatted string to calc-file
-        _write_py(string): write equations and values to python file
+        r__(str): processes the rivet string, where the first 
+            character in the first line sets the string type
+            "r" - evaluate python code
+            "i" - insert text and images
+            "v" - evaluate values
+            "e" - evaluate equations
+            "t" - evaluate tables and plots
+        rivdat(dict): file settings
+        _write_utf(str): write utf8 calc (.txt)
+        _write_rst(str): write rst calc (.rst)
+        _write_py(str): write equations and values to file (.py)
 """
-
 import os
 import sys
 from pathlib import Path
@@ -98,17 +97,17 @@ def _riv_strset(line1: str) -> tuple:
     fig_num =strnum[3]
     str_descrip = " "
     exec_flg  = -1 
-    line2 = line1.split("|")[1]
-    str_type = line2[0].strip()
-    sect_num = line2.find("]]")
+    str_type = line1[0]
+    line1 = line1[1:]
+    sect_num = line1.find("}")
     if sect_num > -1:
-        str_descrip = line2[sect_num + 2:].strip()
-        sect_num = line2[sect_num-2:sect_num]
-        sect_num = sect_num.strip("]]").strip("[[")
+        str_descrip = line1[sect_num + 1:].strip()
+        sect_num = line1[sect_num-1:sect_num]
+        sect_num = sect_num.strip("}").strip("{")
         strnum[1] = sect_num
-    if "--hide" in line2:
+    if "--hide" in line1:
         exec_flg = 1
-        str_descrip = line2[0].replace("--hide","").strip()                
+        str_descrip = line1[0].replace("--hide","").strip()                
     else:
         exec_flg = 0
     return [str_type, str_descrip, exec_flg, strnum]

@@ -1,4 +1,8 @@
 #! python
+"""
+
+
+"""
 import os
 import sys
 import csv
@@ -9,7 +13,6 @@ from tabulate import tabulate
 from pathlib import Path
 from typing import List, Set, Dict, Tuple, Optional
 from io import StringIO
-
 
 __version__ = "0.9.0"
 __author__ = 'rholland@structurelabs.com'
@@ -176,7 +179,20 @@ class Vexec_u:
                     self.vcalc.append("\n")
                     continue
             if "|" == vline1[0]:
-                self.vcalc.append(vline1)
+                vline1 = vline1.split("|")
+                vfile1 = vline[1].strip()
+                rowcol1 = vline[2].strip().split(",")
+                unit1 = vline[3].strip()
+                index1 = rowcol1[0].strip()
+                label1 = rowcol1[1].strip()
+                col1 = rowcol1[2].strip()
+                csvfile1 = os.path.join(self.folders["tpath"], vfile1)
+                df = pd.read_csv(csvfile1, index_col =index1)
+                data1 = df.loc([label1],[col1])
+                val1 = col1 + " = " + str(data1)
+                val2 = val1 +  " | " + label1
+                exec(val1)
+                self.vcalc.append("\n" + val2 + "\n")
                 continue
             if "|" in vline1:
                 vcalc_eq = ""
