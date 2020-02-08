@@ -14,7 +14,11 @@
     t__() : define tables and plots
         
 """
+<<<<<<< HEAD
 #test 123450
+=======
+#test 1234562345
+>>>>>>> ee0a6a236d0bcf43977ce715038929e5ee037898
 
 import osw
 import sys
