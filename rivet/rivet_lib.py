@@ -14,7 +14,7 @@
     t__() : define tables and plots
         
 """
-#test 1234562345
+#test
 
 import osw
 import sys
