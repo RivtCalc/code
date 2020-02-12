@@ -1,0 +1,80 @@
+[s] Example 7 - Stiffness Method
+    Examples 3.4 and 3.5 from McQuire and Gallagher *Matrix Structural Analysis*
+    demonstrate applications of the numpy linear algebra library
+    and unit manipulations.
+
+        #- 01 insert geometry figure
+        #- 02 insert loads figure
+
+[s] Define geometry and material properties
+    units: kN, mm
+
+    **Element Properties**
+    [t] elastic modulus (kN/mm**2)  | e_1 = 200000*MPA.asUnit(KN/MM**2).asNumber()
+    [t] cross section 1 (mm**2)     | a_1 = 10000*(MM**2).asNumber()
+    [t] cross section 2 (mm**2)     | a_2 = 15000*(MM**2).asNumber()
+
+    **Node coordinates** [node number, x, y]
+    [t] node 0      | n_0  = [0,   0.,      0.]
+    [t] node 1      | n_1  = [1,   5000.,   0.]
+    [t] node 2      | n_2  = [2,   5000.,  8660.]
+    [t] node 3      | n_3  = [3,   10000., 8660.]
+
+    [e] node coordinates        #- 02
+        nodes = [n_0, n_1, n_2, n_3]
+
+    **Element Connectivity**  [element number, node1, node2, area, modulus]
+    [e]  element 1   #- 01
+        el_1 = [1,0,1,a_1,e_1]
+
+    [e] element 2    #- 01
+        el_2 = [2,1,3,a_2,e_1]
+
+    [e] element 3    #- 01
+        el_3 = [3,2,3,a_1,e_1]
+
+    [e] element 4    #- 01
+        el_4 = [4,0,2,a_2,e_1]
+
+    [e] element 5    #- 01
+        el_5 = [5,1,2,a_2,e_1]
+
+    [e] element connectivity  #- 02
+        elements = [el_1, el_2, el_3, el_4, el_5]
+
+    **Forces and reactions**
+
+    [t] releases 0 or 1 [node, x, y] | react =  [[0, 1, 1],[1, 0, 1]]
+
+    [t] applied forces  [node, x, y] | forces = [[3, 283., -283.]]
+
+[s] Analyze truss
+    Intermediate results may be viewed in standard out by uncommenting print
+    statements in the file *func_stiff.py*.
+
+        #- 03 read function file
+
+[f] Direct stiffness analysis
+    direct_stiff(nodes, elements, react, forces) | result_1
+
+        #- 04 geometry figure
+        #- 05 geometry figure
+        #- 06 geometry figure
+
+#- formateq | 3,3 | 1.0
+#- 01 | 2,2 |     | 0
+#- 02 | 2,2 |     | 1
+
+#- fileop
+#- 01 | f | truss1.png | Frame geometry | 45 |
+#- 02 | f | truss2.png | Loads          | 45 |
+#- 03 | s | func_stiff.py | | |
+#- 04 | f | geom1.png | Examples 3.4 and 3.5 from McQuire and Gallagher | 60 |
+#- 05 | f | geom2.png | Examples 3.4 and 3.5 from McQuire and Gallagher | 60 |
+#- 06 | f | geom3.png | Examples 3.4 and 3.5 from McQuire and Gallagher | 60 |
+
+# This file contains a on-c-e public domain template (the template).
+# The template is distributed under the CCO 1.0 Public Domain Dedication
+# at http://creativecommons.org/publicdomain/zero/1.0/
+# The template is not a structural design calculation.
+# The template user assumes sole responsibility for all model inputs and results.
