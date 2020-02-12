@@ -55,16 +55,16 @@ class InsertU:
         endflg = False
         for ils in self.strl:
             print("1", ils)
-            if ils[0:2] == "##" or ils[0] == "#":   # remove calc review comments
+            if ils[0:2] == "##" or ils[0] == "#":   # remove comments
                 continue
             ils = ils[4:]                           # remove 4 space indent
             if len(ils.strip()) == 0:
-                self.calcl.append(" ")              # add single space for blank line
+                self.calcl.append(" ")              # add space for blank line
                 continue
-            if ils[0:2] == "||":                    # parse tag
+            if ils[0:2] == "||":                    # find parse tag
                 ipl = ils[2:].split("|")
                 print("2", ipl)            
-                if endflg:                          # append block
+                if endflg:                          # append line to block
                     ipl.append(ils[2:].strip())
                     endflg = False
                 if ils.strip()[-1] == "|":          # set block flag
