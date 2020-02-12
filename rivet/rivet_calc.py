@@ -53,8 +53,9 @@ class InsertU:
             list :  list of calc strings
         """
         endflg = False
+        itmpl = []
         for ils in self.strl:
-            print("1", ils)
+            print(1, ils)
             if ils[0:2] == "##":  continue          # remove review comment
             ils = ils[4:]                           # remove 4 space indent
             if len(ils.strip()) == 0:
@@ -64,14 +65,19 @@ class InsertU:
                 continue
             if ils[0:2] == "||":                    # find parse tag
                 ipl = ils[2:].split("|")
-                print("2", ipl)            
+                print(2, ipl)            
                 if endflg:                          # append line to block
-                    ipl.append(ils[2:].strip())
+                    itmpl.append(ipl[0])
+                    print(6, itmpl)
+                    ipl = itmpl
                     endflg = False
+                    itmpl = []
                 if ils.strip()[-1] == "|":          # set block flag
                     endflg = True
+                    itmpl = ipl
+                    print(7, itmpl)
                     continue
-                print("3", ipl[0])
+                print(3, ipl[0])
                 if  ipl[0].strip() == "text": self.i_txt(ipl)
                 elif  ipl[0].strip() == "img": self.i_img(ipl)
                 elif  ipl[0].strip() == "table": self.i_table(ipl)
@@ -112,7 +118,7 @@ class InsertU:
         file1 = ipl[2].strip()
         ref1 = ("Figure " + str(self.sectnum) + '.' + str(self.fignum) + " "  
             + caption1 + "\npath: " + str(self.folder["fpath"] + "/" + file1 ))
-        self.icalc.append(ref1)
+        self.calcl.append(ref1)
 
     def i_tex(self,ipl: list):
         """insert formated equation from LaTeX string
@@ -121,9 +127,12 @@ class InsertU:
             ipl {list} -- parameters to insert tex equation from file
 
         """
-        txs = ipl[3].strip()
-        txs = txs.encode('unicode-escape').decode()
-        utfs = parse_latex(txs)
+        print(5, ipl)
+        txs = ipl[2].strip()
+        #txs = txs.encode('unicode-escape').decode()
+        ltxs = parse_latex(txs)
+        utfs = sp.pretty(sp.sympify(ltxs, _clash2, evaluate=False))
+        print(6, utfs)
         self.calcl.append(utfs)    
 
     def i_sym(self,ipl):
@@ -133,9 +142,12 @@ class InsertU:
             ipl {list} -- parameters to insert tex equation from file
         """
         #print(ipl)
-        sps = ipl[3].strip()
-        sps = txs.encode('unicode-escape').decode()
-        utfs = sp.pretty(sympify(sps, _clash2, evaluate=False))
+        sps = ipl[2].strip()
+        spl = sps.split("=")
+        sps = "Eq(" + spl[0] +",(" + spl[1] +"))" 
+        #sps = sps.encode('unicode-escape').decode()
+        utfs = sp.pretty(sp.sympify(sps, _clash2, evaluate=False))
+        print(8, utfs)
         self.calcl.append(utfs)   
 
     def i_table(self, ipl):
@@ -146,62 +158,56 @@ class InsertU:
         """       
         
         table = ""
-        if ".csv" in iline1[1]:
-            iline2 = iline1[1].split("*")
-            ifile1 = iline2[0].strip()
-            rowcol = iline2[1].strip().split("c")
-            rows = rowcol[0].strip("r")
-            cols = rowcol[1].strip()
-            csvfile1 = Path(self.folders["tpath"] / ifile1)
-            df = pd.read_csv(csvfile1, usecols = cols,
-                            skiprows = lambda x: x not in rows)
-        
-            maxcol =  iline1[2].split("[")[1].strip("]")
-            csvfile = os.path.join(self.folders["tpath"], iline1[1].strip())
+        if ".csv" in ipl[2]:                        # csv data file       
+            ifiles = ipl[2].strip()
+            rowcol = ipl[1].strip().split("c")
+            rowl = rowcol[0].strip("r")
+            col = rowcol[1].split("w")[0] 
+            width = rowcol[1].split("w")[1]
+            csvfiles = Path(self.folders["tpath"] / ifiles)
+            df = pd.read_csv(csvfiles, usecols = col,
+                            skiprows = lambda x: x not in rowl)        
             parse1 = []
             with open(csvfile,'r') as csvf1:
                 read1 = csv.reader(csvf1)
-                readx = eval("read1" + rows)
+                readx = eval("read1" + rowl)
                 for row in readx:
                     xrow = []
-                    for j in eval(cols):
+                    for j in eval(col):
                         xrow.append(row[j])
                     wrow=[]
                     for i in xrow:
-                        templist = textwrap.wrap(i, int(maxcol)) 
+                        templist = textwrap.wrap(i, int(width)) 
                         wrow.append("""\n""".join(templist))
                     parse1.append(wrow)
-        
             old_stdout = sys.stdout
             output = StringIO()
             output.write(tabulate(parse1, tablefmt="grid", headers="firstrow"))            
             table1 = output.getvalue()
             sys.stdout = old_stdout
-        elif ".xlsx" in iline[1]:
-            iline2 = iline1[1].split("*")
-            ifile1 = iline2[0].strip()
-            rowcol = iline2[1].strip().split("c")
-            rows = rowcol[0].strip("r")
-            cols = rowcol[1].strip()
-            xlsxfile = Path(self.folders["tpath"] / ifile1)
-            df = pd.read_excel(xlsxfile, usecols = cols,
-                            skiprows = lambda x: x not in rows)
-            
+        elif ".xlsx" in ipl[2]:                   # excel data file
+            ifiles = ipl[2].strip()
+            rowcol = ipl[1].strip().split("c")
+            rowl = rowcol[0].strip("r")
+            col = rowcol[1].split("w")[0] 
+            width = rowcol[1].split("w")[1]
+            xlfiles = Path(self.folders["tpath"] / ifiles)
+            df = pd.read_excel(xlfiles, usecols = col,
+                            skiprows = lambda x: x not in rowl)
             old_stdout = sys.stdout
             output = StringIO()
             output.write(tabulate(df, tablefmt="grid", headers="firstrow"))            
             table1 = output.getvalue()
             sys.stdout = old_stdout
             #self.icalc.append("\n" + str(data1) + "\n")
-        elif "rest" in ipl[2]:
-            rstfile = os.path.join(self.folders["tpath"], iline1[1].strip())
+        elif "rest" in ipl[2]:                      # reST text file
+            rstfile = os.path.join(self.folders["tpath"], ipl[1].strip())
             with open(rstfile,'r') as rstf1: 
                 table1 = rstf1.read()
-        elif "include" in ipl[2]:
+        elif "include" in ipl[2]:                   # index inline reST table 
             self.tablenum += 1
             title1 = "  " + ipl[2]
             ref1 = ("Table " + str(self.sectnum) + '.' + str(self.tablenum))  
-        
         else:
             pass
 

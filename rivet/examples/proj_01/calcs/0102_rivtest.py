@@ -32,33 +32,31 @@ i__(""" [[01]] Load Summations
     || text | i,p,5 | ttext1.txt   
     
     Render equations
-    || tex  | .5,# | x = \frac{1 + \omega}{2 + \gamma} |
-    ACI 318-05 5.5.1
+    || tex  | .5,# | x = \\frac{1 + \\omega}{2 + \\gamma} |
+    || ACI 318-05 5.5.1
 
-    || tex | .5,# | \zeta = \sum_{\,i=4}^{\,10}{\frac{(x_i_j_k + i y)}{(\gamma  + 4)}}  
- 
     || sym | .5,# | x = (1 + omega + α) / (4 + gamma)  | 
-    ACI 318-05 5.5.2
+    || ACI 318-05 5.5.2
 
     Render image file
     || img | .5,# | pic1.png |  
-    inserted png file  
+    || inserted png file  
 
     || img | .5,# | pic2.jpg  |
-    inserted jpg file   
+    || inserted jpg file   
 
     Some added text xxxx is put here and a bit of nonsense to make some
     words for a paragraph.
 
     Insert table from csv or xlsx files
-    || table | r[:]c[1,2]w[10] | rebars.csv |  
-    Rebar Table from CSV file [#]_  
+    || table | r[:]c[1,2]w10 | rebars.csv |  
+    || Rebar Table from CSV file [#]_  
     
     || table | r[:]c[1,2] | rebars.xlsx |  
-    Rebar Table from Excel file
+    || Rebar Table from Excel file
 
     || table | rest | rebars.rst  | 
-    Rebar Table from reST file
+    || Rebar Table from reST file
     
     || table | include | Table Title [#]_
 

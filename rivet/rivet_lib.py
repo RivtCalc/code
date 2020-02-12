@@ -154,7 +154,6 @@ def i__(rawstr: str):
     strl = strs.split("\n")
     calc = _rcalc.InsertU(strl, _hdrd, _foldd) 
     icalcl = calc.i_parse()
-
     _utfcalcs = _utfcalcs + "\n".join(icalcl)
     print(_utfcalcs)
 
