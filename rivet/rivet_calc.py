@@ -55,11 +55,12 @@ class InsertU:
         endflg = False
         for ils in self.strl:
             print("1", ils)
-            if ils[0:2] == "##" or ils[0] == "#":   # remove comments
-                continue
+            if ils[0:2] == "##":  continue          # remove review comment
             ils = ils[4:]                           # remove 4 space indent
             if len(ils.strip()) == 0:
-                self.calcl.append(" ")              # add space for blank line
+                self.calcl.append(" ")              # blank line
+                continue
+            if ils[0] == "#":                       # remove comment  
                 continue
             if ils[0:2] == "||":                    # find parse tag
                 ipl = ils[2:].split("|")
@@ -77,7 +78,7 @@ class InsertU:
                 elif  ipl[0].strip() == "tex": self.i_tex(ipl)
                 elif  ipl[0].strip() == "sym": self.i_sym(ipl)
                 elif "[#]" in ipl: self.i_footnote(ipl)
-                else: self.calcl.append(ils)
+                else: self.calcl.append(ils.strip())
                 continue    
             else:
                 self.calcl.append(ils)
@@ -87,63 +88,61 @@ class InsertU:
     def i_footnote(self, iline1):
         pass
 
-    def i_txt(self, ipl):
-        """insert text from txt, docs or html file
+    def i_txt(self, ipl: list):
+        """insert text from txt file
+        
+        Args:
+            ipl (list): list of tag parameters
         """
+
         #print(ipl)
-        text=""
+        texts=""
         txtpath = Path(self.folder["xpath"] /  ipl[2].strip())
         if ".txt" in ipl[2] : 
             with open(txtpath, 'r') as txtf1:
-                text = txtf1.read()
-        elif ".docx" in ipl[2] : 
-            with open(txtpath, 'r') as txtf1:
-                text = docx2txt.process("txtpath")
-        elif ".html" in ipl[2] : 
-            with open(txtpath, 'r') as txtf1:
-                text = html2text.html2text(html)
-        self.calcl.append(text)
+                texts = txtf1.read()
+        self.calcl.append(texts)
 
-    def i_img(self, ill):
+    def i_img(self, ipl: list):
         """ insert figure reference 
         """ 
-        #print(ill)
+        #print(ipl)
         self.fignum += 1
-        caption1 = "  " + ill[3].split("[[")[0]
-        file1 = ill[2].strip()
+        caption1 = "  " + ipl[3].split("[[")[0]
+        file1 = ipl[2].strip()
         ref1 = ("Figure " + str(self.sectnum) + '.' + str(self.fignum) + " "  
             + caption1 + "\npath: " + str(self.folder["fpath"] + "/" + file1 ))
         self.icalc.append(ref1)
 
-    def i_tex(self,ill):
+    def i_tex(self,ipl: list):
         """insert formated equation from LaTeX string
         
         Arguments:
-            ill {list} -- parameters to insert tex equation from file
+            ipl {list} -- parameters to insert tex equation from file
 
         """
-        txs = ill[3].strip()
+        txs = ipl[3].strip()
         txs = txs.encode('unicode-escape').decode()
         utfs = parse_latex(txs)
-        self.icalc.append(utfs)    
+        self.calcl.append(utfs)    
 
-    def i_sym(self,ill):
+    def i_sym(self,ipl):
         """insert formated equation from SymPy string 
         
         Arguments:
-            ill {list} -- parameters to insert tex equation from file
+            ipl {list} -- parameters to insert tex equation from file
         """
-        #print(ill)
-        sps = ill[3].strip()
+        #print(ipl)
+        sps = ipl[3].strip()
         sps = txs.encode('unicode-escape').decode()
         utfs = sp.pretty(sympify(sps, _clash2, evaluate=False))
-        self.icalc.append(utfs)   
+        self.calcl.append(utfs)   
 
-    def i_table(self, ill):
+    def i_table(self, ipl):
         """insert formated equation from SymPy string 
         
         Arguments:
-            ill {list} -- parameters to insert tex equation from file
+            ipl {list} -- parameters to insert tex equation from file
         """       
         
         table = ""
@@ -194,19 +193,19 @@ class InsertU:
             table1 = output.getvalue()
             sys.stdout = old_stdout
             #self.icalc.append("\n" + str(data1) + "\n")
-        elif "rest" in ill[2]:
+        elif "rest" in ipl[2]:
             rstfile = os.path.join(self.folders["tpath"], iline1[1].strip())
             with open(rstfile,'r') as rstf1: 
                 table1 = rstf1.read()
-        elif "include" in ill[2]:
+        elif "include" in ipl[2]:
             self.tablenum += 1
-            title1 = "  " + ill[2]
+            title1 = "  " + ipl[2]
             ref1 = ("Table " + str(self.sectnum) + '.' + str(self.tablenum))  
         
         else:
             pass
 
-        self.icalc.append(table)     
+        self.calcl.append(table)     
 
 
 class Value_u:
