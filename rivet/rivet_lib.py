@@ -15,7 +15,7 @@
         
 """
 
-import osw
+import os
 import sys
 import textwrap
 import logging
@@ -26,9 +26,6 @@ from numpy import *
 import numpy.linalg as la
 import pandas as pd
 import sympy as sy
-import matplotlib.image as mpimg
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 
 from rivet.rivet_unit import *
 import rivet.rivet_calc as _rcalc
@@ -47,9 +44,8 @@ setd: dict = {}                                     # formats
 tagd: dict = {}                                     # subject tags
 _foldd: dict = {}                                   # folder dictionary
 _rund: dict ={}                                     # runtime dictionary
-_export: list = []                                  # values, equations
-_indxd: dict = {}                                   # calc index
-_utfcalcs = """"""                                  # calc string
+_exportl: list = []                                 # values, equations
+_utfcalcs = """"""                                  # calc print string
 
 _rfull = Path(__main__.__file__)                    # calc file path
 _rfile = Path(__main__.__file__).name               # calc file name
@@ -88,7 +84,7 @@ _hdrd: dict = {
 "eqnum" :  0, 
 "fignum" : 0, 
 "tablenum" : 0,
-"calcwidth" : 80
+"swidth" : 80
 }
 
 logging.basicConfig(level=logging.DEBUG,
@@ -106,7 +102,7 @@ logging.info(f"""rivet file : {_rfull}""" )
 with open(_rfull, "r") as f2: calcbak = f2.read()
 with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
 logging.info(f"""backup file written : {_rbak}""")
-# TODO: insert check on folder structure here
+# TODO: insert checks on folder structure here
 
 def _updatehdr(hdrs:str):
     """update header dictionary
@@ -116,17 +112,16 @@ def _updatehdr(hdrs:str):
     """
     global _utfcalcs, _hdrd, _rdict
 
-    rnums = _hdrd["rnum"]
-    snames = _hdrd["sectname"] = hdrs[hdrs.find("]]") + 3 :].strip()
-    snums = _hdrd["sectnum"] = hdrs[hdrs.find("[[")+2:hdrs.find("]]")]
-    calcwidth = _hdrd["calcwidth"]
-    sstr = ('=' * calcwidth)
-    shead = " " +  snames + (str(rnums) + " - " +
-           ("[" + str(snums) + "]")).rjust(calcwidth - len(snames) - 2)
     _hdrd["eqnum"] = 0 
     _hdrd["fignum"] = 0
     _hdrd["tablenum"] = 0
-    
+    swidth = _hdrd["swidth"]
+    rnums = _hdrd["rnum"]
+    snames = _hdrd["sectname"] = hdrs[hdrs.find("]]") + 3 :].strip()
+    snums = _hdrd["sectnum"] = hdrs[hdrs.find("[[")+2:hdrs.find("]]")]
+    shead = " " +  snames + (str(rnums) + " - " +
+           ("[" + str(snums) + "]")).rjust(swidth - len(snames) - 2)
+    sstr = swidth * "="
     _utfcalcs += sstr + "\n" + shead + "\n" + sstr +"\n"
 
 def r__(rawstr: str):
@@ -136,16 +131,9 @@ def r__(rawstr: str):
         rawstr {str} -- [description]
     """
     global  _utfcalcs, _indxd, _rund
-
-    _indxd["calcwidth"] = 80
-    try:
-        _indxd["calcwidth"] = rsetd["width"]
-    except:
-        pass
     
     hdrs,strs = rawstr.split("\n",1)
     if "[[" in hdrs: _updatehdr(hdrs)
-
     
     strs = textwrap.dedent(strs)
     exec(strs, globals())

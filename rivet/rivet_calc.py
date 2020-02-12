@@ -13,8 +13,6 @@ import subprocess
 import tempfile
 import io
 import re
-import docx2txt
-import html2text
 import pandas as pd
 import sympy as sp
 from sympy.parsing.latex import parse_latex
@@ -56,25 +54,23 @@ class InsertU:
         """
         endflg = False
         for ils in self.strl:
-            print(ils)
-            if ils[0:2] == "##":                    # remove calc review comments
+            print("1", ils)
+            if ils[0:2] == "##" or ils[0] == "#":   # remove calc review comments
                 continue
             ils = ils[4:]                           # remove 4 space indent
             if len(ils.strip()) == 0:
                 self.calcl.append(" ")              # add single space for blank line
                 continue
-            if ils[0] == "#":                       # remove calc comments
-                continue
-            if ils[0:2] == "||":                    # insert tag
+            if ils[0:2] == "||":                    # parse tag
                 ipl = ils[2:].split("|")
-                print(ipl)            
+                print("2", ipl)            
                 if endflg:                          # append block
                     ipl.append(ils[2:].strip())
                     endflg = False
-                    continue
-                if ils.strip()[-1] == "|":  # set block flag
+                if ils.strip()[-1] == "|":          # set block flag
                     endflg = True
-                print(ipl[0])
+                    continue
+                print("3", ipl[0])
                 if  ipl[0].strip() == "text": self.i_txt(ipl)
                 elif  ipl[0].strip() == "img": self.i_img(ipl)
                 elif  ipl[0].strip() == "table": self.i_table(ipl)
