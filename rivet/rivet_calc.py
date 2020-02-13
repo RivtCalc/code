@@ -61,8 +61,8 @@ class InsertU:
             if len(ils.strip()) == 0:
                 self.calcl.append(" ")              # blank line
                 continue
-            if ils[0] == "#":                       # remove comment  
-                continue
+            if ils[0] == "#" : continue             # remove comment 
+            if ils[0:2] == "::" : continue          # remove preformat 
             if ils[0:2] == "||":                    # find parse tag
                 ipl = ils[2:].split("|")
                 print(2, ipl)            
@@ -92,6 +92,7 @@ class InsertU:
         return self.calcl
 
     def i_footnote(self, iline1):
+        
         pass
 
     def i_txt(self, ipl: list):

@@ -1,32 +1,34 @@
 #! python 
-#%%
 from rivet.rivet_lib import *
 
 #%%  
-i__(""" [[01]] Load Summations
+i__(''' [[01]] Load Summations
     
     The need to distinguish between the various meanings of "frame of
     reference" has led to a variety of terms. For example, sometimes the type
     of coordinate system is attached as a modifier, as in Cartesian frame of
     reference [#]_.
     
-    || [#] footnote text
+    || [#] footnote text 1
 
     Sometimes the state of motion asfda asd s fdas sfdfasdfasdf is
-    emphasized, as in rotating frame of reference.  
+    emphasized, as in rotating frame of reference. 
+
+    :: 
 
                         2
                     d w
-            M = -EI ───                                 
+             M = -EI ───                                 
                         2
                     dx 
 
+            
+                            (x + i y)
+                ┌── 10   ijk
+             ζ= >     ────────────                            
+                └── i=4   (γ+ 4)
     
-                     (x + i y)
-         ┌── 10   ijk
-      ζ= >     ────────────                            
-         └── i=4   (γ+ 4)
-
+    ::
 
     Insert text from text, rst, docx or html files
     || text | i,p,5 | ttext1.txt   
@@ -48,9 +50,10 @@ i__(""" [[01]] Load Summations
     Some added text xxxx is put here and a bit of nonsense to make some
     words for a paragraph.
 
-    Insert table from csv or xlsx files
+    Insert table from csv, xlsx and rst files
     || table | r[:]c[1,2]w10 | rebars.csv |  
-    || Rebar Table from CSV file [#]_  
+    || Rebar Table from CSV file [#]_ 
+    || [#] footnote text 2
     
     || table | r[:]c[1,2] | rebars.xlsx |  
     || Rebar Table from Excel file
@@ -59,6 +62,7 @@ i__(""" [[01]] Load Summations
     || Rebar Table from reST file
     
     || table | include | Table Title [#]_
+    || [#] footnote text 3
 
     +-----------+-------+--------+-------------+-----------+
     |   barsize |   dia |   area |   perimeter |   wt/foot |
@@ -88,11 +92,9 @@ i__(""" [[01]] Load Summations
     |        18 | 2.257 |   4    |        7.09 |    13.6   |
     +-----------+-------+--------+-------------+-----------+
 
-    || [#] footnote text
-
-    """)
+    ''')
 #%%
-v__(""" some values 
+v__(''' some values 
     
     Some text if needed
 
@@ -103,9 +105,9 @@ v__(""" some values
     i_x = Beam1[2]           | I major
     i_y = Beam2[3]           | I minor
 
-    """)
+    ''')
 
-e__(""" equations label 
+e__(''' equations label 
     
     Some introductory text.
 
@@ -116,9 +118,9 @@ e__(""" equations label
     aa22 = aa2*5    | [2,2,0,2,#] |
     equation label
 
-    """)
+    ''')
 #%%
-i__(""" [[02]] Seismic Analysis
+i__(''' [[02]] Seismic Analysis
     
     This is a test γ = 2*Σ of the system and this is a further test
     and another greek letter Γ₂.
@@ -136,9 +138,9 @@ i__(""" [[02]] Seismic Analysis
 
     || [CIT2000] citation text
 
-    """)
+    ''')
 
-v__(""" some values
+v__(''' some values
 
     this is one line 4 γ
   
@@ -146,9 +148,9 @@ v__(""" some values
     hh = 12.2   | height of balcony
     w1 = 2.2    | uniform load 
 
-    """)
+    ''')
 
-e__(""" some equations
+e__(''' some equations
     
     xx1 = gg + 4     | [2,2,0,#,1] |
     equation label and number
@@ -156,10 +158,10 @@ e__(""" some equations
     xx2 = hh + 10    | [2,2,0,2,#]
     no equation label
 
-    """)
+    ''')
 
 #%%
-t__(""" [[03]] Manipulate Tables (dataframes) and Plots    
+t__(''' [[03]] Manipulate Tables (dataframes) and Plots    
 
     read csv file into dataframe
     || read | T1 | rebars.csv  
@@ -183,13 +185,13 @@ t__(""" [[03]] Manipulate Tables (dataframes) and Plots
     || img | .5 | tb1.png |
     plot title
 
-    """)
+    ''')
 
-r__(""" write calc, docs or report to files 
+r__(''' write calc, docs or report to files 
 
     write_utfcalc()
     #write_pdfdoc()
     #write_htmldoc()
     #write_pdfreport()
     
-    """)
+    ''')

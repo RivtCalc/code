@@ -84,6 +84,8 @@ _hdrd: dict = {
 "eqnum" :  0, 
 "fignum" : 0, 
 "tablenum" : 0,
+"footnum" : 0,
+"footnote" : 0,
 "swidth" : 80
 }
 

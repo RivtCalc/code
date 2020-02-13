@@ -1,5 +1,4 @@
 #! python 
-#%%
 from rivet.rivet_lib import *
 
 #%%  
@@ -10,23 +9,26 @@ i__(""" [[01]] Load Summations
     of coordinate system is attached as a modifier, as in Cartesian frame of
     reference [#]_.
     
-    || [#] footnote text
+    || [#] footnote text 1
 
     Sometimes the state of motion asfda asd s fdas sfdfasdfasdf is
-    emphasized, as in rotating frame of reference.  
+    emphasized, as in rotating frame of reference. 
+
+    :: 
 
                         2
                     d w
-            M = -EI ───                                 
+             M = -EI ───                                 
                         2
                     dx 
 
+            
+                            (x + i y)
+                ┌── 10   ijk
+             ζ= >     ────────────                            
+                └── i=4   (γ+ 4)
     
-                     (x + i y)
-         ┌── 10   ijk
-      ζ= >     ────────────                            
-         └── i=4   (γ+ 4)
-
+    ::
 
     Insert text from text, rst, docx or html files
     || text | i,p,5 | ttext1.txt   
@@ -48,9 +50,10 @@ i__(""" [[01]] Load Summations
     Some added text xxxx is put here and a bit of nonsense to make some
     words for a paragraph.
 
-    Insert table from csv or xlsx files
+    Insert table from csv, xlsx and rst files
     || table | r[:]c[1,2]w10 | rebars.csv |  
-    || Rebar Table from CSV file [#]_  
+    || Rebar Table from CSV file [#]_ 
+    || [#] footnote text 2
     
     || table | r[:]c[1,2] | rebars.xlsx |  
     || Rebar Table from Excel file
@@ -59,6 +62,7 @@ i__(""" [[01]] Load Summations
     || Rebar Table from reST file
     
     || table | include | Table Title [#]_
+    || [#] footnote text 3
 
     +-----------+-------+--------+-------------+-----------+
     |   barsize |   dia |   area |   perimeter |   wt/foot |
@@ -87,8 +91,6 @@ i__(""" [[01]] Load Summations
     +-----------+-------+--------+-------------+-----------+
     |        18 | 2.257 |   4    |        7.09 |    13.6   |
     +-----------+-------+--------+-------------+-----------+
-
-    || [#] footnote text
 
     """)
 #%%
