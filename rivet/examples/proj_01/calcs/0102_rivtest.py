@@ -1,4 +1,5 @@
 #! python 
+#%%
 from rivet.rivet_lib import *
 
 #%%  
@@ -43,27 +44,21 @@ i__(''' [[01]] Load Summations
     Render image file
     || img | .5,# | pic1.png |  
     || inserted png file  
-
     || img | .5,# | pic2.jpg  |
     || inserted jpg file   
 
     Some added text xxxx is put here and a bit of nonsense to make some
     words for a paragraph.
 
-    Insert table from csv, xlsx and rst files
-    || table | r[:]c[1,2]w10 | rebars.csv |  
+    Insert table from csv and rst files
+    || table | mercalli.csv | r[0:5]c[0,1]w30 | 
     || Rebar Table from CSV file [#]_ 
     || [#] footnote text 2
-    
-    || table | r[:]c[1,2] | rebars.xlsx |  
-    || Rebar Table from Excel file
 
-    || table | rest | rebars.rst  | 
+    || table | rebars.rst  | 
     || Rebar Table from reST file
     
-    || table | include | Table Title [#]_
-    || [#] footnote text 3
-
+    || table | Table Title [#]_
     +-----------+-------+--------+-------------+-----------+
     |   barsize |   dia |   area |   perimeter |   wt/foot |
     +===========+=======+========+=============+===========+
@@ -92,8 +87,10 @@ i__(''' [[01]] Load Summations
     |        18 | 2.257 |   4    |        7.09 |    13.6   |
     +-----------+-------+--------+-------------+-----------+
 
+    || [#] footnote text 3
+
     ''')
-#%%
+
 v__(''' some values 
     
     Some text if needed

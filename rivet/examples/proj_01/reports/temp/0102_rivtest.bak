@@ -1,8 +1,9 @@
 #! python 
+#%%
 from rivet.rivet_lib import *
 
 #%%  
-i__(""" [[01]] Load Summations
+i__(''' [[01]] Load Summations
     
     The need to distinguish between the various meanings of "frame of
     reference" has led to a variety of terms. For example, sometimes the type
@@ -43,27 +44,21 @@ i__(""" [[01]] Load Summations
     Render image file
     || img | .5,# | pic1.png |  
     || inserted png file  
-
     || img | .5,# | pic2.jpg  |
     || inserted jpg file   
 
     Some added text xxxx is put here and a bit of nonsense to make some
     words for a paragraph.
 
-    Insert table from csv, xlsx and rst files
-    || table | r[:]c[1,2]w10 | rebars.csv |  
+    Insert table from csv and rst files
+    || table | mercalli.csv | r[0:5]c[0,1]w30 | 
     || Rebar Table from CSV file [#]_ 
     || [#] footnote text 2
-    
-    || table | r[:]c[1,2] | rebars.xlsx |  
-    || Rebar Table from Excel file
 
-    || table | rest | rebars.rst  | 
+    || table | rebars.rst  | 
     || Rebar Table from reST file
     
-    || table | include | Table Title [#]_
-    || [#] footnote text 3
-
+    || table | Table Title [#]_
     +-----------+-------+--------+-------------+-----------+
     |   barsize |   dia |   area |   perimeter |   wt/foot |
     +===========+=======+========+=============+===========+
@@ -92,9 +87,11 @@ i__(""" [[01]] Load Summations
     |        18 | 2.257 |   4    |        7.09 |    13.6   |
     +-----------+-------+--------+-------------+-----------+
 
-    """)
-#%%
-v__(""" some values 
+    || [#] footnote text 3
+
+    ''')
+
+v__(''' some values 
     
     Some text if needed
 
@@ -105,9 +102,9 @@ v__(""" some values
     i_x = Beam1[2]           | I major
     i_y = Beam2[3]           | I minor
 
-    """)
+    ''')
 
-e__(""" equations label 
+e__(''' equations label 
     
     Some introductory text.
 
@@ -118,9 +115,9 @@ e__(""" equations label
     aa22 = aa2*5    | [2,2,0,2,#] |
     equation label
 
-    """)
+    ''')
 #%%
-i__(""" [[02]] Seismic Analysis
+i__(''' [[02]] Seismic Analysis
     
     This is a test γ = 2*Σ of the system and this is a further test
     and another greek letter Γ₂.
@@ -138,9 +135,9 @@ i__(""" [[02]] Seismic Analysis
 
     || [CIT2000] citation text
 
-    """)
+    ''')
 
-v__(""" some values
+v__(''' some values
 
     this is one line 4 γ
   
@@ -148,9 +145,9 @@ v__(""" some values
     hh = 12.2   | height of balcony
     w1 = 2.2    | uniform load 
 
-    """)
+    ''')
 
-e__(""" some equations
+e__(''' some equations
     
     xx1 = gg + 4     | [2,2,0,#,1] |
     equation label and number
@@ -158,10 +155,10 @@ e__(""" some equations
     xx2 = hh + 10    | [2,2,0,2,#]
     no equation label
 
-    """)
+    ''')
 
 #%%
-t__(""" [[03]] Manipulate Tables (dataframes) and Plots    
+t__(''' [[03]] Manipulate Tables (dataframes) and Plots    
 
     read csv file into dataframe
     || read | T1 | rebars.csv  
@@ -185,13 +182,13 @@ t__(""" [[03]] Manipulate Tables (dataframes) and Plots
     || img | .5 | tb1.png |
     plot title
 
-    """)
+    ''')
 
-r__(""" write calc, docs or report to files 
+r__(''' write calc, docs or report to files 
 
     write_utfcalc()
     #write_pdfdoc()
     #write_htmldoc()
     #write_pdfreport()
     
-    """)
+    ''')

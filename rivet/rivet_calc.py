@@ -19,6 +19,7 @@ from sympy.parsing.latex import parse_latex
 from sympy.abc import _clash2
 import matplotlib.pyplot as plt 
 import matplotlib.image as mpimg
+from IPython.display import Image as ipyImage, display
 from tabulate import tabulate 
 from pathlib import Path
 from io import StringIO
@@ -43,8 +44,8 @@ class InsertU:
         """
         self.calcl = []
         self.strl = strl
-        self.folder = folderd
-        self.hdr = hdrd
+        self.folderd = folderd
+        self.hdrd = hdrd
 
     def i_parse(self) -> tuple:
         """ parse insert string
@@ -55,11 +56,11 @@ class InsertU:
         endflg = False
         itmpl = []
         for ils in self.strl:
-            print(1, ils)
             if ils[0:2] == "##":  continue          # remove review comment
             ils = ils[4:]                           # remove 4 space indent
             if len(ils.strip()) == 0:
                 self.calcl.append(" ")              # blank line
+                print(1, ils)
                 continue
             if ils[0] == "#" : continue             # remove comment 
             if ils[0:2] == "::" : continue          # remove preformat 
@@ -84,9 +85,11 @@ class InsertU:
                 elif  ipl[0].strip() == "tex": self.i_tex(ipl)
                 elif  ipl[0].strip() == "sym": self.i_sym(ipl)
                 elif "[#]" in ipl: self.i_footnote(ipl)
+                elif "[#]_" in ipl: self.i_footnote(ipl)
                 else: self.calcl.append(ils.strip())
                 continue    
             else:
+                print(0, ils)
                 self.calcl.append(ils)
 
         return self.calcl
@@ -104,22 +107,31 @@ class InsertU:
 
         #print(ipl)
         texts=""
-        txtpath = Path(self.folder["xpath"] /  ipl[2].strip())
+        txtpath = Path(self.folderd["xpath"] /  ipl[2].strip())
         if ".txt" in ipl[2] : 
             with open(txtpath, 'r') as txtf1:
-                texts = txtf1.read()
-        self.calcl.append(texts)
+                utfs = txtf1.read()
+        self.calcl.append(utfs)
+        print(utfs)
 
     def i_img(self, ipl: list):
         """ insert figure reference 
         """ 
         #print(ipl)
-        self.fignum += 1
-        caption1 = "  " + ipl[3].split("[[")[0]
-        file1 = ipl[2].strip()
-        ref1 = ("Figure " + str(self.sectnum) + '.' + str(self.fignum) + " "  
-            + caption1 + "\npath: " + str(self.folder["fpath"] + "/" + file1 ))
-        self.calcl.append(ref1)
+        self.hdrd["fignum"] += 1
+        fign = self.hdrd["fignum"]
+        sectn = self.hdrd["sectnum"]
+        captions = ipl[4].strip()
+        files = ipl[2].strip()
+        patho = str(Path(self.folderd["fpath"], files))
+        utfs = ("Figure " + str(sectn) + '.' + str(fign) + "  "  
+               + captions + "\npath: " + str(patho) )
+        self.calcl.append(utfs)
+        print(utfs)
+        try:
+            display(ipyImage(filename = str(patho)))
+        except:
+            pass
 
     def i_tex(self,ipl: list):
         """insert formated equation from LaTeX string
@@ -133,8 +145,8 @@ class InsertU:
         #txs = txs.encode('unicode-escape').decode()
         ltxs = parse_latex(txs)
         utfs = sp.pretty(sp.sympify(ltxs, _clash2, evaluate=False))
-        print(6, utfs)
         self.calcl.append(utfs)    
+        print(utfs)
 
     def i_sym(self,ipl):
         """insert formated equation from SymPy string 
@@ -148,31 +160,33 @@ class InsertU:
         sps = "Eq(" + spl[0] +",(" + spl[1] +"))" 
         #sps = sps.encode('unicode-escape').decode()
         utfs = sp.pretty(sp.sympify(sps, _clash2, evaluate=False))
-        print(8, utfs)
         self.calcl.append(utfs)   
-
+        print(utfs)
+            
     def i_table(self, ipl):
         """insert formated equation from SymPy string 
         
         Arguments:
             ipl {list} -- parameters to insert tex equation from file
         """       
-        
         table = ""
-        if ".csv" in ipl[2]:                        # csv data file       
-            ifiles = ipl[2].strip()
-            rowcol = ipl[1].strip().split("c")
-            rowl = rowcol[0].strip("r")
-            col = rowcol[1].split("w")[0] 
-            width = rowcol[1].split("w")[1]
-            csvfiles = Path(self.folders["tpath"] / ifiles)
-            df = pd.read_csv(csvfiles, usecols = col,
-                            skiprows = lambda x: x not in rowl)        
+        tfiles = ipl[1].strip()
+        filep = Path(self.folderd["tpath"], tfiles)   
+        self.hdrd["tablenum"] += 1
+        tablenum = self.hdrd["tablenum"]
+        sectnum = self.hdrd["sectnum"]
+        utfs = "\n"
+
+        if ".csv" in ipl[1]:                        # csv file       
             parse1 = []
-            with open(csvfile,'r') as csvf1:
-                read1 = csv.reader(csvf1)
-                readx = eval("read1" + rowl)
-                for row in readx:
+            rowcol = ipl[2].strip().split("c")
+            rowl = rowcol[0].strip("r")
+            col = rowcol[1].split("w")[0]
+            width = rowcol[1].split("w")[1]
+            with open(filep,'r') as csvf:
+                readl = list(csv.reader(csvf))
+                readl = eval("readl" + rowl)
+                for row in readl:
                     xrow = []
                     for j in eval(col):
                         xrow.append(row[j])
@@ -184,36 +198,27 @@ class InsertU:
             old_stdout = sys.stdout
             output = StringIO()
             output.write(tabulate(parse1, tablefmt="grid", headers="firstrow"))            
-            table1 = output.getvalue()
+            utfs = output.getvalue()
+            titles = "  \n"
             sys.stdout = old_stdout
-        elif ".xlsx" in ipl[2]:                   # excel data file
-            ifiles = ipl[2].strip()
-            rowcol = ipl[1].strip().split("c")
-            rowl = rowcol[0].strip("r")
-            col = rowcol[1].split("w")[0] 
-            width = rowcol[1].split("w")[1]
-            xlfiles = Path(self.folders["tpath"] / ifiles)
-            df = pd.read_excel(xlfiles, usecols = col,
-                            skiprows = lambda x: x not in rowl)
-            old_stdout = sys.stdout
-            output = StringIO()
-            output.write(tabulate(df, tablefmt="grid", headers="firstrow"))            
-            table1 = output.getvalue()
-            sys.stdout = old_stdout
-            #self.icalc.append("\n" + str(data1) + "\n")
-        elif "rest" in ipl[2]:                      # reST text file
-            rstfile = os.path.join(self.folders["tpath"], ipl[1].strip())
-            with open(rstfile,'r') as rstf1: 
-                table1 = rstf1.read()
-        elif "include" in ipl[2]:                   # index inline reST table 
-            self.tablenum += 1
-            title1 = "  " + ipl[2]
-            ref1 = ("Table " + str(self.sectnum) + '.' + str(self.tablenum))  
-        else:
-            pass
+            try: titles = ipl[4].strip() + titles
+            except: pass
+        elif ".rst" in ipl[1]:                        # rst file
+            with open(filep,'r') as rstf1: 
+                utfs = rstf1.read()
+            titles = "  \n"
+            try: titles = ipl[3].strip() + titles
+            except: pass
+        else:                                       # inline reST table 
+            utfs = ""
+            titles = "  "
+            try: titles = ipl[1].strip() + titles
+            except: pass
 
-        self.calcl.append(table)     
-
+        utfs = ("\nTable " + str(sectnum)+'.' + str(tablenum) + 
+                        "  " + titles ) + utfs                                              
+        self.calcl.append(utfs)
+        print(utfs)     
 
 class Value_u:
     """Process value_strings to utf-calc
@@ -234,7 +239,7 @@ class Value_u:
         self.vcalc = []
         self.eq1 = []
         self.vlist = vlist
-        self.folders = folders
+        self.folderd = folders
         self.maxwidth = strnum[0]
         self.sectnum = strnum[1]
         self.eqnum = strnum[2]
@@ -297,7 +302,7 @@ class Value_u:
         label1 = rowcol1[2].strip()
         col1 = rowcol1[3].strip()
         
-        csvfile1 = os.path.join(self.folders["tpath"], vfile1)
+        csvfile1 = os.path.join(self.folderd["tpath"], vfile1)
         df = pd.read_csv(csvfile1, index_col =index1)
         data1 = df.loc[label1,col1]
         val1 = var1 + " = " + str(data1)
@@ -322,7 +327,7 @@ class Equation_u:
         self.ecalc = []
         self.eq1 = []
         self.elist = elist
-        self.folders = folders
+        self.folderd = folders
         self.maxwidth = strnum[0]
         self.sectnum = strnum[1]
         self.eqnum = strnum[2]
@@ -513,7 +518,7 @@ class Table_u:
         self.rivet = rivet_dict
         self.tcalc = []
         self.tlist = tlist
-        self.folders = folders
+        self.folderd = folders
         self.maxwidth = strnum[0]
         self.sectnum = strnum[1]
         self.eqnum = strnum[2]
@@ -535,6 +540,17 @@ class Table_u:
         """
         locals().update(self.rivet)
 
+        if ".xlsx" in ipl[2]:                   # excel file
+            df = pd.read_excel(filep, usecols = lambda x: x in list(col), 
+                            skiprows = lambda x: x not in list(rowl))
+            old_stdout = sys.stdout
+            output = StringIO()
+            output.write(tabulate(df, tablefmt="grid", headers="firstrow"))            
+            table1 = output.getvalue()
+            sys.stdout = old_stdout
+            #self.icalc.append("\n" + str(data1) + "\n")
+        else:
+            pass
         
         for tline in self.tlist:
             globals().update(locals())
@@ -588,10 +604,12 @@ class Table_u:
         temp2 = temp1[1].split("to")
         filename = temp2[0].strip() + ".csv"
         tablename = temp2[1].strip()
-        pathname = Path(self.folders["tpath"], filename).as_posix()
+        pathname = Path(self.folderd["tpath"], filename).as_posix()
         cmdline = tablename + " = pd.read_table(" + '"' + \
                         pathname + '"' +", sep=',')" 
         
+        df = pd.read_csv(csvfiles, usecols = lambda x: x in list(col), 
+                       skiprows = lambda x: x in list(rowl))     
         globals().update(locals())        
         return cmdline
 
@@ -606,7 +624,7 @@ class Table_u:
         temp2 = temp1[1].split("to")
         filename = temp2[1].strip() + ".csv"
         tablename = temp2[0].strip()
-        pathname =  Path(self.folders["tpath"], filename ).as_posix()
+        pathname =  Path(self.folderd["tpath"], filename ).as_posix()
         cmdline = tablename + ".to_csv(" +  '"' + \
                         pathname +  '"' + ", sep=',')"
         
@@ -637,7 +655,7 @@ class Table_u:
         if len(tline1b) > 1:
             self.pltname = tline1b[1]
             filename = self.pltname + ".png"
-            filepath = self.folders["fpath"]
+            filepath = self.folderd["fpath"]
             self.pltfile = Path(filepath, filename).as_posix()
             pltcmd = tline1a[2].strip()
             cmdline1 = "ax = plt.gca()"
@@ -660,7 +678,7 @@ class Table_u:
         if ("png" in tline1a[1]) or ("jpg" in tline1a[1]):
             plt.close()
             filename = tline1a[1].split("insert")[1].strip()
-            filepath = self.folders["fpath"]
+            filepath = self.folderd["fpath"]
             imgfile = Path(filepath, filename).as_posix()
             img = mpimg.imread(imgfile)
             imgplot = plt.imshow(img)

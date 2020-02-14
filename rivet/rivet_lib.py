@@ -157,7 +157,7 @@ def i__(rawstr: str):
     calc = _rcalc.InsertU(strl, _hdrd, _foldd) 
     icalcl = calc.i_parse()
     _utfcalcs = _utfcalcs + "\n".join(icalcl)
-    print(_utfcalcs)
+    #print(_utfcalcs)
 
 def v__(str0: str):
     """generate calc or doc string for insert
