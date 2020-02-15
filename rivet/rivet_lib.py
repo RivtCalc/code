@@ -40,10 +40,8 @@ __author__ = "rholland@structurelabs.com"
 if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
-setd: dict = {}                                     # formats
-tagd: dict = {}                                     # subject tags
 _foldd: dict = {}                                   # folder dictionary
-_rund: dict ={}                                     # runtime dictionary
+_rivetd: dict ={}                                   # runtime dictionary
 _exportl: list = []                                 # values, equations
 _utfcalcs = """"""                                  # calc print string
 
@@ -132,14 +130,14 @@ def r__(rawstr: str):
     Arguments:
         rawstr {str} -- [description]
     """
-    global  _utfcalcs, _indxd, _rund
+    global  _utfcalcs, _hdrd, _rivetd
     
     hdrs,strs = rawstr.split("\n",1)
     if "[[" in hdrs: _updatehdr(hdrs)
     
     strs = textwrap.dedent(strs)
     exec(strs, globals())
-    _rund.update(locals())
+    _rivetd.update(locals())
     globals().update(locals())
 
 def i__(rawstr: str):
@@ -157,31 +155,31 @@ def i__(rawstr: str):
     calc = _rcalc.InsertU(strl, _hdrd, _foldd) 
     icalcl = calc.i_parse()
     _utfcalcs = _utfcalcs + "\n".join(icalcl)
-    #print(_utfcalcs)
 
-def v__(str0: str):
+def v__(rawstr: str):
     """generate calc or doc string for insert
 
     """
-    global rset, utfcalc
+    global _utfcalcs, _hdrd, _foldd, _rivetd
 
-    str1,str2 = str0.split("\n",1)
-    strset = _rsets(str1)
-    calc = _utf.ValueU(str2.split("\n"), _rdict, rdir,  strset[3])
-    dict1, calc1, equ1 = calc.v_parse()
-
-    if strset[2] == 1: 
-        calc(calc1, strset)
+    hdrs,strs = rawstr.split("\n",1)
+    if "[[" in hdrs: _updatehdr(hdrs)
     
-    _equations.append(equ1)
-    _rdict.update(dict1)    
-    globals().update(dict1)
+    strl = strs.split("\n")
+    calc = _rcalc.ValueU(strl, _hdrd, _foldd, _rivetd, _exportl)
+    vcalct  = calc.v_parse()
+    
+    vcalcl, rivetd, equal = vcalct[0], vcalct[1], vcalct[2]
+    _exportl.append(equal)
+    _rivetd.update(rivetd)    
+    globals().update(rivetd)
+    _utfcalcs = _utfcalcs + "\n".join(vcalcl)
 
 def e__(str0: str):
     """evaluate and format an equations rivet-string
 
     """
-    global rset, utfcalc
+    global _utfcalcs, _hdrd, _foldd
 
     str1,str2 = str0.split("\n",1)
     strset = _rsets(str1)
@@ -199,7 +197,7 @@ def t__(str0: str):
     """evaluate and format a tables rivet-string
     
     """
-    global rset, utfcalc
+    global _utfcalcs, _hdrd, _foldd
 
     str1,str2 = str0.split("\n",1)
     strset = _rsets(str1)
@@ -227,7 +225,7 @@ def _print_utfcalc(_utfcalc: str, strset: list):
         pp (int): pretty print flag
         indent (int): indent flag 
     """    
-    global utfcalc
+    global _utfcalcs, _hdrd, _foldd
 
     rivstr1 = []
     sect_num = int(strset[3][1])
@@ -240,20 +238,6 @@ def write_utfcalc(utfcalc, _txtfile):
     with open(_txtfile, "wb") as f1:
         f1.write(_utfcalcs.encode("UTF-8"))
 
-def write_htmldoc():
-    """[summary]
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def write_pdfdoc():
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def write_pdfreport():
-    """[summary]
-    """
-    pass
 
 def write_pycalc():
     """ write rivet independent python file
@@ -287,4 +271,18 @@ def _write_rstcalc(pline, pp, indent):
         "texmak2":  ".".join((_rbase, ".fls")),
         "texmak3":  ".".join((_rbase, ".fdb_latexmk"))
     }
+def write_htmldoc():
+    """[summary]
+    """
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def write_pdfdoc():
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def write_pdfreport():
+    """[summary]
+    """
+    pass
 

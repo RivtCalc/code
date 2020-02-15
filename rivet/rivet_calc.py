@@ -47,11 +47,11 @@ class InsertU:
         self.folderd = folderd
         self.hdrd = hdrd
 
-    def i_parse(self) -> tuple:
+    def i_parse(self) -> list:
         """ parse insert string
        
        Returns:
-            list :  list of calc strings
+            list :  utf formatted calc strings
         """
         endflg = False
         itmpl = []
@@ -86,7 +86,8 @@ class InsertU:
                 elif  ipl[0].strip() == "sym": self.i_sym(ipl)
                 elif "[#]" in ipl: self.i_footnote(ipl)
                 elif "[#]_" in ipl: self.i_footnote(ipl)
-                else: self.calcl.append(ils.strip())
+                else: 
+                    self.calcl.append(ils.strip())
                 continue    
             else:
                 print(0, ils)
@@ -104,25 +105,25 @@ class InsertU:
         Args:
             ipl (list): list of tag parameters
         """
-
-        #print(ipl)
-        texts=""
-        txtpath = Path(self.folderd["xpath"] /  ipl[2].strip())
-        if ".txt" in ipl[2] : 
-            with open(txtpath, 'r') as txtf1:
+        pars = ipl[2]
+        txtpath = Path(self.folderd["xpath"] /  ipl[1].strip())
+        with open(txtpath, 'r') as txtf1:
                 utfs = txtf1.read()
         self.calcl.append(utfs)
         print(utfs)
 
     def i_img(self, ipl: list):
-        """ insert figure reference 
-        """ 
-        #print(ipl)
+        """[summary]
+        
+        Args:
+            ipl (list): [description]
+        """
         self.hdrd["fignum"] += 1
         fign = self.hdrd["fignum"]
         sectn = self.hdrd["sectnum"]
         captions = ipl[4].strip()
-        files = ipl[2].strip()
+        files = ipl[1].strip()
+        pars = ipl[2].strip()
         patho = str(Path(self.folderd["fpath"], files))
         utfs = ("Figure " + str(sectn) + '.' + str(fign) + "  "  
                + captions + "\npath: " + str(patho) )
@@ -141,7 +142,7 @@ class InsertU:
 
         """
         print(5, ipl)
-        txs = ipl[2].strip()
+        txs = ipl[1].strip()
         #txs = txs.encode('unicode-escape').decode()
         ltxs = parse_latex(txs)
         utfs = sp.pretty(sp.sympify(ltxs, _clash2, evaluate=False))
@@ -155,7 +156,8 @@ class InsertU:
             ipl {list} -- parameters to insert tex equation from file
         """
         #print(ipl)
-        sps = ipl[2].strip()
+        pars = ipl[2]
+        sps = ipl[1].strip()
         spl = sps.split("=")
         sps = "Eq(" + spl[0] +",(" + spl[1] +"))" 
         #sps = sps.encode('unicode-escape').decode()
@@ -166,7 +168,7 @@ class InsertU:
     def i_table(self, ipl):
         """insert formated equation from SymPy string 
         
-        Arguments:
+        Args:
             ipl {list} -- parameters to insert tex equation from file
         """       
         table = ""
@@ -185,16 +187,16 @@ class InsertU:
             width = rowcol[1].split("w")[1]
             with open(filep,'r') as csvf:
                 readl = list(csv.reader(csvf))
-                readl = eval("readl" + rowl)
-                for row in readl:
-                    xrow = []
-                    for j in eval(col):
-                        xrow.append(row[j])
-                    wrow=[]
-                    for i in xrow:
-                        templist = textwrap.wrap(i, int(width)) 
-                        wrow.append("""\n""".join(templist))
-                    parse1.append(wrow)
+            readl = eval("readl" + rowl)
+            for row in readl:
+                xrow = []
+                for j in eval(col):
+                    xrow.append(row[j])
+                wrow=[]
+                for i in xrow:
+                    templist = textwrap.wrap(i, int(width)) 
+                    wrow.append("""\n""".join(templist))
+                parse1.append(wrow)
             old_stdout = sys.stdout
             output = StringIO()
             output.write(tabulate(parse1, tablefmt="grid", headers="firstrow"))            
@@ -220,98 +222,119 @@ class InsertU:
         self.calcl.append(utfs)
         print(utfs)     
 
-class Value_u:
-    """Process value_strings to utf-calc
+class ValueU:
+    """process rivet string of type value to utf-calc string
 
-    Returns utf value calcs 
     """
  
-    def __init__(self, vlist: list, rivet_dict: dict, \
-                     folders: dict, strnum: list):    
+    def __init__(self, strl: list,  hdrd: dict, folderd: dict, 
+                                        rivetd: dict, equl: list):
+        """process rivet string of type value to utf-calc string
         
-        """
-
         Args:
-            vlist (list): list of input lines in value string
+            strl (list): rivet string
+            folderd (dict): folder structure
+            hdrd (dict): header information
         """
-
-        self.rivet = rivet_dict
-        self.vcalc = []
-        self.eq1 = []
-        self.vlist = vlist
-        self.folderd = folders
-        self.maxwidth = strnum[0]
-        self.sectnum = strnum[1]
-        self.eqnum = strnum[2]
-        self.fignum = strnum[3]
-            
-    def v_str(self)-> tuple:
-        """compose utf calc string for values
+        self.calcl = []
+        self.strl = strl
+        self.folderd = folderd
+        self.hdrd = hdrd
+        self.equl = equl
+        self.rivetd = rivetd
+          
+    def v_parse(self)-> tuple:
+        """parse strings of type value
 
         Return:
-            vcalc (list): list of calculated strings
-            local_dict (list): local() dictionary
+            calcl (list): utf formatted calc strings
+            rivetd (list): local() dictionary
         """
-        locals().update(self.rivet)
-        
-        for vline in self.vlist:
-            if vline[0:2] == "##":          # filter out review comments
-                continue
-            vline1 = vline[4:]              # filter 4 space indent
-            if len(vline1.strip()) == 0:
-                self.vcalc.append("\n")
-                continue
-            if "|" == vline1[0]: 
-                val1 = self.v_lookup(vline1)
-                exec(val1)
-                continue
-            elif "|" in vline1: 
-                val1 = self.v_assign(vline1)
-                exec(val1)
-            else: self.vcalc.append(vline1)
+        locals().update(self.rivetd)
 
-        return locals(), self.vcalc, self.eq1
+        endflg = False
+        itmpl = []
+        for vls in self.strl:
+            if vls[0:2] == "##":  continue          # remove review comment
+            vls = vls[4:]                           # remove 4 space indent
+            if len(vls.strip()) == 0:
+                self.calcl.append(" ")              # insert blank line
+                print(21, vls)
+                continue
+            if vls[0] == "#" : continue             # remove comment 
+            if vls[0:2] == "::" : continue          # remove preformat 
+            if "|" in vls:                          # act on parse tag
+                vpl = vls.split("|")
+                if "=>" in vpl[0]: 
+                    self.v_lookup(vpl)              # assign vector 
+                else: self.v_assign(vpl) 
+            else: 
+                self.calcl.append(vls)
+                print(vls)
+
+        locals().update(self.rivetd)
+
+        return (self.calcl, self.rivetd, self.equl)
         
-    def v_assign(self, vline1: str) -> str:
-        """[summary]
+    def v_assign(self, vpl: list):
+        """assign value to variable
         
         Args:
-            vline1 (str): [description]
+            vpl (list): list of value string components
         """
-        vcalc_eq = ""
-        vline2 = vline1.split("|")
-        val1 = vline2[0].strip()
-        self.eq1.append(vline2[1] + ", " + val1) 
-        self.vcalc.append(val1 + " | " + vline2[1])
+        
+        locals().update(self.rivetd)
 
-        return val1
+        pys = str(vpl[0]) + "# " + vpl[1].strip()
+        vl = vpl[0].split("=")[1].strip()
+        exec(vpl[0].strip())
+        chkl = ""
+        if "[" in vl:
+            chkl = vl.split("[")[0].strip()
+            evalx = eval(chkl) 
+            if isinstance(evalx, list):
+                exts = str(vpl[0]).strip() + " = " + str(eval(vl))
+                utfs = str.ljust(exts,40) + " | " + vpl[1].strip()
+        else:
+            utfs =  str.ljust(str(vpl[0]).strip(),40) + " | " + vpl[1].strip()
+        
+        self.equl.append(pys)
+        self.calcl.append(utfs)
+        self.rivetd.update(locals())
+        locals().update(self.rivetd)
+        print(utfs)
 
-    def v_lookup(self, vline1: str):
-        """[summary]
+
+    def v_lookup(self, vpl: list):
+        """assign vector from csv file to variable
         
         Args:
-            vline1 (str): [description]
+            vpl (list): list of value string components
         """
-        #print(vline1)
-        vline1 = vline1.split("|")
-        vfile1 = vline1[1].strip()
-        rowcol1 = vline1[2].strip().split(",")
-        unit1 = vline1[3].strip()
-        var1 = rowcol1[0].strip()
-        index1 = rowcol1[1].strip()
-        label1 = rowcol1[2].strip()
-        col1 = rowcol1[3].strip()
         
-        csvfile1 = os.path.join(self.folderd["tpath"], vfile1)
-        df = pd.read_csv(csvfile1, index_col =index1)
-        data1 = df.loc[label1,col1]
-        val1 = var1 + " = " + str(data1)
-        val2 = val1 +  " | " + col1 + " of " + label1
-        self.vcalc.append( val2 + "\n")
+        locals().update(self.rivetd)
+        
+        files1 = vpl[0].split("=>")[0]
+        files2 = files1.split("[")[0].strip()
+        rows = files1.split(".csv")[1].strip()
+        filep = os.path.join(self.folderd["tpath"], files2)
 
-        return val1
+        with open(filep,'r') as csvf:
+            readl = list(csv.reader(csvf))
+        rowl = eval("readl" + rows)
 
-class Equation_u:
+        vars = vpl[0].split("=>")[1].strip()
+        cmds = vars + "=" + str(rowl)
+        exec(cmds)
+        utfs = str.ljust(vpl[0].strip(),40) + " | " + vpl[1].strip()
+
+        self.calcl.append(utfs)
+        self.rivetd.update(locals())
+        locals().update(self.rivetd)
+
+        print(utfs)
+  
+class EquationU:
     """Process equation_strings to utf-calc
 
     Returns utf equation calcs 
@@ -333,7 +356,7 @@ class Equation_u:
         self.eqnum = strnum[2]
         self.fignum = strnum[3]
             
-    def e_str(self):
+    def e_parse(self):
         """compose utf calc string for equation
         
         Return:
@@ -502,7 +525,7 @@ class Equation_u:
         self._write_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 1, 0)
         self._write_utf(" ", 0, 0)
 
-class Table_u:
+class TableU:
     """Process table_strings to utf-calc
 
     Returns utf string of table results

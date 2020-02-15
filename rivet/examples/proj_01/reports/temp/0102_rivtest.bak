@@ -32,19 +32,19 @@ i__(''' [[01]] Load Summations
     ::
 
     Insert text from text, rst, docx or html files
-    || text | i,p,5 | ttext1.txt   
+    || text  | ttext1.txt  | i,p,5
     
     Render equations
-    || tex  | .5,# | x = \\frac{1 + \\omega}{2 + \\gamma} |
+    || tex   | x = \\frac{1 + \\omega}{2 + \\gamma} | .5,# |
     || ACI 318-05 5.5.1
 
-    || sym | .5,# | x = (1 + omega + α) / (4 + gamma)  | 
+    || sym | x = (1 + omega + α) / (4 + gamma)  | .5,# |
     || ACI 318-05 5.5.2
 
     Render image file
-    || img | .5,# | pic1.png |  
+    || img | pic1.png | .5,# |  
     || inserted png file  
-    || img | .5,# | pic2.jpg  |
+    || img | pic2.jpg  | .5,# |
     || inserted jpg file   
 
     Some added text xxxx is put here and a bit of nonsense to make some
@@ -95,16 +95,17 @@ v__(''' some values
     
     Some text if needed
 
-    a11 = 12.23              | description 1 
-    a22 = 2.2                | description 2 
-    a33 = 14                 | description 3 
-    Beam1 : aisc12.csv [4]   | beam properties 
-    i_x = Beam1[2]           | I major
-    i_y = Beam2[3]           | I minor
+    a11 = 12.23                 | description 1 
+    a22 = 2.2                   | description 2 
+    a33 = 14                    | description 3 
+    
+    aisc13.csv[4] => BEAM1      | property vector 
+    I_x = BEAM1[2]              | I major
+    I_y = BEAM1[3]              | I minor
 
     ''')
 
-e__(''' equations label 
+e__(''' equations header
     
     Some introductory text.
 
@@ -171,7 +172,7 @@ t__(''' [[03]] Manipulate Tables (dataframes) and Plots
     || save | table | T2
     
     insert a table
-    || table | rest | rebars2.rst |
+    || table | rebars2.rst |  rest |
     Deflection Table
 
     plot some data from csv 
