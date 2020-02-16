@@ -168,7 +168,6 @@ def v__(rawstr: str):
     strl = strs.split("\n")
     calc = _rcalc.ValueU(strl, _hdrd, _foldd, _rivetd, _exportl)
     vcalct  = calc.v_parse()
-    
     vcalcl, rivetd, equal = vcalct[0], vcalct[1], vcalct[2]
     _exportl.append(equal)
     _rivetd.update(rivetd)    
@@ -181,17 +180,17 @@ def e__(str0: str):
     """
     global _utfcalcs, _hdrd, _foldd
 
-    str1,str2 = str0.split("\n",1)
-    strset = _rsets(str1)
-    calc = _utf.EquationU(str2.split("\n"), _rdict, rdir,  strset[3])
-    dict1, calc1, equ1 = calc.e_parse()
+    hdrs,strs = str0.split("\n",1)
+    if "[[" in hdrs: _updatehdr(hdrs)
     
-    if strset[2] == 1: 
-        calc(calc1, strset)
-    
-    _equations.append(equ1)
-    _rdict.update(dict1)
-    globals().update(dict1)
+    strl = strs.split("\n")
+    calc = _rcalc.EquationU(strl, _hdrd, _foldd, _rivetd, _exportl)
+    ecalct  = calc.e_parse()
+    ecalcl, rivetd, equal = ecalct[0], ecalct[1], ecalct[2]
+    _exportl.append(equal)
+    _rivetd.update(rivetd)    
+    globals().update(rivetd)
+    _utfcalcs = _utfcalcs + "\n".join(ecalcl)
 
 def t__(str0: str):
     """evaluate and format a tables rivet-string
@@ -199,45 +198,29 @@ def t__(str0: str):
     """
     global _utfcalcs, _hdrd, _foldd
 
-    str1,str2 = str0.split("\n",1)
-    strset = _rsets(str1)
-    calc = _utf.Table_u(str2.split("\n"), _rdict, rdir,  strset[3])
-    dict1, calc1, equ1 = calc.t_parse()
+    hdrs,strs = str0.split("\n",1)
+    if "[[" in hdrs: _updatehdr(hdrs)
     
-    if strset[2] == 1: 
-        calc(calc1, strset)
-    
-    _equations.append(equ1)
-    _rdict.update(dict1)
-    globals().update(dict1)
+    strl = strs.split("\n")
+    calc = _rcalc.EquationU(strl, _hdrd, _foldd, _rivetd, _exportl)
+    tcalct  = calc.t_parse()
+    tcalcl, rivetd, equal = tcalct[0], tcalct[1], tcalct[2]
+    _exportl.append(equal)
+    _rivetd.update(rivetd)    
+    globals().update(rivetd)
+    _utfcalcs = _utfcalcs + "\n".join(tcalcl)
 
 def x__(str0: str):
     """ skip execution of string
     
     """
     pass
-
-def _print_utfcalc(_utfcalc: str, strset: list):
-    """ print utfcalc to terminal
-    
-    Args:
-        rivets (list): text 
-        pp (int): pretty print flag
-        indent (int): indent flag 
-    """    
-    global _utfcalcs, _hdrd, _foldd
-
-    rivstr1 = []
-    sect_num = int(strset[3][1])
-    descrip = strset[1]
  
-
 def write_utfcalc(utfcalc, _txtfile):
     """write utf calc string to file
     """
     with open(_txtfile, "wb") as f1:
         f1.write(_utfcalcs.encode("UTF-8"))
-
 
 def write_pycalc():
     """ write rivet independent python file
@@ -271,6 +254,7 @@ def _write_rstcalc(pline, pp, indent):
         "texmak2":  ".".join((_rbase, ".fls")),
         "texmak3":  ".".join((_rbase, ".fdb_latexmk"))
     }
+    
 def write_htmldoc():
     """[summary]
     """

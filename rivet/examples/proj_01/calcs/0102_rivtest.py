@@ -32,19 +32,20 @@ i__(''' [[01]] Load Summations
     ::
 
     Insert text from text, rst, docx or html files
-    || text  | ttext1.txt  | i,p,5
+    || text  | ttext1.txt  | i5
     
     Render equations
-    || tex   | x = \\frac{1 + \\omega}{2 + \\gamma} | .5,# |
+    || tex   | x = \\frac{1 + \\omega}{2 + \\gamma} | s.5,# |
     || ACI 318-05 5.5.1
 
-    || sym | x = (1 + omega + α) / (4 + gamma)  | .5,# |
+    || sym | x = (1 + omega + α) / (4 + gamma)  | s.5,# |
     || ACI 318-05 5.5.2
 
     Render image file
-    || img | pic1.png | .5,# |  
+    || img | pic1.png | s.5,# |  
     || inserted png file  
-    || img | pic2.jpg  | .5,# |
+ 
+    || img | pic2.jpg  | s.5,# |
     || inserted jpg file   
 
     Some added text xxxx is put here and a bit of nonsense to make some
@@ -107,14 +108,16 @@ v__(''' some values
 
 e__(''' equations header
     
-    Some introductory text.
+    Some introductory text. xx
 
-    aa2 = a11*14    | [2,2,1,2,#] | 
-    equation label  
-
+    aa2 = a11*14    | e2,r2,c1,s2,# | 
+    equation label 1 - code reference 
      
-    aa22 = aa2*5    | [2,2,0,2,#] |
-    equation label
+    aa3 = aa2 * 5    | e2,r2,c0,s1,# |
+    equation label 2
+
+    aa4 = BEAM1[4] * 7.2  | e2,r2,c0,s1,# |
+    equation label 3
 
     ''')
 #%%

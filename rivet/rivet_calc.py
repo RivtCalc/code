@@ -25,19 +25,18 @@ from pathlib import Path
 from io import StringIO
 
 class InsertU:
-    """process rivet string of type insert to utf-calc string 
+    """convert rivet string of type insert to utf-calc string 
 
     Attributes:
         strl (list): rivet string
         folderd (dict): folder structure
         hdrd (dict):  header information    
-
     """
 
     def __init__(self, strl: list,  hdrd: dict, folderd: dict):
-        """process rivet string of type insert to utf-calc string
+        """convert rivet string of type insert to utf-calc string
         
-        Arguments:
+        Args:
             strl (list): rivet string
             folderd (dict): folder structure
             hdrd (dict): header information
@@ -51,7 +50,7 @@ class InsertU:
         """ parse insert string
        
        Returns:
-            list :  utf formatted calc strings
+            list :  formatted utf-calc strings
         """
         endflg = False
         itmpl = []
@@ -100,10 +99,10 @@ class InsertU:
         pass
 
     def i_txt(self, ipl: list):
-        """insert text from txt file
+        """insert text from file
         
         Args:
-            ipl (list): list of tag parameters
+            ipl (list): parameter list
         """
         pars = ipl[2]
         txtpath = Path(self.folderd["xpath"] /  ipl[1].strip())
@@ -113,10 +112,10 @@ class InsertU:
         print(utfs)
 
     def i_img(self, ipl: list):
-        """[summary]
+        """insert image from file
         
         Args:
-            ipl (list): [description]
+            ipl (list): parameter list
         """
         self.hdrd["fignum"] += 1
         fign = self.hdrd["fignum"]
@@ -124,21 +123,21 @@ class InsertU:
         captions = ipl[4].strip()
         files = ipl[1].strip()
         pars = ipl[2].strip()
-        patho = str(Path(self.folderd["fpath"], files))
+        paths = str(Path(self.folderd["fpath"], files))
         utfs = ("Figure " + str(sectn) + '.' + str(fign) + "  "  
-               + captions + "\npath: " + str(patho) )
+               + captions + "\npath: " + paths )
         self.calcl.append(utfs)
         print(utfs)
         try:
-            display(ipyImage(filename = str(patho)))
+            display(ipyImage(filename = paths))
         except:
             pass
 
     def i_tex(self,ipl: list):
         """insert formated equation from LaTeX string
         
-        Arguments:
-            ipl {list} -- parameters to insert tex equation from file
+        Args:
+            ipl (list): parameter list
 
         """
         print(5, ipl)
@@ -152,8 +151,8 @@ class InsertU:
     def i_sym(self,ipl):
         """insert formated equation from SymPy string 
         
-        Arguments:
-            ipl {list} -- parameters to insert tex equation from file
+        Args:
+            ipl (list): parameter list
         """
         #print(ipl)
         pars = ipl[2]
@@ -166,10 +165,10 @@ class InsertU:
         print(utfs)
             
     def i_table(self, ipl):
-        """insert formated equation from SymPy string 
+        """insert table from inline or csv, rst file 
         
         Args:
-            ipl {list} -- parameters to insert tex equation from file
+            ipl (list): parameter list
         """       
         table = ""
         tfiles = ipl[1].strip()
@@ -223,18 +222,20 @@ class InsertU:
         print(utfs)     
 
 class ValueU:
-    """process rivet string of type value to utf-calc string
+    """convert rivet string of type value to utf-calc string
 
     """
  
     def __init__(self, strl: list,  hdrd: dict, folderd: dict, 
                                         rivetd: dict, equl: list):
-        """process rivet string of type value to utf-calc string
+        """convert rivet string of type value to utf-calc string
         
         Args:
-            strl (list): rivet string
-            folderd (dict): folder structure
+            strl (list): rivet strings
             hdrd (dict): header information
+            folderd (dict): folder structure
+            rivetd (dict) : rivet calculation variables
+            equl (list) : equations for export
         """
         self.calcl = []
         self.strl = strl
@@ -335,17 +336,31 @@ class ValueU:
         print(utfs)
   
 class EquationU:
-    """Process equation_strings to utf-calc
+    """Convert rivet string of type equation to utf-calc string
 
-    Returns utf equation calcs 
     """
-    def __init__(self, elist: list, rivet_dict: dict, \
-                     folders: dict, strnum: list):    
+
+    def __init__(self, strl: list,  hdrd: dict, folderd: dict, 
+                                        rivetd: dict, equl: list):     
+        """convert rivet string of type equation to utf-calc string
+        
+        Args:
+            strl (list): rivet strings
+            hdrd (dict): header information
+            folderd (dict): folder structure
+            rivetd (dict) : rivet calculation variables
+            equl (list) : equations for export
         """
 
-        Args:
-            elist (list): list of input lines in equation string
-        """
+
+        self.calcl = []
+        self.strl = strl
+        self.folderd = folderd
+        self.hdrd = hdrd
+        self.equl = equl
+        self.rivetd = rivetd
+
+
         self.rivet = rivet_dict
         self.ecalc = []
         self.eq1 = []
@@ -357,7 +372,7 @@ class EquationU:
         self.fignum = strnum[3]
             
     def e_parse(self):
-        """compose utf calc string for equation
+        """parse strings of type equation
         
         Return:
             ecalc (list): list of calculated equation lines
@@ -371,9 +386,9 @@ class EquationU:
         pad = ["","","",""]
         for eline in self.elist:
             #print(eline)
-            if eline[0:2] == "##":          # filter out review comments
+            if eline[0:2] == "##":                      # filter out review comments
                 continue
-            eline = eline[4:]              # filter 4 space indent
+            eline = eline[4:]                           # filter 4 space indent
             if len(eline1.strip()) == 0 :
                 self.ecalc.append("\n")
             elif "|" in eline:
@@ -398,13 +413,9 @@ class EquationU:
 
         return locals(), self.ecalc, self.eq1
 
-    def _prt_eq(self, dval):
-        """ print equations.
-            key : _e + line number  
-            value:  p0  |  p1     |  p2   |   p3    |  p4  | p5   |  p6  |  p7       
-                     var   expr    state    descrip   dec1  dec2   unit   eqnum
-        
-        """   
+    def sym_eq(self):
+        pass
+
         try:                                                # set decimal format
             eformat, rformat = str(dval[4]).strip(), str(dval[5]).strip()
             exec("set_insertoptions(precision=" + eformat.strip() + ")")
@@ -438,6 +449,9 @@ class EquationU:
         except:
             self._write_utf(dval[1], 1, 0)                  # ASCII form
             self._write_utf(" ", 0, 0)
+
+    def sub_eq(self):
+
         try:                                                # substitute                            
             symat = symeq.atoms(Symbol)
             for _n2 in symat:
@@ -478,7 +492,16 @@ class EquationU:
             self._write_utf(out3, 1, 0)               # print substituted form
             self._write_utf(" ", 0, 0)
         except:
-            pass
+            pass   
+
+    def prt_eq(self, dval):
+        """ print equations.
+            key : _e + line number  
+            value:  p0  |  p1     |  p2   |   p3    |  p4  | p5   |  p6  |  p7       
+                     var   expr    state    descrip   dec1  dec2   unit   eqnum
+        
+        """   
+
         for j2 in self.odict:                         # restore units
             try:
                 statex = self.odict[j2][2].strip()
