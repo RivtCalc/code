@@ -32,34 +32,35 @@ i__(''' [[01]] Load Summations
     ::
 
     Insert text from text, rst, docx or html files
-    || text  | ttext1.txt  | i5
+    || text | ttext1.txt  | i:5,w:30
     
     Render equations
-    || tex   | x = \\frac{1 + \\omega}{2 + \\gamma} | s.5,# |
+    || tex  | x = \\frac{1 + \\omega}{2 + \\gamma} | s:1,n:t |
     || ACI 318-05 5.5.1
 
-    || sym | x = (1 + omega + α) / (4 + gamma)  | s.5,# |
+    || sym | x = (12 + omega + α) / (14 + gamma)  | s:1,n:t |
     || ACI 318-05 5.5.2
 
     Render image file
-    || img | pic1.png | s.5,# |  
+    || img | pic1.png | s:1,n:t |  
     || inserted png file  
  
-    || img | pic2.jpg  | s.5,# |
+    || img | pic2.jpg  | s:1,n:t |
     || inserted jpg file   
 
     Some added text xxxx is put here and a bit of nonsense to make some
     words for a paragraph.
 
     Insert table from csv and rst files
-    || table | mercalli.csv | r[0:5]c[0,1]w30 | 
+    || table | mercalli.csv | r:[0:5],c:[0,1],m:30,n:t | 
     || Rebar Table from CSV file [#]_ 
     || [#] footnote text 2
 
-    || table | rebars.rst  | 
+    || table | rebars.rst  | n:t |
     || Rebar Table from reST file
     
-    || table | Table Title [#]_
+    || table | inline |
+    || Table Title [#]_
     +-----------+-------+--------+-------------+-----------+
     |   barsize |   dia |   area |   perimeter |   wt/foot |
     +===========+=======+========+=============+===========+
@@ -81,13 +82,7 @@ i__(''' [[01]] Load Summations
     +-----------+-------+--------+-------------+-----------+
     |        10 | 1.27  |   1.27 |        3.99 |     4.303 |
     +-----------+-------+--------+-------------+-----------+
-    |        11 | 1.41  |   1.56 |        4.43 |     5.313 |
-    +-----------+-------+--------+-------------+-----------+
-    |        14 | 1.693 |   2.25 |        5.32 |     7.65  |
-    +-----------+-------+--------+-------------+-----------+
-    |        18 | 2.257 |   4    |        7.09 |    13.6   |
-    +-----------+-------+--------+-------------+-----------+
-
+   
     || [#] footnote text 3
 
     ''')
@@ -103,6 +98,7 @@ v__(''' some values
     aisc13.csv[4] => BEAM1      | property vector 
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
+    a11 :                       | reprint a value
 
     ''')
 
@@ -110,13 +106,15 @@ e__(''' equations header
     
     Some introductory text. xx
 
-    aa2 = a11*14    | e2,r2,c1,s2,# | 
+    aa1 = a11*14    | e:2,r:2,c:0,p:2,n:t | 
     equation label 1 - code reference 
      
-    aa3 = aa2 * 5    | e2,r2,c0,s1,# |
+    aa2 = a11*14  | p:0  
+
+    aa3 = (aa2 * 5)/a11    | |
     equation label 2
 
-    aa4 = BEAM1[4] * 7.2  | e2,r2,c0,s1,# |
+    aa4 = BEAM1[4] * 7.2  | |
     equation label 3
 
     ''')
@@ -168,23 +166,24 @@ t__(''' [[03]] Manipulate Tables (dataframes) and Plots
     || read | T1 | rebars.csv  
     
     create and populate a table    
-    || create | T2 | rebars2.csv
+    || create | rebars2.csv | T2
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
-    T2["prod"] = T2["area1"]*T2["len1"]
-    || save | table | T2
+    T2["prod1"] = T2["area1"]*T2["len1"]
+    || write | tb2.csv | T2
     
     insert a table
-    || table | rebars2.rst |  rest |
-    Deflection Table
+    || table | rebars2.csv | r:[0:5],c:[0,1],w:30 |
+    Table title goes here
 
-    plot some data from csv 
-    || plot | tb1.csv | x="dia", y="area", row=[1:10], kind="line", grid=1   
-    || add  | x="dia", y="perimeter", color="blue"  |
-    || save | plot | tb1.png | 
+    plot some data from csv file
+    || plot | tb2.csv | plot1 | x:len1,y:area1,r:[1:10],k:line,g:1   
+    || add  | x:len1, y:prod1, c:blue  |
+    || save | tb2.png | plot1 
 
-    || img | .5 | tb1.png |
-    plot title
+    insert a plot
+    || img | tb1.png | s:1,#:1 |
+    || Plot title goes here
 
     ''')
 

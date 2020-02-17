@@ -13,6 +13,8 @@ import subprocess
 import tempfile
 import io
 import re
+from numpy import *
+import numpy.linalg as la
 import pandas as pd
 import sympy as sp
 from sympy.parsing.latex import parse_latex
@@ -45,6 +47,9 @@ class InsertU:
         self.strl = strl
         self.folderd = folderd
         self.hdrd = hdrd
+        self.paramd = { "i":5, "w":40,
+                        "s":1, "n":"t",
+                        "r":"[:]", "c":"[:]", "m":30}
 
     def i_parse(self) -> list:
         """ parse insert string
@@ -78,6 +83,7 @@ class InsertU:
                     print(7, itmpl)
                     continue
                 print(3, ipl[0])
+                i_updateparams(ipl)
                 if  ipl[0].strip() == "text": self.i_txt(ipl)
                 elif  ipl[0].strip() == "img": self.i_img(ipl)
                 elif  ipl[0].strip() == "table": self.i_table(ipl)
@@ -94,7 +100,21 @@ class InsertU:
 
         return self.calcl
 
-    def i_footnote(self, iline1):
+    def i_updateparams(self, ipl: list):
+        """update process parameters from tag
+        
+        Args:
+            ipl (list): [description]
+        """
+        try:
+            paraml = ipl[2].split(",")
+            for i in paraml:
+                key = i.split(":")[0].strip() 
+                self.paramd[key] = i.split(":")[1]
+        except:
+            pass
+
+    def i_footnote(self, ipl: list):
         
         pass
 
@@ -109,6 +129,7 @@ class InsertU:
         with open(txtpath, 'r') as txtf1:
                 utfs = txtf1.read()
         self.calcl.append(utfs)
+        
         print(utfs)
 
     def i_img(self, ipl: list):
@@ -268,12 +289,14 @@ class ValueU:
                 vpl = vls.split("|")
                 if "=>" in vpl[0]: 
                     self.v_lookup(vpl)              # assign vector 
-                else: self.v_assign(vpl) 
+                elif ":" in vpl[0]:
+                    self.v_reprint(vpl)             # reprint a value
+                else: self.v_assign(vpl)            # assign a value
             else: 
                 self.calcl.append(vls)
                 print(vls)
 
-        locals().update(self.rivetd)
+        self.rivetd.append(locals())
 
         return (self.calcl, self.rivetd, self.equl)
         
@@ -302,7 +325,7 @@ class ValueU:
         self.equl.append(pys)
         self.calcl.append(utfs)
         self.rivetd.update(locals())
-        locals().update(self.rivetd)
+        
         print(utfs)
 
 
@@ -310,7 +333,7 @@ class ValueU:
         """assign vector from csv file to variable
         
         Args:
-            vpl (list): list of value string components
+            vpl (list): list of value string items
         """
         
         locals().update(self.rivetd)
@@ -331,10 +354,22 @@ class ValueU:
 
         self.calcl.append(utfs)
         self.rivetd.update(locals())
-        locals().update(self.rivetd)
 
         print(utfs)
-  
+    
+    def v_reprint(self, vpl: list):
+        """reprint a variable value
+        
+        Args:
+            vpl (list): list of value string items
+        """
+
+        vars = vpl[0].split(":")[0].strip()
+        ans = str(eval(vars))
+        utfs = str.ljust(vars + " = " + ans, 40) + " | " + vpl[1].strip()
+
+        print(utfs)
+
 class EquationU:
     """Convert rivet string of type equation to utf-calc string
 
@@ -351,106 +386,104 @@ class EquationU:
             rivetd (dict) : rivet calculation variables
             equl (list) : equations for export
         """
-
-
         self.calcl = []
         self.strl = strl
         self.folderd = folderd
         self.hdrd = hdrd
         self.equl = equl
         self.rivetd = rivetd
+        self.paramd = { "e":2,"r":2,"c":0, "p":2, "n":"t"}
 
-
-        self.rivet = rivet_dict
-        self.ecalc = []
-        self.eq1 = []
-        self.elist = elist
-        self.folderd = folders
-        self.maxwidth = strnum[0]
-        self.sectnum = strnum[1]
-        self.eqnum = strnum[2]
-        self.fignum = strnum[3]
-            
-    def e_parse(self):
+    def e_parse(self) -> tuple:
         """parse strings of type equation
         
         Return:
             ecalc (list): list of calculated equation lines
             local_dict (list): local() dictionary
         """
-        locals().update(self.rivet)
-        ecalc_eq = ""
-        ecalc_ans = ""
-        descrip_flag = 0
-        descrip1, unit1, sigfig1 = "equation", "", [2,2] 
-        pad = ["","","",""]
-        for eline in self.elist:
-            #print(eline)
-            if eline[0:2] == "##":                      # filter out review comments
-                continue
-            eline = eline[4:]                           # filter 4 space indent
-            if len(eline1.strip()) == 0 :
-                self.ecalc.append("\n")
-            elif "|" in eline:
-                descrip_flag = 1
-                eline1 = (eline.strip()).split("|") + pad
-                descrip2, unit2, sigfig2 = eline1[0:3]
-                self.ecalc.append(descrip2.strip())
-                #print("descrip", eline1)
-            elif "=" in eline:
-                ecalc_eq = eline.strip()
-                if descrip_flag == 0:
-                    descrip2, unit2, sigfig2 = descrip1, unit1, sigfig1
-                exec(ecalc_eq)
-                dep_var, ind_var = ecalc_eq.split("=")
-                ecalc_ans = str(dep_var).strip() + " = " + str(eval(ind_var)).strip()
-                self.ecalc.append(ecalc_eq)
-                self.ecalc.append(ecalc_ans)
-                self.eq1.append(descrip2 + ", " + ecalc_eq)
-                ecalc_eq = ""
+        locals().update(self.rivetd)                
+        endflg = False
+        etmpl = []                                  # block string
+
+        for els in self.strl:
+            if els[0:2] == "##":  continue          # remove review comment
+            els = els[4:]                           # remove 4 space indent
+            if len(els.strip()) == 0:
+                self.calcl.append(" ")              # blank line
+                print(" "); continue
+            if els[0] == "#" : continue             # remove comment 
+            if els[0:2] == "::" : continue          # remove preformat 
+            if "=" in els:                          # find parse tag
+                epl = els.split("|")
+                print(32, epl)            
+                if endflg:                          # append line to block
+                    etmpl.append(epl[0]); epl = etmpl
+                    print(36, etmpl)
+                    endflg = False; etmpl = []
+                if els.strip()[-1] == "|":          # set block flag
+                    endflg = True
+                    etmpl = epl
+                    print(35, etmpl); continue
+                print(37, epl[0,1])
+                e_updateparams(epl[1].strip())
+                exec(epl[0].strip())                # exec equation
+                if self.paramd["p"] == 1:
+                    eq_symbol(epl)
+                if self.paramd["p"] == 2:
+                    eq_symbol(epl); eq_sub(epl)
             else:
-                self.ecalc.append(eline.strip())
+                print(39, els)
+                self.calcl.append(els)
 
-        return locals(), self.ecalc, self.eq1
+        self.rivetd.update(locals())
+        return self.calcl
 
-    def sym_eq(self):
-        pass
-
-        try:                                                # set decimal format
-            eformat, rformat = str(dval[4]).strip(), str(dval[5]).strip()
-            exec("set_insertoptions(precision=" + eformat.strip() + ")")
-            exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
-        except:
-            rformat = '3'
-            eformat = '3'
-            set_insertoptions(precision=3)
-            Unum.VALUE_FORMAT = "%.3f"
-        cunit = dval[6].strip()
-        var0  =  dval[0].strip()
-        #print('dval_e', dval
-        for k1 in self.odict:                               # evaluate 
-            if k1[0:2] in ['_v','_e']:
-                    try: exec(self.odict[k1][2].strip())
-                    except: pass       
-        tmp = int(self.widthc-2) * '-'                      # print line
-        self._write_utf(" ", 0, 0)
-        self._write_utf((u'\u250C' + tmp + u'\u2510').rjust(self.widthc), 1, 0)
-        self._write_utf((dval[3] + "  " + dval[7]).rjust(self.widthc-1), 0, 0)
-        self._write_utf(" ", 0, 0)
-        for _j in self.odict:                               # symbolic form
-            if _j[0:2] in ['_v','_e']:
-                #print(str(self.odict[_j][0]))
-                varsym(str(self.odict[_j][0]))
+    def e_updateparams(self, eps: string):
+        """update process parameters from tag
+        
+        Args:
+            eps (string): equation print parameters
+        """
         try:
-            symeq = sympify(dval[1].strip())                # sympy form
-            self._write_utf(symeq, 1, 0)
-            self._write_utf(" ", 0, 0)
-            self._write_utf(" ", 0, 0)
+            paraml = eps.split(",")
+            for i in paraml:
+                key = i.split(":")[0].strip() 
+                self.paramd[key] = i.split(":")[1]
         except:
-            self._write_utf(dval[1], 1, 0)                  # ASCII form
-            self._write_utf(" ", 0, 0)
+            pass
+        eformat = self.paramd["e"]
+        rformat = self.paramd["r"]
+        exec("set_printoptions(precision=" + eformat.strip() + ")")
+        exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
 
-    def sub_eq(self):
+    def eq_symbol(self, epl: list):
+
+        locals().update(self.rivetd)
+        utfs = epl[0].strip(); descrips = epl[3]; pars = epl[1]
+        vars = utfs.split("=")
+        results = vars[0].strip() + " = " + str(eval(vars[1]))
+        eqnums = (" [ " + self.paramd["sectnum"] + "." + 
+                                self.paramd["eqnum"] + " ] ")
+        print(" "); self.calcl.append(" ") 
+        ehdr = (descrips + " [ " + results + " ] " + 
+            " [ " + eqnums + " ] ").rjust(self.paramd["swidth"])
+        print((ehdr)); self.calcl.append("ehdr") 
+        print(" "); self.calcl.append(" ")       
+        try: 
+            eps = "Eq(" + epl[0] +",(" + epl[1] +"))" 
+            #sps = sps.encode('unicode-escape').decode()
+            utfs = sp.pretty(sp.sympify(eps, _clash2, evaluate=False))
+            print(utfs); self.calcl.append(utfs)
+        else:
+            print(utfs); self.calcl.append(utfs)
+
+        try: self.equl.append(" # " + epl[3].strip())       # append eq py
+        except: pass
+        self.equl.append(epl[0].strip())
+        self.rivetd.update(locals())
+
+
+    def eq_sub(self):
 
         try:                                                # substitute                            
             symat = symeq.atoms(Symbol)
@@ -494,20 +527,6 @@ class EquationU:
         except:
             pass   
 
-    def prt_eq(self, dval):
-        """ print equations.
-            key : _e + line number  
-            value:  p0  |  p1     |  p2   |   p3    |  p4  | p5   |  p6  |  p7       
-                     var   expr    state    descrip   dec1  dec2   unit   eqnum
-        
-        """   
-
-        for j2 in self.odict:                         # restore units
-            try:
-                statex = self.odict[j2][2].strip()
-                exec(statex)
-            except:
-                pass
         typev = type(eval(var0))                # print result right justified
         if typev == ndarray:
             tmp1 = eval(var0)
@@ -547,6 +566,18 @@ class EquationU:
         tmp = int(self.widthc-2) * '-'           # print horizontal line
         self._write_utf((u'\u2514' + tmp + u'\u2518').rjust(self.widthc), 1, 0)
         self._write_utf(" ", 0, 0)
+
+        self.equl.append(pys)
+        self.calcl.append(utfs)
+        self.rivetd.update(locals())
+
+
+    def eq_chk(self, dval):
+        """ check function
+        
+        """   
+
+        pass
 
 class TableU:
     """Process table_strings to utf-calc

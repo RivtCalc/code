@@ -22,11 +22,6 @@ import logging
 from pathlib import Path
 from typing import List, Set, Dict, Tuple, Optional
 
-from numpy import *
-import numpy.linalg as la
-import pandas as pd
-import sympy as sy
-
 from rivet.rivet_unit import *
 import rivet.rivet_calc as _rcalc
 #import rivet.rivet_doc as _rdoc
@@ -203,7 +198,7 @@ def t__(str0: str):
     
     strl = strs.split("\n")
     calc = _rcalc.EquationU(strl, _hdrd, _foldd, _rivetd, _exportl)
-    tcalct  = calc.t_parse()
+    tcalct  = calc.t_parse()s
     tcalcl, rivetd, equal = tcalct[0], tcalct[1], tcalct[2]
     _exportl.append(equal)
     _rivetd.update(rivetd)    
