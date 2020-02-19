@@ -1,8 +1,8 @@
 #! python
 """convert rivet strings to utf-8 calcs
 
-This module converts each rivet string type to a utf-8 calc string by means
-of a class for each string type. 
+This module converts each rivet string type to a utf-8 calc string using
+a class for each string type. 
 
 """
 import os
@@ -371,13 +371,13 @@ class ValueU:
         print(utfs)
 
 class EquationU:
-    """Convert rivet string of type equation to utf-calc string
+    """Convert rivet string type **equation** to utf-calc string
 
     """
 
     def __init__(self, strl: list,  hdrd: dict, folderd: dict, 
                                         rivetd: dict, equl: list):     
-        """convert rivet string of type equation to utf-calc string
+        """convert rivet string type **equation** to utf-calc string
         
         Args:
             strl (list): rivet strings

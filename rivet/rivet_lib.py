@@ -162,8 +162,8 @@ def v__(rawstr: str):
     
     strl = strs.split("\n")
     calc = _rcalc.ValueU(strl, _hdrd, _foldd, _rivetd, _exportl)
-    vcalct  = calc.v_parse()
-    vcalcl, rivetd, equal = vcalct[0], vcalct[1], vcalct[2]
+    vcalc  = calc.v_parse()
+    vcalcl, rivetd, equal = vcalc[0], vcalc[1], vcalc[2]
     _exportl.append(equal)
     _rivetd.update(rivetd)    
     globals().update(rivetd)
@@ -180,8 +180,8 @@ def e__(str0: str):
     
     strl = strs.split("\n")
     calc = _rcalc.EquationU(strl, _hdrd, _foldd, _rivetd, _exportl)
-    ecalct  = calc.e_parse()
-    ecalcl, rivetd, equal = ecalct[0], ecalct[1], ecalct[2]
+    ecalc  = calc.e_parse()
+    ecalcl, rivetd, equal = ecalc[0], ecalc[1], ecalc[2]
     _exportl.append(equal)
     _rivetd.update(rivetd)    
     globals().update(rivetd)
@@ -197,9 +197,9 @@ def t__(str0: str):
     if "[[" in hdrs: _updatehdr(hdrs)
     
     strl = strs.split("\n")
-    calc = _rcalc.EquationU(strl, _hdrd, _foldd, _rivetd, _exportl)
-    tcalct  = calc.t_parse()s
-    tcalcl, rivetd, equal = tcalct[0], tcalct[1], tcalct[2]
+    calc = _rcalc.TableU(strl, _hdrd, _foldd, _rivetd, _exportl)
+    tcalc  = calc.t_parse()
+    tcalcl, rivetd, equal = tcalc[0], tcalc[1], tcalc[2]
     _exportl.append(equal)
     _rivetd.update(rivetd)    
     globals().update(rivetd)
