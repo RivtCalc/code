@@ -151,10 +151,10 @@ v__(''' some values
 
 e__(''' some equations
     
-    xx1 = gg + 4     | [2,2,0,#,1] |
+    xx1 = gg + 4     | e:2,r:2,c:0,p:2,n:t |
     equation label and number
 
-    xx2 = hh + 10    | [2,2,0,2,#]
+    xx2 = hh + 10    | e:2,r:2,c:0,p:2,n:f |
     no equation label
 
     ''')
@@ -162,9 +162,6 @@ e__(''' some equations
 #%%
 t__(''' [[03]] Manipulate Tables (dataframes) and Plots    
 
-    read csv file into dataframe
-    || read | T1 | rebars.csv  
-    
     create and populate a table    
     || create | rebars2.csv | T2
     T2["len1"] = range(1,8)  
@@ -172,6 +169,9 @@ t__(''' [[03]] Manipulate Tables (dataframes) and Plots
     T2["prod1"] = T2["area1"]*T2["len1"]
     || write | tb2.csv | T2
     
+    read csv file into dataframe
+    || read | T1 | rebars.csv  
+
     insert a table
     || table | rebars2.csv | r:[0:5],c:[0,1],w:30 |
     Table title goes here
@@ -187,7 +187,7 @@ t__(''' [[03]] Manipulate Tables (dataframes) and Plots
 
     ''')
 
-r__(''' write calc, docs or report to files 
+r__(''' write calc, doc or report to file
 
     write_utfcalc()
     #write_pdfdoc()
@@ -195,3 +195,4 @@ r__(''' write calc, docs or report to files
     #write_pdfreport()
     
     ''')
+    

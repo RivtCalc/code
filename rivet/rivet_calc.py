@@ -11,8 +11,9 @@ import csv
 import textwrap
 import subprocess
 import tempfile
-import io
 import re
+import io
+from io import StringIO
 from numpy import *
 import numpy.linalg as la
 import pandas as pd
@@ -24,7 +25,6 @@ import matplotlib.image as mpimg
 from IPython.display import Image as ipyImage, display
 from tabulate import tabulate 
 from pathlib import Path
-from io import StringIO
 
 class InsertU:
     """convert rivet string of type insert to utf-calc string 
@@ -428,9 +428,9 @@ class EquationU:
                 e_updateparams(epl[1].strip())
                 exec(epl[0].strip())                # exec equation
                 if self.paramd["p"] == 1:
-                    eq_symbol(epl)
+                    eq_symbol(epl,1)
                 if self.paramd["p"] == 2:
-                    eq_symbol(epl); eq_sub(epl)
+                    eq_symbol(epl,2)
             else:
                 print(39, els)
                 self.calcl.append(els)
@@ -456,10 +456,14 @@ class EquationU:
         exec("set_printoptions(precision=" + eformat.strip() + ")")
         exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
 
-    def eq_symbol(self, epl: list):
-
+    def eq_symbol(self, epl: list, flag: int):
+        """[summary]
+        
+        Args:
+            epl (list): [description]
+        """
         locals().update(self.rivetd)
-        utfs = epl[0].strip(); descrips = epl[3]; pars = epl[1]
+        utfs = epl[0].strip(); descrips = epl[3]; pard = dict(epl[1])
         vars = utfs.split("=")
         results = vars[0].strip() + " = " + str(eval(vars[1]))
         eqnums = (" [ " + self.paramd["sectnum"] + "." + 
@@ -477,24 +481,37 @@ class EquationU:
         else:
             print(utfs); self.calcl.append(utfs)
 
-        try: self.equl.append(" # " + epl[3].strip())       # append eq py
+        try: self.equl.append(" # " + epl[3].strip())       # export eq to py
         except: pass
         self.equl.append(epl[0].strip())
         self.rivetd.update(locals())
+        if flag == 2: eq_sub(epl, eps)      # substitute variable with number
+        if pard["c"] != 0: eq_chk(results, pard["c"])   # check result
 
+    def eq_sub(self, epl: list, eps: str):
 
-    def eq_sub(self):
-
-        try:                                                # substitute                            
-            symat = symeq.atoms(Symbol)
+        locals().update(self.rivetd)
+        utfs = epl[0].strip(); descrips = epl[3]; pard = dict(epl[1])
+        vars = utfs.split("=")
+        results = vars[0].strip() + " = " + str(eval(vars[1]))
+        try: 
+            eps = "Eq(" + epl[0] +",(" + epl[1] +"))" 
+            #sps = sps.encode('unicode-escape').decode()
+            utfs = sp.pretty(sp.sympify(eps, _clash2, evaluate=False))
+            print(utfs); self.calcl.append(utfs)
+        else:
+            print(utfs); self.calcl.append(utfs)
+        try:
+            symeq = sp.sympify(eps.strip())                                                 # substitute                            
+            symat = symeq.atoms(sp.Symbol)
             for _n2 in symat:
                 evlen = len((eval(_n2.__str__())).__str__())  # get var length
                 new_var = str(_n2).rjust(evlen, '~')
                 new_var = new_var.replace('_','|')
-                symeq1 = symeq.subs(_n2, symbols(new_var))
-            out2 = pretty(symeq1, wrap_line=False)
+                symeq1 = symeq.subs(_n2, sp.Symbols(new_var))
+            out2 = sp.pretty(symeq1, wrap_line=False)
             #print('out2a\n', out2)
-            symat1 = symeq1.atoms(Symbol)       # adjust character length
+            symat1 = symeq1.atoms(sp.Symbol)       # adjust character length
             for _n1 in symat1:                   
                 orig_var = str(_n1).replace('~', '')
                 orig_var = orig_var.replace('|', '_')
@@ -509,7 +526,7 @@ class EquationU:
                     symeval1 = eval(orig_var.__str__()).__str__()
                 out2 = out2.replace(_n1.__str__(), symeval1)
             #print('out2b\n', out2)
-            out3 = out2                             # clean up unicode 
+            out3 = out2                         # clean up unicode 
             out3.replace('*', '\\u22C5') 
             #print('out3a\n', out3)
             _cnt = 0
@@ -522,7 +539,7 @@ class EquationU:
                         out3 = out3.replace('-'*_cnt, u'\u2014'*_cnt)
                     _cnt = 0
             #print('out3b \n', out3)
-            self._write_utf(out3, 1, 0)               # print substituted form
+            self._write_utf(out3, 1, 0)         # print substituted form
             self._write_utf(" ", 0, 0)
         except:
             pass   
@@ -571,13 +588,9 @@ class EquationU:
         self.calcl.append(utfs)
         self.rivetd.update(locals())
 
+def eq_chk(results, compare):
+    pass
 
-    def eq_chk(self, dval):
-        """ check function
-        
-        """   
-
-        pass
 
 class TableU:
     """Process table_strings to utf-calc
