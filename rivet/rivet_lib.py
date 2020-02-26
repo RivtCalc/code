@@ -131,10 +131,7 @@ def r__(rawstr: str):
     if "[[" in hdrs: _updatehdr(hdrs)
     
     strs = textwrap.dedent(strs)
-    exec(strs, globals())
-    _rivetd.update(locals())
-    globals().update(locals())
-
+    
 def i__(rawstr: str):
     """generate calc or reST string for insert
     

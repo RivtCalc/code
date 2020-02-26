@@ -1,6 +1,32 @@
 #! python 
 #%%
 from rivet.rivet_lib import *
+r__(''' Resources
+
+    |summary|
+    Test project dummy summary.
+
+    |toc| sections
+    
+    |labels|
+    field: structures, buildings
+    assemblies: floor, wall  
+    materials: concrete, steel 
+    components: beams columns 
+    loads: fire, seismic, vibration           
+    analysis: series, spectrum, nonlinear           
+    codes: ACI318-2005, CBC-2007
+    notes: damage estimates, bilinear steel, cracked concrete 
+
+    |docstrings|
+    test1.py
+
+    |append|
+    A. myreport1.pdf
+    B. myreport2.pdf
+
+
+    ''')
 
 #%%  
 i__(''' [[01]] Load Summations
@@ -157,6 +183,8 @@ e__(''' some equations
     xx2 = hh + 10    | e:2,r:2,c:0,p:2,n:f |
     no equation label
 
+    | http:google.com
+
     ''')
 
 #%%
@@ -187,12 +215,8 @@ t__(''' [[03]] Manipulate Tables (dataframes) and Plots
 
     ''')
 
-r__(''' write calc, doc or report to file
+#write_utfcalc()
+#write_pdfdoc()
+#write_htmldoc()
+#write_pdfreport()
 
-    write_utfcalc()
-    #write_pdfdoc()
-    #write_htmldoc()
-    #write_pdfreport()
-    
-    ''')
-    
