@@ -1,35 +1,33 @@
 #! python 
 #%%
 from rivet.rivet_lib import *
-r__(''' Resources
+r__(''' repo information
 
-    |summary|
-    Test project dummy summary.
-
-    |toc| sections
+    |summary|sections|docstrings|
+    The r__ function writes an rst file that can be uploaded to a github gist.
+    The summary command includes this summary paragraph and optionally a
+    table of contents at the level of sections or functions, and a listing
+    of docstrings used in imported functions. 
     
     |labels|
-    field: structures, buildings
-    assemblies: floor, wall  
-    materials: concrete, steel 
-    components: beams columns 
-    loads: fire, seismic, vibration           
-    analysis: series, spectrum, nonlinear           
-    codes: ACI318-2005, CBC-2007
-    notes: damage estimates, bilinear steel, cracked concrete 
-
-    |docstrings|
-    test1.py
+    field, structures, buildings
+    assemblies,  floor, wall  
+    materials, concrete, steel 
+    components, beams columns 
+    loads, fire, seismic, vibration           
+    analysis, series, spectrum, nonlinear           
+    codes, ACI318-2005, CBC-2007
+    notes, damage estimates, cracked concrete 
 
     |append|
-    A. myreport1.pdf
-    B. myreport2.pdf
+    myreport1.pdf,A,Some Data
+    myreport2.pdf,B,Some Tables 
 
 
     ''')
 
 #%%  
-i__(''' [[01]] Load Summations
+i__(''' [[01]] Load Summations xx
     
     The need to distinguish between the various meanings of "frame of
     reference" has led to a variety of terms. For example, sometimes the type
