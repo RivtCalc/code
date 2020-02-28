@@ -4,27 +4,30 @@ from rivet.rivet_lib import *
 r__(''' repository data
 
     || summary | sections | docstrings |
-    
-    The r__ function contains summary calc information used in repositories and
-    dababases. It writes an rst file that can be uploaded to a GitHub gist. The
-    **summary** command includes this paragraph, an optional a table of
-    contents at the level of sections or functions, and an optional listing of
-    docstrings used in imported functions. The file contents are also appended
-    to the front of the calc output.
+        
+        The r__ function contains summary calc information used in
+        repositories and dababases. It writes an rst file that can be
+        uploaded to a GitHub gist. The **summary** command includes this
+        paragraph, an optional a table of contents at the level of
+        sections or functions, and an optional listing of docstrings used
+        in imported functions. The file contents are also appended to the
+        front of the calc output.
     
     || labels |
-    field, structures, buildings
-    assemblies,  floor, wall  
-    materials, concrete, steel 
-    components, beams columns 
-    loads, fire, seismic, vibration           
-    analysis, series, spectrum, nonlinear           
-    codes, ACI318-2005, CBC-2007
-    notes, damage estimates, cracked concrete 
+
+        field, structures, buildings
+        assemblies,  floor, wall  
+        materials, concrete, steel 
+        components, beams columns 
+        loads, fire, seismic, vibration           
+        analysis, series, spectrum, nonlinear           
+        codes, ACI318-2005, CBC-2007
+        notes, damage estimates, cracked concrete 
 
     || append |
-    myreport1.pdf,A,Some Data
-    myreport2.pdf,B,Some Tables 
+
+        myreport1.pdf,A,Some Data
+        myreport2.pdf,B,Some Tables 
 
 
     ''')
@@ -33,9 +36,9 @@ r__(''' repository data
 i__(''' [[01]] Load Summations xx
     
     The need to distinguish between the various meanings of "frame of
-    reference" has led to a variety of terms. For example, sometimes the type
-    of coordinate system is attached as a modifier, as in Cartesian frame of
-    reference [#]_.
+    reference" has led to a variety of terms. For example, sometimes the
+    type of coordinate system is attached as a modifier, as in Cartesian
+    frame of reference [#]_.
     
     || [#] footnote text 1
 
@@ -59,35 +62,46 @@ i__(''' [[01]] Load Summations xx
     ::
 
     Insert text from text, rst, docx or html files
+
     || text | ttext1.txt  | i:5,w:30
     
     Render equations
-    || tex  | x = \\frac{1 + \\omega}{2 + \\gamma} | s:1,n:t |
-    || ACI 318-05 5.5.1
 
-    || sym | x = (12 + omega + α) / (14 + gamma)  | s:1,n:t |
-    || ACI 318-05 5.5.2
+    ||r| ACI 318-05 5.5.1
+    || tex  | x = \\frac{1 + \\omega}{2 + \\gamma} | s:1,n:t 
+    
+    ||r| ACI 318-05 5.5.2
+    || sym | x = (12 + omega + α) / (14 + gamma)  | s:1,n:t 
 
     Render image file
-    || img | pic1.png | s:1,n:t |  
-    || inserted png file  
+
+    || img | pic1.png | s:1,n:t |
+    
+        Inserted png file  
  
     || img | pic2.jpg  | s:1,n:t |
-    || inserted jpg file   
+    
+        Inserted jpg file   
 
     Some added text xxxx is put here and a bit of nonsense to make some
     words for a paragraph.
 
     Insert table from csv and rst files
+
     || table | mercalli.csv | r:[0:5],c:[0,1],m:30,n:t | 
-    || Rebar Table from CSV file [#]_ 
+    
+        Rebar Table from CSV file [#]_ 
+    
     || [#] footnote text 2
 
     || table | rebars.rst  | n:t |
-    || Rebar Table from reST file
+        
+        Rebar Table from reST file
     
-    || table | inline |
-    || Table Title [#]_
+    || table | inline | n:t |
+    
+        Table Title [#]_
+
     +-----------+-------+--------+-------------+-----------+
     |   barsize |   dia |   area |   perimeter |   wt/foot |
     +===========+=======+========+=============+===========+
@@ -133,34 +147,35 @@ e__(''' equations header
     
     Some introductory text. xx
 
-    aa1 = a11*14    | e:2,r:2,c:0,p:2,n:t | 
-    equation label 1 - code reference 
+    aa1 = a11*14    
+    || e:2,r:2,c:0,p:2,n:t | equation label 1 - code reference 
      
-    aa2 = a11*14  | p:0  
+    aa2 = a11*14  
+    || p:0  
 
-    aa3 = (aa2 * 5)/a11    | |
-    equation label 2
+    aa3 = (aa2 * 5)/a11    
+    || |equation label 2
 
-    aa4 = BEAM1[4] * 7.2  | |
-    equation label 3
+    aa4 = BEAM1[4] * 7.2  
+    || |equation label 3
 
     ''')
 #%%
 i__(''' [[02]] Seismic Analysis
     
-    This is a test γ = 2*Σ of the system and this is a further test
-    and another greek letter Γ₂.
+    This is a test γ = 2*Σ of the system and this is a further test and
+    another greek letter Γ₂.
 
     The need to distinguish between the various meanings of "frame of
-    reference" has led to a variety of terms. For example, sometimes the type
-    of coordinate
+    reference" has led to a variety of terms. For example, sometimes the
+    type of coordinate
 
     || newpage
 
-    The way it transforms to frames considered as related is emphasized as in
-    Galilean frame of reference. Sometimes frames are distinguished by the
-    scale of their observations, as in macroscopic and microscopic frames of
-    reference [CIT2000]_.
+    The way it transforms to frames considered as related is emphasized as
+    in Galilean frame of reference. Sometimes frames are distinguished by
+    the scale of their observations, as in macroscopic and microscopic
+    frames of reference [CIT2000]_.
 
     || [CIT2000] citation text
 
@@ -178,13 +193,13 @@ v__(''' some values
 
 e__(''' some equations
     
-    xx1 = gg + 4     | e:2,r:2,c:0,p:2,n:t |
-    equation label and number
+    xx1 = gg + 4     
+    || e:2,r:2,c:0,p:2,n:t | equation label and number
 
-    xx2 = hh + 10    | e:2,r:2,c:0,p:2,n:f |
-    no equation label
+    xx2 = hh + 10    
+    || e:2,r:2,c:0,p:2,n:f | no equation label
 
-    | http:google.com
+    || http:google.com
 
     ''')
 
@@ -192,7 +207,7 @@ e__(''' some equations
 t__(''' [[03]] Manipulate Tables (dataframes) and Plots    
 
     create and populate a table    
-    || create | rebars2.csv | T2
+    || create | T2
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
@@ -203,16 +218,18 @@ t__(''' [[03]] Manipulate Tables (dataframes) and Plots
 
     insert a table
     || table | rebars2.csv | r:[0:5],c:[0,1],w:30 |
-    Table title goes here
+    
+        Table title goes here
 
     plot some data from csv file
-    || plot | tb2.csv | plot1 | x:len1,y:area1,r:[1:10],k:line,g:1   
-    || add  | x:len1, y:prod1, c:blue  |
-    || save | tb2.png | plot1 
+    || plot | newplot1 | plt1.csv | x:len1, y:area1, r:[1:10], k:line, g:t   
+    || add  | x:len1, y:prod1, c:blue 
+    || save | tb2.png | newplot1 
 
     insert a plot
     || img | tb1.png | s:1,#:1 |
-    || Plot title goes here
+    
+        Plot title goes here
 
     ''')
 
