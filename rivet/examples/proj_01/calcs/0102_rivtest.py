@@ -1,15 +1,18 @@
 #! python 
 #%%
 from rivet.rivet_lib import *
-r__(''' repo information
+r__(''' repository data
 
-    |summary|sections|docstrings|
-    The r__ function writes an rst file that can be uploaded to a github gist.
-    The summary command includes this summary paragraph and optionally a
-    table of contents at the level of sections or functions, and a listing
-    of docstrings used in imported functions. 
+    || summary | sections | docstrings |
     
-    |labels|
+    The r__ function contains summary calc information used in repositories and
+    dababases. It writes an rst file that can be uploaded to a GitHub gist. The
+    **summary** command includes this paragraph, an optional a table of
+    contents at the level of sections or functions, and an optional listing of
+    docstrings used in imported functions. The file contents are also appended
+    to the front of the calc output.
+    
+    || labels |
     field, structures, buildings
     assemblies,  floor, wall  
     materials, concrete, steel 
@@ -19,7 +22,7 @@ r__(''' repo information
     codes, ACI318-2005, CBC-2007
     notes, damage estimates, cracked concrete 
 
-    |append|
+    || append |
     myreport1.pdf,A,Some Data
     myreport2.pdf,B,Some Tables 
 
