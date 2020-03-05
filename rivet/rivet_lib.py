@@ -29,6 +29,7 @@
         || plot             : define new plot from data file
         || add              : add data to plot
         || save             : write plot image to file
+        || img              : image from file
     Commands and tags for all strings
         || link             : http link
         || [abc]            : citation description    

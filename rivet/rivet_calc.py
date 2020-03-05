@@ -26,13 +26,170 @@ from IPython.display import Image as ipyImage, display
 from tabulate import tabulate 
 from pathlib import Path
 
+def _parse_cmd(rivS :str, cmdS :str) -> list:
+    """parse a command string
+    
+    Args:
+        rivS (str): string type
+        cmdS (str): command string
+    
+    List of commands by string type (notes in paranthesis):
+    r__('''r-string''') (repository and calc data)
+        || summary | (toc) sections / functions  | (include) docstrings | 
+            paragraph text
+        || labels |
+            csv list
+        || append |          
+            pdf file name, appendix title text
+    i__('''i-string''') (insert text and images)
+        || text | .txt file | (indent) i:n, (width) w:30 
+        || tex  | latex equation text 
+        || sym  | sympy equation text
+        || img  | image file | (scale) s:1, (fig number) n:t(rue) (or) f(alse) |
+            figure title text
+        || table | inline | (table number) n:t(rue) / f(alse) |
+            table title text
+        || table | .rst file name | (table number) n:t/f |
+            table title text
+        || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, n:t/f | 
+            table title text
+    v__('''v-string''') (define values)
+    e__('''e-string''') (define equations)
+        || format | (decimal)e:n, (result)r:n, (check)c:0, (print)p:0/1/2, n:t/f  
+    t__('''t-string''') (define tables and plots)
+        || create | table name
+        || write | .csv file name | table name 
+        || read  | .csv file name | table name
+        || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, n:t/f | 
+            table title text          
+        || plot | .csv file |(col names)x:col,y:col,(rows):[],(kind)k:line,(grid)g:t/f
+        || add  | (col names) x:col, y:col, (color)c:blue        
+        || save | file name (.png or .jpg) | plot name (base name .csv file)
+        || img  | image file | (scale) s:1, (fig number) n:t(rue) (or) f(alse)
+            figure title text        
+    All strings
+        || link | http link text
+        || cite | (citation) text | citation description text   
+        || foot | footnote description text
+    """
+    
+    cmdL = cmdS.split("|")
+    allL = ["link", "cite", "foot"]
+    rL = ["summary", "labels", "append"]
+    iL = ["text", "tex", "sym", "img", "table"]  
+    eL = ["format"]
+    tL = ["create", "write", "read", "table", "plot", "add", "save", "img"]
+
+    if cmdL[0] in allL:
+        if cmdL[0] == "link":
+            pass
+        elif cmdL[0] == "cite":
+            pass
+        elif cmdL[0] == "foot":
+            pass
+        else:
+            pass
+    return
+
+    if rivS == "repro":
+        if cmdL[0].strip() in rL:
+            pass
+        pass
+    elif rivS == "insert":
+        pass
+    elif rivS == "equation":
+        pass
+    elif rivS == "table":
+        pass
+    else:
+        pass
+
+    ipl = ils[2:].split("|")
+    print(2, ipl)            
+    if endflg:                          # append line to block
+        itmpl.append(ipl[0])
+        print(6, itmpl)
+        ipl = itmpl
+        endflg = False
+        itmpl = []
+    if ils.strip()[-1] == "|":          # set block flag
+        endflg = True
+        itmpl = ipl
+        print(7, itmpl)
+        continue
+    print(3, ipl[0])
+    i_updateparams(ipl)
+
+
+def _parse_tag(tagS: str):
+    """parse tags
+    
+    Args:
+        tagS (str): line from rivet string
+    
+    List of tags (notes in paranthesis):
+    [abc]_      (citation name)   
+    [#]_        (footnote number, # generates number) 
+    [page]_     (new doc page)
+    [line]_     (draw horizontal line)
+    [r]_        (right justify line)
+
+    """
 class RepoU:
     """convert repo-string to utf-calc string
 
     """
-    
+    def __init__(self, strL: list,  hdrD: dict, folderD: dict):
+        """convert rivet string of type insert to utf-calc string
+        
+        Args:
+            strl (list): rivet string
+            folderd (dict): folder structure
+            hdrd (dict): header information
+        """
+
+        self.calcL = []
+        self.strL = strL
+        self.folderD = folderD
+        self.hdrD = hdrD
+
+    def r_parse(self) -> list:
+        """ parse repo string
+       
+       Returns:
+            list :  formatted utf-calc strings
+        """
+        endflg = False
+        itmpl = []
+        for ils in self.strl:
+            if ils[0:2] == "##":  continue          # remove review comment
+            ils = ils[4:]                           # remove 4 space indent
+            if len(ils.strip()) == 0:
+                self.calcl.append(" ")              # blank line
+                print(1, ils)
+                continue
+            if ils[0] == "#" : continue             # remove comment 
+            if ils[0:2] == "::" : continue          # remove preformat 
+            if ils[0:2] == "||":                    # find parse tag
+ 
+                if  ipl[0].strip() == "text": self.i_txt(ipl)
+                elif  ipl[0].strip() == "img": self.i_img(ipl)
+                elif  ipl[0].strip() == "table": self.i_table(ipl)
+                elif  ipl[0].strip() == "tex": self.i_tex(ipl)
+                elif  ipl[0].strip() == "sym": self.i_sym(ipl)
+                elif "[#]" in ipl: self.i_footnote(ipl)
+                elif "[#]_" in ipl: self.i_footnote(ipl)
+                else: 
+                    self.calcl.append(ils.strip())
+                continue    
+            else:
+                print(0, ils)
+                self.calcl.append(ils)
+
+        return self.calcl        
+
 class InsertU:
-    """convert rivet string of type insert to utf-calc string 
+    """convert rivet-string to utf-calc string 
 
     Attributes:
         strl (list): rivet string

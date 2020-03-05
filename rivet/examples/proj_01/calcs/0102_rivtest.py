@@ -6,10 +6,11 @@ r__(''' repository data
     || summary | sections | docstrings |    
     The r__ function contains summary calc information used in
     repositories and dababases. It writes an rst file that can be uploaded
-    to a GitHub gist. The **summary** command includes this paragraph, an
-    optional a table of contents at the level of sections or functions,
-    and an optional listing of docstrings used in imported functions. The
-    file contents are also appended to the front of the calc output.
+    to a GitHub gist or repository. The **summary** command includes this
+    paragraph, an optional a table of contents at the level of sections or
+    functions, and an optional listing of docstrings used in imported
+    functions. The file contents are also appended to the front of the
+    calc output.
 
     || labels |
     field, structures, buildings
@@ -22,12 +23,9 @@ r__(''' repository data
     notes, damage estimates, cracked concrete 
 
     || append |
-    myreport1.pdf,A,Some Data
-    myreport2.pdf,B,Some Tables 
-
-
+    myreport1.pdf, A. Some Data
+    myreport2.pdf, B. Some Tables 
     ''')
-
 #%%  
 i__(''' [01]_ Load Summations xx
     
@@ -65,18 +63,18 @@ i__(''' [01]_ Load Summations xx
     ----------------
 
     ACI 318-05 5.5.1 [r]_
-    || tex  | x = \\frac{1 + \\omega}{2 + \\gamma} | s:1,n:t 
+    || tex  | x = \\frac{1 + \\omega}{2 + \\gamma} | s:1,#:t 
     
     ACI 318-05 5.5.2 [r]_
-    || sym | x = (12 + omega + α) / (14 + gamma)  | s:1,n:t 
+    || sym | x = (12 + omega + α) / (14 + gamma)  | s:1,#:t 
 
     Render image file
     -----------------
 
-    || img | pic1.png | s:1,n:t | 
+    || img | pic1.png | s:1,#:t | 
     Inserted png file  
  
-    || img | pic2.jpg  | s:1,n:t |
+    || img | pic2.jpg  | s:1,#:t |
     Inserted jpg file   
 
     Some added text xxxx is put here and a bit of nonsense to make some
@@ -85,15 +83,15 @@ i__(''' [01]_ Load Summations xx
     Insert table from csv and rst files
     ------------------------------------
 
-    || table | mercalli.csv | r:[0:5],c:[0,1],m:30,n:t | 
+    || table | mercalli.csv | r:[0:5],c:[0,1],m:30,#:t | 
     Rebar Table from CSV file [#]_ 
     
-    || [#] footnote text 2
+    || foot | footnote text 2
 
-    || table | rebars.rst  | n:t |    
+    || table | rebars.rst  | #:t |    
     Rebar Table from reST file
     
-    || table | inline | n:t |
+    || table | inline | #:t |
     Table Title [#]_
 
     +-----------+-------+--------+-------------+-----------+
@@ -118,7 +116,7 @@ i__(''' [01]_ Load Summations xx
     |        10 | 1.27  |   1.27 |        3.99 |     4.303 |
     +-----------+-------+--------+-------------+-----------+
    
-    || # | footnote text 3
+    || foot | footnote text 3
 
     ''')
 
@@ -134,20 +132,21 @@ v__(''' some values
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
     a11 :                       | reprint a value
-
     ''')
 
 e__(''' equations header
     
     Some introductory text.  Set equation format.
 
-    || format | e:2,r:2,c:0,p:2,n:t 
+    || format | e:2,r:2,c:0,p:2,#:t 
     
-    aa1 = a11*14                    | ACI 318-05 1.1
+    ACI 318-05 1.1 [r]_
+    aa1 = a11*14                    
 
     aa2 = a11*14  
 
-    aa3 = (aa2 * 5)/a11             | ACI 318-05 1.2
+    ACI 318-05 1.2 [r]_
+    aa3 = (aa2 * 5)/a11             
     
     aa4 = BEAM1[4] * 7.2  
     
@@ -169,7 +168,7 @@ i__(''' [02]_ Seismic Analysis
     the scale of their observations, as in macroscopic and microscopic
     frames of reference [CIT2000]_.
 
-    || [CIT2000] | citation text
+    || cite | CIT2000 | citation text
 
     ''')
 
@@ -197,7 +196,6 @@ e__(''' some equations
     || link | http:google.com
 
     ''')
-
 #%%
 t__(''' [03]_ Manipulate Tables (dataframes) and Plots    
 
@@ -211,7 +209,7 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
     
     read csv file into dataframe
     ----------------------------
-    || read | T1 | rebars.csv  
+    || read | rebars.csv  | T1
 
     insert a table
     --------------
@@ -228,7 +226,6 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
     -------------
     || img | tb1.png | s:1,#:t |
     Plot title goes here
-
     ''')
 
 #write_utfcalc()
