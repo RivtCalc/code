@@ -5,12 +5,16 @@ r__(''' repository data
 
     || summary | sections | docstrings |    
     The r__ function contains summary calc information used in
-    repositories and dababases. It writes an rst file that can be uploaded
+    repositories and dababases. It writes an .rst file that can be uploaded
     to a GitHub gist or repository. The **summary** command includes this
     paragraph, an optional a table of contents at the level of sections or
     functions, and an optional listing of docstrings used in imported
     functions. The file contents are also appended to the front of the
     calc output.
+
+    || append |
+    myreport1.pdf, A. Some Data
+    myreport2.pdf, B. Some Tables 
 
     || labels |
     field, structures, buildings
@@ -19,15 +23,13 @@ r__(''' repository data
     components, beams columns 
     loads, fire, seismic, vibration           
     analysis, series, spectrum, nonlinear           
-    codes, ACI318-2005, CBC-2007
-    notes, damage estimates, cracked concrete 
+    codes, ACI318-2005, CBC-200
+    notes, damage estimates, cracked concrete
 
-    || append |
-    myreport1.pdf, A. Some Data
-    myreport2.pdf, B. Some Tables 
+    || repolink |  
     ''')
 #%%  
-i__(''' [01]_ Load Summations xx
+i__(''' [01]_ Load Summations 
     
     The need to distinguish between the various meanings of "frame of
     reference" has led to a variety of terms. For example, sometimes the
@@ -131,7 +133,7 @@ v__(''' some values
     aisc13.csv[4] => BEAM1      | property vector 
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
-    a11 :                       | reprint a value
+    a11 ==                      | reprint a value
     ''')
 
 e__(''' equations header
@@ -159,9 +161,7 @@ i__(''' [02]_ Seismic Analysis
 
     The need to distinguish between the various meanings of "frame of
     reference" has led to a variety of terms. For example, sometimes the
-    type of coordinate
-
-    [page]_
+    type of coordinate. [page]_
 
     The way it transforms to frames considered as related is emphasized as
     in Galilean frame of reference. Sometimes frames are distinguished by

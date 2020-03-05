@@ -26,7 +26,7 @@ from IPython.display import Image as ipyImage, display
 from tabulate import tabulate 
 from pathlib import Path
 
-def _parse_cmd(rivS :str, cmdS :str) -> list:
+def _parse_cmd(cmdS :str) -> list:
     """parse a command string
     
     Args:
@@ -34,6 +34,21 @@ def _parse_cmd(rivS :str, cmdS :str) -> list:
         cmdS (str): command string
     
     List of commands by string type (notes in paranthesis):
+    summary
+    -------
+    all : link, cite, foot
+    repro : summary, labels, append
+    insert : text, tex, sym, img, table  
+    equation : format
+    table : create, write, read, table, plot, add, save, img
+
+    detail
+    ------
+    all strings
+        || link | http link text
+        || cite | (citation) text | citation description text   
+        || foot | footnote description text
+
     r__('''r-string''') (repository and calc data)
         || summary | (toc) sections / functions  | (include) docstrings | 
             paragraph text
@@ -45,81 +60,65 @@ def _parse_cmd(rivS :str, cmdS :str) -> list:
         || text | .txt file | (indent) i:n, (width) w:30 
         || tex  | latex equation text 
         || sym  | sympy equation text
-        || img  | image file | (scale) s:1, (fig number) n:t(rue) (or) f(alse) |
+        || img  | image file | (scale) s:1, (fig number) #:t(rue) (or) f(alse) |
             figure title text
-        || table | inline | (table number) n:t(rue) / f(alse) |
+        || table | inline | (table number) #:t(rue)/f(alse) |
             table title text
-        || table | .rst file name | (table number) n:t/f |
+        || table | .rst file name | (table number) #:t/f |
             table title text
-        || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, n:t/f | 
+        || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f | 
             table title text
     v__('''v-string''') (define values)
     e__('''e-string''') (define equations)
-        || format | (decimal)e:n, (result)r:n, (check)c:0, (print)p:0/1/2, n:t/f  
+        || format | (decimal)e:n, (result)r:n, (check)c:0, (print)p:0/1/2, #:t/f  
     t__('''t-string''') (define tables and plots)
-        || create | table name
+        || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f | 
+            table title text          
+        || create| table name
         || write | .csv file name | table name 
         || read  | .csv file name | table name
-        || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, n:t/f | 
-            table title text          
+        || img  | image file | (scale) s:1, (fig number) n:t(rue) (or) f(alse)
+            figure title text        
         || plot | .csv file |(col names)x:col,y:col,(rows):[],(kind)k:line,(grid)g:t/f
         || add  | (col names) x:col, y:col, (color)c:blue        
         || save | file name (.png or .jpg) | plot name (base name .csv file)
-        || img  | image file | (scale) s:1, (fig number) n:t(rue) (or) f(alse)
-            figure title text        
-    All strings
-        || link | http link text
-        || cite | (citation) text | citation description text   
-        || foot | footnote description text
     """
     
     cmdL = cmdS.split("|")
-    allL = ["link", "cite", "foot"]
-    rL = ["summary", "labels", "append"]
-    iL = ["text", "tex", "sym", "img", "table"]  
-    eL = ["format"]
-    tL = ["create", "write", "read", "table", "plot", "add", "save", "img"]
-
-    if cmdL[0] in allL:
-        if cmdL[0] == "link":
-            pass
-        elif cmdL[0] == "cite":
-            pass
-        elif cmdL[0] == "foot":
-            pass
-        else:
-            pass
-    return
-
-    if rivS == "repro":
-        if cmdL[0].strip() in rL:
-            pass
+    if cmdL[0] == "text":
         pass
-    elif rivS == "insert":
+    elif cmdL[0] == "tex":
         pass
-    elif rivS == "equation":
+    elif cmdL[0] == "sym":
         pass
-    elif rivS == "table":
+    elif cmdL[0] == "format":
+        pass
+    elif cmdL[0] == "create":
+        pass
+    elif cmdL[0] == "write":
+        pass
+    elif cmdL[0] == "read":
+        pass
+    elif cmdL[0] == "add":
+        pass
+    elif cmdL[0] == "save":
+        pass
+    elif cmdL[0] == "link":
+        pass
+    elif cmdL[0] == "repolink":
+        pass
+    elif cmdL[0] == "cite":
+        pass
+    elif cmdL[0] == "foot":
+        pass
+    elif cmdL[0] == "plot":
+        pass
+    elif cmdL[0] == "img":
+        pass
+    elif cmdL[0] == "table":
         pass
     else:
         pass
-
-    ipl = ils[2:].split("|")
-    print(2, ipl)            
-    if endflg:                          # append line to block
-        itmpl.append(ipl[0])
-        print(6, itmpl)
-        ipl = itmpl
-        endflg = False
-        itmpl = []
-    if ils.strip()[-1] == "|":          # set block flag
-        endflg = True
-        itmpl = ipl
-        print(7, itmpl)
-        continue
-    print(3, ipl[0])
-    i_updateparams(ipl)
-
 
 def _parse_tag(tagS: str):
     """parse tags
@@ -132,9 +131,26 @@ def _parse_tag(tagS: str):
     [#]_        (footnote number, # generates number) 
     [page]_     (new doc page)
     [line]_     (draw horizontal line)
-    [r]_        (right justify line)
+    [r]_        (right justify line of text)
+    [c]_        (center line of text)
 
     """
+    if "[#]_" in tagS:
+        pass
+    elif "[page]_" in tagS:
+        pass
+    elif "[line]_" in tagS:
+        pass
+    elif "[r]_" in tagS:
+        pass
+    else:
+        tag = re.search(r"\[.*?\]_", tagS)
+        tagx = tag.group(0)
+        modline = tagS.replace(" " + tagx,"")
+
+def _clean_string(xS :str):
+
+
 class RepoU:
     """convert repo-string to utf-calc string
 
@@ -160,31 +176,46 @@ class RepoU:
             list :  formatted utf-calc strings
         """
         endflg = False
-        itmpl = []
-        for ils in self.strl:
-            if ils[0:2] == "##":  continue          # remove review comment
-            ils = ils[4:]                           # remove 4 space indent
-            if len(ils.strip()) == 0:
-                self.calcl.append(" ")              # blank line
-                print(1, ils)
+        rtmpL = []
+        for rS in self.strL:
+            if rS[0:2] == "##":  continue          # remove review comment
+            rS = rS[4:]                            # remove 4 space indent
+            if rS[0] == "# " : continue            # remove comment 
+            if rS[0:2] == "::" : continue          # remove preformat 
+            if len(rS.strip()) == 0: continue      # empty line
+            if "]_" in rS:                         # find tags
+                rS = _parse_tag(rS)
+                self.calcL.append(rs) 
                 continue
-            if ils[0] == "#" : continue             # remove comment 
-            if ils[0:2] == "::" : continue          # remove preformat 
-            if ils[0:2] == "||":                    # find parse tag
- 
-                if  ipl[0].strip() == "text": self.i_txt(ipl)
-                elif  ipl[0].strip() == "img": self.i_img(ipl)
-                elif  ipl[0].strip() == "table": self.i_table(ipl)
-                elif  ipl[0].strip() == "tex": self.i_tex(ipl)
-                elif  ipl[0].strip() == "sym": self.i_sym(ipl)
-                elif "[#]" in ipl: self.i_footnote(ipl)
-                elif "[#]_" in ipl: self.i_footnote(ipl)
-                else: 
-                    self.calcl.append(ils.strip())
-                continue    
-            else:
-                print(0, ils)
-                self.calcl.append(ils)
+            if rS[0:2] == "||":                    # find command tag
+                ipl = ils[2:].split("|")
+                print(2, ipl)            
+                if endflg:                          # append line to block
+                    itmpl.append(ipl[0])
+                    print(6, itmpl)
+                    ipl = itmpl
+                    endflg = False
+                    itmpl = []
+                if ils.strip()[-1] == "|":          # set block flag
+                    endflg = True
+                    itmpl = ipl
+                    print(7, itmpl)
+                    continue
+                print(3, ipl[0])
+                i_updateparams(ipl)                               
+            if  rpl[0].strip() == "summary": self.i_txt(ipl)
+            elif  rpl[0].strip() == "": self.i_img(ipl)
+            elif  rpl[0].strip() == "table": self.i_table(ipl)
+            elif  rpl[0].strip() == "tex": self.i_tex(ipl)
+            elif  rpl[0].strip() == "sym": self.i_sym(ipl)
+            elif "[#]" in ipl: self.i_footnote(ipl)
+            elif "[#]_" in ipl: self.i_footnote(ipl)
+            else: 
+                self.calcl.append(ils.strip())
+            continue    
+        else:
+            print(0, ils)
+            self.calcl.append(ils)
 
         return self.calcl        
 
