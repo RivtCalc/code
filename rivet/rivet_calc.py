@@ -26,6 +26,11 @@ from IPython.display import Image as ipyImage, display
 from tabulate import tabulate 
 from pathlib import Path
 
+class RepoU:
+    """convert repo-string to utf-calc string
+
+    """
+    
 class InsertU:
     """convert rivet string of type insert to utf-calc string 
 
@@ -588,9 +593,8 @@ class EquationU:
         self.calcl.append(utfs)
         self.rivetd.update(locals())
 
-def eq_chk(results, compare):
-    pass
-
+    def eq_chk(results, compare):
+        pass
 
 class TableU:
     """Process table_strings to utf-calc

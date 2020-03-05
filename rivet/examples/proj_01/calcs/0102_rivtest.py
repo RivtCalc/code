@@ -29,7 +29,7 @@ r__(''' repository data
     ''')
 
 #%%  
-i__(''' [[01]] Load Summations xx
+i__(''' [01]_ Load Summations xx
     
     The need to distinguish between the various meanings of "frame of
     reference" has led to a variety of terms. For example, sometimes the
@@ -153,7 +153,7 @@ e__(''' equations header
     
     ''')
 #%%
-i__(''' [[02]] Seismic Analysis
+i__(''' [02]_ Seismic Analysis
     
     This is a test γ = 2*Σ of the system and this is a further test and
     another greek letter Γ₂.
@@ -185,6 +185,7 @@ v__(''' some values
 
 e__(''' some equations
     
+    equation reference [r]_
     xx1 = gg + 4     
 
     || format |n:f 
@@ -198,7 +199,7 @@ e__(''' some equations
     ''')
 
 #%%
-t__(''' [[03]] Manipulate Tables (dataframes) and Plots    
+t__(''' [03]_ Manipulate Tables (dataframes) and Plots    
 
     create and populate a table
     ---------------------------    
@@ -219,9 +220,9 @@ t__(''' [[03]] Manipulate Tables (dataframes) and Plots
 
     plot some data from csv file
     ----------------------------
-    || plot | newplot1 | plt1.csv | x:len1, y:area1, r:[1:10], k:line, g:t   
+    || plot | plt1.csv | x:len1, y:area1, r:[1:10], k:line, g:t   
     || add  | x:len1, y:prod1, c:blue 
-    || save | tb2.png | newplot1 
+    || save | plt1.png | plt1
 
     insert a plot
     -------------

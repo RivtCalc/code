@@ -1,44 +1,68 @@
 #! python
-"""rivet_lib - evaluate and format a rivet-string
+"""Exposes functions that process rivet-strings.
 
-    Exposes functions which process rivet-strings.
+    rivet markup is used in multi-line strings that are arguments to five
+    functions. Strings may include any unicode (UF-8). The first line of
+    each string is a description. Each string type includes commands
+    (lines begin with ||) and tags (bracketed with []_). The strings may
+    also include reStructuredText markup.
 
-    The language includes five types of strings. 
-    The first line of each sets string parameters.
-
-    function and string type
-    r__() : python code 
-    i__() : insert text and images
-    v__() : define values
-    e__() : define equations
-    t__() : define tables and plots
-        
+    String commands and tags (command parameters are not shown)
+    r__('''r-string''') : repository and calc data 
+        || summary          : summary paragraph and table of contents
+        || labels           : labels for search and database
+        || append           : pdf files to append
+    i__('''i-string''') : insert text and images
+        || text             : text from file
+        || tex              : LaTeX equation
+        || sym              : sympy equation
+        || img              : image from file
+        || table            : table from file or inline
+    v__('''v-string''') : define values        
+    e__('''e-string''') : define equations
+        || format           : equation format
+    t__('''t-string''') : define tables and plots
+        || create           : define new table
+        || write            : write table data to file
+        || read             : read table data from file
+        || table            : insert table from data file
+        || plot             : define new plot from data file
+        || add              : add data to plot
+        || save             : write plot image to file
+    Commands and tags for all strings
+        || link             : http link
+        || [abc]            : citation description    
+        || #                : footnote description
+        [abc]_              : citation        
+        [#]_                : footnote
+        [page]_             : new doc page
+        [line]_             : draw horizontal line
+        [r]_                : right justify line
 """
 
+import __main__
 import os
 import sys
 import textwrap
 import logging
 from pathlib import Path
 from typing import List, Set, Dict, Tuple, Optional
-
 from rivet.rivet_unit import *
 import rivet.rivet_calc as _rcalc
 #import rivet.rivet_doc as _rdoc
 #import rivet.rivet_reprt as _reprt
 #import rivet.rivet_chk as _rchk
 
-import __main__
-
 __version__ = "0.9.2"
 __author__ = "rholland@structurelabs.com"
 if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
-_foldd: dict = {}                                   # folder dictionary
-_rivetd: dict ={}                                   # runtime dictionary
-_exportl: list = []                                 # values, equations
-_utfcalcs = """"""                                  # calc print string
+_foldD: dict = {}                                   # folder dictionary
+_rivetD: dict ={}                                   # runtime dictionary
+_exportL: list = []                                 # values
+_formatD: dict = {}                                 # equation format             
+_utfcalcS = """"""                                  # calc print string
 
 _rfull = Path(__main__.__file__)                    # calc file path
 _rfile = Path(__main__.__file__).name               # calc file name
@@ -51,7 +75,7 @@ _rpath = Path(_ppath / "reports")                   # report folder path
 _txtfile = Path(_cpath / ".".join((_rname, "txt"))) # calc output
 _pyfile = Path(_cpath / "scripts" / "".join(("r", _rfile)))   # pycalc export
 
-_foldd: dict = {
+_foldD: dict = {
 "ppath": _ppath,
 "cpath": Path(_rfull).parent,
 "dpath": _dpath,
@@ -65,10 +89,10 @@ _foldd: dict = {
 "apath": Path(_rpath, "append"),
 "mpath": Path(_rpath, "temp"),
 }
-_rbak = Path(_foldd["mpath"] / ".".join((_rname, "bak")))
-_logfile = Path(_foldd["mpath"] / ".".join((_rname, "log")))
+_rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
+_logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
 
-_hdrd: dict = {
+_hdrD: dict = {
 "rnum" : _rname[0:4],
 "divnum" : _rname[0:2],
 "calcnum" : _rname[2:4],
@@ -97,110 +121,112 @@ logging.info(f"""rivet file : {_rfull}""" )
 with open(_rfull, "r") as f2: calcbak = f2.read()
 with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
 logging.info(f"""backup file written : {_rbak}""")
-# TODO: insert checks on folder structure here
+# TODO: call check on folder structure here
 
-def _updatehdr(hdrs:str):
+def _updatehdr(hdrS:str):
     """update header dictionary
     
     Arguments:
         hdrs {str} -- header of rivet string
     """
-    global _utfcalcs, _hdrd, _rdict
+    global _utfcalcS, _hdrD, _rivetD
 
-    _hdrd["eqnum"] = 0 
-    _hdrd["fignum"] = 0
-    _hdrd["tablenum"] = 0
-    swidth = _hdrd["swidth"]
-    rnums = _hdrd["rnum"]
-    snames = _hdrd["sectname"] = hdrs[hdrs.find("]]") + 3 :].strip()
-    snums = _hdrd["sectnum"] = hdrs[hdrs.find("[[")+2:hdrs.find("]]")]
-    shead = " " +  snames + (str(rnums) + " - " +
-           ("[" + str(snums) + "]")).rjust(swidth - len(snames) - 2)
-    sstr = swidth * "="
-    _utfcalcs += sstr + "\n" + shead + "\n" + sstr +"\n"
+    _hdrD["eqnum"] = 0 
+    _hdrD["fignum"] = 0
+    _hdrD["tablenum"] = 0
+    swidthI = int(_hdrD["swidth"])
+    rnumS = str(_hdrD["rnum"])
+    snameS = _hdrD["sectname"] = hdrS[hdrS.find("]_") + 2:].strip()
+    snumS = _hdrD["sectnum"] = hdrS[hdrS.find("[")+2:hdrS.find("]_")]
+    sheadS = " " +  snameS + (rnumS + " - " +
+           ("[" + str(snumS) + "]")).rjust(swidthI - len(snameS) - 2)
+    sstrS = swidthI * "="
+    _utfcalcS += sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
 
-def r__(rawstr: str):
-    """[summary]
+def r__(rawstrS: str):
+    """convert repo-string to calc or reST string
     
-    Arguments:
-        rawstr {str} -- [description]
+    Args:
+        rawstrS (str): repo-string
     """
-    global  _utfcalcs, _hdrd, _rivetd
+    global  _utfcalcS, _hdrD, _rivetD
     
-    hdrs,strs = rawstr.split("\n",1)
-    if "[[" in hdrs: _updatehdr(hdrs)
+    hdrS,strS = rawstrS.split("\n",1)
+    if "]_" in hdrS: _updatehdr(hdrS)
     
-    strs = textwrap.dedent(strs)
+    strS = textwrap.dedent(rawstrS)
     
-def i__(rawstr: str):
-    """generate calc or reST string for insert
+def i__(rawstrS: str):
+    """convert insert-string to calc or reST string
     
-    Arguments:
-        rstr {str} -- [description]
+    Args:
+        rawstrS (str): insert-string
     """
-    global _utfcalcs, _hdrd, _foldd
+    global _utfcalcS, _hdrD, _foldD
 
-    hdrs,strs = rawstr.split("\n",1)
-    if "[[" in hdrs: _updatehdr(hdrs)
+    hdrS,strS = rawstrS.split("\n",1)
+    if "]_" in hdrS: _updatehdr(hdrS)
 
-    strl = strs.split("\n")
-    calc = _rcalc.InsertU(strl, _hdrd, _foldd) 
+    strl = strS.split("\n")
+    calc = _rcalc.InsertU(strl, _hdrD, _foldD) 
     icalcl = calc.i_parse()
-    _utfcalcs = _utfcalcs + "\n".join(icalcl)
+    _utfcalcS = _utfcalcS + "\n".join(icalcl)
 
-def v__(rawstr: str):
-    """generate calc or doc string for insert
-
+def v__(rawstrS: str):
+    """generate calc or reST from value-string
+    
+    Args:
+        rawstr (str): value-string
     """
-    global _utfcalcs, _hdrd, _foldd, _rivetd
+    global _utfcalcS, _hdrD, _foldD, _rivetD
 
-    hdrs,strs = rawstr.split("\n",1)
-    if "[[" in hdrs: _updatehdr(hdrs)
+    hdrS,strS = rawstrS.split("\n",1)
+    if "]_" in hdrs: _updatehdr(hdrs)
     
     strl = strs.split("\n")
-    calc = _rcalc.ValueU(strl, _hdrd, _foldd, _rivetd, _exportl)
-    vcalc  = calc.v_parse()
-    vcalcl, rivetd, equal = vcalc[0], vcalc[1], vcalc[2]
-    _exportl.append(equal)
-    _rivetd.update(rivetd)    
+    calc = _rcalc.ValueU(strl, _hdrD, _foldD, _rivetD, _exportL)
+    vcalc  = calc.v_pformat) dict{ = }                      # equation format             
+    vcalcl, rivetd,sequal = vcalc[0], vcalc[1], vcalc[2]
+    _exportL.append(equal)
+    _formatD. dict = {}                         # equatupdation formate(rivetd)    
     globals().update(rivetd)
-    _utfcalcs = _utfcalcs + "\n".join(vcalcl)
+    _utfcalcS = _utfcalcS + "\n".join(vcalcl)
 
 def e__(str0: str):
     """evaluate and format an equations rivet-string
 
     """
-    global _utfcalcs, _hdrd, _foldd
+    global _utfcalcS, _hdrD, _foldD
 
     hdrs,strs = str0.split("\n",1)
-    if "[[" in hdrs: _updatehdr(hdrs)
+    if "]_" in hdrs: _updatehdr(hdrs)
     
     strl = strs.split("\n")
-    calc = _rcalc.EquationU(strl, _hdrd, _foldd, _rivetd, _exportl)
-    ecalc  = calc.e_parse()
-    ecalcl, rivetd, equal = ecalc[0], ecalc[1], ecalc[2]
-    _exportl.append(equal)
-    _rivetd.update(rivetd)    
+    calc = _rcalc.EquationU(strl, _hdrD, _foldD, _rivetD, _exportL)
+    ecalc  = calc.e_pformat) dict{ = }                                  # equation format             
+    ecalcl, rivetd,sequal = ecalc[0], ecalc[1], ecalc[2]
+    _exportL.append(equal)
+    _formatD. dict = {}                                  # equat            updation formate(rivetd)    
     globals().update(rivetd)
-    _utfcalcs = _utfcalcs + "\n".join(ecalcl)
+    _utfcalcS = _utfcalcS + "\n".join(ecalcl)
 
 def t__(str0: str):
     """evaluate and format a tables rivet-string
     
     """
-    global _utfcalcs, _hdrd, _foldd
+    global _utfcalcS, _hdrD, _foldD
 
     hdrs,strs = str0.split("\n",1)
     if "[[" in hdrs: _updatehdr(hdrs)
     
     strl = strs.split("\n")
-    calc = _rcalc.TableU(strl, _hdrd, _foldd, _rivetd, _exportl)
-    tcalc  = calc.t_parse()
+s   calc = _rcalc.TableU(strl, _hdrD, _foldD, _rivetD, _exportL)
+    tcalc  = calc.t_pformat) dict{ = }                                  # equation format             
     tcalcl, rivetd, equal = tcalc[0], tcalc[1], tcalc[2]
-    _exportl.append(equal)
-    _rivetd.update(rivetd)    
+    _exportL.append(equal)
+    _formatD. dict = {}                                  # equat            updation formate(rivetd)    
     globals().update(rivetd)
-    _utfcalcs = _utfcalcs + "\n".join(tcalcl)
+    _utfcalcS = _utfcalcS + "\n".join(tcalcl)
 
 def x__(str0: str):
     """ skip execution of string
@@ -212,7 +238,7 @@ def write_utfcalc(utfcalc, _txtfile):
     """write utf calc string to file
     """
     with open(_txtfile, "wb") as f1:
-        f1.write(_utfcalcs.encode("UTF-8"))
+        f1.write(_utfcalcS.encode("UTF-8"))
 
 def write_pycalc():
     """ write rivet independent python file
