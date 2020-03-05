@@ -53,7 +53,7 @@ import rivet.rivet_calc as _rcalc
 #import rivet.rivet_reprt as _reprt
 #import rivet.rivet_chk as _rchk
 
-__version__ = "0.9.2"
+__version__ = "0.9.0"
 __author__ = "rholland@structurelabs.com"
 if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
