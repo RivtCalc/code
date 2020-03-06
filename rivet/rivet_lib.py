@@ -182,9 +182,9 @@ def v__(rawstrS: str):
     global _utfcalcS, _hdrD, _foldD, _rivetD
 
     hdrS,strS = rawstrS.split("\n",1)
-    if "]_" in hdrs: _updatehdr(hdrs)
+    if "]_" in hdrS: _updatehdr(hdrS)
     
-    strl = strs.split("\n")
+    strL = strS.split("\n")
     calc = _rcalc.ValueU(strl, _hdrD, _foldD, _rivetD, _exportL)
     vcalc  = calc.v_pformat) dict{ = }                      # equation format             
     vcalcl, rivetd,sequal = vcalc[0], vcalc[1], vcalc[2]

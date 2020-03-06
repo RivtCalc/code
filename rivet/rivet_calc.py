@@ -34,6 +34,7 @@ def _parse_cmd(cmdS :str) -> list:
         cmdS (str): command string
     
     List of commands by string type (notes in paranthesis):
+    
     summary
     -------
     all : link, cite, foot
@@ -48,7 +49,6 @@ def _parse_cmd(cmdS :str) -> list:
         || link | http link text
         || cite | (citation) text | citation description text   
         || foot | footnote description text
-
     r__('''r-string''') (repository and calc data)
         || summary | (toc) sections / functions  | (include) docstrings | 
             paragraph text
@@ -105,8 +105,6 @@ def _parse_cmd(cmdS :str) -> list:
         pass
     elif cmdL[0] == "link":
         pass
-    elif cmdL[0] == "repolink":
-        pass
     elif cmdL[0] == "cite":
         pass
     elif cmdL[0] == "foot":
@@ -148,9 +146,6 @@ def _parse_tag(tagS: str):
         tagx = tag.group(0)
         modline = tagS.replace(" " + tagx,"")
 
-def _clean_string(xS :str):
-
-
 class RepoU:
     """convert repo-string to utf-calc string
 
@@ -168,7 +163,7 @@ class RepoU:
         self.strL = strL
         self.folderD = folderD
         self.hdrD = hdrD
-
+    
     def r_parse(self) -> list:
         """ parse repo string
        
@@ -176,48 +171,65 @@ class RepoU:
             list :  formatted utf-calc strings
         """
         endflg = False
-        rtmpL = []
+        rtmpS = ""
         for rS in self.strL:
             if rS[0:2] == "##":  continue          # remove review comment
             rS = rS[4:]                            # remove 4 space indent
+            if len(rS.strip()) == 0:               # empty line
+                if endflg:
+                    rS = _parse_cmd(rS)
+                    endflg = False
+                    rtmpS = ""
+                else:
+                    continue      
             if rS[0] == "# " : continue            # remove comment 
             if rS[0:2] == "::" : continue          # remove preformat 
-            if len(rS.strip()) == 0: continue      # empty line
             if "]_" in rS:                         # find tags
                 rS = _parse_tag(rS)
-                self.calcL.append(rs) 
+                self.calcL.append(rS) 
                 continue
             if rS[0:2] == "||":                    # find command tag
-                ipl = ils[2:].split("|")
-                print(2, ipl)            
-                if endflg:                          # append line to block
-                    itmpl.append(ipl[0])
-                    print(6, itmpl)
-                    ipl = itmpl
-                    endflg = False
-                    itmpl = []
-                if ils.strip()[-1] == "|":          # set block flag
+                if rS.strip()[-1] == "|":          # set block flag
                     endflg = True
-                    itmpl = ipl
-                    print(7, itmpl)
+                    rtmpS = rS
                     continue
-                print(3, ipl[0])
-                i_updateparams(ipl)                               
-            if  rpl[0].strip() == "summary": self.i_txt(ipl)
-            elif  rpl[0].strip() == "": self.i_img(ipl)
-            elif  rpl[0].strip() == "table": self.i_table(ipl)
-            elif  rpl[0].strip() == "tex": self.i_tex(ipl)
-            elif  rpl[0].strip() == "sym": self.i_sym(ipl)
-            elif "[#]" in ipl: self.i_footnote(ipl)
-            elif "[#]_" in ipl: self.i_footnote(ipl)
+                else:
+                    rS = _parse_cmd(rS[2:])        
+            if endflg:
+                rtmpS = rtmpS + rS
+                continue
+            
+            rL = rS.split("\n", 1)
+            if  "summary" in rL[0]:
+                self.calcL.append("Summary\n")
+                self.calcL.append("-------\n") 
+                self.calcL.append(rL[1])
+            if  "append" in rL[0]: 
+                pass
+            if  "labels" in rL[0]:
+                csvL = rL[1].split("\n")
+                tabL = [x.split(",") for x in csvL]
+                max_len = max(len(x) for x in tabL) 
+                for idx,val in enumerate(tabL):
+                    if len(val) < max_len:
+                        addL = max_len - len(val)
+                        tabL[idx].append(["-"]*addL)
+                headers = ["category"]
+                headers.append(["label"]*max_len-1)
+                old_stdout = sys.stdout
+                output = StringIO()
+                output.write(tabulate(tabL, headers, tablefmt="grid"))            
+                label = output.getvalue()
+                sys.stdout = old_stdout
+            if  "link" in rL[0]:
+                rL = rL[0].split("|") 
+                self.calcL.append("Github repository link\n")
+                self.calcL.append("----------------------\n") 
+                self.calcL.append(rL[1])
             else: 
-                self.calcl.append(ils.strip())
-            continue    
-        else:
-            print(0, ils)
-            self.calcl.append(ils)
+                pass
 
-        return self.calcl        
+        return self.calcL        
 
 class InsertU:
     """convert rivet-string to utf-calc string 

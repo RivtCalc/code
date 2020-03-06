@@ -20,13 +20,13 @@ r__(''' repository data
     field, structures, buildings
     assemblies,  floor, wall  
     materials, concrete, steel 
-    components, beams columns 
+    components, beams, columns 
     loads, fire, seismic, vibration           
     analysis, series, spectrum, nonlinear           
     codes, ACI318-2005, CBC-200
     notes, damage estimates, cracked concrete
 
-    || repolink |  
+    || link |  http://www.github.com
     ''')
 #%%  
 i__(''' [01]_ Load Summations 
