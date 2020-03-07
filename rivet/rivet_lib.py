@@ -1,13 +1,15 @@
 #! python
-"""Exposes functions that process rivet-strings.
+"""Exposes rivet-string functions.
 
-    rivet markup is used in multi-line strings that are arguments to five
-    functions. Strings may include any unicode (UF-8). The first line of
-    each string is a description. Each string type includes commands
-    (lines begin with ||) and tags (bracketed with []_). The strings may
-    also include reStructuredText markup.
+    **rivet** markup is used in the five string functions and 4 processing
+    functions exposed in this module. rivet-strings may include any unicode
+    (UF-8). The first line of each string is a description. Each string type
+    includes a set of commands (lines begin with ||) and tags (bracketed with
+    []_). The strings may also include reStructuredText markup (
+    https://docutils.sourceforge.io/docs/user/rst/quickref.html ).
 
-    String commands and tags (command parameters are not shown)
+    String functions with commands and tags (parameters not shown)
+    --------------------------------------------------------------
     r__('''r-string''') : repository and calc data 
         || summary          : summary paragraph and table of contents
         || labels           : labels for search and database
@@ -18,9 +20,17 @@
         || sym              : sympy equation
         || img              : image from file
         || table            : table from file or inline
+        || cite             : citation description    
+        || foot             : footnote description
+        [abc]_              : citation        
+        [#]_                : footnote
     v__('''v-string''') : define values        
     e__('''e-string''') : define equations
         || format           : equation format
+        || cite             : citation description    
+        || foot             : footnote description
+        [abc]_              : citation        
+        [#]_                : footnote
     t__('''t-string''') : define tables and plots
         || create           : define new table
         || write            : write table data to file
@@ -30,15 +40,24 @@
         || add              : add data to plot
         || save             : write plot image to file
         || img              : image from file
-    Commands and tags for all strings
-        || link             : http link
-        || [abc]            : citation description    
-        || #                : footnote description
+        || cite             : citation description    
+        || foot             : footnote description    
         [abc]_              : citation        
         [#]_                : footnote
+    Commands and tags for all rivet-strings
+        || link             : http link
         [page]_             : new doc page
         [line]_             : draw horizontal line
         [r]_                : right justify line
+
+    Process functions
+    -----------------
+    utfcalc()    : writes calc to text file
+    pyvalues()   : writes all variable - values relations to python file
+    pdfdoc()     : writes calc to pdf file
+    htmldoc()    : writes calc to html file
+    pdfreport()  : writes report to pdf file
+
 """
 
 import __main__
@@ -241,27 +260,7 @@ def x__(str0: str):
     """
     pass
  
-def write_utfcalc(utfcalc, _txtfile):
-    """write utf calc string to file
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(_utfcalcS.encode("UTF-8"))
-
-def write_pycalc():
-    """ write rivet independent python file
- 
-        Write a Python file with values and _equations and excluding
-        explanatory text and formatting.  Used for extensions and 
-        importing design information into other rivet files.      
-    """
-    str1 =  ("""\nThis file contains Python _equations 
-            from the rivet design file 
-            for lsti in zip(vlistx, vlisty)
-            if __name__ == "__main__":\n
-            vlist()\n\n""")
-    _rfile.write("\n")
-
-def _write_rstcalc(pline, pp, indent):
+def _rstcalc(pline, pp, indent):
     """[summary]
     
     Args:
@@ -279,19 +278,38 @@ def _write_rstcalc(pline, pp, indent):
         "texmak2":  ".".join((_rbase, ".fls")),
         "texmak3":  ".".join((_rbase, ".fdb_latexmk"))
     }
+def utfcalc(utfcalc, _txtfile):
+    """write utf calc string to file
+    """
+    with open(_txtfile, "wb") as f1:
+        f1.write(_utfcalcS.encode("UTF-8"))
+
+def pyvalues():
+    """ write rivet independent python file of values
+ 
+        Write a Python file with values and _equation results.  
+        Used for extensions and importing design information 
+        into other rivet or python files.  File name
+        is the calc file name prepended with 'v'.      
+    """
+    str1 =  ("""\nThis file contains Python _equations 
+            from the rivet design file 
+            for lsti in zip(vlistx, vlisty)
+            if __name__ == "__main__":\n
+            vlist()\n\n""")
+    _rfile.write("\n")
     
-def write_htmldoc():
+def htmldoc():
     """[summary]
     """
     with open(_txtfile, "wb") as f1:
         f1.write(utfcalc.encode("UTF-8"))
 
-def write_pdfdoc():
+def pdfdoc():
     with open(_txtfile, "wb") as f1:
         f1.write(utfcalc.encode("UTF-8"))
 
-def write_pdfreport():
+def pdfreport():
     """[summary]
     """
     pass
-
