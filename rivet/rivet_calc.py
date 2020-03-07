@@ -1,9 +1,60 @@
 #! python
 """convert rivet strings to utf-8 calcs
 
-This module converts each rivet string type to a utf-8 calc string using
-a class for each string type. 
+This module converts each rivet string to a utf-8 calc string, using
+a class for each of the 5 string types. String markup inlcudes commands and 
+tags.  See parse_tag function for tag summary.
 
+List of commands by string type {notes in braces}:
+    
+
+type    : commands
+----      --------
+all     : link, cite, foot
+repro   : summary, labels, append
+insert  : text, tex, sym, img, table  
+equation: format
+table   : create, write, read, table, plot, add, save, img
+
+detail
+------
+all strings
+    || link | http link text
+    || cite | {citation} text | citation description text   
+    || foot | footnote description text
+r__('''r-string''') {repository and calc data}
+    || summary | {toc} sections / functions  | {include} docstrings | 
+        paragraph text
+    || labels |
+        csv list
+    || append |          
+        pdf file name, appendix title text
+i__('''i-string''') {insert text and images}
+    || text | .txt file | (indent) i:n, (width) w:30 
+    || tex  | latex equation text 
+    || sym  | sympy equation text
+    || img  | image file | (scale) s:1, (fig number) #:t(rue) (or) f(alse) |
+        figure title text
+    || table | inline | (table number) #:t(rue)/f(alse) |
+        table title text
+    || table | .rst file name | (table number) #:t/f |
+        table title text
+    || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f | 
+        table title text
+v__('''v-string''') (define values)
+e__('''e-string''') (define equations)
+    || format | (decimal)e:n, (result)r:n, (check)c:0, (print)p:0/1/2, #:t/f  
+t__('''t-string''') (define tables and plots)
+    || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f | 
+        table title text          
+    || create| table name
+    || write | .csv file name | table name 
+    || read  | .csv file name | table name
+    || img  | image file | (scale) s:1, (fig number) n:t(rue) (or) f(alse)
+        figure title text        
+    || plot | .csv file |(col names)x:col,y:col,(rows):[],(kind)k:line,(grid)g:t/f
+    || add  | (col names) x:col, y:col, (color)c:blue        
+    || save | file name (.png or .jpg) | plot name (base name .csv file)
 """
 import os
 import sys
@@ -25,98 +76,6 @@ import matplotlib.image as mpimg
 from IPython.display import Image as ipyImage, display
 from tabulate import tabulate 
 from pathlib import Path
-
-def _parse_cmd(cmdS :str) -> list:
-    """parse a command string
-    
-    Args:
-        rivS (str): string type
-        cmdS (str): command string
-    
-    List of commands by string type (notes in paranthesis):
-    
-    summary
-    -------
-    all : link, cite, foot
-    repro : summary, labels, append
-    insert : text, tex, sym, img, table  
-    equation : format
-    table : create, write, read, table, plot, add, save, img
-
-    detail
-    ------
-    all strings
-        || link | http link text
-        || cite | (citation) text | citation description text   
-        || foot | footnote description text
-    r__('''r-string''') (repository and calc data)
-        || summary | (toc) sections / functions  | (include) docstrings | 
-            paragraph text
-        || labels |
-            csv list
-        || append |          
-            pdf file name, appendix title text
-    i__('''i-string''') (insert text and images)
-        || text | .txt file | (indent) i:n, (width) w:30 
-        || tex  | latex equation text 
-        || sym  | sympy equation text
-        || img  | image file | (scale) s:1, (fig number) #:t(rue) (or) f(alse) |
-            figure title text
-        || table | inline | (table number) #:t(rue)/f(alse) |
-            table title text
-        || table | .rst file name | (table number) #:t/f |
-            table title text
-        || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f | 
-            table title text
-    v__('''v-string''') (define values)
-    e__('''e-string''') (define equations)
-        || format | (decimal)e:n, (result)r:n, (check)c:0, (print)p:0/1/2, #:t/f  
-    t__('''t-string''') (define tables and plots)
-        || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f | 
-            table title text          
-        || create| table name
-        || write | .csv file name | table name 
-        || read  | .csv file name | table name
-        || img  | image file | (scale) s:1, (fig number) n:t(rue) (or) f(alse)
-            figure title text        
-        || plot | .csv file |(col names)x:col,y:col,(rows):[],(kind)k:line,(grid)g:t/f
-        || add  | (col names) x:col, y:col, (color)c:blue        
-        || save | file name (.png or .jpg) | plot name (base name .csv file)
-    """
-    
-    cmdL = cmdS.split("|")
-    if cmdL[0] == "text":
-        pass
-    elif cmdL[0] == "tex":
-        pass
-    elif cmdL[0] == "sym":
-        pass
-    elif cmdL[0] == "format":
-        pass
-    elif cmdL[0] == "create":
-        pass
-    elif cmdL[0] == "write":
-        pass
-    elif cmdL[0] == "read":
-        pass
-    elif cmdL[0] == "add":
-        pass
-    elif cmdL[0] == "save":
-        pass
-    elif cmdL[0] == "link":
-        pass
-    elif cmdL[0] == "cite":
-        pass
-    elif cmdL[0] == "foot":
-        pass
-    elif cmdL[0] == "plot":
-        pass
-    elif cmdL[0] == "img":
-        pass
-    elif cmdL[0] == "table":
-        pass
-    else:
-        pass
 
 def _parse_tag(tagS: str):
     """parse tags
@@ -149,26 +108,24 @@ def _parse_tag(tagS: str):
 class RepoU:
     """convert repo-string to utf-calc string
 
+    Attributes:
+        rstrL (list): rivet-strings
+        folderD (dict): folder structure
+        hdrD (dict): header information
     """
-    def __init__(self, strL: list,  hdrD: dict, folderD: dict):
-        """convert rivet string of type insert to utf-calc string
-        
-        Args:
-            strl (list): rivet string
-            folderd (dict): folder structure
-            hdrd (dict): header information
-        """
-
-        self.calcL = []
+    def __init__(self, strL :list,  hdrD :dict, folderD :dict) -> str:
+        self.calcS = """"""
         self.strL = strL
         self.folderD = folderD
         self.hdrD = hdrD
+
+        r_parse(self)
     
-    def r_parse(self) -> list:
+    def r_parse(self) -> string:
         """ parse repo string
        
        Returns:
-            list :  formatted utf-calc strings
+            string :  formatted utf-calc string
         """
         endflg = False
         rtmpS = ""
@@ -176,190 +133,166 @@ class RepoU:
             if rS[0:2] == "##":  continue          # remove review comment
             rS = rS[4:]                            # remove 4 space indent
             if len(rS.strip()) == 0:               # empty line
-                if endflg:
-                    rS = _parse_cmd(rS)
+                if endflg:                         # process block
+                    rL = rtmpS.split("\n", 1)
+                    self.calcS.append
+                    if  "summary" in rL[0]: r_summary(rL)
+                    if  "append" in rL[0]: r_append(rL)
+                    if  "labels" in rL[0]: r_labels(rL)
                     endflg = False
-                    rtmpS = ""
+                    rtmpS = """"""
+                    continue
                 else:
+                    self.calcS.append("\n")
                     continue      
-            if rS[0] == "# " : continue            # remove comment 
-            if rS[0:2] == "::" : continue          # remove preformat 
-            if "]_" in rS:                         # find tags
-                rS = _parse_tag(rS)
-                self.calcL.append(rS) 
-                continue
             if rS[0:2] == "||":                    # find command tag
                 if rS.strip()[-1] == "|":          # set block flag
                     endflg = True
                     rtmpS = rS
                     continue
-                else:
-                    rS = _parse_cmd(rS[2:])        
             if endflg:
                 rtmpS = rtmpS + rS
                 continue
-            
             rL = rS.split("\n", 1)
-            if  "summary" in rL[0]:
-                self.calcL.append("Summary\n")
-                self.calcL.append("-------\n") 
-                self.calcL.append(rL[1])
-            if  "append" in rL[0]: 
-                pass
-            if  "labels" in rL[0]:
-                csvL = rL[1].split("\n")
-                tabL = [x.split(",") for x in csvL]
-                max_len = max(len(x) for x in tabL) 
-                for idx,val in enumerate(tabL):
-                    if len(val) < max_len:
-                        addL = max_len - len(val)
-                        tabL[idx].append(["-"]*addL)
-                headers = ["category"]
-                headers.append(["label"]*max_len-1)
-                old_stdout = sys.stdout
-                output = StringIO()
-                output.write(tabulate(tabL, headers, tablefmt="grid"))            
-                label = output.getvalue()
-                sys.stdout = old_stdout
             if  "link" in rL[0]:
                 rL = rL[0].split("|") 
-                self.calcL.append("Github repository link\n")
-                self.calcL.append("----------------------\n") 
-                self.calcL.append(rL[1])
-            else: 
-                pass
+                utfS = "Github repository link\n"
+                utfS += "----------------------\n" 
+                utfS += rL[1]
+                print(utfS); self.calcS.append(utfS)
+            if "]_" in rS:                         # find tags
+                utfS = self.calcS.append(_parse_tag(rS))
+                print(utfS); self.calcS.append(utfS)
+                continue
+            if rS[0] == "# " : continue            # remove comment 
+            if rS[0:2] == "::" : continue          # remove preformat 
+            else:
+                print(rS) 
+                self.calcS.append(rS)
 
-        return self.calcL        
+        return self.calcS        
+
+    def r_summary(self, rL):
+        utfS = "Summary\n"
+        utfS += "-------\n"
+        utfS += rL[1]
+        print(utfS)
+        self.calcS.append(utfS)
+        
+    def r_append(self):
+        pass
+
+    def r_labels(self, rL):
+
+        csvL = rL[1].split("\n")
+        tabL = [x.split(",") for x in csvL]
+        max_len = max(len(x) for x in tabL) 
+        for idx,val in enumerate(tabL):
+            if len(val) < max_len:
+                addL = max_len - len(val)
+                tabL[idx].append(["-"]*addL)
+        headers = ["category"]
+        headers.append(["label"]*max_len-1)
+        old_stdout = sys.stdout
+        output = StringIO()
+        output.write(tabulate(tabL, headers, tablefmt="grid"))            
+        label = output.getvalue()
+        sys.stdout = old_stdout
+
 
 class InsertU:
     """convert rivet-string to utf-calc string 
 
     Attributes:
-        strl (list): rivet string
-        folderd (dict): folder structure
-        hdrd (dict):  header information    
+        istrL (list): insert-strings
+        folderD (dict): folder structure
+        hdrD (dict):  header information
+        imgD
+        tableD    
     """
 
-    def __init__(self, strl: list,  hdrd: dict, folderd: dict):
-        """convert rivet string of type insert to utf-calc string
-        
-        Args:
-            strl (list): rivet string
-            folderd (dict): folder structure
-            hdrd (dict): header information
-        """
-        self.calcl = []
-        self.strl = strl
-        self.folderd = folderd
-        self.hdrd = hdrd
-        self.paramd = { "i":5, "w":40,
-                        "s":1, "n":"t",
-                        "r":"[:]", "c":"[:]", "m":30}
+    def __init__(self, istrL: list,  hdrD: dict, folderD: dict,
+                            imgD: dict, tableD: dict):
+        self.calcS = """"""
+        self.strL = strL
+        self.folderD = folderD
+        self.hdrD = hdrD
+        self.imgD =imgD
+        self.tableD = tableD
 
-    def i_parse(self) -> list:
-        """ parse insert string
+    def i_parse(self) -> tuple:
+        """ parse insert-string
        
        Returns:
-            list :  formatted utf-calc strings
+            tuple :  a string and 3 dictionaries
         """
         endflg = False
-        itmpl = []
-        for ils in self.strl:
-            if ils[0:2] == "##":  continue          # remove review comment
-            ils = ils[4:]                           # remove 4 space indent
-            if len(ils.strip()) == 0:
-                self.calcl.append(" ")              # blank line
-                print(1, ils)
-                continue
-            if ils[0] == "#" : continue             # remove comment 
-            if ils[0:2] == "::" : continue          # remove preformat 
-            if ils[0:2] == "||":                    # find parse tag
-                ipl = ils[2:].split("|")
-                print(2, ipl)            
-                if endflg:                          # append line to block
-                    itmpl.append(ipl[0])
-                    print(6, itmpl)
-                    ipl = itmpl
+        itmpS = ""
+        for iS in self.strL:
+            if iS[0:2] == "##":  continue          # remove review comment
+            iS = iS[4:]                            # remove 4 space indent
+            if len(iS.strip()) == 0:               # empty line
+                if endflg:                         # write block
+                    iL = iS.split("\n", 1)
+                    if  iL[0].strip()    == "text": self.i_txt(iL)
+                    elif  iL[0].strip() == "img": self.i_img(iL)
+                    elif  ipl[0].strip() == "table": self.i_table(iL)
+                    elif "[#]" in iL: self.i_footnote(iL)
+                    elif "[#]_" in iL: self.i_footnote(iL)
                     endflg = False
-                    itmpl = []
-                if ils.strip()[-1] == "|":          # set block flag
+                    itmpS = """"""
+                else:
+                    self.calcS.append("\n")
+                    continue      
+            if iS[0:2] == "||":                    # find command tag
+                if iS.strip()[-1] == "|":          # set block flag
                     endflg = True
-                    itmpl = ipl
-                    print(7, itmpl)
+                    itmpS = iS
                     continue
-                print(3, ipl[0])
-                i_updateparams(ipl)
-                if  ipl[0].strip() == "text": self.i_txt(ipl)
-                elif  ipl[0].strip() == "img": self.i_img(ipl)
-                elif  ipl[0].strip() == "table": self.i_table(ipl)
-                elif  ipl[0].strip() == "tex": self.i_tex(ipl)
-                elif  ipl[0].strip() == "sym": self.i_sym(ipl)
-                elif "[#]" in ipl: self.i_footnote(ipl)
-                elif "[#]_" in ipl: self.i_footnote(ipl)
-                else: 
-                    self.calcl.append(ils.strip())
-                continue    
-            else:
-                print(0, ils)
-                self.calcl.append(ils)
+            if endflg:
+                itmpS = itmpS + iS
+                continue
+            iL = iS.split("\n")
+            if  iL[0].strip() == "tex": self.i_tex(iL)
+            if  iL[0].strip() == "sym": self.i_sym(iL)
+            if  "link" in iL[0]:
+                iL = iL[0].split("|")                 
+                utfS = "link | " + iL[1] + "\n"
+                self.calcS.append(utfS)
+            if  "cite" in iL[0]:
+                iL = iL[0].split("|")                 
+                utfS = "link | " + iL[1] + "\n"
+                self.calcS.append(utfS)
+            if  "foot" in iL[0]:
+                iL = iL[0].split("|")                 
+                utfS = "link | " + iL[1] + "\n"
+                self.calcS.append(utfS)
+            if iS[0] == "# " : continue            # remove comment 
+            if iS[0:2] == "::" : continue          # remove preformat 
+            if "]_" in iS:                         # find tags
+                self.calcS.append(_parse_tag(iS))
+                continue
+            else: 
+                self.calcS.append(iS)
 
-        return self.calcl
+        return self.calcS, self.hdrD, self.imgD, self.tableD 
 
-    def i_updateparams(self, ipl: list):
-        """update process parameters from tag
-        
-        Args:
-            ipl (list): [description]
-        """
-        try:
-            paraml = ipl[2].split(",")
-            for i in paraml:
-                key = i.split(":")[0].strip() 
-                self.paramd[key] = i.split(":")[1]
-        except:
-            pass
-
-    def i_footnote(self, ipl: list):
-        
-        pass
-
-    def i_txt(self, ipl: list):
+    def i_txt(self, iL: list):
         """insert text from file
         
         Args:
-            ipl (list): parameter list
+            iL (list): text command list
         """
-        pars = ipl[2]
-        txtpath = Path(self.folderd["xpath"] /  ipl[1].strip())
+        parS = iL[2]
+        formatD = dict(item.split(":") for item in parS.split(","))
+        imgD.update(formatD)
+        txtpath = Path(self.folderd["xpath"] /  iL[1].strip())
         with open(txtpath, 'r') as txtf1:
                 utfs = txtf1.read()
-        self.calcl.append(utfs)
-        
+        self.calcS.append(utfs)
         print(utfs)
-
-    def i_img(self, ipl: list):
-        """insert image from file
         
-        Args:
-            ipl (list): parameter list
-        """
-        self.hdrd["fignum"] += 1
-        fign = self.hdrd["fignum"]
-        sectn = self.hdrd["sectnum"]
-        captions = ipl[4].strip()
-        files = ipl[1].strip()
-        pars = ipl[2].strip()
-        paths = str(Path(self.folderd["fpath"], files))
-        utfs = ("Figure " + str(sectn) + '.' + str(fign) + "  "  
-               + captions + "\npath: " + paths )
-        self.calcl.append(utfs)
-        print(utfs)
-        try:
-            display(ipyImage(filename = paths))
-        except:
-            pass
-
-    def i_tex(self,ipl: list):
+    def i_tex(self,iL: list):
         """insert formated equation from LaTeX string
         
         Args:
@@ -390,6 +323,30 @@ class InsertU:
         self.calcl.append(utfs)   
         print(utfs)
             
+    def i_img(self, iL: list):
+        """insert image from file
+        
+        Args:
+            ipl (list): parameter list
+        """
+        parS = iL[2]
+        formatD = dict(item.split(":") for item in parS.split(","))
+        self.imgD.update(formatD)
+        self.hdrD["fignum"] += 1
+        fign = self.hdrD["fignum"]
+        sectn = self.hdrD["sectnum"]
+        captions = iL[4].strip()
+        files = iL[1].strip()
+        imgpath = str(Path(self.folderd["fpath"], files))
+        utfs = ("Figure " + str(sectn) + '.' + str(fign) + "  "  
+               + captions + "\npath: " + imgpath )
+        self.calcl.append(utfs)
+        print(utfs)
+        try:
+            display(ipyImage(filename = imgpath))
+        except:
+            pass
+
     def i_table(self, ipl):
         """insert table from inline or csv, rst file 
         

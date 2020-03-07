@@ -29,14 +29,14 @@ r__(''' repository data
     || link |  http://www.github.com
     ''')
 #%%  
-i__(''' [01]_ Load Summations 
+i__(''' [01]_ Load Sums 
     
     The need to distinguish between the various meanings of "frame of
     reference" has led to a variety of terms. For example, sometimes the
     type of coordinate system is attached as a modifier, as in Cartesian
     frame of reference [#]_.
     
-    || # | footnote text 1
+    || foot | footnote text 1
 
     Sometimes the state of motion asfda asd s fdas sfdfasdfasdf is
     emphasized, as in rotating frame of reference. 

@@ -106,6 +106,9 @@ _hdrD: dict = {
 "footnote" : 0,
 "swidth" : 80
 }
+_imgD = {"i":5, "w":40, "s":1, "#":"t"}
+_tableD = {"r":"[:]", "c":"[:]", "m":30, "#":"t"}
+_equaD = { "e":2, "r":2 , "c":0, "p": 2, "#":"t"}
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
@@ -155,23 +158,26 @@ def r__(rawstrS: str):
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)
     
-    strS = textwrap.dedent(rawstrS)
-    
+    strL = strS.split("\n")
+    calc = _rcalc.InsertU(strL, _hdrD, _foldD) 
+    calcS, _imgD, _tableD, _equaD = calc.i_parse()
+    _utfcalcS = _utfcalcS + calcS
+
 def i__(rawstrS: str):
     """convert insert-string to calc or reST string
     
     Args:
         rawstrS (str): insert-string
     """
-    global _utfcalcS, _hdrD, _foldD
+    global _utfcalcS, _hdrD, _foldD, _imgD, _tableD
 
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)
 
-    strl = strS.split("\n")
-    calc = _rcalc.InsertU(strl, _hdrD, _foldD) 
-    icalcl = calc.i_parse()
-    _utfcalcS = _utfcalcS + "\n".join(icalcl)
+    strL = strS.split("\n")
+    calc = _rcalc.InsertU(strL, _hdrD, _foldD, _imgD, _tableD) 
+    calcS, _imgD, _tableD = calc.i_parse()
+    _utfcalcS = _utfcalcS + calcS
 
 def v__(rawstrS: str):
     """generate calc or reST from value-string
