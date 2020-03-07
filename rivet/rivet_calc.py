@@ -33,7 +33,7 @@ i__('''i-string''') {insert text and images}
     || text | .txt file | (indent) i:n, (width) w:30 
     || tex  | latex equation text 
     || sym  | sympy equation text
-    || img  | image file | (scale) s:1, (fig number) #:t(rue) (or) f(alse) |
+    || img  | image file | (scale) s:1, (fig number) #:t(rue)/ f(alse) |
         figure title text
     || table | inline | (table number) #:t(rue)/f(alse) |
         table title text
@@ -299,29 +299,32 @@ class InsertU:
             ipl (list): parameter list
 
         """
-        print(5, ipl)
-        txs = ipl[1].strip()
+        parS = iL[2]
+        formatD = dict(item.split(":") for item in parS.split(","))
+        imgD.update(formatD)
+        txS = iL[1].strip()
         #txs = txs.encode('unicode-escape').decode()
-        ltxs = parse_latex(txs)
-        utfs = sp.pretty(sp.sympify(ltxs, _clash2, evaluate=False))
-        self.calcl.append(utfs)    
-        print(utfs)
+        ltxS = parse_latex(txS)
+        utfS = sp.pretty(sp.sympify(ltxS, _clash2, evaluate=False))
+        print(utfS)
+        self.calcl.append(utfS)    
 
-    def i_sym(self,ipl):
+    def i_sym(self,iL):
         """insert formated equation from SymPy string 
         
         Args:
             ipl (list): parameter list
         """
-        #print(ipl)
-        pars = ipl[2]
-        sps = ipl[1].strip()
-        spl = sps.split("=")
-        sps = "Eq(" + spl[0] +",(" + spl[1] +"))" 
+        parS = iL[2]
+        formatD = dict(item.split(":") for item in parS.split(","))
+        imgD.update(formatD)
+        spS = ipl[1].strip()
+        spL = spS.split("=")
+        spS = "Eq(" + spL[0] +",(" + spL[1] +"))" 
         #sps = sps.encode('unicode-escape').decode()
-        utfs = sp.pretty(sp.sympify(sps, _clash2, evaluate=False))
-        self.calcl.append(utfs)   
-        print(utfs)
+        utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
+        print(utfS)
+        self.calcl.append(utfS)   
             
     def i_img(self, iL: list):
         """insert image from file
@@ -405,7 +408,14 @@ class InsertU:
         print(utfs)     
 
 class ValueU:
-    """convert rivet string of type value to utf-calc string
+    """convert value rivet-string to utf-calc string
+        
+    Attributes:
+        strl (list): rivet strings
+        hdrd (dict): header information
+        folderd (dict): folder structure
+        rivetd (dict) : rivet calculation variables
+        equl (list) : equations for export
 
     """
  
@@ -413,12 +423,6 @@ class ValueU:
                                         rivetd: dict, equl: list):
         """convert rivet string of type value to utf-calc string
         
-        Args:
-            strl (list): rivet strings
-            hdrd (dict): header information
-            folderd (dict): folder structure
-            rivetd (dict) : rivet calculation variables
-            equl (list) : equations for export
         """
         self.calcl = []
         self.strl = strl
