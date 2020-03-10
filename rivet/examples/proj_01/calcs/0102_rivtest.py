@@ -3,7 +3,7 @@
 from rivet.rivet_lib import *
 r__(''' repository data
 
-    || summary | sections | docstrings |    
+    || summary | sections | docstrings     
     The r__ function contains summary calc information used in
     repositories and dababases. It writes an .rst file that can be uploaded
     to a GitHub gist or repository. The **summary** command includes this
@@ -12,11 +12,11 @@ r__(''' repository data
     functions. The file contents are also appended to the front of the
     calc output.
 
-    || append |
+    || append 
     myreport1.pdf, A. Some Data
     myreport2.pdf, B. Some Tables 
 
-    || labels |
+    || labels 
     field, structures, buildings
     assemblies,  floor, wall  
     materials, concrete, steel 
@@ -73,10 +73,10 @@ i__(''' [01]_ Load Sums
     Render image file
     -----------------
 
-    || img | pic1.png | s:1,#:t | 
+    || img | pic1.png | s:1,#:t 
     Inserted png file  
  
-    || img | pic2.jpg  | s:1,#:t |
+    || img | pic2.jpg  | s:1,#:t 
     Inserted jpg file   
 
     Some added text xxxx is put here and a bit of nonsense to make some
@@ -85,15 +85,15 @@ i__(''' [01]_ Load Sums
     Insert table from csv and rst files
     ------------------------------------
 
-    || table | mercalli.csv | r:[0:5],c:[0,1],m:30,#:t | 
+    || table | mercalli.csv | r:[0:5],c:[0,1],m:30,#:t  
     Rebar Table from CSV file [#]_ 
     
     || foot | footnote text 2
 
-    || table | rebars.rst  | #:t |    
+    || table | rebars.rst  | #:t    
     Rebar Table from reST file
     
-    || table | inline | #:t |
+    || table | inline | #:t 
     Table Title [#]_
 
     +-----------+-------+--------+-------------+-----------+
@@ -213,7 +213,7 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
 
     insert a table
     --------------
-    || table | rebars2.csv | r:[0:5],c:[0,1],w:30,#:t |
+    || table | rebars2.csv | r:[0:5],c:[0,1],w:30,#:t 
     Table title goes here
 
     plot some data from csv file
@@ -224,7 +224,7 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
 
     insert a plot
     -------------
-    || img | tb1.png | s:1,#:t |
+    || img | tb1.png | s:1,#:t 
     Plot title goes here
     ''')
 

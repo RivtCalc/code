@@ -6,54 +6,52 @@ a class for each of the 5 string types. String markup inlcudes commands and
 tags.  See parse_tag function for tag summary.
 
 List of commands by string type {notes in braces}:
-    
-
 type    : commands
 ----      --------
-all     : link, cite, foot
-repro   : summary, labels, append
-insert  : text, tex, sym, img, table  
-equation: format
-table   : create, write, read, table, plot, add, save, img
+repro   : summary, labels, append, link
+insert  : text, tex, sym, img, table, cite, foot, link,   
+values  : link
+equation: format, link
+table   : create, write, read, table, plot, add, save, img, cite, foot, link
 
 detail
 ------
-all strings
+r__('''r-string''') {repository and calc data}
+    || summary | {toc} sections / functions  | {include} docstrings  
+        {paragraph text}
+    || labels 
+        {csv list}
+    || append           
+        x.pdf {pdf file name}, {appendix title text}
+    || link | http:\\www.x {link text}
+i__('''i-string''') {insert text and images}
+    || text | x.txt {text file} | {indent n} i:n, (max width) w:65 
+    || tex  | {latex equation text}
+    || sym  | {sympy equation text}
+    || img  | x.png/x.jpg {image file} | {scale} s:1, {fig number} #:t(rue)/f(alse) 
+        figure title text
+    || table | inline | (table number) #:t(rue)/f(alse) 
+        table title text
+    || table | x.rst {file name} | (table number) #:t/f 
+        table title text
+    || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f  
+        table title text
     || link | http link text
     || cite | {citation} text | citation description text   
     || foot | footnote description text
-r__('''r-string''') {repository and calc data}
-    || summary | {toc} sections / functions  | {include} docstrings | 
-        paragraph text
-    || labels |
-        csv list
-    || append |          
-        pdf file name, appendix title text
-i__('''i-string''') {insert text and images}
-    || text | .txt file | (indent) i:n, (width) w:30 
-    || tex  | latex equation text 
-    || sym  | sympy equation text
-    || img  | image file | (scale) s:1, (fig number) #:t(rue)/ f(alse) |
-        figure title text
-    || table | inline | (table number) #:t(rue)/f(alse) |
-        table title text
-    || table | .rst file name | (table number) #:t/f |
-        table title text
-    || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f | 
-        table title text
-v__('''v-string''') (define values)
-e__('''e-string''') (define equations)
-    || format | (decimal)e:n, (result)r:n, (check)c:0, (print)p:0/1/2, #:t/f  
+v__('''v-string''') {define values}
+e__('''e-string''') {define equations)}
+    || format | {decimals}e:n, {result}r:n, {check}c:0, {print}p:0/1/2, #:t/f  
 t__('''t-string''') (define tables and plots)
-    || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f | 
+    || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f 
         table title text          
     || create| table name
     || write | .csv file name | table name 
     || read  | .csv file name | table name
     || img  | image file | (scale) s:1, (fig number) n:t(rue) (or) f(alse)
         figure title text        
-    || plot | .csv file |(col names)x:col,y:col,(rows):[],(kind)k:line,(grid)g:t/f
-    || add  | (col names) x:col, y:col, (color)c:blue        
+    || plot | .csv file |(col names)x:c1,y:c2,(rows)r:[],(kind)k:line,(grid)g:t/f
+    || add (data to plot) | (col names) x:c1, y:c2, (color)c:blue        
     || save | file name (.png or .jpg) | plot name (base name .csv file)
 """
 import os
