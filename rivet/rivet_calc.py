@@ -8,11 +8,11 @@ tags.  See parse_tag function for tag summary.
 List of commands by string type {notes in braces}:
 type    : commands
 ----      --------
-repro   : summary, labels, append, link
-insert  : text, tex, sym, img, table, cite, foot, link,   
+repro   : summary {block}, labels {block}, append {block}, link
+insert  : text, tex, sym, img {block}, table {block}, cite, foot, link,   
 values  : link
 equation: format, link
-table   : create, write, read, table, plot, add, save, img, cite, foot, link
+table   : create, write, read, plot, add, save, {plus insert commands}
 
 detail
 ------
@@ -30,11 +30,11 @@ i__('''i-string''') {insert text and images}
     || sym  | {sympy equation text}
     || img  | x.png/x.jpg {image file} | {scale} s:1, {fig number} #:t(rue)/f(alse) 
         figure title text
-    || table | inline | (table number) #:t(rue)/f(alse) 
+    || table | inline | {table number} #:t{rue}/f{alse} 
         table title text
-    || table | x.rst {file name} | (table number) #:t/f 
+    || table | x.rst {file name} | {table number} #:t/f 
         table title text
-    || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f  
+    || table | n.csv {file name} | {row}r:[], {col}c:[], {max width}m:30, #:t/f  
         table title text
     || link | http link text
     || cite | {citation} text | citation description text   
@@ -43,16 +43,13 @@ v__('''v-string''') {define values}
 e__('''e-string''') {define equations)}
     || format | {decimals}e:n, {result}r:n, {check}c:0, {print}p:0/1/2, #:t/f  
 t__('''t-string''') (define tables and plots)
-    || table | .csv file | (row)r:[], (col)c:[], (max width)m:30, #:t/f 
-        table title text          
     || create| table name
     || write | .csv file name | table name 
     || read  | .csv file name | table name
-    || img  | image file | (scale) s:1, (fig number) n:t(rue) (or) f(alse)
-        figure title text        
-    || plot | .csv file |(col names)x:c1,y:c2,(rows)r:[],(kind)k:line,(grid)g:t/f
-    || add (data to plot) | (col names) x:c1, y:c2, (color)c:blue        
-    || save | file name (.png or .jpg) | plot name (base name .csv file)
+    || plot | f.csv {file name} |(col names)x:c1,y:c2,(rows)r:[],(kind)k:line,(grid)g:t/f
+    || add (data to plot) | (col names) x:c3, y:c4, (color)c:blue        
+    || save | n.png / n.jpg {file names} | f {name from plot command} 
+    {plus insert commands}
 """
 import os
 import sys
