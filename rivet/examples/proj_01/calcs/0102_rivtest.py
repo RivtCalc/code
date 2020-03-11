@@ -27,6 +27,7 @@ r__(''' repository data
     notes, damage estimates, cracked concrete
 
     || link |  http://www.github.com
+
     ''')
 #%%  
 i__(''' [01]_ Load Sums 
@@ -134,6 +135,7 @@ v__(''' some values
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
     a11 ==                      | reprint a value
+
     ''')
 
 e__(''' equations header

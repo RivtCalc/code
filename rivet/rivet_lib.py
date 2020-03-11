@@ -59,7 +59,6 @@
     pdfreport()  : writes report to pdf file
 
 """
-
 import __main__
 import os
 import sys
@@ -178,9 +177,9 @@ def r__(rawstrS: str):
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    calc = _rcalc.InsertU(strL, _hdrD, _foldD) 
-    calcS, _imgD, _tableD, _equaD = calc.i_parse()
-    _utfcalcS = _utfcalcS + calcS
+    rcalc = _rcalc.RepoU(strL, _hdrD, _foldD) 
+    rcalcS, _imgD, _tableD, _equaD = rcalc.r_parse()
+    _utfcalcS = _utfcalcS + rcalcS
 
 def i__(rawstrS: str):
     """convert insert-string to calc or reST string
@@ -194,9 +193,9 @@ def i__(rawstrS: str):
     if "]_" in hdrS: _updatehdr(hdrS)
 
     strL = strS.split("\n")
-    calc = _rcalc.InsertU(strL, _hdrD, _foldD, _imgD, _tableD) 
-    calcS, _imgD, _tableD = calc.i_parse()
-    _utfcalcS = _utfcalcS + calcS
+    icalc = _rcalc.InsertU(strL, _hdrD, _foldD, _imgD, _tableD) 
+    icalcS, _imgD, _tableD = icalc.i_parse()
+    _utfcalcS = _utfcalcS + icalcS
 
 def v__(rawstrS: str):
     """generate calc or reST from value-string
@@ -210,49 +209,37 @@ def v__(rawstrS: str):
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    calc = _rcalc.ValueU(strl, _hdrD, _foldD, _rivetD, _exportL)
-    vcalc  = calc.v_pformat) dict{ = }                      # equation format             
-    vcalcl, rivetd,sequal = vcalc[0], vcalc[1], vcalc[2]
-    _exportL.append(equal)
-    _formatD. dict = {}                         # equatupdation formate(rivetd)    
-    globals().update(rivetd)
-    _utfcalcS = _utfcalcS + "\n".join(vcalcl)
+    vcalc = _rcalc.ValueU(strL, _hdrD, _foldD, _exportL, _rivetD)
+    vcalcS, _imgD, _tableD = vcalc.v_parse()
+    _utfcalcS = _utfcalcS + vcalcS
 
-def e__(str0: str):
+def e__(rawstrS: str):
     """evaluate and format an equations rivet-string
 
     """
     global _utfcalcS, _hdrD, _foldD
 
-    hdrs,strs = str0.split("\n",1)
-    if "]_" in hdrs: _updatehdr(hdrs)
+    hdrS,strS = rawstrS.split("\n",1)
+    if "]_" in hdrS: _updatehdr(hdrS)
     
-    strl = strs.split("\n")
-    calc = _rcalc.EquationU(strl, _hdrD, _foldD, _rivetD, _exportL)
-    ecalc  = calc.e_pformat) dict{ = }                                  # equation format             
-    ecalcl, rivetd,sequal = ecalc[0], ecalc[1], ecalc[2]
-    _exportL.append(equal)
-    _formatD. dict = {}                                  # equat            updation formate(rivetd)    
-    globals().update(rivetd)
-    _utfcalcS = _utfcalcS + "\n".join(ecalcl)
+    strL = strS.split("\n")
+    ecalc = _rcalc.ValueU(strL, _hdrD, _foldD, _exportL, _rivetD)
+    ecalcS, _imgD, _tableD = ecalc.e_parse()
+    _utfcalcS = _utfcalcS + ecalcS
 
-def t__(str0: str):
+def t__(rawstrS: str):
     """evaluate and format a tables rivet-string
     
     """
     global _utfcalcS, _hdrD, _foldD
 
-    hdrs,strs = str0.split("\n",1)
-    if "[[" in hdrs: _updatehdr(hdrs)
+    hdrS,strS = rawstrS.split("\n",1)
+    if "]_" in hdrS: _updatehdr(hdrS)
     
-    strl = strs.split("\n")
-s   calc = _rcalc.TableU(strl, _hdrD, _foldD, _rivetD, _exportL)
-    tcalc  = calc.t_pformat) dict{ = }                                  # equation format             
-    tcalcl, rivetd, equal = tcalc[0], tcalc[1], tcalc[2]
-    _exportL.append(equal)
-    _formatD. dict = {}                                  # equat            updation formate(rivetd)    
-    globals().update(rivetd)
-    _utfcalcS = _utfcalcS + "\n".join(tcalcl)
+    strL = strS.split("\n")
+    vcalc = _rcalc.ValueU(strL, _hdrD, _foldD, _exportL, _rivetD)
+    vcalcS, _imgD, _tableD = vcalc.i_parse()
+    _utfcalcS = _utfcalcS + vcalcS
 
 def x__(str0: str):
     """ skip execution of string

@@ -36,11 +36,11 @@ i__('''i-string''') {insert text and images}
         table title text
     || table | n.csv {file name} | {row}r:[], {col}c:[], {max width}m:30, #:t/f  
         table title text
-    || link | http link text
-    || cite | {citation} text | citation description text   
+    || link | {http link text}
+    || cite | {citation text} | citation description text   
     || foot | footnote description text
 v__('''v-string''') {define values}
-e__('''e-string''') {define equations)}
+e__('''e-string''') {define equations}
     || format | {decimals}e:n, {result}r:n, {check}c:0, {print}p:0/1/2, #:t/f  
 t__('''t-string''') (define tables and plots)
     || create| table name
@@ -49,7 +49,16 @@ t__('''t-string''') (define tables and plots)
     || plot | f.csv {file name} |(col names)x:c1,y:c2,(rows)r:[],(kind)k:line,(grid)g:t/f
     || add (data to plot) | (col names) x:c3, y:c4, (color)c:blue        
     || save | n.png / n.jpg {file names} | f {name from plot command} 
-    {plus insert commands}
+    {plus all insert commands}
+
+List of tags {notes in braces}:
+------------------------------
+    [abc]_      {citation name}   
+    [#]_        {# generates footnote number) 
+    [page]_     {new doc page)
+    [line]_     {draw horizontal line)
+    [r]_        {right justify line of text)
+    [c]_        {center line of text)
 """
 import os
 import sys
@@ -114,9 +123,9 @@ class RepoU:
         self.folderD = folderD
         self.hdrD = hdrD
 
-        r_parse(self)
+        self.r_parse()
     
-    def r_parse(self) -> string:
+    def r_parse(self) -> str:
         """ parse repo string
        
        Returns:
@@ -138,7 +147,7 @@ class RepoU:
                     rtmpS = """"""
                     continue
                 else:
-                    self.calcS.append("\n")
+                    self.calcS += "\n"
                     continue      
             if rS[0:2] == "||":                    # find command tag
                 if rS.strip()[-1] == "|":          # set block flag
@@ -154,7 +163,7 @@ class RepoU:
                 utfS = "Github repository link\n"
                 utfS += "----------------------\n" 
                 utfS += rL[1]
-                print(utfS); self.calcS.append(utfS)
+                print(utfS); self.calcS += utfS
             if "]_" in rS:                         # find tags
                 utfS = self.calcS.append(_parse_tag(rS))
                 print(utfS); self.calcS.append(utfS)
@@ -163,7 +172,7 @@ class RepoU:
             if rS[0:2] == "::" : continue          # remove preformat 
             else:
                 print(rS) 
-                self.calcS.append(rS)
+                self.calcS += rS
 
         return self.calcS        
 
@@ -172,7 +181,7 @@ class RepoU:
         utfS += "-------\n"
         utfS += rL[1]
         print(utfS)
-        self.calcS.append(utfS)
+        self.calcS += utfS
         
     def r_append(self):
         pass
@@ -231,7 +240,7 @@ class InsertU:
                     iL = iS.split("\n", 1)
                     if  iL[0].strip()    == "text": self.i_txt(iL)
                     elif  iL[0].strip() == "img": self.i_img(iL)
-                    elif  ipl[0].strip() == "table": self.i_table(iL)
+                    elif  iL[0].strip() == "table": self.i_table(iL)
                     elif "[#]" in iL: self.i_footnote(iL)
                     elif "[#]_" in iL: self.i_footnote(iL)
                     endflg = False
@@ -599,7 +608,7 @@ class EquationU:
         self.rivetd.update(locals())
         return self.calcl
 
-    def e_updateparams(self, eps: string):
+    def e_updateparams(self, eps: str):
         """update process parameters from tag
         
         Args:
@@ -639,7 +648,7 @@ class EquationU:
             #sps = sps.encode('unicode-escape').decode()
             utfs = sp.pretty(sp.sympify(eps, _clash2, evaluate=False))
             print(utfs); self.calcl.append(utfs)
-        else:
+        except:
             print(utfs); self.calcl.append(utfs)
 
         try: self.equl.append(" # " + epl[3].strip())       # export eq to py
@@ -660,7 +669,7 @@ class EquationU:
             #sps = sps.encode('unicode-escape').decode()
             utfs = sp.pretty(sp.sympify(eps, _clash2, evaluate=False))
             print(utfs); self.calcl.append(utfs)
-        else:
+        except:
             print(utfs); self.calcl.append(utfs)
         try:
             symeq = sp.sympify(eps.strip())                                                 # substitute                            
