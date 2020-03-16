@@ -1,5 +1,5 @@
 #! python
-"""convert rivet strings to utf-8 calcsxx
+"""convert rivet strings to utf-8 calcs
 
 This module converts each rivet string to a utf-8 calc string, using
 a class for each of the 5 string types. String markup inlcudes commands and 
