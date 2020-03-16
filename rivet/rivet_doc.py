@@ -12,11 +12,11 @@ from sympy import *
 from sympy import var as varsym
 from sympy import printing
 from sympy.core.alphabets import greeks
-import once
 import once.config as cfg
+import rivet.rivet_doc
 from once.calcheck import ModCheck
 from once.calpdf import *
-from once.calunit import *
+from rivet.rivet_unit import *
 try:
     from PIL import Image as PImage
     from PIL import ImageOps as PImageOps

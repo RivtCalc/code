@@ -12,11 +12,7 @@ r__(''' repository data
     functions. The file contents are also appended to the front of the
     calc output.
 
-    || append 
-    myreport1.pdf, A. Some Data
-    myreport2.pdf, B. Some Tables 
-
-    || labels 
+    || label
     field, structures, buildings
     assemblies,  floor, wall  
     materials, concrete, steel 
@@ -26,12 +22,12 @@ r__(''' repository data
     codes, ACI318-2005, CBC-200
     notes, damage estimates, cracked concrete
 
-    || import | docstrings
-    script1.py
-    script2.py
-
     github repo link
     || link |  http://www.github.com
+
+    || append 
+    myreport1.pdf, A. Some Data
+    myreport2.pdf, B. Some Tables 
 
     ''')
 #%%  
@@ -71,19 +67,19 @@ i__(''' [01]_ Load Sums
     ----------------
 
     ACI 318-05 5.5.1 [r]_
-    || tex# : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
+    || latex# : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
     
     ACI 318-05 5.5.2 [r]_
-    || sym# : 1 | x = (12 + omega + α) / (14 + gamma)  
+    || sympy# : 1 | x = (12 + omega + α) / (14 + gamma)  
 
     Render image file
     -----------------
 
-    || img# : .5 : .5 | pic1.png | pic2.png 
+    || image# : .5 : .5 | pic1.png | pic2.png 
     Inserted png file
     Side by side  
  
-    || img | pic2.jpg 
+    || image | pic2.jpg 
 
     Some added text xxxx is put here and a bit of nonsense to make some
     words for a paragraph.
@@ -147,7 +143,7 @@ e__(''' equations header
     
     Some introductory text.  Set equation format.
 
-    || format | e:2,r:2,c:0,p:2,#:t 
+    || format# | e:2,r:2,c:0,p:2
     
     ACI 318-05 1.1 [r]_
     aa1 = a11*14                    
@@ -181,6 +177,9 @@ i__(''' [02]_ Seismic Analysis
 
 v__(''' some values
 
+    || value | silent
+    values1.py
+
     this is one line 4 γ
   
     gg = 5.4    | height of roof 
@@ -190,6 +189,10 @@ v__(''' some values
     ''')
 
 e__(''' some equations
+
+    || function | silent
+    script1.py
+    script2.py
     
     equation reference [r]_
     xx1 = gg + 4     
@@ -206,34 +209,34 @@ e__(''' some equations
 #%%
 t__(''' [03]_ Manipulate Tables (dataframes) and Plots    
 
-    create and populate a table
-    ---------------------------    
-    || data | tb_new.csv | T2
+    create a dataframe
+    -------------------    
+    || data | T2 | data description
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
-    || write | T2 | cols = [], rows = [] 
+    || write | test3.csv | T2 
     
     read csv file into dataframe
     ----------------------------
-    || data | rebars.csv | T1
-    || read | T1 | rows = [], cols=[]
+    || read | rebars.csv | T3 | file description
+    || select | T3 | cols = [], rows = []
 
     insert a table
     --------------
     || table# : 20 | rebars2.csv  
     Table title goes here
 
-    plot some data from csv file
+    plot data from csv file
     ----------------------------
-    || plot | plt1.csv | P1
-    || set | P1 | x:len1, y:area1, type:line, grid:t   
+    || read | plt1.csv | P1 | file description
+    || plot | P1 | x:len1, y:area1, type:line, grid:t
     || add  | P1 | x:len1, y:prod1, c:blue 
-    || save | plt1.png | P1
+    || write | plt1.png | P1
 
     insert a plot
     -------------
-    || img# : 1 | tb1.png  
+    || image# : 1 | tb1.png  
     Plot title goes here
     ''')
 
