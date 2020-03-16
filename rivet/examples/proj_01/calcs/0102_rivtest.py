@@ -3,7 +3,7 @@
 from rivet.rivet_lib import *
 r__(''' repository data
 
-    || summary | sections | docstrings     
+    || summary | sections   
     The r__ function contains summary calc information used in
     repositories and dababases. It writes an .rst file that can be uploaded
     to a GitHub gist or repository. The **summary** command includes this
@@ -26,6 +26,11 @@ r__(''' repository data
     codes, ACI318-2005, CBC-200
     notes, damage estimates, cracked concrete
 
+    || import | docstrings
+    script1.py
+    script2.py
+
+    github repo link
     || link |  http://www.github.com
 
     ''')
@@ -60,25 +65,25 @@ i__(''' [01]_ Load Sums
     Insert text from text, rst, docx or html files
     ----------------------------------------------
 
-    || text | ttext1.txt  | i:5,w:30
+    || text : 70 | ttext1.txt
     
     Render equations
     ----------------
 
     ACI 318-05 5.5.1 [r]_
-    || tex  | x = \\frac{1 + \\omega}{2 + \\gamma} | s:1,#:t 
+    || tex# : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
     
     ACI 318-05 5.5.2 [r]_
-    || sym | x = (12 + omega + α) / (14 + gamma)  | s:1,#:t 
+    || sym# : 1 | x = (12 + omega + α) / (14 + gamma)  
 
     Render image file
     -----------------
 
-    || img | pic1.png | s:1,#:t 
-    Inserted png file  
+    || img# : .5 : .5 | pic1.png | pic2.png 
+    Inserted png file
+    Side by side  
  
-    || img | pic2.jpg  | s:1,#:t 
-    Inserted jpg file   
+    || img | pic2.jpg 
 
     Some added text xxxx is put here and a bit of nonsense to make some
     words for a paragraph.
@@ -86,15 +91,15 @@ i__(''' [01]_ Load Sums
     Insert table from csv and rst files
     ------------------------------------
 
-    || table | mercalli.csv | r:[0:5],c:[0,1],m:30,#:t  
+    || table : 30 | mercalli.csv   
     Rebar Table from CSV file [#]_ 
     
     || foot | footnote text 2
 
-    || table | rebars.rst  | #:t    
+    || table# | rebars.rst     
     Rebar Table from reST file
     
-    || table | inline | #:t 
+    || table# | inline  
     Table Title [#]_
 
     +-----------+-------+--------+-------------+-----------+
@@ -203,30 +208,32 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
 
     create and populate a table
     ---------------------------    
-    || create | T2
+    || data | tb_new.csv | T2
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
-    || write | tb2.csv | T2
+    || write | T2 | cols = [], rows = [] 
     
     read csv file into dataframe
     ----------------------------
-    || read | rebars.csv  | T1
+    || data | rebars.csv | T1
+    || read | T1 | rows = [], cols=[]
 
     insert a table
     --------------
-    || table | rebars2.csv | r:[0:5],c:[0,1],w:30,#:t 
+    || table# : 20 | rebars2.csv  
     Table title goes here
 
     plot some data from csv file
     ----------------------------
-    || plot | plt1.csv | x:len1, y:area1, r:[1:10], k:line, g:t   
-    || add  | x:len1, y:prod1, c:blue 
-    || save | plt1.png | plt1
+    || plot | plt1.csv | P1
+    || set | P1 | x:len1, y:area1, type:line, grid:t   
+    || add  | P1 | x:len1, y:prod1, c:blue 
+    || save | plt1.png | P1
 
     insert a plot
     -------------
-    || img | tb1.png | s:1,#:t 
+    || img# : 1 | tb1.png  
     Plot title goes here
     ''')
 
