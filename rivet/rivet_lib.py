@@ -178,7 +178,7 @@ def r__(rawstrS: str):
     
     strL = strS.split("\n")
     rcalc = _rcalc.RepoU(strL, _hdrD, _foldD) 
-    rcalcS, _imgD, _tableD, _equaD = rcalc.r_parse()
+    rcalcS = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
 def i__(rawstrS: str):

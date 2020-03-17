@@ -123,7 +123,41 @@ class RepoU:
         self.folderD = folderD
         self.hdrD = hdrD
 
-        self.r_parse()
+    def r_link(self, rL):
+        utfS = "Github repository link\n"
+        utfS += "----------------------\n" 
+        utfS += rL[1].strip()
+        print(utfS + "\n"); self.calcS += utfS
+
+    def r_summary(self, rL):
+        utfS = "Summary\n"
+        utfS += "-------\n"
+        utfS += rL[2]
+        print(utfS + "\n"); self.calcS += utfS
+        
+    def r_append(self, rL):
+        utfS = "Appendices\n"
+        utfS += "----------\n" 
+        utfS += rL[2].strip()
+        print(utfS + "\n"); self.calcS += utfS
+
+    def r_label(self, rL):
+        #print(3,rL)
+        csvL = rL[2].split("\n")
+        tabL = [x.split(",") for x in csvL]
+        maxlenI = max(len(x) for x in tabL)
+        for idx,val in enumerate(tabL):
+            if len(val) < maxlenI:
+                addL = maxlenI - len(val)
+                tabL[idx].extend("-"*addL)
+        headers = ["category"]
+        for i in range(maxlenI-1) : headers.append("label") 
+        old_stdout = sys.stdout
+        output = StringIO()
+        output.write(tabulate(tabL, headers, tablefmt="grid"))            
+        utfS = output.getvalue()
+        print(utfS + "\n"); self.calcS += utfS
+        sys.stdout = old_stdout    
     
     def r_parse(self) -> str:
         """ parse repo string
@@ -131,78 +165,43 @@ class RepoU:
        Returns:
             string :  formatted utf-calc string
         """
-        endflg = False
+        endflgB = False
         rtmpS = ""
+        rL = []
+        rcmdL = ["summary", "label", "append", "link" ]
+        rfuncL =  [self.r_summary, self.r_label, self.r_append, self.r_link]
         for rS in self.strL:
-            if rS[0:2] == "##":  continue          # remove review comment
-            rS = rS[4:]                            # remove 4 space indent
-            if len(rS.strip()) == 0:               # empty line
-                if endflg:                         # process block
-                    rL = rtmpS.split("\n", 1)
-                    self.calcS.append
-                    if  "summary" in rL[0]: r_summary(rL)
-                    if  "append" in rL[0]: r_append(rL)
-                    if  "labels" in rL[0]: r_labels(rL)
-                    endflg = False
-                    rtmpS = """"""
-                    continue
-                else:
-                    self.calcS += "\n"
-                    continue      
-            if rS[0:2] == "||":                    # find command tag
-                if rS.strip()[-1] == "|":          # set block flag
-                    endflg = True
-                    rtmpS = rS
-                    continue
-            if endflg:
-                rtmpS = rtmpS + rS
+            if rS[0:2] == "##":  continue           # remove review comment
+            rS = rS[4:]                             # remove indent
+            if len(rS.strip()) == 0:                # blank line, end block
+                print("\n"); self.calcS += "\n"
+                if endflgB:
+                    rL.append(rtmpS.strip())
+                    rfuncL[indxI](rL)                           
+                    endflgB = False
+                    rtmpS = ""
+                    rL = []
+                continue      
+            if endflgB:
+                rtmpS = rtmpS + rS + "\n"
                 continue
-            rL = rS.split("\n", 1)
-            if  "link" in rL[0]:
-                rL = rL[0].split("|") 
-                utfS = "Github repository link\n"
-                utfS += "----------------------\n" 
-                utfS += rL[1]
-                print(utfS); self.calcS += utfS
-            if "]_" in rS:                         # find tags
-                utfS = self.calcS.append(_parse_tag(rS))
-                print(utfS); self.calcS.append(utfS)
+            if rS[0:2] == "||":                     # find command tag
+                rL = rS[2:].split("|")
+                indxI = rcmdL.index(rL[0].strip())            
+                endflgB = True
                 continue
-            if rS[0] == "# " : continue            # remove comment 
-            if rS[0:2] == "::" : continue          # remove preformat 
-            else:
-                print(rS) 
-                self.calcS += rS
+            # commands
+            if rS[0] == "#" : continue              # remove comment 
+            if rS[0:2] == "::" : continue           # remove preformat 
+            if "]_" in rS:                          # find tags
+                utfS = self.calcS + _parse_tag(rS)
+                print(utfS + "\n"); self.calcS += utfS
+                continue
+            else:        
+                print(rS + "\n") 
+                self.calcS += rS + "\n"
 
         return self.calcS        
-
-    def r_summary(self, rL):
-        utfS = "Summary\n"
-        utfS += "-------\n"
-        utfS += rL[1]
-        print(utfS)
-        self.calcS += utfS
-        
-    def r_append(self):
-        pass
-
-    def r_labels(self, rL):
-
-        csvL = rL[1].split("\n")
-        tabL = [x.split(",") for x in csvL]
-        max_len = max(len(x) for x in tabL) 
-        for idx,val in enumerate(tabL):
-            if len(val) < max_len:
-                addL = max_len - len(val)
-                tabL[idx].append(["-"]*addL)
-        headers = ["category"]
-        headers.append(["label"]*max_len-1)
-        old_stdout = sys.stdout
-        output = StringIO()
-        output.write(tabulate(tabL, headers, tablefmt="grid"))            
-        label = output.getvalue()
-        sys.stdout = old_stdout
-
 
 class InsertU:
     """convert rivet-string to utf-calc string 
@@ -215,7 +214,7 @@ class InsertU:
         tableD    
     """
 
-    def __init__(self, istrL: list,  hdrD: dict, folderD: dict,
+    def __init__(self, strL: list,  hdrD: dict, folderD: dict,
                             imgD: dict, tableD: dict):
         self.calcS = """"""
         self.strL = strL
@@ -246,7 +245,7 @@ class InsertU:
                     endflg = False
                     itmpS = """"""
                 else:
-                    self.calcS.append("\n")
+                    self.calcS += "\n"
                     continue      
             if iS[0:2] == "||":                    # find command tag
                 if iS.strip()[-1] == "|":          # set block flag

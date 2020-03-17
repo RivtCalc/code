@@ -3,7 +3,7 @@
 from rivet.rivet_lib import *
 r__(''' repository data
 
-    || summary | sections   
+    || summary | section   
     The r__ function contains summary calc information used in
     repositories and dababases. It writes an .rst file that can be uploaded
     to a GitHub gist or repository. The **summary** command includes this
@@ -12,20 +12,19 @@ r__(''' repository data
     functions. The file contents are also appended to the front of the
     calc output.
 
-    || label
+    || label | rivet
     field, structures, buildings
     assemblies,  floor, wall  
     materials, concrete, steel 
     components, beams, columns 
     loads, fire, seismic, vibration           
-    analysis, series, spectrum, nonlinear           
+    analysis, series, spectrum, nonlinear 
     codes, ACI318-2005, CBC-200
     notes, damage estimates, cracked concrete
 
-    github repo link
     || link |  http://www.github.com
 
-    || append 
+    || append | cover
     myreport1.pdf, A. Some Data
     myreport2.pdf, B. Some Tables 
 
@@ -95,7 +94,7 @@ i__(''' [01]_ Load Sums
     || table# | rebars.rst     
     Rebar Table from reST file
     
-    || table# | inline  
+    || table# | inline 
     Table Title [#]_
 
     +-----------+-------+--------+-------------+-----------+
@@ -211,15 +210,15 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
 
     create a dataframe
     -------------------    
-    || data | T2 | data description
+    || data | inline | T2 | optional description
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
-    || write | test3.csv | T2 
+    || save | test3.csv | T2 
     
     read csv file into dataframe
     ----------------------------
-    || read | rebars.csv | T3 | file description
+    || data | test1.csv  | T3 | optional description
     || select | T3 | cols = [], rows = []
 
     insert a table
@@ -229,10 +228,10 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
 
     plot data from csv file
     ----------------------------
-    || read | plt1.csv | P1 | file description
+    || data | plt1.csv | P1 | optional description
     || plot | P1 | x:len1, y:area1, type:line, grid:t
     || add  | P1 | x:len1, y:prod1, c:blue 
-    || write | plt1.png | P1
+    || save | plt1.png | P1
 
     insert a plot
     -------------
