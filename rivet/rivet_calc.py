@@ -81,7 +81,7 @@ from IPython.display import Image as ipyImage, display
 from tabulate import tabulate 
 from pathlib import Path
 
-def _tags(tagS :str, calcS :str) -> str:
+def _tags(tagS: str, calcS: str, hdrD: dict) -> str:
     """parse tags
     
     Args:
@@ -89,28 +89,31 @@ def _tags(tagS :str, calcS :str) -> str:
     
     List of tags (notes in paranthesis):
     [abc]_      (citation name)   
-    [#]_        (footnote number, # generates number) 
+    [#]_        (footnote number generator) 
     [page]_     (new doc page)
     [line]_     (draw horizontal line)
     [r]_        (right justify line of text)
     [c]_        (center line of text)
 
     """
-    if "[#]_" in tagS:
-        pass
-    elif "[page]_" in tagS:
+    if "[page]_" in tagS:
         pass
     elif "[line]_" in tagS:
         pass
     elif "[r]_" in tagS:
-        pass
+        utfS = str.rjust(tagS, 80)
+        print(utfS + "\n"); calcS += utfS        
+        return calcS
     elif "[link]_" in tagS:
         rL = tagS.split("]_")
         utfS = "link: "+ rL[1].strip()
         print(utfS + "\n"); calcS += utfS
         return calcS
     elif "[foot]_" in tagS:
-        pass
+        rL = tagS.split("]_")
+        utfS = "[" + str(hdrD["que"].popleft()) + "] " + rL[1].strip()
+        print(utfS + "\n"); calcS += utfS
+        return calcS
     elif "[cite]_" in tagS:
         pass
     else:
@@ -191,9 +194,16 @@ class RepoU:
             if rS[0] == "#" : continue              # remove comment 
             if rS[0:2] == "::" : continue           # remove preformat 
             if "]_" in rS:                          # find tag
-                self.calcS = _tags(rS, self.calcS); continue                 # find tag
-            else:        
-                print(rS + "\n"); self.calcS += rS + "\n"
+                if "[#]_" in rS:
+                    incrI = self.hdrD["que"][-1] + 1
+                    self.hdrD["que"].append(incrI)
+                    rS = rS.replace("[#]_", "[" + 
+                        str(self.hdrD["que"].popleft()) + "]" )
+                    print(rS); self.calcS += rS + "\n"
+                else:
+                    self.calcS = _tags(rS, self.calcS, self.hdrD)
+            else:
+                print(rS); self.calcS += rS + "\n"    
 
         return self.calcS        
 
@@ -223,37 +233,47 @@ class InsertU:
         Args:
             iL (list): text command list
         """
-        parS = iL[2]
-        formatD = dict(item.split(":") for item in parS.split(","))
-        imgD.update(formatD)
-        txtpath = Path(self.folderd["xpath"] /  iL[1].strip())
+        try: 
+            widthI = int(iL[0].split(":")[1])
+        except:
+            widthI = self.imgD["width"]
+        formatD = {"width":widthI}
+        self.imgD.update(formatD)
+        txtpath = Path(self.folderD["xpath"] /  iL[1].strip())
         with open(txtpath, 'r') as txtf1:
-                utfs = txtf1.read()
-        self.calcS.append(utfs)
-        print(utfs)
+                utfL = txtf1.readlines()
+        txtS = "".join(utfL)
+        indI = int((80-widthI)/2)
+        indS = " "*indI
+        utfL = textwrap.wrap(txtS, width=widthI)
+        utfL = [s+"\n" for s in utfL]
+        utfS = indS + indS.join(utfL)
+        print(utfS); self.calcS += utfS + "\n"
         
     def i_latex(self,iL: list):
         """insert formated equation from LaTeX string
         
         Args:
-            ipl (list): parameter list
+            ipL (list): parameter list
 
         """
-        parS = iL[2]
-        formatD = dict(item.split(":") for item in parS.split(","))
-        imgD.update(formatD)
+        try:
+            scaleI = int(iL[0].split(":")[1])
+        except:
+            scaleI = self.imgD["scale1"]
+        formatD = {"scale1":scaleI}
+        self.imgD.update(formatD)
         txS = iL[1].strip()
         #txs = txs.encode('unicode-escape').decode()
         ltxS = parse_latex(txS)
         utfS = sp.pretty(sp.sympify(ltxS, _clash2, evaluate=False))
-        print(utfS)
-        self.calcl.append(utfS)    
+        print(utfS+"\n"); self.calcS += utfS + "\n"   
 
     def i_sympy(self,iL):
         """insert formated equation from SymPy string 
         
         Args:
-            ipl (list): parameter list
+            ipL (list): parameter list
         """
         parS = iL[2]
         formatD = dict(item.split(":") for item in parS.split(","))
@@ -354,7 +374,7 @@ class InsertU:
             tuple :  a string and 3 dictionaries
         """
         endflgB = False; itmpS = ""; iL = []; indxI = -1
-        icmdL = ["text", "sympy", "latex", "image", "table"]
+        icmdL = ["text", "sympy", "latex", "table", "image"]
         ifuncL =  [self.i_text, self.i_sympy, self.i_latex, 
                     self.i_image, self.i_table]
         for iS in self.strL:
@@ -365,22 +385,27 @@ class InsertU:
                     iL.append(itmpS.strip())
                     ifuncL[indxI](iL)                           
                     endflgB = False; itmpS = ""; iL = []; indxI = -1
-                print("\n"); self.calcS += "\n"
-                continue      
+                print("\n"); self.calcS += "\n"; continue      
             if endflgB:
                 itmpS = itmpS + iS + "\n"; continue
             if iS[0:2] == "||":                     # find command
                 iL = iS[2:].split("|")
-                indxI = icmdL.index(iL[0].strip())            
+                callS = ((iL[0].split(":"))[0]).strip()
+                indxI = icmdL.index(callS)            
                 endflgB = True; continue
-            # commands
             if iS[0] == "#" : continue              # remove comment 
             if iS[0:2] == "::" : continue           # remove preformat 
-            print(55,iS)
             if "]_" in iS:                          # find tag
-                self.calcS = _tags(iS, self.calcS); continue    
+                if "[#]_" in iS:
+                    iS = iS.replace("[#]_", "[" + 
+                        str(self.hdrD["que"][-1]) + "]" )
+                    print(iS); self.calcS += iS + "\n"
+                    incrI = self.hdrD["que"][-1] + 1
+                    self.hdrD["que"].append(incrI)
+                else:
+                    self.calcS = _tags(iS, self.calcS, self.hdrD); continue    
             else:        
-                print(iS + "\n"); self.calcS += iS + "\n"
+                print(iS); self.calcS += iS + "\n"
 
         return self.calcS, self.hdrD, self.imgD, self.tableD 
 

@@ -65,6 +65,7 @@ import sys
 import textwrap
 import logging
 from pathlib import Path
+from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
 from rivet.rivet_unit import *
 import rivet.rivet_calc as _rcalc
@@ -122,11 +123,12 @@ _hdrD: dict = {
 "tablenum" : 0,
 "footnum" : 0,
 "footnote" : 0,
-"swidth" : 80
+"swidth" : 80,
+"que" : deque([1])
 }
-_imgD = {"i":5, "w":40, "s":1, "#":"t"}
-_tableD = {"r":"[:]", "c":"[:]", "m":30, "#":"t"}
-_equaD = { "e":2, "r":2 , "c":0, "p": 2, "#":"t"}
+_imgD = {"width":60, "scale1":1, "scale2":1}
+_tableD = {"row":"[:]", "col":"[:]", "max":30}
+_equaD = { "equ":2, "ans":2 , "chk":0, "prt": 2}
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',

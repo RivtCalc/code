@@ -57,10 +57,9 @@ i__(''' [01]_ Load Sums
                 └── i=4   (γ+ 4)
     
 
-    Insert text from text, rst, docx or html files
-    ----------------------------------------------
-
-    || text : 70 | ttext1.txt
+    Insert from text or rst files
+    -----------------------------
+    || text : 60 | ttext1.txt
     
     Render equations
     ----------------
@@ -72,7 +71,6 @@ i__(''' [01]_ Load Sums
 
     Render image file
     -----------------
-
     || image : .5 : .5 | pic1.png | pic2.png 
     Inserted png file
     Side by side  
@@ -84,7 +82,6 @@ i__(''' [01]_ Load Sums
 
     Insert table from csv and rst files
     ------------------------------------
-
     || table : 30 | mercalli.csv   
     Rebar Table from CSV file [#]_ 
     
