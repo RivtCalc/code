@@ -22,7 +22,7 @@ r__(''' repository data
     codes, ACI318-2005, CBC-200
     notes, damage estimates, cracked concrete
 
-    || link |  http://www.github.com
+    [link]_ http://www.github.com
 
     || append | cover
     myreport1.pdf, A. Some Data
@@ -37,7 +37,7 @@ i__(''' [01]_ Load Sums
     type of coordinate system is attached as a modifier, as in Cartesian
     frame of reference [#]_.
     
-    || foot | footnote text 1
+    [foot]_ footnote text 1
 
     Sometimes the state of motion asfda asd s fdas sfdfasdfasdf is
     emphasized, as in rotating frame of reference. 
@@ -64,17 +64,16 @@ i__(''' [01]_ Load Sums
     
     Render equations
     ----------------
+    || latex : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
+    ACI 318-05 5.5.1
 
-    ACI 318-05 5.5.1 [r]_
-    || latex# : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
-    
     ACI 318-05 5.5.2 [r]_
-    || sympy# : 1 | x = (12 + omega + α) / (14 + gamma)  
+    || sympy : 1 | x = (12 + omega + α) / (14 + gamma)  
 
     Render image file
     -----------------
 
-    || image# : .5 : .5 | pic1.png | pic2.png 
+    || image : .5 : .5 | pic1.png | pic2.png 
     Inserted png file
     Side by side  
  
@@ -89,12 +88,12 @@ i__(''' [01]_ Load Sums
     || table : 30 | mercalli.csv   
     Rebar Table from CSV file [#]_ 
     
-    || foot | footnote text 2
+    [foot]_ footnote text 2
 
-    || table# | rebars.rst     
+    || table | rebars.rst     
     Rebar Table from reST file
     
-    || table# | inline 
+    || table | inline 
     Table Title [#]_
 
     +-----------+-------+--------+-------------+-----------+
@@ -119,7 +118,7 @@ i__(''' [01]_ Load Sums
     |        10 | 1.27  |   1.27 |        3.99 |     4.303 |
     +-----------+-------+--------+-------------+-----------+
    
-    || foot | footnote text 3
+    [foot]_ footnote text 3
 
     ''')
 

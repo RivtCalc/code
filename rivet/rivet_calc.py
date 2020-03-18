@@ -81,7 +81,7 @@ from IPython.display import Image as ipyImage, display
 from tabulate import tabulate 
 from pathlib import Path
 
-def _parse_tag(tagS: str):
+def _tags(tagS :str, calcS :str) -> str:
     """parse tags
     
     Args:
@@ -104,6 +104,15 @@ def _parse_tag(tagS: str):
         pass
     elif "[r]_" in tagS:
         pass
+    elif "[link]_" in tagS:
+        rL = tagS.split("]_")
+        utfS = "link: "+ rL[1].strip()
+        print(utfS + "\n"); calcS += utfS
+        return calcS
+    elif "[foot]_" in tagS:
+        pass
+    elif "[cite]_" in tagS:
+        pass
     else:
         tag = re.search(r"\[.*?\]_", tagS)
         tagx = tag.group(0)
@@ -122,12 +131,6 @@ class RepoU:
         self.strL = strL
         self.folderD = folderD
         self.hdrD = hdrD
-
-    def r_link(self, rL):
-        utfS = "Github repository link\n"
-        utfS += "----------------------\n" 
-        utfS += rL[1].strip()
-        print(utfS + "\n"); self.calcS += utfS
 
     def r_summary(self, rL):
         utfS = "Summary\n"
@@ -165,41 +168,32 @@ class RepoU:
        Returns:
             string :  formatted utf-calc string
         """
-        endflgB = False
-        rtmpS = ""
-        rL = []
-        rcmdL = ["summary", "label", "append", "link" ]
-        rfuncL =  [self.r_summary, self.r_label, self.r_append, self.r_link]
+        endflgB = False; rtmpS = ""; rL = []; indxI = -1
+        rcmdL = ["summary", "label", "append" ]
+        rfuncL =  [self.r_summary, self.r_label, self.r_append]
         for rS in self.strL:
             if rS[0:2] == "##":  continue           # remove review comment
             rS = rS[4:]                             # remove indent
             if len(rS.strip()) == 0:                # blank line, end block
-                print("\n"); self.calcS += "\n"
                 if endflgB:
                     rL.append(rtmpS.strip())
                     rfuncL[indxI](rL)                           
-                    endflgB = False
-                    rtmpS = ""
-                    rL = []
-                continue      
-            if endflgB:
-                rtmpS = rtmpS + rS + "\n"
+                    endflgB = False; rtmpS = ""; rL = []; indx = -1      
+                print("\n"); self.calcS += "\n" 
                 continue
-            if rS[0:2] == "||":                     # find command tag
+            if endflgB:
+                rtmpS = rtmpS + rS + "\n"; continue
+            if rS[0:2] == "||":                     # find command
                 rL = rS[2:].split("|")
                 indxI = rcmdL.index(rL[0].strip())            
-                endflgB = True
-                continue
+                endflgB = True; continue
             # commands
             if rS[0] == "#" : continue              # remove comment 
             if rS[0:2] == "::" : continue           # remove preformat 
-            if "]_" in rS:                          # find tags
-                utfS = self.calcS + _parse_tag(rS)
-                print(utfS + "\n"); self.calcS += utfS
-                continue
+            if "]_" in rS:                          # find tag
+                self.calcS = _tags(rS, self.calcS); continue                 # find tag
             else:        
-                print(rS + "\n") 
-                self.calcS += rS + "\n"
+                print(rS + "\n"); self.calcS += rS + "\n"
 
         return self.calcS        
 
@@ -223,64 +217,7 @@ class InsertU:
         self.imgD =imgD
         self.tableD = tableD
 
-    def i_parse(self) -> tuple:
-        """ parse insert-string
-       
-       Returns:
-            tuple :  a string and 3 dictionaries
-        """
-        endflg = False
-        itmpS = ""
-        for iS in self.strL:
-            if iS[0:2] == "##":  continue          # remove review comment
-            iS = iS[4:]                            # remove 4 space indent
-            if len(iS.strip()) == 0:               # empty line
-                if endflg:                         # write block
-                    iL = iS.split("\n", 1)
-                    if  iL[0].strip()    == "text": self.i_txt(iL)
-                    elif  iL[0].strip() == "img": self.i_img(iL)
-                    elif  iL[0].strip() == "table": self.i_table(iL)
-                    elif "[#]" in iL: self.i_footnote(iL)
-                    elif "[#]_" in iL: self.i_footnote(iL)
-                    endflg = False
-                    itmpS = """"""
-                else:
-                    self.calcS += "\n"
-                    continue      
-            if iS[0:2] == "||":                    # find command tag
-                if iS.strip()[-1] == "|":          # set block flag
-                    endflg = True
-                    itmpS = iS
-                    continue
-            if endflg:
-                itmpS = itmpS + iS
-                continue
-            iL = iS.split("\n")
-            if  iL[0].strip() == "tex": self.i_tex(iL)
-            if  iL[0].strip() == "sym": self.i_sym(iL)
-            if  "link" in iL[0]:
-                iL = iL[0].split("|")                 
-                utfS = "link | " + iL[1] + "\n"
-                self.calcS.append(utfS)
-            if  "cite" in iL[0]:
-                iL = iL[0].split("|")                 
-                utfS = "link | " + iL[1] + "\n"
-                self.calcS.append(utfS)
-            if  "foot" in iL[0]:
-                iL = iL[0].split("|")                 
-                utfS = "link | " + iL[1] + "\n"
-                self.calcS.append(utfS)
-            if iS[0] == "# " : continue            # remove comment 
-            if iS[0:2] == "::" : continue          # remove preformat 
-            if "]_" in iS:                         # find tags
-                self.calcS.append(_parse_tag(iS))
-                continue
-            else: 
-                self.calcS.append(iS)
-
-        return self.calcS, self.hdrD, self.imgD, self.tableD 
-
-    def i_txt(self, iL: list):
+    def i_text(self, iL: list):
         """insert text from file
         
         Args:
@@ -295,7 +232,7 @@ class InsertU:
         self.calcS.append(utfs)
         print(utfs)
         
-    def i_tex(self,iL: list):
+    def i_latex(self,iL: list):
         """insert formated equation from LaTeX string
         
         Args:
@@ -312,7 +249,7 @@ class InsertU:
         print(utfS)
         self.calcl.append(utfS)    
 
-    def i_sym(self,iL):
+    def i_sympy(self,iL):
         """insert formated equation from SymPy string 
         
         Args:
@@ -329,7 +266,7 @@ class InsertU:
         print(utfS)
         self.calcl.append(utfS)   
             
-    def i_img(self, iL: list):
+    def i_image(self, iL: list):
         """insert image from file
         
         Args:
@@ -409,6 +346,43 @@ class InsertU:
                         "  " + titles ) + utfs                                              
         self.calcl.append(utfs)
         print(utfs)     
+
+    def i_parse(self) -> tuple:
+        """ parse insert-string
+       
+       Returns:
+            tuple :  a string and 3 dictionaries
+        """
+        endflgB = False; itmpS = ""; iL = []; indxI = -1
+        icmdL = ["text", "sympy", "latex", "image", "table"]
+        ifuncL =  [self.i_text, self.i_sympy, self.i_latex, 
+                    self.i_image, self.i_table]
+        for iS in self.strL:
+            if iS[0:2] == "##":  continue          # remove review comment
+            iS = iS[4:]                            # remove 4 space indent
+            if len(iS.strip()) == 0:               # empty line
+                if endflgB:
+                    iL.append(itmpS.strip())
+                    ifuncL[indxI](iL)                           
+                    endflgB = False; itmpS = ""; iL = []; indxI = -1
+                print("\n"); self.calcS += "\n"
+                continue      
+            if endflgB:
+                itmpS = itmpS + iS + "\n"; continue
+            if iS[0:2] == "||":                     # find command
+                iL = iS[2:].split("|")
+                indxI = icmdL.index(iL[0].strip())            
+                endflgB = True; continue
+            # commands
+            if iS[0] == "#" : continue              # remove comment 
+            if iS[0:2] == "::" : continue           # remove preformat 
+            print(55,iS)
+            if "]_" in iS:                          # find tag
+                self.calcS = _tags(iS, self.calcS); continue    
+            else:        
+                print(iS + "\n"); self.calcS += iS + "\n"
+
+        return self.calcS, self.hdrD, self.imgD, self.tableD 
 
 class ValueU:
     """convert value rivet-string to utf-calc string
