@@ -3,14 +3,13 @@
 from rivet.rivet_lib import *
 r__(''' repository data
 
-    || summary | section   
-    The r__ function contains summary calc information used in
-    repositories and dababases. It writes an .rst file that can be uploaded
-    to a GitHub gist or repository. The **summary** command includes this
-    paragraph, an optional a table of contents at the level of sections or
+    || summary | section The r__ function contains summary calc information
+    used in repositories and dababases. It writes an .rst file that can be
+    uploaded to a GitHub gist or repository. The **summary** command includes
+    this paragraph, an optional a table of contents at the level of sections or
     functions, and an optional listing of docstrings used in imported
-    functions. The file contents are also appended to the front of the
-    calc output.
+    functions. The file contents are also appended to the front of the calc
+    output.
 
     || label | rivet
     field, structures, buildings
@@ -33,14 +32,14 @@ r__(''' repository data
 i__(''' [01]_ Load Sums 
     
     The need to distinguish between the various meanings of "frame of
-    reference" has led to a variety of terms. For example, sometimes the
-    type of coordinate system is attached as a modifier, as in Cartesian
-    frame of reference [#]_.
+    reference" has led to a variety of terms. For example, sometimes the type
+    of coordinate system is attached as a modifier, as in Cartesian frame of
+    reference [#]_.
     
     [foot]_ footnote text 1
 
-    Sometimes the state of motion asfda asd s fdas sfdfasdfasdf is
-    emphasized, as in rotating frame of reference. 
+    Sometimes the state of motion asfda asd s fdas sfdfasdfasdf is emphasized,
+    as in rotating frame of reference.
 
     :: 
 
@@ -59,10 +58,12 @@ i__(''' [01]_ Load Sums
 
     Insert from text or rst files
     -----------------------------
+    
     || text : 60 | ttext1.txt
     
     Render equations
     ----------------
+    
     || latex : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
     ACI 318-05 5.5.1
 
@@ -71,28 +72,31 @@ i__(''' [01]_ Load Sums
 
     Render image file
     -----------------
-    || image : .5 : .5 | pic1.png | pic2.png 
+    || image : .5 | pic1.png 
     Inserted png file
-    Side by side  
+        
+    || image2 : .5,.5 | pic1.png | pic2.png 
+    Inserted png file
+    Side by side in docs
  
     || image | pic2.jpg 
 
-    Some added text xxxx is put here and a bit of nonsense to make some
-    words for a paragraph.
+    Some added text xxxx is put here and a bit of nonsense to make some words
+    for a paragraph.
 
     Insert table from csv and rst files
     ------------------------------------
-    || table : 30 | mercalli.csv   
-    Rebar Table from CSV file [#]_ 
+    || table : 50 | mercalli.csv   
+    Rebar Table from CSV file
     
-    [foot]_ footnote text 2
+    note1: abc
+    note2: def
 
     || table | rebars.rst     
     Rebar Table from reST file
     
     || table | inline 
-    Table Title [#]_
-
+    Inline Table Title
     +-----------+-------+--------+-------------+-----------+
     |   barsize |   dia |   area |   perimeter |   wt/foot |
     +===========+=======+========+=============+===========+
@@ -115,8 +119,6 @@ i__(''' [01]_ Load Sums
     |        10 | 1.27  |   1.27 |        3.99 |     4.303 |
     +-----------+-------+--------+-------------+-----------+
    
-    [foot]_ footnote text 3
-
     ''')
 
 v__(''' some values 
@@ -138,7 +140,7 @@ e__(''' equations header
     
     Some introductory text.  Set equation format.
 
-    || format# | e:2,r:2,c:0,p:2
+    || format | equ:2,ans:2,chk:0,prt:2
     
     ACI 318-05 1.1 [r]_
     aa1 = a11*14                    
@@ -159,7 +161,9 @@ i__(''' [02]_ Seismic Analysis
 
     The need to distinguish between the various meanings of "frame of
     reference" has led to a variety of terms. For example, sometimes the
-    type of coordinate. [page]_
+    type of coordinate. 
+    
+    [page]_
 
     The way it transforms to frames considered as related is emphasized as
     in Galilean frame of reference. Sometimes frames are distinguished by
@@ -172,8 +176,8 @@ i__(''' [02]_ Seismic Analysis
 
 v__(''' some values
 
-    || value | silent
-    values1.py
+    || values | nodocs
+    0102_values.py
 
     this is one line 4 γ
   
@@ -185,7 +189,7 @@ v__(''' some values
 
 e__(''' some equations
 
-    || function | silent
+    || functions | nodocs
     script1.py
     script2.py
     
@@ -219,7 +223,7 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
 
     insert a table
     --------------
-    || table# : 20 | rebars2.csv  
+    || table : 20 | T3  
     Table title goes here
 
     plot data from csv file
@@ -231,7 +235,7 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
 
     insert a plot
     -------------
-    || image# : 1 | tb1.png  
+    || image : 1 | tb1.png  
     Plot title goes here
     ''')
 

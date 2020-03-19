@@ -101,7 +101,8 @@ def _tags(tagS: str, calcS: str, hdrD: dict) -> str:
     elif "[line]_" in tagS:
         pass
     elif "[r]_" in tagS:
-        utfS = str.rjust(tagS, 80)
+        tagL = tagS.split("[r]")
+        utfS = str.rjust(tagL[0].strip(), 80)
         print(utfS + "\n"); calcS += utfS        
         return calcS
     elif "[link]_" in tagS:
@@ -237,8 +238,7 @@ class InsertU:
             widthI = int(iL[0].split(":")[1])
         except:
             widthI = self.imgD["width"]
-        formatD = {"width":widthI}
-        self.imgD.update(formatD)
+        self.imgD.update({"width":widthI})
         txtpath = Path(self.folderD["xpath"] /  iL[1].strip())
         with open(txtpath, 'r') as txtf1:
                 utfL = txtf1.readlines()
@@ -261,8 +261,7 @@ class InsertU:
             scaleI = int(iL[0].split(":")[1])
         except:
             scaleI = self.imgD["scale1"]
-        formatD = {"scale1":scaleI}
-        self.imgD.update(formatD)
+        self.imgD.update({"scale1":scaleI})
         txS = iL[1].strip()
         #txs = txs.encode('unicode-escape').decode()
         ltxS = parse_latex(txS)
@@ -275,16 +274,17 @@ class InsertU:
         Args:
             ipL (list): parameter list
         """
-        parS = iL[2]
-        formatD = dict(item.split(":") for item in parS.split(","))
-        imgD.update(formatD)
-        spS = ipl[1].strip()
+        try:
+            scaleI = int(iL[0].split(":")[1])
+        except:
+            scaleI = self.imgD["scale1"]
+        self.imgD.update({"scale1":scaleI})
+        spS = iL[1].strip()
         spL = spS.split("=")
         spS = "Eq(" + spL[0] +",(" + spL[1] +"))" 
         #sps = sps.encode('unicode-escape').decode()
         utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
-        print(utfS)
-        self.calcl.append(utfS)   
+        print(utfS); self.calcS += utfS + "\n"   
             
     def i_image(self, iL: list):
         """insert image from file
@@ -292,80 +292,100 @@ class InsertU:
         Args:
             ipl (list): parameter list
         """
-        parS = iL[2]
-        formatD = dict(item.split(":") for item in parS.split(","))
-        self.imgD.update(formatD)
+        try:
+            scaleI = int(iL[0].split(":")[1])
+        except:
+            scaleI = self.imgD["scale1"]
+        self.imgD.update({"scale1":scaleI})
         self.hdrD["fignum"] += 1
-        fign = self.hdrD["fignum"]
-        sectn = self.hdrD["sectnum"]
-        captions = iL[4].strip()
-        files = iL[1].strip()
-        imgpath = str(Path(self.folderd["fpath"], files))
-        utfs = ("Figure " + str(sectn) + '.' + str(fign) + "  "  
-               + captions + "\npath: " + imgpath )
-        self.calcl.append(utfs)
-        print(utfs)
+        figI = self.hdrD["fignum"]
+        sectI = self.hdrD["sectnum"]
+        fileS = iL[1].strip()
+        captionS = iL[2].strip()
+        imgpathS = str(Path(self.folderD["fpath"], fileS))
+        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+               + captionS + "\npath: " + imgpathS)
+        print(utfS); self.calcS += utfS + "\n"
+        try:
+            display(ipyImage(filename = imgpathS))
+        except:
+            pass
+
+    def i_image2(self, iL: list):
+        """insert image from file
+        
+        Args:
+            ipl (list): parameter list
+        """
+        try:
+            scaleI = int(iL[0].split(":")[1])
+        except:
+            scaleI = self.imgD["scale1"]
+        self.imgD.update({"scale1":scaleI})
+        self.hdrD["fignum"] += 1
+        figI = self.hdrD["fignum"]
+        sectI = self.hdrD["sectnum"]
+        fileS = iL[1].strip()
+        captionS = iL[2].strip()
+        imgpath = str(Path(self.folderD["fpath"], fileS))
+        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+               + captionS + "\npath: " + imgpath)
+        print(utfS); self.calcS += utfS + "\n"
         try:
             display(ipyImage(filename = imgpath))
         except:
             pass
 
-    def i_table(self, ipl):
+    def i_table(self, iL: list):
         """insert table from inline or csv, rst file 
         
         Args:
             ipl (list): parameter list
         """       
-        table = ""
-        tfiles = ipl[1].strip()
-        filep = Path(self.folderd["tpath"], tfiles)   
-        self.hdrd["tablenum"] += 1
-        tablenum = self.hdrd["tablenum"]
-        sectnum = self.hdrd["sectnum"]
-        utfs = "\n"
-
-        if ".csv" in ipl[1]:                        # csv file       
-            parse1 = []
-            rowcol = ipl[2].strip().split("c")
-            rowl = rowcol[0].strip("r")
-            col = rowcol[1].split("w")[0]
-            width = rowcol[1].split("w")[1]
-            with open(filep,'r') as csvf:
-                readl = list(csv.reader(csvf))
-            readl = eval("readl" + rowl)
-            for row in readl:
-                xrow = []
-                for j in eval(col):
-                    xrow.append(row[j])
+        try:
+            widthI = int(iL[0].split(":")[1])
+        except:
+            widthI = int(self.imgD["width"])
+        self.imgD.update({"width":widthI})
+        tableS = ""; utfS = ""
+        fileS = iL[1].strip()
+        tfileS = Path(self.folderD["tpath"], fileS)   
+        tableI = self.hdrD["tablenum"] + 1
+        self.hdrD.update({"tablenum":tableI})
+        sectI = self.hdrD["sectnum"]
+        if ".csv" in iL[1]:                        # csv file       
+            format1 = []
+            with open(tfileS,'r') as csvfile:
+                readL = list(csv.reader(csvfile))
+            for row in readL:
                 wrow=[]
-                for i in xrow:
-                    templist = textwrap.wrap(i, int(width)) 
+                for i in row:
+                    templist = textwrap.wrap(i, widthI) 
                     wrow.append("""\n""".join(templist))
-                parse1.append(wrow)
+                format1.append(wrow)
             old_stdout = sys.stdout
             output = StringIO()
-            output.write(tabulate(parse1, tablefmt="grid", headers="firstrow"))            
-            utfs = output.getvalue()
-            titles = "  \n"
+            output.write(tabulate(format1, tablefmt="grid", headers="firstrow"))            
+            utfS = output.getvalue()
+            titleS = "  \n"
             sys.stdout = old_stdout
-            try: titles = ipl[4].strip() + titles
-            except: pass
-        elif ".rst" in ipl[1]:                        # rst file
-            with open(filep,'r') as rstf1: 
-                utfs = rstf1.read()
-            titles = "  \n"
-            try: titles = ipl[3].strip() + titles
+            try: titleS = iL[2].strip() + titleS
+            except: pass        
+        elif ".rst" in iL[1]:                        # rst file
+            with open(tfileS,'r') as rst: 
+                utfS = rst.read()
+            titleS = "  \n"
+            try: titleS = iL[2].strip() + titleS
             except: pass
         else:                                       # inline reST table 
             utfs = ""
-            titles = "  "
-            try: titles = ipl[1].strip() + titles
+            titleS = "  "
+            try: titleS = iL[2].strip() + titleS
             except: pass
-
-        utfs = ("\nTable " + str(sectnum)+'.' + str(tablenum) + 
-                        "  " + titles ) + utfs                                              
-        self.calcl.append(utfs)
-        print(utfs)     
+        utfS = ("\nTable " + str(sectI)+'.' + str(tableI) + 
+                        "  " + titleS ) + utfS                                              
+        print(utfS); self.calcS += utfS + "\n"
+     
 
     def i_parse(self) -> tuple:
         """ parse insert-string
@@ -374,9 +394,9 @@ class InsertU:
             tuple :  a string and 3 dictionaries
         """
         endflgB = False; itmpS = ""; iL = []; indxI = -1
-        icmdL = ["text", "sympy", "latex", "table", "image"]
+        icmdL = ["text", "sympy", "latex", "table", "image", "image2"]
         ifuncL =  [self.i_text, self.i_sympy, self.i_latex, 
-                    self.i_image, self.i_table]
+                    self.i_table, self.i_image, self.i_image2]
         for iS in self.strL:
             if iS[0:2] == "##":  continue          # remove review comment
             iS = iS[4:]                            # remove 4 space indent
@@ -407,7 +427,7 @@ class InsertU:
             else:        
                 print(iS); self.calcS += iS + "\n"
 
-        return self.calcS, self.hdrD, self.imgD, self.tableD 
+        return self.calcS, self.hdrD, self.imgD, self.tableD,   
 
 class ValueU:
     """convert value rivet-string to utf-calc string

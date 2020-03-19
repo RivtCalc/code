@@ -93,7 +93,7 @@ _ppath = Path(_rfull).parent.parent                 # project folder path
 _dpath = Path(_ppath / "docs")                      # doc folder path
 _rpath = Path(_ppath / "reports")                   # report folder path
 _txtfile = Path(_cpath / ".".join((_rname, "txt"))) # calc output
-_pyfile = Path(_cpath / "scripts" / "".join(("r", _rfile)))   # pycalc export
+_pyfile = Path(_cpath / "scripts" / "".join(("r", _rfile))) # pycalc export
 
 _foldD: dict = {
 "ppath": _ppath,
@@ -130,6 +130,18 @@ _imgD = {"width":60, "scale1":1, "scale2":1}
 _tableD = {"row":"[:]", "col":"[:]", "max":30}
 _equaD = { "equ":2, "ans":2 , "chk":0, "prt": 2}
 
+def shorten_path(file_path: str, length: int)-> str:
+    """split path and return path of depth = length
+    
+    Args:
+        file_path (str): path to shorten
+        length (int): path depth
+    
+    Returns:
+        str: shortened path
+    """
+    return Path(*Path(file_path).parts[-length:])
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d %H:%M',
@@ -141,10 +153,12 @@ formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 
-logging.info(f"""rivet file : {_rfull}""" )
+_rshort = shorten_path(_rfull, 3)
+logging.info(f"""rivet file : {_rshort}""" )
 with open(_rfull, "r") as f2: calcbak = f2.read()
 with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
-logging.info(f"""backup file written : {_rbak}""")
+_rshort = shorten_path(_rbak, 4)
+logging.info(f"""backup file written : {_rshort}""")
 # TODO: call check on folder structure here
 
 def _updatehdr(hdrS:str):
@@ -196,7 +210,7 @@ def i__(rawstrS: str):
 
     strL = strS.split("\n")
     icalc = _rcalc.InsertU(strL, _hdrD, _foldD, _imgD, _tableD) 
-    icalcS, _imgD, _tableD = icalc.i_parse()
+    icalcS, _hdrD, _imgD, _tableD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
 def v__(rawstrS: str):
