@@ -176,7 +176,7 @@ i__(''' [02]_ Seismic Analysis
 
 v__(''' some values
 
-    || values | nodocs
+    || values | nodoc
     0102_values.py
 
     this is one line 4 γ
@@ -189,7 +189,7 @@ v__(''' some values
 
 e__(''' some equations
 
-    || functions | nodocs
+    || functions | nodoc
     script1.py
     script2.py
     

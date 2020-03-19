@@ -78,14 +78,12 @@ __author__ = "rholland@structurelabs.com"
 if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
-_foldD: dict = {}                                   # folder dictionary
 _rivetD: dict ={}                                   # runtime dictionary
 _exportL: list = []                                 # values
-_formatD: dict = {}                                 # equation format             
 _utfcalcS = """"""                                  # calc print string
 
 _rfull = Path(__main__.__file__)                    # calc file path
-_rfile = Path(__main__.__file__).name               # calc file name
+_rfile s= Path(__main__.__file__).name               # calc file name
 _rname = _rfile.split(".py")[0]                     # calc file basename
 _rivpath = Path("rivet.rivet_lib.py").parent        # rivet program path
 _cpath =  Path(_rfull).parent                       # calc folder path
@@ -95,6 +93,7 @@ _rpath = Path(_ppath / "reports")                   # report folder path
 _txtfile = Path(_cpath / ".".join((_rname, "txt"))) # calc output
 _pyfile = Path(_cpath / "scripts" / "".join(("r", _rfile))) # pycalc export
 
+# folders 
 _foldD: dict = {
 "ppath": _ppath,
 "cpath": Path(_rfull).parent,
@@ -112,6 +111,7 @@ _foldD: dict = {
 _rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
 
+# section headers
 _hdrD: dict = {
 "rnum" : _rname[0:4],
 "divnum" : _rname[0:2],
@@ -123,12 +123,13 @@ _hdrD: dict = {
 "tablenum" : 0,
 "footnum" : 0,
 "footnote" : 0,
-"swidth" : 80,
-"que" : deque([1])
+"footque" : deque([1]),
+"swidth" : 80
 }
-_imgD = {"width":60, "scale1":1, "scale2":1}
-_tableD = {"row":"[:]", "col":"[:]", "max":30}
-_equaD = { "equ":2, "ans":2 , "chk":0, "prt": 2}
+# command settings
+_setD = {"txtwidth":60, "scale1":1, "scale2":1,
+        "row":"[:]", "col":"[:]", "maxwidth":30,
+        "equ":2, "ans":2 , "chk":0, "prt": 2}
 
 def shorten_path(file_path: str, length: int)-> str:
     """split path and return path of depth = length
@@ -203,14 +204,14 @@ def i__(rawstrS: str):
     Args:
         rawstrS (str): insert-string
     """
-    global _utfcalcS, _hdrD, _foldD, _imgD, _tableD
+    global _utfcalcS, _hdrD, _foldD, _setD
 
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)
 
     strL = strS.split("\n")
-    icalc = _rcalc.InsertU(strL, _hdrD, _foldD, _imgD, _tableD) 
-    icalcS, _hdrD, _imgD, _tableD = icalc.i_parse()
+    icalc = _rcalc.InsertU(strL, _hdrD, _foldD, _setD) 
+    icalcS, _hdrD, _setD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
 def v__(rawstrS: str):
@@ -219,21 +220,21 @@ def v__(rawstrS: str):
     Args:
         rawstr (str): value-string
     """
-    global _utfcalcS, _hdrD, _foldD, _rivetD
+    global _utfcalcS, _hdrD, _foldD, _rivetD, _setD, _exportL
 
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
     vcalc = _rcalc.ValueU(strL, _hdrD, _foldD, _exportL, _rivetD)
-    vcalcS, _imgD, _tableD = vcalc.v_parse()
+    vcalcS, _hdrD, _exportL, _rivetD, _setD = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
 def e__(rawstrS: str):
     """evaluate and format an equations rivet-string
 
     """
-    global _utfcalcS, _hdrD, _foldD
+    global _utfcalcS, _hdrD, _foldD, _rivetD, _setD, _exportL
 
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)
@@ -247,7 +248,7 @@ def t__(rawstrS: str):
     """evaluate and format a tables rivet-string
     
     """
-    global _utfcalcS, _hdrD, _foldD
+    global _utfcalcS, _hdrD, _foldD, _rivetD, _setD, _exportL
 
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)

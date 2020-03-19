@@ -75,10 +75,6 @@ i__(''' [01]_ Load Sums
     || image : .5 | pic1.png 
     Inserted png file
         
-    || image2 : .5,.5 | pic1.png | pic2.png 
-    Inserted png file
-    Side by side in docs
- 
     || image | pic2.jpg 
 
     Some added text xxxx is put here and a bit of nonsense to make some words
@@ -123,7 +119,7 @@ i__(''' [01]_ Load Sums
 
 v__(''' some values 
     
-    Some text if needed
+    Some text to describe what is going on
 
     a11 = 12.23                 | description 1 
     a22 = 2.2                   | description 2 
@@ -164,6 +160,10 @@ i__(''' [02]_ Seismic Analysis
     type of coordinate. 
     
     [page]_
+
+    || image2 : .5,.5 | pic1.png | pic2.png 
+    Inserted png file
+    Side by side in docs
 
     The way it transforms to frames considered as related is emphasized as
     in Galilean frame of reference. Sometimes frames are distinguished by
@@ -239,6 +239,7 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
     Plot title goes here
     ''')
 
+#write_values()
 #write_utfcalc()
 #write_pdfdoc()
 #write_htmldoc()
