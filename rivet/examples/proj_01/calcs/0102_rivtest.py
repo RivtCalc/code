@@ -122,7 +122,7 @@ v__(''' some values
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
 
-    || values | 0103_values.py | Rebar Properties
+    || values | 0103_testvalues.py | Rebar Properties
 
     a11 ==                      | reprint a value
 
