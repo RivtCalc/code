@@ -219,7 +219,7 @@ def v__(rawstrS: str):
     
     strL = strS.split("\n")
     vcalc = _rcalc.ValueU(strL, _hdrD, _foldD, _rivetD)
-    vcalcS, _hdrD, _exportL, _rivetD, _setD = vcalc.v_parse()
+    vcalcS, _exportS, _hdrD, _rivetD = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
 def e__(rawstrS: str):

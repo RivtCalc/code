@@ -55,11 +55,6 @@ i__(''' [01]_ Load Sums
              ζ= >     ────────────                            
                 └── i=4   (γ+ 4)
     
-
-    Insert from text or rst files
-    -----------------------------
-    
-    || text : 60 | ttext1.txt
     
     Render equations
     ----------------
@@ -75,10 +70,6 @@ i__(''' [01]_ Load Sums
     || image : .5 | pic1.png 
     Inserted png file
         
-    || image2 : .5,.5 | pic1.png | pic2.png 
-    Inserted png file
-    Side by side in docs
- 
     || image | pic2.jpg 
 
     Some added text xxxx is put here and a bit of nonsense to make some words
@@ -123,16 +114,18 @@ i__(''' [01]_ Load Sums
 
 v__(''' some values 
     
-    Some text if needed
-
+    || values | inline | Steel Properties
     a11 = 12.23                 | description 1 
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
-    
-    aisc13.csv[4] => BEAM1      | property vector 
+    BEAM1 => aisc13.csv[4]      | steel property vector 
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
+
+    || values | 0103_values.py | Rebar Properties
+
     a11 ==                      | reprint a value
+
 
     ''')
 
@@ -142,12 +135,12 @@ e__(''' equations header
 
     || format | equ:2,ans:2,chk:0,prt:2
     
-    ACI 318-05 1.1 [r]_
+                                            ACI 318-05 1.1 [r]_
     aa1 = a11*14                    
 
     aa2 = a11*14  
 
-    ACI 318-05 1.2 [r]_
+                                            ACI 318-05 1.2 [r]_
     aa3 = (aa2 * 5)/a11             
     
     aa4 = BEAM1[4] * 7.2  
@@ -164,6 +157,10 @@ i__(''' [02]_ Seismic Analysis
     type of coordinate. 
     
     [page]_
+
+    || image2 : .5,.5 | pic1.png | pic2.png 
+    Inserted png file
+    Side by side in docs
 
     The way it transforms to frames considered as related is emphasized as
     in Galilean frame of reference. Sometimes frames are distinguished by
@@ -239,6 +236,7 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
     Plot title goes here
     ''')
 
+#write_values()
 #write_utfcalc()
 #write_pdfdoc()
 #write_htmldoc()

@@ -318,7 +318,7 @@ class InsertU:
             scaleI = int(iL[0].split(":")[1])
         except:
             scaleI = self.setD["scale1"]
-        self.imgD.update({"scale1":scaleI})
+        self.setD.update({"scale1":scaleI})
         spS = iL[1].strip()
         spL = spS.split("=")
         spS = "Eq(" + spL[0] +",(" + spL[1] +"))" 
@@ -335,7 +335,7 @@ class InsertU:
         try:
             scaleI = int(iL[0].split(":")[1])
         except:
-            scaleI = self.imgD["scale1"]
+            scaleI = self.setD["scale1"]
         self.setD.update({"scale1":scaleI})
         self.hdrD["fignum"] += 1
         figI = self.hdrD["fignum"]
@@ -452,7 +452,7 @@ class ValueU:
             calcS (list): utf formatted calc strings
             rivetD (list): local() dictionary
          """
-        locals().update(self.rivetd)
+        locals().update(self.rivetD)
 
         endflgB = False; vtmpS = ""; vL = []; indxI = -1
         vcmdL = ["values"]
@@ -494,9 +494,9 @@ class ValueU:
                     self.calcS = _tags(iS, self.calcS, self.hdrD); continue  
             else: 
                 print(vS); self.calcS += utfS + "\n"
-        self.rivetD.append(locals())
+        self.rivetD.update(locals())
         
-        return (self.calcl, self.rivetd, self.exportS)
+        return (self.calcS, self.exportS, self.hdrD, self.rivetD)
         
     def v_values(self, vL: list):
         """assign values to variables
@@ -508,7 +508,7 @@ class ValueU:
         locals().update(self.rivetD)
 
         pyS = """"""
-        valL =[]                            # list - convert to table
+        valL =[]                            # value list for table
         if "inline" in vL[0][1]:
             for v in vL[1:]:
                 vS = v.split("|")
@@ -520,22 +520,28 @@ class ValueU:
                 valL.append([varS, valS, descripS])
                 exec(vS[0])
         if ".py" in vL[0][1]:
-            pass
-        
+            tfileS = vL[0][1].strip()
+            with open(tfileS,'r') as pyfile:
+                readL = pyfile.readlines()
+            for v in readL:
+                vS = v.split("#")
+                varS = vS[0].split("=")[0].strip()
+                valS = vS[0].split("=")[1].strip()
+                descripS = vS[1].strip()
+                valL.append([varS, valS, descripS])
+                exec(vS[0])
+
         df = pd.DataFrame(valL)               
-        headerL = ["line", "variable", "value", "description"]
+        hdrL = ["line", "variable", "value", "description"]
         old_stdout = sys.stdout
         output = StringIO()
-        output.write(tabulate(df, tablefmt="grid", headers=headerL))            
-        rstout = output.getvalue()
+        output.write(tabulate(df, tablefmt="grid", headers=hdrL))            
+        rstS = output.getvalue()
         sys.stdout = old_stdout
         
         self.exportS += pyS
-        self.calcL += v
-        self.rivetd.update(locals())
-
-
-
+        self.calcS += rstS
+        self.rivetD.update(locals())
 
     def v_lookup(self, vpl: list):
         """assign vector from csv file to variable
