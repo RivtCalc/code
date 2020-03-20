@@ -482,18 +482,18 @@ class ValueU:
                 descripS = vS.split("|")[1].strip()
                 valS = str(eval(varS))
                 utfS = str.ljust(varS + " = " + valS, 40) + " | " + descripS
-                print(vS); self.calcS += utfS + "\n" ; continue
+                print(utfS); self.calcS += utfS + "\n" ; continue
             if "]_" in vS:                          # process a tag
                 if "[#]_" in vS:
-                    iS = iS.replace("[#]_", "[" + 
+                    vS = vS.replace("[#]_", "[" + 
                         str(self.hdrD["footque"][-1]) + "]" )
-                    print(iS); self.calcS += iS + "\n"
+                    print(vS); self.calcS += vS + "\n"
                     incrI = self.hdrD["footque"][-1] + 1
                     self.hdrD["footque"].append(incrI)
                 else:
                     self.calcS = _tags(iS, self.calcS, self.hdrD); continue  
             else: 
-                print(vS); self.calcS += utfS + "\n"
+                print(vS); self.calcS += vS + "\n"
         self.rivetD.update(locals())
         
         return (self.calcS, self.exportS, self.hdrD, self.rivetD)
