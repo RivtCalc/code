@@ -83,7 +83,7 @@ _exportL: list = []                                 # values
 _utfcalcS = """"""                                  # calc print string
 
 _rfull = Path(__main__.__file__)                    # calc file path
-_rfile s= Path(__main__.__file__).name               # calc file name
+_rfile = Path(__main__.__file__).name               # calc file name
 _rname = _rfile.split(".py")[0]                     # calc file basename
 _rivpath = Path("rivet.rivet_lib.py").parent        # rivet program path
 _cpath =  Path(_rfull).parent                       # calc folder path
@@ -106,30 +106,22 @@ _foldD: dict = {
 "hpath": Path(_dpath, "html"),
 "fpath": Path(_dpath, "html/figures"),
 "apath": Path(_rpath, "append"),
-"mpath": Path(_rpath, "temp"),
+"mpath": Path(_rpath, "temp")
 }
 _rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
 
 # section headers
-_hdrD: dict = {
-"rnum" : _rname[0:4],
-"divnum" : _rname[0:2],
-"calcnum" : _rname[2:4],
-"sectnum" : 0, 
-"sectname" : "",
-"eqnum" :  0, 
-"fignum" : 0, 
-"tablenum" : 0,
-"footnum" : 0,
-"footnote" : 0,
-"footque" : deque([1]),
-"swidth" : 80
-}
+_hdrD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2:4],
+"sectnum": 0, "sectname": "",
+"eqnum":  0, "fignum": 0, "tablenum" : 0,
+"footnum": 0,"footnote": 0,"footque": deque([1]),
+"swidth": 80}
+
 # command settings
-_setD = {"txtwidth":60, "scale1":1, "scale2":1,
-        "row":"[:]", "col":"[:]", "maxwidth":30,
-        "equ":2, "ans":2 , "chk":0, "prt": 2}
+_setD = {"txtwidth": 60, "scale1": 1, "scale2": 1,
+        "row": "[:]", "col": "[:]", 
+        "equ": 2, "ans": 2 , "chk": 0, "prt": 2}
 
 def shorten_path(file_path: str, length: int)-> str:
     """split path and return path of depth = length
@@ -226,7 +218,7 @@ def v__(rawstrS: str):
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    vcalc = _rcalc.ValueU(strL, _hdrD, _foldD, _exportL, _rivetD)
+    vcalc = _rcalc.ValueU(strL, _hdrD, _foldD, _rivetD)
     vcalcS, _hdrD, _exportL, _rivetD, _setD = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 

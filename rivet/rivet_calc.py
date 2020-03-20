@@ -153,7 +153,7 @@ class RepoU:
                 if endflgB:
                     rL.append(rtmpS.strip())
                     methodL[indxI](rL)              # call attribute from list                          
-                    endflgB = False; rtmpS = ""; rL = []; indx = -1      
+                    endflgB = False; rtmpS = ""; rL = []; indxI = -1      
                 print("\n"); self.calcS += "\n" 
                 continue
             if endflgB:                             # add lines until blank
@@ -210,7 +210,7 @@ class RepoU:
         sys.stdout = old_stdout    
     
 class InsertU:
-    """convert rivet-string to utf-calc string 
+    """convert insert-string to utf-calc string 
 
     Attributes:
         strL (list): rivet-string
@@ -233,9 +233,9 @@ class InsertU:
             tuple :  a string and 3 dictionaries
         """
         endflgB = False; itmpS = ""; iL = []; indxI = -1
-        icmdL = ["text", "sympy", "latex", "table", "image", "image2"]
-        attribL =  [self.i_text, self.i_sympy, self.i_latex, 
-                    self.i_table, self.i_image, self.i_image2]
+        icmdL = ["sympy", "latex", "table", "image", "image2"]
+        attribL =  [self.i_sympy, self.i_latex, self.i_table, 
+                    self.i_image, self.i_image2]
         for iS in self.strL:
             if iS[0:2] == "##":  continue          # remove review comment
             iS = iS[4:]                            # remove 4 space indent
@@ -381,8 +381,8 @@ class InsertU:
         try:
             widthI = int(iL[0].split(":")[1])
         except:
-            widthI = int(self.imgD["width"])
-        self.setD.update({"width":widthI})
+            widthI = int(self.setD["txtwidth"])
+        self.setD.update({"txtwidth":widthI})
         tableS = ""; utfS = ""
         fileS = iL[1].strip()
         tfileS = Path(self.folderD["tpath"], fileS)   
@@ -423,27 +423,26 @@ class InsertU:
         print(utfS); self.calcS += utfS + "\n"  
 
 class ValueU:
-    """convert value rivet-string to utf-calc string
+    """convert value-string to utf-calc string
         
     Attributes:
-        strl (list): rivet strings
-        hdrd (dict): header information
-        folderd (dict): folder structure
-        rivetd (dict) : rivet calculation variables
-        equl (list) : equations for export
+        strL (list): rivet strings
+        exportL (list) : values for export
+        hdrD (dict): header information
+        folderD (dict): folder structure
+        rivetD (dict) : rivet calculation variables
 
     """
  
-    def __init__(self, strL: list, equL: list, hdrD: dict, exportL: list, 
-                                folderD: dict, rivetD: dict, ):
-        """convert rivet string of type value to utf-calc string
+    def __init__(self, strL: list, hdrD: dict, folderD: dict, rivetD: dict):
+        """convert value-string to utf-calc string
         
         """
         self.calcS = """"""
+        self.exportS = """"""
         self.strL = strL
         self.folderD = folderD
         self.hdrD = hdrD
-        self.exportL = exportL
         self.rivetD = rivetD
           
     def v_parse(self)-> tuple:
@@ -452,62 +451,90 @@ class ValueU:
         Return:
             calcS (list): utf formatted calc strings
             rivetD (list): local() dictionary
-        """
+         """
         locals().update(self.rivetd)
 
-        endflg = False
-        itmpl = []
-        for vls in self.strl:
-            if vls[0:2] == "##":  continue          # remove review comment
-            vls = vls[4:]                           # remove 4 space indent
-            if len(vls.strip()) == 0:
-                self.calcl.append(" ")              # insert blank line
-                print(21, vls)
+        endflgB = False; vtmpS = ""; vL = []; indxI = -1
+        vcmdL = ["values"]
+        methodL =  [self.v_values]
+
+        for vS in self.strL:
+            if vS[0:2] == "##":  continue          # remove review comment
+            vS = vS[4:]                            # remove 4 space indent
+            if len(vS.strip()) == 0:               # insert blank line
+                print("\n"); self.calcS += "\n"; continue             
+                if endflgB:                        # end block
+                    vL.append(vtmpS.strip())
+                    methodL[indxI](vL)              # call attribute from list                          
+                    endflgB = False; vtmpS = ""; vL = []; indxI = -1      
+                print("\n"); self.calcS += "\n" 
                 continue
-            if vls[0] == "#" : continue             # remove comment 
-            if vls[0:2] == "::" : continue          # remove preformat 
-            if "|" in vls:                          # act on parse tag
-                vpl = vls.split("|")
-                if "=>" in vpl[0]: 
-                    self.v_lookup(vpl)              # assign vector 
-                elif ":" in vpl[0]:
-                    self.v_reprint(vpl)             # reprint a value
-                else: self.v_assign(vpl)            # assign a value
+            if endflgB:                             # add lines until blank
+                vtmpS = vtmpS + vS + "\n"; continue
+            if vS[0:2] == "||":                     # find command
+                vL = vS[2:].split("|")
+                indxI = vcmdL.index(vL[0].strip())            
+                endflgB = True; continue
+            if vS[0] == "#" : continue             # remove comment 
+            if vS[0:2] == "::" : continue          # remove preformat 
+            if "==" in vS:                         # print value
+                varS = vS.split("==")[0].strip()
+                descripS = vS.split("|")[1].strip()
+                valS = str(eval(varS))
+                utfS = str.ljust(varS + " = " + valS, 40) + " | " + descripS
+                print(vS); self.calcS += utfS + "\n" ; continue
+            if "]_" in vS:                          # process a tag
+                if "[#]_" in vS:
+                    iS = iS.replace("[#]_", "[" + 
+                        str(self.hdrD["footque"][-1]) + "]" )
+                    print(iS); self.calcS += iS + "\n"
+                    incrI = self.hdrD["footque"][-1] + 1
+                    self.hdrD["footque"].append(incrI)
+                else:
+                    self.calcS = _tags(iS, self.calcS, self.hdrD); continue  
             else: 
-                self.calcl.append(vls)
-                print(vls)
-
-        self.rivetd.append(locals())
-
-        return (self.calcl, self.rivetd, self.equl)
+                print(vS); self.calcS += utfS + "\n"
+        self.rivetD.append(locals())
         
-    def v_assign(self, vpl: list):
-        """assign value to variable
+        return (self.calcl, self.rivetd, self.exportS)
+        
+    def v_values(self, vL: list):
+        """assign values to variables
         
         Args:
-            vpl (list): list of value string components
+            vL (list): list of values
         """
         
-        locals().update(self.rivetd)
+        locals().update(self.rivetD)
 
-        pys = str(vpl[0]) + "# " + vpl[1].strip()
-        vl = vpl[0].split("=")[1].strip()
-        exec(vpl[0].strip())
-        chkl = ""
-        if "[" in vl:
-            chkl = vl.split("[")[0].strip()
-            evalx = eval(chkl) 
-            if isinstance(evalx, list):
-                exts = str(vpl[0]).strip() + " = " + str(eval(vl))
-                utfs = str.ljust(exts,40) + " | " + vpl[1].strip()
-        else:
-            utfs =  str.ljust(str(vpl[0]).strip(),40) + " | " + vpl[1].strip()
+        pyS = """"""
+        valL =[]                            # list - convert to table
+        if "inline" in vL[0][1]:
+            for v in vL[1:]:
+                vS = v.split("|")
+                varS = vS[0].split("=")[0].strip()
+                valS = vS[0].split("=")[1].strip()
+                descripS = vS[1].strip()
+                pyS = str(vS[0]).strip() + "   # " + vS[1].strip() +"\n"
+                pyS += pyS
+                valL.append([varS, valS, descripS])
+                exec(vS[0])
+        if ".py" in vL[0][1]:
+            pass
         
-        self.equl.append(pys)
-        self.calcl.append(utfs)
+        df = pd.DataFrame(valL)               
+        headerL = ["line", "variable", "value", "description"]
+        old_stdout = sys.stdout
+        output = StringIO()
+        output.write(tabulate(df, tablefmt="grid", headers=headerL))            
+        rstout = output.getvalue()
+        sys.stdout = old_stdout
+        
+        self.exportS += pyS
+        self.calcL += v
         self.rivetd.update(locals())
-        
-        print(utfs)
+
+
 
 
     def v_lookup(self, vpl: list):
@@ -538,18 +565,6 @@ class ValueU:
 
         print(utfs)
     
-    def v_reprint(self, vpl: list):
-        """reprint a variable value
-        
-        Args:
-            vpl (list): list of value string items
-        """
-
-        vars = vpl[0].split(":")[0].strip()
-        ans = str(eval(vars))
-        utfs = str.ljust(vars + " = " + ans, 40) + " | " + vpl[1].strip()
-
-        print(utfs)
 
 class EquationU:
     """Convert rivet string type **equation** to utf-calc string
@@ -789,7 +804,7 @@ class TableU:
         self.tcalc = []
         self.tlist = tlist
         self.folderd = folders
-        self.maxwidth = strnum[0]
+        self.txtwidth = _setD["txtwidth"]
         self.sectnum = strnum[1]
         self.eqnum = strnum[2]
         self.fignum = strnum[3]
@@ -900,20 +915,6 @@ class TableU:
         
         return cmdline
 
-    def t_create(self, tline1:str) -> str:
-        """[summary]
-        
-        Args:
-            tline (str): [description]
-        """
-        tline1a = tline1.split("|")
-        temp = tline1a[1].split("new")
-        tablename = temp[1].strip()
-        cmdline = tablename + " = pd.DataFrame()"
-        
-        globals().update(locals())
-        return cmdline
-
     def t_plot(self, tline1: str)-> list:
         """[summary]
         
@@ -937,6 +938,20 @@ class TableU:
 
         globals().update(locals())
         return cmdline1, cmdline2
+
+    def t_create(self, tline1:str) -> str:
+        """[summary]
+        
+        Args:
+            tline (str): [description]
+        """
+        tline1a = tline1.split("|")
+        temp = tline1a[1].split("new")
+        tablename = temp[1].strip()
+        cmdline = tablename + " = pd.DataFrame()"
+        
+        globals().update(locals())
+        return cmdline
 
     def t_insert(self, tline1: str):
         """[summary]

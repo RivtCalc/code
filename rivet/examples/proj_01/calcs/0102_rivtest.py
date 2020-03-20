@@ -55,11 +55,6 @@ i__(''' [01]_ Load Sums
              ζ= >     ────────────                            
                 └── i=4   (γ+ 4)
     
-
-    Insert from text or rst files
-    -----------------------------
-    
-    || text : 60 | ttext1.txt
     
     Render equations
     ----------------
@@ -119,16 +114,18 @@ i__(''' [01]_ Load Sums
 
 v__(''' some values 
     
-    Some text to describe what is going on
-
+    || values | inline | Steel Properties
     a11 = 12.23                 | description 1 
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
-    
-    aisc13.csv[4] => BEAM1      | property vector 
+    BEAM1 => aisc13.csv[4]      | steel property vector 
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
+
+    || values | 0103_values.py | Rebar Properties
+
     a11 ==                      | reprint a value
+
 
     ''')
 
@@ -138,12 +135,12 @@ e__(''' equations header
 
     || format | equ:2,ans:2,chk:0,prt:2
     
-    ACI 318-05 1.1 [r]_
+                                            ACI 318-05 1.1 [r]_
     aa1 = a11*14                    
 
     aa2 = a11*14  
 
-    ACI 318-05 1.2 [r]_
+                                            ACI 318-05 1.2 [r]_
     aa3 = (aa2 * 5)/a11             
     
     aa4 = BEAM1[4] * 7.2  
