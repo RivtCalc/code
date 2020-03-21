@@ -454,26 +454,26 @@ class ValueU:
          """
         locals().update(self.rivetD)
 
-        endflgB = False; vtmpS = ""; vL = []; indxI = -1
+        endflgB = False; vL = []; indxI = -1
         vcmdL = ["values"]
-        methodL =  [self.v_values]
+        methodL =  [self.v_assign]
 
         for vS in self.strL:
-            if vS[0:2] == "##":  continue          # remove review comment
-            vS = vS[4:]                            # remove 4 space indent
-            if len(vS.strip()) == 0:               # insert blank line
-                print("\n"); self.calcS += "\n"; continue             
-                if endflgB:                        # end block
-                    vL.append(vtmpS.strip())
+            locals().update(self.rivetD)
+            if vS[0:2] == "##":  continue           # remove review comment
+            vS = vS[4:]                             # remove 4 space indent
+            if len(vS.strip()) == 0:                # insert blank line
+                print("\n"); self.calcS += "\n"            
+                if endflgB:                         # end block
                     methodL[indxI](vL)              # call attribute from list                          
-                    endflgB = False; vtmpS = ""; vL = []; indxI = -1      
-                print("\n"); self.calcS += "\n" 
+                    endflgB = False; vL = []; indxI = -1      
                 continue
-            if endflgB:                             # add lines until blank
-                vtmpS = vtmpS + vS + "\n"; continue
+            if endflgB:                             # add values
+                vL.append(vS); continue
             if vS[0:2] == "||":                     # find command
-                vL = vS[2:].split("|")
-                indxI = vcmdL.index(vL[0].strip())            
+                vpL = vS[2:].split("|")
+                indxI = vcmdL.index(vpL[0].strip())
+                vL.append(vS[2:])            
                 endflgB = True; continue
             if vS[0] == "#" : continue             # remove comment 
             if vS[0:2] == "::" : continue          # remove preformat 
@@ -498,7 +498,7 @@ class ValueU:
         
         return (self.calcS, self.exportS, self.hdrD, self.rivetD)
         
-    def v_values(self, vL: list):
+    def v_assign(self, vL: list):
         """assign values to variables
         
         Args:
@@ -509,18 +509,27 @@ class ValueU:
 
         pyS = """"""
         valL =[]                            # value list for table
-        if "inline" in vL[0][1]:
+        vpL = vL[0].split("|")
+        if "inline" in vpL[1]:
             for v in vL[1:]:
                 vS = v.split("|")
+                if "<=" in vS[0]: 
+                    varS, valS, descripS = self.v_lookup(v)
+                    trimS = str(valS[:3]) + "..."
+                    valL.append([varS, trimS, descripS])
+                    locals().update(self.rivetD)
+                    continue
                 varS = vS[0].split("=")[0].strip()
                 valS = vS[0].split("=")[1].strip()
+                if "[" in valS: valS = eval(valS)
                 descripS = vS[1].strip()
-                pyS = str(vS[0]).strip() + "   # " + vS[1].strip() +"\n"
+                pyS = str(varS + " = " + valS +  
+                        "   # " + descripS + "\n")
                 pyS += pyS
+                exec(vS[0].strip())
                 valL.append([varS, valS, descripS])
-                exec(vS[0])
-        if ".py" in vL[0][1]:
-            tfileS = vL[0][1].strip()
+        elif ".py" in vpL[1]:
+            tfileS = Path(self.folderD["spath"], vpL[1].strip())
             with open(tfileS,'r') as pyfile:
                 readL = pyfile.readlines()
             for v in readL:
@@ -529,56 +538,57 @@ class ValueU:
                 valS = vS[0].split("=")[1].strip()
                 descripS = vS[1].strip()
                 valL.append([varS, valS, descripS])
-                exec(vS[0])
-
+                exec(vS[0].strip())
+        else:
+            print(vL[0]); self.calcS += vL[0] + "\n"
+        
         df = pd.DataFrame(valL)               
-        hdrL = ["line", "variable", "value", "description"]
+        hdrL = ["variable", "value", "description"]
         old_stdout = sys.stdout
         output = StringIO()
-        output.write(tabulate(df, tablefmt="grid", headers=hdrL))            
-        rstS = output.getvalue()
+        output.write(tabulate(df, tablefmt="grid", headers=hdrL,
+                                        showindex=False))            
+        valueS = output.getvalue()
         sys.stdout = old_stdout
-        
+        print(valueS +"\n"); self.calcS += valueS + "\n"
+
         self.exportS += pyS
-        self.calcS += rstS
         self.rivetD.update(locals())
 
-    def v_lookup(self, vpl: list):
+    def v_lookup(self, v: str ):
         """assign vector from csv file to variable
         
         Args:
             vpl (list): list of value string items
         """
         
-        locals().update(self.rivetd)
+        locals().update(self.rivetD)
         
-        files1 = vpl[0].split("=>")[0]
-        files2 = files1.split("[")[0].strip()
-        rows = files1.split(".csv")[1].strip()
-        filep = os.path.join(self.folderd["tpath"], files2)
-
-        with open(filep,'r') as csvf:
-            readl = list(csv.reader(csvf))
-        rowl = eval("readl" + rows)
-
-        vars = vpl[0].split("=>")[1].strip()
-        cmds = vars + "=" + str(rowl)
-        exec(cmds)
-        utfs = str.ljust(vpl[0].strip(),40) + " | " + vpl[1].strip()
-
-        self.calcl.append(utfs)
-        self.rivetd.update(locals())
-
-        print(utfs)
-    
+        varS = v.split("<=")[0].strip()
+        descripS = v.split("|")[1].strip()
+        fileL = v.split("<=")[1].strip()
+        fileS = fileL.split("[")[0].strip()
+        rowS = v.split("[")[1]
+        rowI = int(rowS.split("]")[0].strip())
+        fileP = os.path.join(self.folderD["tpath"], fileS)
+        with open(fileP,'r') as csvf:
+            reader = csv.reader(csvf)
+            for i in range(rowI):
+                rowL = next(reader)
+            rowL = list(next(reader))
+        cmdS = varS + "=" + str(rowL)
+        exec(cmdS)
+        
+        self.rivetD.update(locals())
+        return (varS, rowL, descripS)
 
 class EquationU:
     """Convert rivet string type **equation** to utf-calc string
 
     """
 
-    def __init__(self, strl: list,  hdrd: dict, folderd: dict, 
-                                        rivetd: dict, equl: list):     
+    def __init__(self, strL: list, exportS: str, hdrD: dict, 
+                           folderD: dict, rivetD: dict, setD: dict):     
         """convert rivet string type **equation** to utf-calc string
         
         Args:
@@ -588,13 +598,13 @@ class EquationU:
             rivetd (dict) : rivet calculation variables
             equl (list) : equations for export
         """
-        self.calcl = []
-        self.strl = strl
-        self.folderd = folderd
-        self.hdrd = hdrd
-        self.equl = equl
-        self.rivetd = rivetd
-        self.paramd = { "e":2,"r":2,"c":0, "p":2, "n":"t"}
+        self.calcS = """"""
+        self.exportS = exportS
+        self.strL = strL
+        self.folderD = folderD
+        self.hdrD = hdrD
+        self.rivetD = rivetD
+        self.setD = setD
 
     def e_parse(self) -> tuple:
         """parse strings of type equation
@@ -638,7 +648,7 @@ class EquationU:
                 self.calcl.append(els)
 
         self.rivetd.update(locals())
-        return self.calcl
+        return self.calcS
 
     def e_updateparams(self, eps: str):
         """update process parameters from tag
@@ -658,7 +668,7 @@ class EquationU:
         exec("set_printoptions(precision=" + eformat.strip() + ")")
         exec("Unum.VALUE_FORMAT = '%." + eformat.strip() + "f'")
 
-    def eq_symbol(self, epl: list, flag: int):
+    def e_symbol(self, epl: list, flag: int):
         """[summary]
         
         Args:
@@ -690,7 +700,7 @@ class EquationU:
         if flag == 2: eq_sub(epl, eps)      # substitute variable with number
         if pard["c"] != 0: eq_chk(results, pard["c"])   # check result
 
-    def eq_sub(self, epl: list, eps: str):
+    def e_sub(self, epl: list, eps: str):
 
         locals().update(self.rivetd)
         utfs = epl[0].strip(); descrips = epl[3]; pard = dict(epl[1])
@@ -746,6 +756,8 @@ class EquationU:
         except:
             pass   
 
+    def e_result(self):
+
         typev = type(eval(var0))                # print result right justified
         if typev == ndarray:
             tmp1 = eval(var0)
@@ -790,7 +802,7 @@ class EquationU:
         self.calcl.append(utfs)
         self.rivetd.update(locals())
 
-    def eq_chk(results, compare):
+    def e_chk(results, compare):
         pass
 
 class TableU:

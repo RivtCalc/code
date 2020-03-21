@@ -68,7 +68,7 @@ from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
 from rivet.rivet_unit import *
-import rivet.rivet_calc as _rcalc
+import rivet.rivet_calc as _rivcalc
 #import rivet.rivet_doc as _rdoc
 #import rivet.rivet_reprt as _reprt
 #import rivet.rivet_chk as _rchk
@@ -81,7 +81,6 @@ if sys.version_info < (3, 7):
 _rivetD: dict ={}                                   # runtime dictionary
 _exportL: list = []                                 # values
 _utfcalcS = """"""                                  # calc print string
-
 _rfull = Path(__main__.__file__)                    # calc file path
 _rfile = Path(__main__.__file__).name               # calc file name
 _rname = _rfile.split(".py")[0]                     # calc file basename
@@ -186,7 +185,7 @@ def r__(rawstrS: str):
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    rcalc = _rcalc.RepoU(strL, _hdrD, _foldD) 
+    rcalc = _rivcalc.RepoU(strL, _hdrD, _foldD) 
     rcalcS = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
@@ -202,7 +201,7 @@ def i__(rawstrS: str):
     if "]_" in hdrS: _updatehdr(hdrS)
 
     strL = strS.split("\n")
-    icalc = _rcalc.InsertU(strL, _hdrD, _foldD, _setD) 
+    icalc = _rivcalc.InsertU(strL, _hdrD, _foldD, _setD) 
     icalcS, _hdrD, _setD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
@@ -218,7 +217,7 @@ def v__(rawstrS: str):
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    vcalc = _rcalc.ValueU(strL, _hdrD, _foldD, _rivetD)
+    vcalc = _rivcalc.ValueU(strL, _hdrD, _foldD, _rivetD)
     vcalcS, _exportS, _hdrD, _rivetD = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
@@ -232,8 +231,8 @@ def e__(rawstrS: str):
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    ecalc = _rcalc.ValueU(strL, _hdrD, _foldD, _exportL, _rivetD)
-    ecalcS, _imgD, _tableD = ecalc.e_parse()
+    ecalc = _rivcalc.EquationU(strL, _exportL, _hdrD, _foldD, _rivetD, _setD)
+    ecalcS, _exportS, _hdrD, _rivetD = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
 def t__(rawstrS: str):
@@ -246,7 +245,7 @@ def t__(rawstrS: str):
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    vcalc = _rcalc.ValueU(strL, _hdrD, _foldD, _exportL, _rivetD)
+    tcalc = _rivcalc.TableU(strL, _hdrD, _foldD, _exportL, _rivetD)
     vcalcS, _imgD, _tableD = vcalc.i_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
