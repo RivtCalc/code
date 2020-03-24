@@ -145,7 +145,7 @@ PDXDict begin
 
 /arrowhead {
   gsave
-    [] 0 setdash
+    [] 0 cmdDash
     strokeC strokeM strokeY strokeK setcmykcolor
     2 copy moveto
     4 2 roll exch 4 -1 roll exch
@@ -377,7 +377,7 @@ PDXDict begin
   } if
 } def
 /w /setlinewidth load def
-/d /setdash load def
+/d /cmdDash load def
 /B {
   nesting 0 eq { %ifelse
     gsave F grestore S
@@ -539,7 +539,7 @@ WinAnsiEncoding /_Arial-BoldMT /Arial-BoldMT RE
 WinAnsiEncoding /_ArialMT /ArialMT RE
 
 newpath 2 setlinecap 0 setlinejoin 2 setmiterlimit
-[] 0 setdash
+[] 0 cmdDash
 -79 280 moveto -79 615 lineto 535 615 lineto 535 280 lineto closepath clip
 newpath
 %%EndPageSetup

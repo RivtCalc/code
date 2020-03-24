@@ -55,10 +55,9 @@ LM      = unit( 'lm'    , CD * SR   , 'lumen'          )
 LX      = unit( 'lx'    , LM / M**2 , 'lux'            )
 celsius = CELSIUS = unit( 'deg C' , K         , 'degree Celsius' )
 FAHR    = unit('degF', K*9./5 , 'degree Fahrenheit')
-# warning : conversion is for relative degree size not actual temperature
+# note that temperature conversion is for relative degree size, not offset
 # ================ do not modify above =================================
-
-# =========== add structural engineering units here ==============
+# =========== define engineering units below ===========================
 # metric
 G   = unit('G', 9.80665 * M/S**2, 'gravity acceleration')
 PA  = unit('Pa', N / M**2, 'pascal')
@@ -67,7 +66,6 @@ KPA = unit('KPa', PA*(10**3), 'kilopascals')
 KN  = unit('KN', N*(10**3), 'kilonewton')
 MN  = unit('MN', N*(10**6), 'meganewton')
 KM  = unit('M', M*(10**3), 'kilometer')
-
 # imperial
 IN      = unit('in', M / 39.370079, 'inch')
 FT      = unit('ft', M / 3.2808399, 'foot')

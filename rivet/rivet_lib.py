@@ -67,6 +67,7 @@ import logging
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
+from tabulate import tabulate
 from rivet.rivet_unit import *
 import rivet.rivet_calc as _rivcalc
 #import rivet.rivet_doc as _rdoc
@@ -110,15 +111,15 @@ _foldD: dict = {
 _rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
 
-# section headers
-_hdrD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2:4],
+# section settings
+_setsectD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2:4],
 "sectnum": 0, "sectname": "",
 "eqnum":  0, "fignum": 0, "tablenum" : 0,
 "footnum": 0,"footnote": 0,"footque": deque([1]),
 "swidth": 80}
 
 # command settings
-_setD = {"txtwidth": 60, "scale1": 1, "scale2": 1,
+_setcmdD = {"cwidth": 60, "scale1": 1, "scale2": 1,
         "row": "[:]", "col": "[:]", 
         "equ": 2, "ans": 2 , "chk": 0, "prt": 2}
 
@@ -154,20 +155,20 @@ logging.info(f"""backup file written : {_rshort}""")
 # TODO: call check on folder structure here
 
 def _updatehdr(hdrS:str):
-    """update header dictionary
+    """update section dictionary
     
     Arguments:
         hdrs {str} -- header of rivet string
     """
-    global _utfcalcS, _hdrD, _rivetD
+    global _utfcalcS, _setsectD, _rivetD
 
-    _hdrD["eqnum"] = 0 
-    _hdrD["fignum"] = 0
-    _hdrD["tablenum"] = 0
-    swidthI = int(_hdrD["swidth"])
-    rnumS = str(_hdrD["rnum"])
-    snameS = _hdrD["sectname"] = hdrS[hdrS.find("]_") + 2:].strip()
-    snumS = _hdrD["sectnum"] = hdrS[hdrS.find("[")+2:hdrS.find("]_")]
+    _setsectD["eqnum"] = 0 
+    _setsectD["fignum"] = 0
+    _setsectD["tablenum"] = 0
+    swidthI = int(_setsectD["swidth"])
+    rnumS = str(_setsectD["rnum"])
+    snameS = _setsectD["sectname"] = hdrS[hdrS.find("]_") + 2:].strip()
+    snumS = _setsectD["sectnum"] = hdrS[hdrS.find("[")+2:hdrS.find("]_")]
     sheadS = " " +  snameS + (rnumS + " - " +
            ("[" + str(snumS) + "]")).rjust(swidthI - len(snameS) - 2)
     sstrS = swidthI * "="
@@ -179,13 +180,13 @@ def r__(rawstrS: str):
     Args:
         rawstrS (str): repo-string
     """
-    global  _utfcalcS, _hdrD, _rivetD
+    global  _utfcalcS, _setsectD, _rivetD
     
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    rcalc = _rivcalc.RepoU(strL, _hdrD, _foldD) 
+    rcalc = _rivcalc.RepoU(strL, _setsectD, _foldD) 
     rcalcS = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
@@ -195,14 +196,14 @@ def i__(rawstrS: str):
     Args:
         rawstrS (str): insert-string
     """
-    global _utfcalcS, _hdrD, _foldD, _setD
+    global _utfcalcS, _setsectD, _foldD, _setcmdD
 
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)
 
     strL = strS.split("\n")
-    icalc = _rivcalc.InsertU(strL, _hdrD, _foldD, _setD) 
-    icalcS, _hdrD, _setD = icalc.i_parse()
+    icalc = _rivcalc.InsertU(strL, _setsectD, _foldD, _setcmdD) 
+    icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
 def v__(rawstrS: str):
@@ -211,41 +212,41 @@ def v__(rawstrS: str):
     Args:
         rawstr (str): value-string
     """
-    global _utfcalcS, _hdrD, _foldD, _rivetD, _setD, _exportL
+    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportL
 
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    vcalc = _rivcalc.ValueU(strL, _hdrD, _foldD, _rivetD)
-    vcalcS, _exportS, _hdrD, _rivetD = vcalc.v_parse()
+    vcalc = _rivcalc.ValueU(strL, _setsectD, _foldD, _rivetD)
+    vcalcS, _exportS, _setsectD, _rivetD = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
 def e__(rawstrS: str):
     """evaluate and format an equations rivet-string
 
     """
-    global _utfcalcS, _hdrD, _foldD, _rivetD, _setD, _exportL
+    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportL
 
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    ecalc = _rivcalc.EquationU(strL, _exportL, _hdrD, _foldD, _rivetD, _setD)
-    ecalcS, _exportS, _hdrD, _rivetD = ecalc.e_parse()
+    ecalc = _rivcalc.EquationU(strL, _exportL, _setsectD, _foldD, _rivetD, _setcmdD)
+    ecalcS, _exportS, _setsectD, _rivetD = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
 def t__(rawstrS: str):
     """evaluate and format a tables rivet-string
     
     """
-    global _utfcalcS, _hdrD, _foldD, _rivetD, _setD, _exportL
+    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportL
 
     hdrS,strS = rawstrS.split("\n",1)
     if "]_" in hdrS: _updatehdr(hdrS)
     
     strL = strS.split("\n")
-    tcalc = _rivcalc.TableU(strL, _hdrD, _foldD, _exportL, _rivetD)
+    tcalc = _rivcalc.TableU(strL, _setsectD, _foldD, _exportL, _rivetD)
     vcalcS, _imgD, _tableD = vcalc.i_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
@@ -254,7 +255,54 @@ def x__(str0: str):
     
     """
     pass
+
+def list_values():
+        
+    rivetL = [[k,v] for k,v in _rivetD.items()]
+    for i in rivetL:
+        if isinstance(i[1], list):
+                i[1] = i[1][0:4] + ["..."]
+    print("."*70)
+    print("All Currently Defined Variables and Values")                
+    print(tabulate(rivetL, tablefmt="grid", headers=["variable", "value"]))
+    print("."*70)
+
+def py_values():
+    """ write rivet independent python file of calculation values
  
+        Write a Python file with values and _equation results.  
+        Used for extensions and importing design information 
+        into other rivet or python files.  File name
+        is the calc file name prepended with 'v'.      
+    """
+    str1 =  ("""\nThis file contains Python _equations 
+            from the rivet design file 
+            for lsti in zip(vlistx, vlisty)
+            if __name__ == "__main__":\n
+            vlist()\n\n""")
+    _rfile.write("\n")
+
+def utfcalc(utfcalc, _txtfile):
+    """write utf calc string to file
+    """
+    with open(_txtfile, "wb") as f1:
+        f1.write(_utfcalcS.encode("UTF-8"))
+
+def htmldoc():
+    """[summary]
+    """
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def pdfdoc():
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def pdfreport():
+    """[summary]
+    """
+    pass
+
 def _rstcalc(pline, pp, indent):
     """[summary]
     
@@ -273,38 +321,3 @@ def _rstcalc(pline, pp, indent):
         "texmak2":  ".".join((_rbase, ".fls")),
         "texmak3":  ".".join((_rbase, ".fdb_latexmk"))
     }
-def utfcalc(utfcalc, _txtfile):
-    """write utf calc string to file
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(_utfcalcS.encode("UTF-8"))
-
-def pyvalues():
-    """ write rivet independent python file of values
- 
-        Write a Python file with values and _equation results.  
-        Used for extensions and importing design information 
-        into other rivet or python files.  File name
-        is the calc file name prepended with 'v'.      
-    """
-    str1 =  ("""\nThis file contains Python _equations 
-            from the rivet design file 
-            for lsti in zip(vlistx, vlisty)
-            if __name__ == "__main__":\n
-            vlist()\n\n""")
-    _rfile.write("\n")
-    
-def htmldoc():
-    """[summary]
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def pdfdoc():
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def pdfreport():
-    """[summary]
-    """
-    pass

@@ -46,7 +46,7 @@ i__(''' [01]_ Load Sums
 
                         2
                     d w
-             M = -EI ───                                 
+             M = -EI ───                                   
                         2
                     dx 
 
@@ -58,8 +58,7 @@ i__(''' [01]_ Load Sums
     
     
     Render equations
-    ----------------
-    
+    ---------------- 
     || latex : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
     ACI 318-05 5.5.1
 
@@ -76,8 +75,8 @@ i__(''' [01]_ Load Sums
     Some added text xxxx is put here and a bit of nonsense to make some words
     for a paragraph.
 
-    Insert table from csv and rst files
-    ------------------------------------
+    Insert table or text from csv, rst or txt files
+    -----------------------------------------------
     || table : 50 | mercalli.csv   
     Rebar Table from CSV file
     
@@ -115,7 +114,9 @@ i__(''' [01]_ Load Sums
 
 v__(''' some values 
     
-    || values | inline | Steel Properties
+    Some text about the values.
+    
+    || values | inline | noprint | Steel Properties
     a11 = 12.23                 | description 1 
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
@@ -123,28 +124,34 @@ v__(''' some values
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
 
+
+    values from file
     || values | 0103_testvalues.py | Rebar Properties
 
     a11 ==                      | reprint a value
 
     ''')
 
-e__(''' equations header
+list_values()
+
+e__(''' equations string
     
     Some introductory text.  Set equation format.
 
-    || format | equ:2,ans:2,chk:0,prt:2
-    
                                             ACI 318-05 1.1 [r]_
-    aa1 = a11*14                    
+    aa1 = a11*14
+    unit1:FT*LBS,unit2:N*M,prec:22,prt:2,num:yes,chk:< 1
 
     aa2 = a11*14  
 
                                             ACI 318-05 1.2 [r]_
     aa3 = (aa2 * 5)/a11             
     
-    aa4 = BEAM1 * 7.2  
-    
+    aa4 = BEAM1 * 7.2
+
+    || func | scripts1.py | pin_pin(a11, a22)
+    ans:2,doc:no
+
     ''')
 #%%
 i__(''' [02]_ Seismic Analysis
