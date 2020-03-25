@@ -64,6 +64,7 @@ import os
 import sys
 import textwrap
 import logging
+import numpy
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
@@ -264,10 +265,15 @@ def list_values():
                 i[1] = i[1][0:4] + ["..."]
             else:
                 pass
-    print("."*70)
+        if isinstance(i[1], numpy.ndarray):
+            if numpy.size(i[1]) > 3:
+                i[1] = numpy.hstack([i[1][:4],["..."]])
+            else:
+                pass    
+    print("." * _setsectD["swidth"] + "\n")
     print("All Currently Defined Variables and Values")                
     print(tabulate(rivetL, tablefmt="grid", headers=["variable", "value"]))
-    print("."*70)
+    print("." * _setsectD["swidth"])
 
 def py_values():
     """ write rivet independent python file of calculation values

@@ -516,14 +516,20 @@ class ValueU:
             for v in vL[1:]:
                 vS = v.split("|")
                 if "<=" in vS[0]:
-                    varlS = vS[0].split("<=")[0].strip() 
+                    varlS = vS[0].split("<=")[0].strip()
                     cmdS, descripS = self.v_lookup(v)
+                    print(99,cmdS)
                     exec(cmdS, globals(), self.rivetD)
                     locals().update(self.rivetD)
-                    if len(eval(varlS)) > 3:
-                        trimL= eval(varlS)[:3] + ["..."]
+                    tempS = cmdS.split("array")[1].strip()
+                    tempS = eval(tempS.strip(")").strip("("))
+                    print(90, len(tempS))
+                    if len(tempS) > 3:
+                        trimL= tempS[:3]
+                        trimL.append("...")
                     else:
-                        trimL = eval(varlS)
+                        trimL = tempS
+                        print(94)
                     valL.append([varlS, trimL, descripS])
                     continue
                 varS = vS[0].split("=")[0].strip()
@@ -543,10 +549,12 @@ class ValueU:
                 vS = v.split("#")
                 varS = vS[0].split("=")[0].strip()
                 valS = vS[0].split("=")[1].strip()
+                arrayS = "array(" + valS + ")"                
                 descripS = vS[1].strip()
-                valL.append([varS, valS, descripS])
-                exec(vS[0].strip(), globals(), self.rivetD)
+                cmdS = str(varS + " = " + arrayS + "   # " + descripS + "\n")
+                exec(cmdS, globals(), self.rivetD)
                 locals().update(self.rivetD)
+                valL.append([varS, valS, descripS])
         else:
             print(vL[0]); self.calcS += vL[0] + "\n"
         
@@ -583,7 +591,7 @@ class ValueU:
             for i in range(rowI):
                 rowL = next(reader)
             rowL = list(next(reader))
-        cmdS = varS + "=" + str(rowL)
+        cmdS = varS + "= array(" + str(rowL) + ")"
 
         return (cmdS, descripS)
 
