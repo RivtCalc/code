@@ -113,7 +113,6 @@ i__(''' [01]_ Load Sums
     ''')
 
 v__(''' some values 
-    
     Some text about the values.
     
     || values | inline | print | Steel Properties
