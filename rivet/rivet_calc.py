@@ -81,6 +81,7 @@ from tabulate import tabulate
 from pathlib import Path
 from rivet.rivet_unit import *
 
+
 def _tags(tagS: str, calcS: str, sectD: dict) -> str:
     """parse tags
     
@@ -455,7 +456,6 @@ class ValueU:
             sectD (dict):
             rivetD (list): local() dictionary
          """
-        locals().update(self.rivetD)
 
         endflgB = False; vL = []; indxI = -1
         vcmdL = ["values"]
@@ -518,19 +518,21 @@ class ValueU:
                 if "<=" in vS[0]:
                     varlS = vS[0].split("<=")[0].strip() 
                     cmdS, descripS = self.v_lookup(v)
-                    exec(cmdS, {}, self.rivetD)
+                    exec(cmdS, globals(), self.rivetD)
                     locals().update(self.rivetD)
-                    trimL= eval(varlS)[:3] +["..."]
+                    if len(eval(varlS)) > 3:
+                        trimL= eval(varlS)[:3] + ["..."]
+                    else:
+                        trimL = eval(varlS)
                     valL.append([varlS, trimL, descripS])
                     continue
                 varS = vS[0].split("=")[0].strip()
                 valS = vS[0].split("=")[1].strip()
-                if "[" in valS: valS = eval(valS)
+                arrayS = "array(" + valS + ")"
                 descripS = vS[1].strip()
-                pyS = str(varS + " = " + valS +  
-                        "   # " + descripS + "\n")
-                pyS += pyS
-                exec(vS[0].strip(),{},self.rivetD)
+                cmdS = str(varS + " = " + arrayS + "   # " + descripS + "\n")
+                pyS += cmdS
+                exec(cmdS,globals(),self.rivetD)
                 locals().update(self.rivetD)
                 valL.append([varS, valS, descripS])
         elif ".py" in vpL[1]:
@@ -543,7 +545,7 @@ class ValueU:
                 valS = vS[0].split("=")[1].strip()
                 descripS = vS[1].strip()
                 valL.append([varS, valS, descripS])
-                exec(vS[0].strip(), {}, self.rivetD)
+                exec(vS[0].strip(), globals(), self.rivetD)
                 locals().update(self.rivetD)
         else:
             print(vL[0]); self.calcS += vL[0] + "\n"
@@ -624,21 +626,21 @@ class EquationU:
 
         endflgB = False; etmpS = ""; eL = []; indxI = -1
         ecmdL = ["func", "equation"]
-        attribL =  [self.e_function, self.e_result, self.e_symbol, self.e_sub]
+        attribL = [self.e_function, self.e_result, self.e_symbol, self.e_sub]
 
         for eS in self.strL:
             if eS[0:2] == "##":  continue          # remove review comment
             eS = eS[4:]                            # remove 4 space indent
             if len(eS.strip()) == 0:               # if empty line                   
                 print("\n"); self.calcS += "\n"
-                if endflgB:                            # add next line
+                if endflgB:                        # add next line
                     eL.append(eS.strip())
-                    attribL[indxI](eL)                  # call attribute from list                           
+                    attribL[indxI](eL)             # call attribute from list                           
                     endflgB = False; etmpS = ""; eL = []; indxI = -1
                 continue
             if endflgB:
                 eL.append(eS.strip()); continue
-            if "||" in eS:                          # process command
+            if "||" in eS:                         # process command
                 eL = eS[2:].split("|")
                 callS = ((eL[0].split(":"))[0]).strip()
                 indxI = ecmdL.index(callS)            
@@ -674,21 +676,21 @@ class EquationU:
         efS = eL[1].strip()
         formatD = dict(efS.split(":") for efS in efS.split(","))
         print(77, formatD)
-        self.cmdD.update(formatD); formatS = self.cmdD["equ"].strip() 
+        self.cmdD.update(formatD) 
+        formatS = str(self.cmdD["prec1"].strip()) 
         exec("set_printoptions(precision=" + formatS + ")")
         exec("Unum.VALUE_FORMAT = '%." + formatS + "f'")
-
-        cmdS = eS; exec(cmdS, {}, self.rivetD)
+        cmdS = eS; exec(cmdS, globals(), self.rivetD)
         locals().update(self.rivetD)
         resS = eS.split("=")[0].strip()
         typeE = type(eval(resS))
         if typeE == list or typeE == tuple:
-            tmp1 = eval(var0)
+            eF = eval(resS)
             self._write_utf((var0 + " = "), 1)
             self._write_utf(' ', 0)
             plist1 = ppr.pformat(tmp1, width=40)
             self._write_utf(plist1, 0, 0)
-        elif typeE == Unum:
+        if typeE == Unum:
             exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
             if len(cunit) > 0:
                 tmp = eval(var0).au(eval(cunit))

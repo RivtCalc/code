@@ -116,17 +116,17 @@ v__(''' some values
     
     Some text about the values.
     
-    || values | inline | noprint | Steel Properties
-    a11 = 12.23                 | description 1 
+    || values | inline | print | Steel Properties
+    a11 = 12.23*IN                 | description 1 
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
-    BEAM1 <= aisc13.csv[4]      | steel property vector 
+    BEAM1 <= aisc13.csv[4]      | steel vector from file 
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
-
+    V_1 = [1,4,3]*FT            | a vector
 
     values from file
-    || values | 0103_testvalues.py | Rebar Properties
+    || values | 0103_testvalues.py | noprint |Rebar Properties
 
     a11 ==                      | reprint a value
 
@@ -139,8 +139,8 @@ e__(''' equations string
     Some introductory text.  Set equation format.
 
                                             ACI 318-05 1.1 [r]_
-    aa1 = a11*14
-    unit1:FT*LBS,unit2:N*M,prec:22,prt:2,num:yes,chk:< 1
+    aa1 = a11*6
+    uni1:IN,uni2:M,chk:< 1,prec1:2,prec2:2,num:True,prt:2
 
     aa2 = a11*14  
 

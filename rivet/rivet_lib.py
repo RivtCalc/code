@@ -119,9 +119,8 @@ _setsectD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2
 "swidth": 80}
 
 # command settings
-_setcmdD = {"cwidth": 60, "scale1": 1, "scale2": 1,
-        "row": "[:]", "col": "[:]", 
-        "equ": 2, "ans": 2 , "chk": 0, "prt": 2}
+_setcmdD = {"cwidth": 60, "scale1": 1, "scale2": 1, "row": "[:]", "col": "[:]", 
+    "uni1": "", "uni2": "", "prec1": 2, "prec2": 2, "chk": "", "num": True, "prt": 0}
 
 def shorten_path(file_path: str, length: int)-> str:
     """split path and return path of depth = length
@@ -261,7 +260,10 @@ def list_values():
     rivetL = [[k,v] for k,v in _rivetD.items()]
     for i in rivetL:
         if isinstance(i[1], list):
+            if len(i[1]) > 3:
                 i[1] = i[1][0:4] + ["..."]
+            else:
+                pass
     print("."*70)
     print("All Currently Defined Variables and Values")                
     print(tabulate(rivetL, tablefmt="grid", headers=["variable", "value"]))
