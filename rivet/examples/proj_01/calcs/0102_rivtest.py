@@ -139,7 +139,7 @@ e__(''' equations string
 
                                             ACI 318-05 1.1 [r]_
     aa1 = a11*6
-    unit:IN,alt:M,prec:2,trim:2,,chk:< 1,num:True
+    unit:IN,alt:M,prec:2,trim:2,,chk:< 1,num:True,prt:0
 
     aa2 = a11*14  
 

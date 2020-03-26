@@ -133,7 +133,7 @@ class RepoU:
         folderD (dict): folder structure
         sectD (dict): header information
     """
-    def __init__(self, strL :list,  sectD :dict, folderD :dict) -> str:
+    def __init__(self, strL :list, folderD :dict, sectD :dict) -> str:
         self.calcS = """"""
         self.strL = strL
         self.folderD = folderD
@@ -221,7 +221,7 @@ class InsertU:
         cmdD (dict): command settings
     """
 
-    def __init__(self, strL: list,  sectD: dict, folderD: dict, cmdD: dict):
+    def __init__(self, strL: list, folderD: dict, cmdD: dict, sectD: dict):
         self.calcS = """"""
         self.strL = strL
         self.folderD = folderD
@@ -429,32 +429,36 @@ class ValueU:
         
     Attributes:
         strL (list): rivet strings
-        exportL (list) : values for export
-        sectD (dict): header information
+        exportS (string) : values for export
         folderD (dict): folder structure
+        setsectD (dict): section settings
+        setcmdD (dict): command settings
         rivetD (dict) : rivet calculation variables
 
     """
  
-    def __init__(self, strL: list, sectD: dict, folderD: dict, rivetD: dict):
+    def __init__(self, strL: list, folderD: dict, setcmdD: dict,
+                setsectD: dict, rivetD: dict, exportS: str):
         """convert value-string to utf-calc string
         
         """
         self.calcS = """"""
-        self.exportS = """"""
+        self.exportS = exportS
         self.strL = strL
-        self.folderD = folderD
-        self.sectD = sectD
         self.rivetD = rivetD
-          
+        self.folderD = folderD
+        self.setsectD = setsectD
+        self.setcmdD = setcmdD
+
     def v_parse(self)-> tuple:
         """parse strings of type value
 
         Return:
             calcS (list): utf formatted calc strings
             exportS (list): 
-            sectD (dict):
-            rivetD (list): local() dictionary
+            rivetD (list): calculation values
+            setsectD (dict): section settings
+            setcmdD (dict): command settings
          """
 
         endflgB = False; vL = []; indxI = -1
@@ -487,18 +491,18 @@ class ValueU:
                 utfS = str.ljust(varS + " = " + valS, 40) + " | " + descripS
                 print(utfS); self.calcS += utfS + "\n" ; continue
             if "]_" in vS:                          # process a tag
-                if "[#]_" in vS:
+                if "[#]_" in vS:                    # find footnote tag
                     vS = vS.replace("[#]_", "[" + 
                         str(self.sectD["footque"][-1]) + "]" )
                     print(vS); self.calcS += vS + "\n"
-                    incrI = self.sectD["footque"][-1] + 1
-                    self.sectD["footque"].append(incrI)
+                    incrI = self.setsectD["footque"][-1] + 1
+                    self.setsectD["footque"].append(incrI)
                 else:
                     self.calcS = _tags(vS, self.calcS, self.sectD); continue  
             else: 
                 print(vS); self.calcS += vS + "\n"
         
-        return (self.calcS, self.exportS, self.sectD, self.rivetD)
+        return (self.calcS, self.setsectD, self.rivetD, self.exportS, )
         
     def v_assign(self, vL: list):
         """assign values to variables
@@ -600,41 +604,42 @@ class EquationU:
 
     """
 
-    def __init__(self, strL: list, exportS: str, sectD: dict, 
-                           folderD: dict, rivetD: dict, cmdD: dict):     
+    def __init__(self, strL: list, folderD: dict, setcmdD: dict,
+                setsectD: dict, rivetD: dict, exportS: str):     
         """convert rivet string type **equation** to utf-calc string
         
         Args:
             strL (list): rivet strings
-            sectD (dict): header information
+            rivetD (dict): rivet calculation values
             folderD (dict): folders
-            rivetD (dict): rivet calculation variables
             exportS (str): exported values
-            cmdD (dict): command settings
+            setcmdD (dict): command settings
+            setsectD (dict): section settings
+
         """
         self.calcS = """"""
         self.exportS = exportS
         self.strL = strL
         self.folderD = folderD
-        self.sectD = sectD
         self.rivetD = rivetD
-        self.cmdD = cmdD
+        self.setsectD = setsectD
+        self.setcmdD = setcmdD
 
     def e_parse(self) -> tuple:
         """parse strings of type equation
         
-        Return:
-                
+        Return:  
             calcS (list): utf formatted calc strings
             exportS (list): 
-            sectD (dict):
+            setsectD (dict): updated section settings
+            setcmdD (dict): updated command settings
             rivetD (list): local() dictionary
         """
         locals().update(self.rivetD)                
 
         endflgB = False; etmpS = ""; eL = []; indxI = -1
         ecmdL = ["func", "equation"]
-        attribL = [self.e_function, self.e_result, self.e_symbol, self.e_sub]
+        attribL = [self.e_symbol, self.e_table, self.e_sub, self.e_function]
 
         for eS in self.strL:
             if eS[0:2] == "##":  continue          # remove review comment
@@ -668,14 +673,53 @@ class EquationU:
                     incrI = self.sectD["footque"][-1] + 1
                     self.sectD["footque"].append(incrI)
                 else:
-                    self.calcS = _tags(eS, self.calcS, self.sectD); continue    
+                    self.calcS = _tags(eS, self.calcS, self.setsectD); continue    
             else:        
                 print(eS); self.calcS += eS + "\n"
         
-        return (self.calcS, self.exportS, self.sectD, 
-                                    self.rivetD, self.cmdD)
+        return (self.calcS, self.setsectD, self.rivetD, self.exportS)
+  
+    def e_symbol(self, epl: list, flag: int):
+        """[summary]
+    
+        Args:
+        epl (list): [description]
+        """
+        locals().update(self.rivetd)
+        utfs = epl[0].strip(); descrips = epl[3]; pard = dict(epl[1])
+        vars = utfs.split("=")
+        results = vars[0].strip() + " = " + str(eval(vars[1]))
+        eqnums = (" [ " + self.paramd["sectnum"] + "." + 
+                                self.paramd["eqnum"] + " ] ")
+        print(" "); self.calcl.append(" ") 
+        ehdr = (descrips + " [ " + results + " ] " + 
+            " [ " + eqnums + " ] ").rjust(self.paramd["swidth"])
+        print((ehdr)); self.calcl.append("ehdr") 
+        print(" "); self.calcl.append(" ")       
+        try: 
+            eps = "Eq(" + epl[0] +",(" + epl[1] +"))" 
+            #sps = sps.encode('unicode-escape').decode()
+            utfs = sp.pretty(sp.sympify(eps, _clash2, evaluate=False))
+            print(utfs); self.calcl.append(utfs)
+        except:
+            print(utfs); self.calcl.append(utfs)
 
-    def e_result(self, eL):
+        try: self.equl.append(" # " + epl[3].strip())       # export eq to py
+        except: pass
+        self.equl.append(epl[0].strip())
+        self.rivetd.update(locals())
+        if flag == 2: eq_sub(epl, eps)      # substitute variable with number
+        if pard["c"] != 0: eq_chk(results, pard["c"])   # check result                                  self.rivetD, self.cmdD)
+
+    def e_table(self, eL):
+        """ process equations and write tables
+        
+        Args:
+            eL ([type]): [description]
+        
+        Returns:
+            [type]: [description]
+        """
 
         locals().update(self.rivetD)
         
@@ -684,7 +728,8 @@ class EquationU:
         efS = eL[1].strip()
         formatD = dict(efS.split(":") for efS in efS.split(","))
         print(77, formatD)
-        self.cmdD.update(formatD) 
+        if self.setcmdD["default"] == True:
+                self.setcmdD.update(formatD) 
         formatS = str(self.cmdD["prec1"].strip()) 
         exec("set_printoptions(precision=" + formatS + ")")
         exec("Unum.VALUE_FORMAT = '%." + formatS + "f'")
@@ -727,39 +772,14 @@ class EquationU:
 
         return (self.calcS, self.exportS, self.sectD, self.rivetD)
 
-    def e_symbol(self, epl: list, flag: int):
-        """[summary]
+    def e_sub(self, epl: list, eps: str):
+        """process equations and substitute variables
         
         Args:
             epl (list): [description]
+            eps (str): [description]
         """
-        locals().update(self.rivetd)
-        utfs = epl[0].strip(); descrips = epl[3]; pard = dict(epl[1])
-        vars = utfs.split("=")
-        results = vars[0].strip() + " = " + str(eval(vars[1]))
-        eqnums = (" [ " + self.paramd["sectnum"] + "." + 
-                                self.paramd["eqnum"] + " ] ")
-        print(" "); self.calcl.append(" ") 
-        ehdr = (descrips + " [ " + results + " ] " + 
-            " [ " + eqnums + " ] ").rjust(self.paramd["swidth"])
-        print((ehdr)); self.calcl.append("ehdr") 
-        print(" "); self.calcl.append(" ")       
-        try: 
-            eps = "Eq(" + epl[0] +",(" + epl[1] +"))" 
-            #sps = sps.encode('unicode-escape').decode()
-            utfs = sp.pretty(sp.sympify(eps, _clash2, evaluate=False))
-            print(utfs); self.calcl.append(utfs)
-        except:
-            print(utfs); self.calcl.append(utfs)
-
-        try: self.equl.append(" # " + epl[3].strip())       # export eq to py
-        except: pass
-        self.equl.append(epl[0].strip())
-        self.rivetd.update(locals())
-        if flag == 2: eq_sub(epl, eps)      # substitute variable with number
-        if pard["c"] != 0: eq_chk(results, pard["c"])   # check result
-
-    def e_sub(self, epl: list, eps: str):
+        
 
         locals().update(self.rivetd)
         utfs = epl[0].strip(); descrips = epl[3]; pard = dict(epl[1])
@@ -815,9 +835,6 @@ class EquationU:
         except:
             pass   
 
-    def e_chk(self, compare):
-        pass
-
     def e_function(self):
         pass
 
@@ -827,25 +844,29 @@ class TableU:
     Returns utf string of table results
     """
  
-    def __init__(self, tlist: list, rivetD: dict, \
-                     folders: dict, setD: list):    
+    def __init__(self, strL: list, folderD: dict, setcmdD: dict,
+                        setsectD: dict, rivetD: dict):       
         """
 
         Args:
             tlist (list): list of input lines in table string
         """
+        
+        self.calcS = """"""
+        self.strL = strL
         self.rivetD = rivetD
+        self.folderD = folderD
+        self.setcmdD = setcmdD
+        self.setsectD = setsectD
         self.tcalc = []
-        self.tlist = tlist
-        self.folderd = folders
-        self.setD = setD["cwidth"]
+        self.tlist = []
 
         try:
             plt.close()
         except:
             pass
 
-    def t_str(self) -> tuple:
+    def t_parse(self) -> tuple:
         """compose utf calc string for values
 
         Return:
@@ -905,7 +926,7 @@ class TableU:
                 self.tcalc.append(tline1)
         
         eq1 = []
-        return locals(), self.tcalc, eq1
+        return (self.calcS, self.setsectD, self.rivetD)
        
     def t_read(self, tline1: str) -> str:
         """[summary]

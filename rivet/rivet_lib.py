@@ -121,7 +121,10 @@ _setsectD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2
 
 # command settings
 _setcmdD = {"cwidth": 60, "scale1": 1, "scale2": 1, "row": "[:]", "col": "[:]", 
-    "uni1": "", "uni2": "", "prec1": 2, "prec2": 2, "chk": "", "num": True, "prt": 0}
+    "unit": "", "alt": "", "prec": 2, "trim": 2, "chk": "", "prt": 0,
+    "num": True, "default": False}
+
+_exportS = """"""
 
 def shorten_path(file_path: str, length: int)-> str:
     """split path and return path of depth = length
@@ -154,7 +157,7 @@ _rshort = shorten_path(_rbak, 4)
 logging.info(f"""backup file written : {_rshort}""")
 # TODO: call check on folder structure here
 
-def _updatehdr(hdrS:str):
+def _update(hdrS:str):
     """update section dictionary
     
     Arguments:
@@ -182,11 +185,11 @@ def r__(rawstrS: str):
     """
     global  _utfcalcS, _setsectD, _rivetD
     
-    hdrS,strS = rawstrS.split("\n",1)
-    if "]_" in hdrS: _updatehdr(hdrS)
+    sectS,strS = rawstrS.split("\n",1)
+    if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    rcalc = _rivcalc.RepoU(strL, _setsectD, _foldD) 
+    rcalc = _rivcalc.RepoU(strL, _foldD, _setsectD) 
     rcalcS = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
@@ -198,11 +201,11 @@ def i__(rawstrS: str):
     """
     global _utfcalcS, _setsectD, _foldD, _setcmdD
 
-    hdrS,strS = rawstrS.split("\n",1)
-    if "]_" in hdrS: _updatehdr(hdrS)
+    sectS,strS = rawstrS.split("\n",1)
+    if "]_" in sectS: _update(sectS)
 
     strL = strS.split("\n")
-    icalc = _rivcalc.InsertU(strL, _setsectD, _foldD, _setcmdD) 
+    icalc = _rivcalc.InsertU(strL, _foldD, _setcmdD, _setsectD) 
     icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
@@ -212,43 +215,43 @@ def v__(rawstrS: str):
     Args:
         rawstr (str): value-string
     """
-    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportL
+    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
 
-    hdrS,strS = rawstrS.split("\n",1)
-    if "]_" in hdrS: _updatehdr(hdrS)
+    sectS,strS = rawstrS.split("\n",1)
+    if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    vcalc = _rivcalc.ValueU(strL, _setsectD, _foldD, _rivetD)
-    vcalcS, _exportS, _setsectD, _rivetD = vcalc.v_parse()
+    vcalc = _rivcalc.ValueU(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    vcalcS, _setsectD, _rivetD, _exportS = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
 def e__(rawstrS: str):
     """evaluate and format an equations rivet-string
 
     """
-    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportL
+    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
 
-    hdrS,strS = rawstrS.split("\n",1)
-    if "]_" in hdrS: _updatehdr(hdrS)
+    sectS,strS = rawstrS.split("\n",1)
+    if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    ecalc = _rivcalc.EquationU(strL, _exportL, _setsectD, _foldD, _rivetD, _setcmdD)
-    ecalcS, _exportS, _setsectD, _rivetD = ecalc.e_parse()
+    ecalc = _rivcalc.EquationU(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    ecalcS, _setsectD, _rivetD, _exportS = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
 def t__(rawstrS: str):
     """evaluate and format a tables rivet-string
     
     """
-    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportL
+    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD
 
-    hdrS,strS = rawstrS.split("\n",1)
-    if "]_" in hdrS: _updatehdr(hdrS)
+    sectS,strS = rawstrS.split("\n",1)
+    if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    tcalc = _rivcalc.TableU(strL, _setsectD, _foldD, _exportL, _rivetD)
-    vcalcS, _imgD, _tableD = vcalc.i_parse()
-    _utfcalcS = _utfcalcS + vcalcS
+    tcalc = _rivcalc.TableU(strL, _foldD, _setcmdD, _setsectD, _rivetD)
+    tcalcS, _setsectD, _rivetD = tcalc.t_parse()
+    _utfcalcS = _utfcalcS + tcalcS
 
 def x__(str0: str):
     """ skip execution of string
