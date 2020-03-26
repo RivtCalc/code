@@ -271,7 +271,7 @@ def list_values():
             else:
                 pass    
     print("." * _setsectD["swidth"] + "\n")
-    print("All Currently Defined Variables and Values")                
+    print("All Defined Variables")                
     print(tabulate(rivetL, tablefmt="grid", headers=["variable", "value"]))
     print("." * _setsectD["swidth"])
 

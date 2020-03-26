@@ -32,5 +32,6 @@
 .DS_Store?
 .VSCodeCounter
 .vscode
+.spyproject
 settings.json
 
