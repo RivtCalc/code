@@ -112,17 +112,18 @@ _foldD: dict = {
 _rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
 
+# command settings
+_setcmdD = {"cwidth": 60, "scale1": 1, "scale2": 1, "row": "[:]", "col": "[:]", 
+    "unit": "", "alt": "", "prec": 2, "trim": 2, "chk": "", 
+    "sub": False, "num": True, "default": False}
+
 # section settings
 _setsectD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2:4],
 "sectnum": 0, "sectname": "",
 "eqnum":  0, "fignum": 0, "tablenum" : 0,
-"footnum": 0,"footnote": 0,"footque": deque([1]),
+"footnum": 0,"footnote": 0,"footqueL": deque([1]),
 "swidth": 80}
 
-# command settings
-_setcmdD = {"cwidth": 60, "scale1": 1, "scale2": 1, "row": "[:]", "col": "[:]", 
-    "unit": "", "alt": "", "prec": 2, "trim": 2, "chk": "", "prt": 0,
-    "num": True, "default": False}
 
 _exportS = """"""
 
@@ -189,8 +190,8 @@ def r__(rawstrS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    rcalc = _rivcalc.RepoU(strL, _foldD, _setsectD) 
-    rcalcS = rcalc.r_parse()
+    rcalc = _rivcalc.R_utf(strL, _foldD, _setsectD) 
+    rcalcS, _setsectD = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
 def i__(rawstrS: str):
@@ -205,7 +206,7 @@ def i__(rawstrS: str):
     if "]_" in sectS: _update(sectS)
 
     strL = strS.split("\n")
-    icalc = _rivcalc.InsertU(strL, _foldD, _setcmdD, _setsectD) 
+    icalc = _rivcalc.I_utf(strL, _foldD, _setcmdD, _setsectD) 
     icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
@@ -221,7 +222,7 @@ def v__(rawstrS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    vcalc = _rivcalc.ValueU(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    vcalc = _rivcalc.V_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
     vcalcS, _setsectD, _rivetD, _exportS = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
@@ -235,7 +236,7 @@ def e__(rawstrS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    ecalc = _rivcalc.EquationU(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    ecalc = _rivcalc.E_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
     ecalcS, _setsectD, _rivetD, _exportS = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
@@ -249,7 +250,7 @@ def t__(rawstrS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    tcalc = _rivcalc.TableU(strL, _foldD, _setcmdD, _setsectD, _rivetD)
+    tcalc = _rivcalc.T_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD)
     tcalcS, _setsectD, _rivetD = tcalc.t_parse()
     _utfcalcS = _utfcalcS + tcalcS
 
@@ -273,10 +274,11 @@ def list_values():
                 i[1] = numpy.hstack([i[1][:4],["..."]])
             else:
                 pass    
-    print("." * _setsectD["swidth"] + "\n")
-    print("All Defined Variables")                
-    print(tabulate(rivetL, tablefmt="grid", headers=["variable", "value"]))
     print("." * _setsectD["swidth"])
+    print("All Defined Variables")
+    print("." * _setsectD["swidth"])                
+    print(tabulate(rivetL, tablefmt="grid", headers=["variable", "value"]))
+    print("." * _setsectD["swidth"] + "\n")
 
 def py_values():
     """ write rivet independent python file of calculation values

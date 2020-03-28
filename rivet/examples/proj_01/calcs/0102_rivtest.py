@@ -60,7 +60,7 @@ i__(''' [01]_ Load Sums
     Render equations
     ---------------- 
     || latex : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
-    ACI 318-05 5.5.1
+    ACI 318-05 5.5.1 [r]_
 
     ACI 318-05 5.5.2 [r]_
     || sympy : 1 | x = (12 + omega + α) / (14 + gamma)  
@@ -116,7 +116,7 @@ v__(''' some values
     Some text about the values.
     
     || values | inline | print | Steel Properties
-    a11 = 12.23*IN                 | description 1 
+    a11 = 12.23*IN              | description 1 
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
     BEAM1 <= aisc13.csv[4]      | steel vector from file 
@@ -138,8 +138,8 @@ e__(''' equations string
     Some introductory text.  Set equation format.
 
                                             ACI 318-05 1.1 [r]_
-    aa1 = a11*6
-    unit:IN,alt:M,prec:2,trim:2,,chk:< 1,num:True,prt:0
+    aa1 = a11*6*IN
+    unit:IN,alt:M,prec:2,trim:2,num:True,prt:0
 
     aa2 = a11*14  
 
@@ -148,8 +148,8 @@ e__(''' equations string
     
     aa4 = BEAM1 * 7.2
 
-    || func | scripts1.py | pin_pin(a11, a22)
-    ans:2,doc:no
+    | func | scripts1.py | pin_pin(a11, a22)
+    prec:2,doc:no
 
     ''')
 #%%
