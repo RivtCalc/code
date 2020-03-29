@@ -203,32 +203,31 @@ e__(''' some equations
 
     ''')
 #%%
-t__(''' [03]_ Manipulate Tables (dataframes) and Plots    
+t__(''' [03]_ Manipulate tables (dataframes) and plots    
 
     create a dataframe
     -------------------    
-    || T2 | define | description
+    || define | T2 | description
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
-    || save | test3.csv | T2 
+    || save | T2 | test2.csv
     
     read csv file into dataframe
     ----------------------------
-    || T3 | test1.csv | description
-    || T3_1 | select | cols = [], rows = []
+    || read | T3 | test1.csv
 
-    insert a table from dataframe
-    -----------------------------
-    || table : 20 | T3_1  
+    insert and save a table from dataframe
+    --------------------------------------
+    || insert : 20 | T3 | cols = [], rows = []
     Table title goes here
 
     plot data from csv file
-    ----------------------------
-    || P1 | plt1.csv | description
-    || P1 | plot | x:len1, y:area1, type:line, grid:true
-    || P1  | add | x:len1, y:prod1, c:blue 
-    || P1 | save | plt1.png
+    -----------------------
+    || read | P1 | plt1.csv
+    || plot | P1 | x:len1, y:area1, type:line, grid:true
+    || add | P1  | x:len1, y:prod1, c:blue 
+    || save | P1 | plt1.png
 
     insert a plot
     -------------
@@ -236,6 +235,7 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
     Plot title goes here
     ''')
 
+#list_values()
 #write_values()
 #write_utfcalc()
 #write_pdfdoc()
