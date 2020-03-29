@@ -88,11 +88,12 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
     Args:
         tagS (str): line from rivet string
     
-    List of tags (notes in paranthesis):
+    List of tags :
     [abc]_      (citation name)   
-    [#]_        (footnote number generator) 
     [page]_     (new doc page)
     [line]_     (draw horizontal line)
+    [link]_     (url link)
+    [foot]_     (footnote reference)
     [r]_        (right justify line of text)
     [c]_        (center line of text)
 
@@ -102,7 +103,7 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
         print(utfS); calcS += utfS + "\n"
         return calcS
     elif "[line]_" in tagS:
-        utfS = int(setsectD("swidth")) * '-'   
+        utfS = int(setsectD["swidth"]) * '-'   
         print(utfS); calcS += utfS + "\n"
         return calcS        
     elif "[r]_" in tagS:
@@ -121,14 +122,15 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
         print(utfS); calcS += utfS + "\n"
         return calcS
     elif "[cite]_" in tagS:
-        utfS = tagS.replace("]_","]")
+        rL = tagS.split("]_")
+        utfS = rL[1]
         print(utfS); calcS += utfS + "\n"
         return calcS
-        
     else:
-        tag = re.search(r"\[.*?\]_", tagS)
-        tagx = tag.group(0)
-        modline = tagS.replace(" " + tagx,"")
+        return tagS
+        #tag = re.search(r"\[.*?\]_", tagS)
+        #tagx = tag.group(0)
+        #modline = tagS.replace(" " + tagx,"")
 
 class R_utf:
     """convert repo-string to utf-calc string
@@ -173,17 +175,21 @@ class R_utf:
             # commands
             if rS[0] == "#" : continue              # remove comment 
             if rS[0:2] == "::" : continue           # remove preformat 
-            if "]_" in rS:                          # find tag
-                if "[#]_" in rS:
+            if "]_" in iS:                          # process a tag
+                if "[#]_" in iS:
+                    iS = iS.replace("[#]_", "[" + 
+                        str(self.setsectD["footqueL"][-1]) + "]" )
+                    print(iS); self.calcS += iS + "\n"
                     incrI = self.setsectD["footqueL"][-1] + 1
                     self.setsectD["footqueL"].append(incrI)
-                    rS = rS.replace("[#]_", "[" + 
-                        str(self.setsectD["footqueL"].popleft()) + "]" )
-                    print(rS); self.calcS += rS + "\n"
-                else:
-                    self.calcS = _tags(rS, self.calcS, self.setsectD)
+                    continue
+            elif any(tag in iS for tag in tagL):
+                self.calcS = _tags(iS, self.calcS, self.setsectD)
+                continue 
             else:
-                print(rS); self.calcS += rS + "\n"    
+                utfS = iS.replace("]_","]")
+                print(utfS); self.calcS += utfS + "\n"
+                continue    
 
         return (self.calcS, self.setsectD)
 
@@ -241,6 +247,8 @@ class I_utf:
         """
         endflgB = False; itmpS = ""; iL = []; indxI = -1
         icmdL = ["sympy", "latex", "table", "image", "image2"]
+        tagL =  ["[page]_", "[line]_", "[r]_", "[c]_", "[link]_", 
+                                "[cite]_", "[foot]_"] 
         attribL =  [self.i_sympy, self.i_latex, self.i_table, 
                     self.i_image, self.i_image2]
         for iS in self.strL:
@@ -251,7 +259,6 @@ class I_utf:
                     attribL[indxI](iL)                  # call attribute from list                           
                     endflgB = False; itmpS = ""; iL = []; indxI = -1
                     continue
-                print(10, self.calcS)
                 print("\n"); self.calcS += "\n"; continue      
             if endflgB:
                 iL.append(iS); continue
@@ -269,11 +276,14 @@ class I_utf:
                     print(iS); self.calcS += iS + "\n"
                     incrI = self.setsectD["footqueL"][-1] + 1
                     self.setsectD["footqueL"].append(incrI)
-                else:
-                    self.calcS = _tags(iS, self.calcS, self.setsectD) 
-                    continue    
-            else:   
-                print(iS); self.calcS += iS + "\n"
+                    continue
+            elif any(tag in iS for tag in tagL):
+                self.calcS = _tags(iS, self.calcS, self.setsectD)
+                continue 
+            else:
+                utfS = iS.replace("]_","]")
+                print(utfS); self.calcS += utfS + "\n"
+                continue    
 
         return self.calcS, self.setsectD, self.setcmdD
 
@@ -354,7 +364,7 @@ class I_utf:
         imgpathS = str(Path(self.folderD["fpath"], fileS))
         utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
                + captionS + "\npath: " + imgpathS + "\n")
-        print(utfS); self.calcS += utfS + "\n"
+        print(utfS+"\n"); self.calcS += utfS + "\n"
 
     def i_image2(self, iL: list):
         """insert two images side by side from files
@@ -362,7 +372,6 @@ class I_utf:
         Args:
             iL (list): image parameter list
         """
-        print(10)
         try:                                            # update default scale
             scaleI= iL[0].split(":")[1]
             scale1I = int(scaleI.split(","))[0].strip()
@@ -508,17 +517,21 @@ class V_utf:
                 valS = str(eval(varS))
                 utfS = str.ljust(varS + " = " + valS, 40) + " | " + descripS
                 print(utfS); self.calcS += utfS + "\n" ; continue
-            if "]_" in vS:                          # process a tag
-                if "[#]_" in vS:                    # find footnote tag
-                    vS = vS.replace("[#]_", "[" + 
-                        str(self.sectD["footqueL"][-1]) + "]" )
-                    print(vS); self.calcS += vS + "\n"
+            if "]_" in iS:                          # process a tag
+                if "[#]_" in iS:
+                    iS = iS.replace("[#]_", "[" + 
+                        str(self.setsectD["footqueL"][-1]) + "]" )
+                    print(iS); self.calcS += iS + "\n"
                     incrI = self.setsectD["footqueL"][-1] + 1
                     self.setsectD["footqueL"].append(incrI)
-                else:
-                    self.calcS = _tags(vS, self.calcS, self.setsectD); continue  
-            else: 
-                print(vS); self.calcS += vS + "\n"
+                    continue
+            elif any(tag in iS for tag in tagL):
+                self.calcS = _tags(iS, self.calcS, self.setsectD)
+                continue 
+            else:
+                utfS = iS.replace("]_","]")
+                print(utfS); self.calcS += utfS + "\n"
+                continue    
         
         return (self.calcS, self.setsectD, self.rivetD, self.exportS, )
         
@@ -687,17 +700,21 @@ class E_utf:
                 endflgB = True; continue            
             if eS[0] == "#" : continue             # remove comment 
             if eS[0:2] == "::" : continue          # remove preformat 
-            if "]_" in eS:                          # process a tag
-                if "[#]_" in eS:
-                    eS = eS.replace("[#]_", "[" + 
+            if "]_" in iS:                          # process a tag
+                if "[#]_" in iS:
+                    iS = iS.replace("[#]_", "[" + 
                         str(self.setsectD["footqueL"][-1]) + "]" )
-                    print(eS); self.calcS += eS + "\n"
+                    print(iS); self.calcS += iS + "\n"
                     incrI = self.setsectD["footqueL"][-1] + 1
                     self.setsectD["footqueL"].append(incrI)
-                else:
-                    self.calcS = _tags(eS, self.calcS, self.setsectD); continue    
-            else:        
-                print(eS); self.calcS += eS + "\n"
+                    continue
+            elif any(tag in iS for tag in tagL):
+                self.calcS = _tags(iS, self.calcS, self.setsectD)
+                continue 
+            else:
+                utfS = iS.replace("]_","]")
+                print(utfS); self.calcS += utfS + "\n"
+                continue    
         
         return (self.calcS, self.setsectD, self.rivetD, self.exportS)
   
@@ -868,8 +885,8 @@ class T_utf:
     Returns utf string of table results
     """
  
-    def __init__(self, strL: list, folderD: dict, setcmdD: dict,
-                        setsectD: dict, rivetD: dict):       
+    def __init__(self, strL: list, folderD: dict, 
+                        setcmdD: dict, setsectD: dict, rivetD: dict):       
         """
 
         Args:
@@ -899,58 +916,52 @@ class T_utf:
         """
         locals().update(self.rivet)
 
-        if ".xlsx" in ipl[2]:                   # excel file
-            df = pd.read_excel(filep, usecols = lambda x: x in list(col), 
-                            skiprows = lambda x: x not in list(rowl))
-            old_stdout = sys.stdout
-            output = StringIO()
-            output.write(tabulate(df, tablefmt="grid", headers="firstrow"))            
-            table1 = output.getvalue()
-            sys.stdout = old_stdout
-            #self.icalc.append("\n" + str(data1) + "\n")
-        else:
-            pass
-        
-        for tline in self.tlist:
-            globals().update(locals())
-            tline1 = tline[4:]
-            if len(tline1.strip()) == 0:
-                self.tcalc.append("\n")
+        locals().update(self.rivetD)                
+
+        endflgB = False; tL = []; indxI = -1
+        ecmdL = ["read", "save", "data", "table", "plot", "image", "image2" ]
+        attribL = [self.t_symbol, self.t_save, self.t_data, self.t_table,
+                                self.t_plot, self.t_image, self.t_image2]
+
+        for tS in self.strL:
+            tS = tS[4:].strip()                    # remove 4 space indent
+            if len(tS.strip()) == 0:               # empty line                   
+                if endflgB:                        # accumulate next line
+                    tL.append(tS.strip())
+                    attribL[indxI](tL)             # call attribute                           
+                    endflgB = False; ttmpS = ""; tL = []; indxI = -1
                 continue
-            exstr = ""
-            if "|" == tline1[0]: 
-                if " read " in tline1[:8]:
-                    exstr = self.t_read(tline1)
-                elif " write " in tline1[:8]:
-                    extstr = self.t_write(tline1)
-                elif " create " in tline1[:8]:
-                    exstr = self.t_create(tline1)
-                elif " insert " in tline1[:10]:
-                    self.t_insert(tline1)
-                elif " plot " in tline1[:8]:
-                    cmd1, cmd2 = self.t_plot(tline1)
-                    exec(cmd1)
-                    exec(cmd2)
-                    plt.savefig(self.pltfile)
-                else:
-                    self.tcalc.append(tline1)
-                exec(exstr)
-                continue
-            if "=" in tline1:
-                tline1a = tline1.split("|")
-                if len(tline1a) > 1:
-                    tcalc_eq = ""
-                    tcalc_eq = tline1a[0].strip() 
-                    exec(tcalc_eq)
-                    self.tcalc.append(tcalc_eq + " | " + tline1a[1])        
-                else:
-                    exec(tline1a[0])
-                    self.tcalc.append(tline1a)
-            else: 
-                self.tcalc.append(tline1)
+                print("\n"); self.calcS += "\n"
+            if endflgB:
+                eL.append(eS.strip()); continue
+            if "||" in eS:                         # command
+                eL = eS[2:].split("|")
+                callS = ((eL[0].split(":"))[0]).strip()
+                indxI = ecmdL.index(callS)            
+            if "=" in eS:                          # equation
+                eL.append(eS.strip())
+                callS = "equation"
+                indxI = ecmdL.index(callS)         
+                endflgB = True; continue            
+            if eS[0] == "#" : continue             # remove comment 
+            if eS[0:2] == "::" : continue          # remove preformat 
+            if "]_" in iS:                         # process a tag
+                if "[#]_" in iS:
+                    iS = iS.replace("[#]_", "[" + 
+                        str(self.setsectD["footqueL"][-1]) + "]" )
+                    print(iS); self.calcS += iS + "\n"
+                    incrI = self.setsectD["footqueL"][-1] + 1
+                    self.setsectD["footqueL"].append(incrI)
+                    continue
+            elif any(tag in iS for tag in tagL):
+                self.calcS = _tags(iS, self.calcS, self.setsectD)
+                continue 
+            else:
+                utfS = iS.replace("]_","]")
+                print(utfS); self.calcS += utfS + "\n"
+                continue       
         
-        eq1 = []
-        return (self.calcS, self.setsectD, self.rivetD)
+        return (self.calcS, self.setsectD, self.rivetD, self.exportS)
        
     def t_read(self, tline1: str) -> str:
         """[summary]
@@ -970,9 +981,10 @@ class T_utf:
         df = pd.read_csv(csvfiles, usecols = lambda x: x in list(col), 
                        skiprows = lambda x: x in list(rowl))     
         globals().update(locals())        
+        
         return cmdline
 
-    def t_write(self, tline1: str) -> str:
+    def t_save(self, tline1: str) -> str:
         """[summary]
         
         Args:
@@ -989,31 +1001,7 @@ class T_utf:
         
         return cmdline
 
-    def t_plot(self, tline1: str)-> list:
-        """[summary]
-        
-        Args:
-            tline (str): [description]
-        """                
-        tline1a = tline1.split("|")
-        tline1b = (tline1a[1].strip()).split(" ")
-        if len(tline1b) > 1:
-            self.pltname = tline1b[1]
-            filename = self.pltname + ".png"
-            filepath = self.folderd["fpath"]
-            self.pltfile = Path(filepath, filename).as_posix()
-            pltcmd = tline1a[2].strip()
-            cmdline1 = "ax = plt.gca()"
-            cmdline2 = self.pltname + ".plot(" + pltcmd + ", ax=ax)"
-        else:
-            pltcmd = tline1a[2].strip()
-            cmdline1 = ""
-            cmdline2 = self.pltname + ".plot(" + pltcmd + ", ax=ax)"
-
-        globals().update(locals())
-        return cmdline1, cmdline2
-
-    def t_create(self, tline1:str) -> str:
+    def t_data(self, tline1:str) -> str:
         """[summary]
         
         Args:
@@ -1027,7 +1015,7 @@ class T_utf:
         globals().update(locals())
         return cmdline
 
-    def t_insert(self, tline1: str):
+    def t_table(self, tline1: str):
         """[summary]
         
         Args:
@@ -1059,3 +1047,27 @@ class T_utf:
             self.tcalc.append(rstout)
 
             globals().update(locals())
+
+    def t_plot(self, tline1: str)-> list:
+        """[summary]
+        
+        Args:
+            tline (str): [description]
+        """                
+        tline1a = tline1.split("|")
+        tline1b = (tline1a[1].strip()).split(" ")
+        if len(tline1b) > 1:
+            self.pltname = tline1b[1]
+            filename = self.pltname + ".png"
+            filepath = self.folderd["fpath"]
+            self.pltfile = Path(filepath, filename).as_posix()
+            pltcmd = tline1a[2].strip()
+            cmdline1 = "ax = plt.gca()"
+            cmdline2 = self.pltname + ".plot(" + pltcmd + ", ax=ax)"
+        else:
+            pltcmd = tline1a[2].strip()
+            cmdline1 = ""
+            cmdline2 = self.pltname + ".plot(" + pltcmd + ", ax=ax)"
+
+        globals().update(locals())
+        return cmdline1, cmdline2

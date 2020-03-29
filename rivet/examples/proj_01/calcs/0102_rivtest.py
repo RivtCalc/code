@@ -172,7 +172,7 @@ i__(''' [02]_ Seismic Analysis
     the scale of their observations, as in macroscopic and microscopic
     frames of reference [CIT2000]_.
 
-    || cite | CIT2000 | citation text
+    [cite]_ CIT2000 | citation reference
 
     ''')
 
@@ -180,7 +180,6 @@ v__(''' some values
 
     || values | 0103_testvalues.py | Some Values
     
-
     this is one line 4 γ
   
     gg = 5.4    | height of roof 
@@ -199,7 +198,7 @@ e__(''' some equations
     
     [line]_
 
-    || link | http:google.com
+    [link]_ http:google.com
 
     ''')
 #%%
@@ -207,7 +206,7 @@ t__(''' [03]_ Manipulate tables (dataframes) and plots
 
     create a dataframe
     -------------------    
-    || define | T2 | description
+    || data | T2 | description
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
@@ -216,7 +215,7 @@ t__(''' [03]_ Manipulate tables (dataframes) and plots
     insert and save a table from dataframe
     --------------------------------------
     || read | test1.csv | T3
-    || insert : 20 | T3 | cols = [], rows = []
+    || table : 20 | T3 | cols = [], rows = []
     Table title goes here
 
     plot data from dataframe
