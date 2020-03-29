@@ -211,23 +211,20 @@ t__(''' [03]_ Manipulate tables (dataframes) and plots
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
-    || save | T2 | test2.csv
+    || save | test2.csv | T2
     
-    read csv file into dataframe
-    ----------------------------
-    || read | T3 | test1.csv
-
     insert and save a table from dataframe
     --------------------------------------
+    || read | test1.csv | T3
     || insert : 20 | T3 | cols = [], rows = []
     Table title goes here
 
-    plot data from csv file
-    -----------------------
-    || read | P1 | plt1.csv
+    plot data from dataframe
+    ------------------------
+    || read | plt1.csv | P1
     || plot | P1 | x:len1, y:area1, type:line, grid:true
     || add | P1  | x:len1, y:prod1, c:blue 
-    || save | P1 | plt1.png
+    || save | plt1.png | P1
 
     insert a plot
     -------------
