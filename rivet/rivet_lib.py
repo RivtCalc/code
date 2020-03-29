@@ -92,7 +92,7 @@ _ppath = Path(_rfull).parent.parent                 # project folder path
 _dpath = Path(_ppath / "docs")                      # doc folder path
 _rpath = Path(_ppath / "reports")                   # report folder path
 _txtfile = Path(_cpath / ".".join((_rname, "txt"))) # calc output
-_pyfile = Path(_cpath / "scripts" / "".join(("r", _rfile))) # pycalc export
+_pyfile = Path(_cpath / "scripts" / "".join(("v", _rfile))) # pycalc export
 
 # folders 
 _foldD: dict = {
@@ -113,9 +113,9 @@ _rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
 
 # command settings
-_setcmdD = {"cwidth": 60, "scale1": 1, "scale2": 1, "row": "[:]", "col": "[:]", 
+_setcmdD = {"cwidth": 50, "scale1": 1, "scale2": 1, "row": "[:]", "col": "[:]", 
     "unit": "", "alt": "", "prec": 2, "trim": 2, "chk": "", 
-    "sub": False, "num": True, "default": False}
+    "sub": False, "default": False}
 
 # section settings
 _setsectD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2:4],

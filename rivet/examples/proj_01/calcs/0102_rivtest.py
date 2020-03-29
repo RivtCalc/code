@@ -115,7 +115,7 @@ i__(''' [01]_ Load Sums
 v__(''' some values 
     Some text about the values.
     
-    || values | inline | print | Steel Properties
+    || values | inline | Steel Properties
     a11 = 12.23*IN              | description 1 
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
@@ -124,10 +124,9 @@ v__(''' some values
     I_y = BEAM1[3]              | I minor
     V_1 = [1,4,3]*FT            | a vector
 
-    values from file
-    || values | 0103_testvalues.py | noprint |Rebar Properties
-
-    a11 ==                      | reprint a value
+    one value from file
+    || values | 0103_testvalues.py | Rebar Properties
+    a11 ==                      
 
     ''')
 
@@ -148,8 +147,8 @@ e__(''' equations string
     
     aa4 = BEAM1 * 7.2
 
-    | func | scripts1.py | pin_pin(a11, a22)
-    prec:2,doc:no
+    | func | scripts1.py | pin_pin(a11, a22) | prec:2, unit:FT*LB, alt:N*M
+    | func | scripts1.py | fixed_fixed(a11, a22) | prec:2, unit:FT*LB, alt:N*M
 
     ''')
 #%%
@@ -179,8 +178,8 @@ i__(''' [02]_ Seismic Analysis
 
 v__(''' some values
 
-    || values | nodoc
-    0102_values.py
+    || values | 0103_testvalues.py | Some Values
+    
 
     this is one line 4 γ
   
@@ -192,14 +191,9 @@ v__(''' some values
 
 e__(''' some equations
 
-    || functions | nodoc
-    script1.py
-    script2.py
     
     equation reference [r]_
     xx1 = gg + 4     
-
-    || format |n:f 
 
     xx2 = hh + 10    
     
@@ -213,7 +207,7 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
 
     create a dataframe
     -------------------    
-    || data | inline | T2 | optional description
+    || T2 | define | description
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
@@ -221,24 +215,24 @@ t__(''' [03]_ Manipulate Tables (dataframes) and Plots
     
     read csv file into dataframe
     ----------------------------
-    || data | test1.csv  | T3 | optional description
-    || select | T3 | cols = [], rows = []
+    || T3 | test1.csv | description
+    || T3_1 | select | cols = [], rows = []
 
-    insert a table
-    --------------
-    || table : 20 | T3  
+    insert a table from dataframe
+    -----------------------------
+    || table : 20 | T3_1  
     Table title goes here
 
     plot data from csv file
     ----------------------------
-    || data | plt1.csv | P1 | optional description
-    || plot | P1 | x:len1, y:area1, type:line, grid:t
-    || add  | P1 | x:len1, y:prod1, c:blue 
-    || save | plt1.png | P1
+    || P1 | plt1.csv | description
+    || P1 | plot | x:len1, y:area1, type:line, grid:true
+    || P1  | add | x:len1, y:prod1, c:blue 
+    || P1 | save | plt1.png
 
     insert a plot
     -------------
-    || image : 1 | tb1.png  
+    || image : 1 | plt1.png  
     Plot title goes here
     ''')
 

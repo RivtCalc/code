@@ -98,7 +98,7 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
 
     """
     if "[page]_" in tagS:
-        utfS = "new page " + int(setsectD["swidth"]-9) * "."
+        utfS = int(setsectD["swidth"]) * "."
         print(utfS); calcS += utfS + "\n"
         return calcS
     elif "[line]_" in tagS:
@@ -121,7 +121,10 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
         print(utfS); calcS += utfS + "\n"
         return calcS
     elif "[cite]_" in tagS:
-        pass
+        utfS = tagS.replace("]_","]")
+        print(utfS); calcS += utfS + "\n"
+        return calcS
+        
     else:
         tag = re.search(r"\[.*?\]_", tagS)
         tagx = tag.group(0)
@@ -354,25 +357,36 @@ class I_utf:
         print(utfS); self.calcS += utfS + "\n"
 
     def i_image2(self, iL: list):
-        """insert image from file
+        """insert two images side by side from files
         
         Args:
-            ipl (list): parameter list
+            iL (list): image parameter list
         """
         print(10)
-        try:
+        try:                                            # update default scale
             scaleI= iL[0].split(":")[1]
             scale1I = int(scaleI.split(","))[0].strip()
             scale2I = int(scaleI.split(","))[1].strip()
+            self.setcmdD.update({"scale1":scale1I})
+            self.setcmdD.update({"scale2":scale2I})
         except:
             scale1I = self.setcmdD["scale1"]
             scale2I = self.setcmdD["scale2"]
-        self.setcmdD.update({"scale1":scaleI})
-        self.setsectD["fignum"] += 1
+        self.setsectD["fignum"] += 1                     # image 1
         figI = self.setsectD["fignum"]
         sectI = self.setsectD["sectnum"]
         fileS = iL[1].strip()
-        captionS = iL[2].strip()
+        captionS = iL[3].strip()
+        imgP = str(Path(self.folderD["fpath"], fileS))
+        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+               + captionS + "\npath: " + imgP)
+        print(utfS); self.calcS += utfS + "\n"
+
+        self.setsectD["fignum"] += 1                     # image 2
+        figI = self.setsectD["fignum"]
+        sectI = self.setsectD["sectnum"]
+        fileS = iL[2].strip()
+        captionS = iL[4].strip()
         imgP = str(Path(self.folderD["fpath"], fileS))
         utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
                + captionS + "\npath: " + imgP)
