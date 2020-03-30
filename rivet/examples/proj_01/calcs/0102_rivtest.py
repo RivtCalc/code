@@ -122,7 +122,7 @@ v__(''' some values
     BEAM1 |= aisc13.csv[2]      | steel column vector from file 
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
-    V_1 = [1,4,3]*FT            | a vector
+    V1 = [1,4,3]*FT            | a vector
 
     values from file
     || values | 0103_testvalues.py | Rebar Properties
@@ -140,7 +140,7 @@ e__(''' equations string
                                                         ACI 318-05 1.1 [r]_
     aa1 = a11*6*IN         | unit:IN,alt:M
     
-    aa2 = a11*14*IN        | unit:FT,alt:mm
+    aa2 = V1*14*IN        | unit:FT,alt:mm
 
                                                        ACI 318-05 1.2 [r]_
     aa3 = (aa2 * 5)/a11             
