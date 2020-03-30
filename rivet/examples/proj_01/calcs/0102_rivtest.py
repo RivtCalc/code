@@ -147,8 +147,8 @@ e__(''' equations string
     
     aa4 = BEAM1 * 7.2
 
-    | func | scripts1.py | pin_pin(a11, a22) | prec:2, unit:FT*LB, alt:N*M
-    | func | scripts1.py | fixed_fixed(a11, a22) | prec:2, unit:FT*LB, alt:N*M
+    | func | scripts1.py | pin_pin(a11, a22) | unit:FT*LB, alt:N*M
+    | func | scripts1.py | fixed_fixed(a11, a22) | unit:FT*LB, alt:N*M
 
     ''')
 #%%
