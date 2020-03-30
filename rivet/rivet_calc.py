@@ -14,8 +14,8 @@ values  : link
 equation: format, link
 table   : create, write, read, plot, add, save, {plus insert commands}
 
-detail
-------
+detail {notes}
+--------------
 r__('''r-string''') {repository and calc data}
     || summary | {toc} sections / functions  | {include} docstrings  
         {paragraph text}
@@ -23,43 +23,49 @@ r__('''r-string''') {repository and calc data}
         {csv list}
     || append           
         x.pdf {pdf file name}, {appendix title text}
-    || link | http:\\www.x {link text}
 i__('''i-string''') {insert text and images}
-    || text | x.txt {text file} | {indent n} i:n, (max width) w:65 
-    || tex  | {latex equation text}
-    || sym  | {sympy equation text}
-    || img  | x.png/x.jpg {image file} | {scale} s:1, {fig number} #:t(rue)/f(alse) 
-        figure title text
-    || table | inline | {table number} #:t{rue}/f{alse} 
-        table title text
-    || table | x.rst {file name} | {table number} #:t/f 
-        table title text
-    || table | n.csv {file name} | {row}r:[], {col}c:[], {max width}m:30, #:t/f  
-        table title text
-    || link | {http link text}
-    || cite | {citation text} | citation description text   
-    || foot | footnote description text
+    || latex : ss  {scale} | {latex equation text}
+    || sympy : ss | {sympy equation text}
+    || image2 : ss {scale} | x.png/x.jpg {image file} 
+    figure title text
+    || image : ss | x.png/x.jpg {image file} 
+    figure title text
+    || table : ww {width} | x.txt {text file} 
+    || table : ww | n.csv {file name} 
+    table title text
+    || table  | x.rst {file name}
+    table title text
+    || table  | inline 
+    table title text
 v__('''v-string''') {define values}
+    || values | 
 e__('''e-string''') {define equations}
     || format | {decimals}e:n, {result}r:n, {check}c:0, {print}p:0/1/2, #:t/f  
+    || func   | {decimals}e:n, {result}r:n, {check}c:0, {print}p:0/1/2, #:t/f  
 t__('''t-string''') (define tables and plots)
-    || create| table name
-    || write | .csv file name | table name 
-    || read  | .csv file name | table name
-    || plot | f.csv {file name} |(col names)x:c1,y:c2,(rows)r:[],(kind)k:line,(grid)g:t/f
+    || read   | .csv file name | table name
+    || save   | .csv file name | table name 
+    || data   | table name
+
+    || plot   | f.csv {file name} |(col names)x:c1,y:c2,(rows)r:[],(kind)k:line,(grid)g:t/f
     || add (data to plot) | (col names) x:c3, y:c4, (color)c:blue        
     || save | n.png / n.jpg {file names} | f {name from plot command} 
     {plus all insert commands}
 
-List of tags {notes in braces}:
-------------------------------
-    [abc]_      {citation name}   
-    [#]_        {# generates footnote number) 
-    [page]_     {new doc page)
-    [line]_     {draw horizontal line)
-    [r]_        {right justify line of text)
-    [c]_        {center line of text)
+List of tags {notes}:
+---------------------
+    [xyz123]_               {citation}   
+    [cite]_                 {citation description}
+    [#]_                    {footnote (auto)} 
+    [foot]_                 {footnote description}
+    [page]_                 {new page in docs)
+    [line]_                 {draw horizontal line)
+    [link]_  http://xyz     {url link}
+    [r]_                    {right justify line of text)
+    [re]_                   {right justify line of text and add equation number)
+    [c]_                    {center line of text)
 """
+
 import os
 import sys
 import csv
@@ -73,10 +79,10 @@ from numpy import *
 import numpy.linalg as la
 import pandas as pd
 import sympy as sp
-from sympy.parsing.latex import parse_latex
-from sympy.abc import _clash2
 import matplotlib.pyplot as plt 
 import matplotlib.image as mpimg
+from sympy.parsing.latex import parse_latex
+from sympy.abc import _clash2
 from tabulate import tabulate 
 from pathlib import Path
 from rivet.rivet_unit import *
@@ -155,6 +161,8 @@ class R_utf:
         endflgB = False; rtmpS = ""; rL = []; indxI = -1
         rcmdL = ["summary", "label", "append" ]
         methodL =  [self.r_summary, self.r_label, self.r_append]
+        tagL =  ["[page]_", "[line]_", "[r]_", "[rn]_", "[c]_",  
+                    "[link]_", "[cite]_", "[foot]_"] 
         
         for rS in self.strL:
             if rS[0:2] == "##":  continue           # remove review comment
@@ -175,23 +183,22 @@ class R_utf:
             # commands
             if rS[0] == "#" : continue              # remove comment 
             if rS[0:2] == "::" : continue           # remove preformat 
-            if "]_" in iS:                          # process a tag
-                if "[#]_" in iS:
-                    iS = iS.replace("[#]_", "[" + 
+            if "]_" in rS:                          # process a tag
+                if "[#]_" in rS:
+                    rS = rS.replace("[#]_", "[" + 
                         str(self.setsectD["footqueL"][-1]) + "]" )
-                    print(iS); self.calcS += iS + "\n"
+                    print(rS); self.calcS += rS + "\n"
                     incrI = self.setsectD["footqueL"][-1] + 1
-                    self.setsectD["footqueL"].append(incrI)
-                    continue
-            elif any(tag in iS for tag in tagL):
-                self.calcS = _tags(iS, self.calcS, self.setsectD)
-                continue 
+                    self.setsectD["footqueL"].append(incrI); continue
+            elif any(tag in rS for tag in tagL):
+                self.calcS = _tags(rS, self.calcS, self.setsectD); continue 
             else:
-                utfS = iS.replace("]_","]")
-                print(utfS); self.calcS += utfS + "\n"
-                continue    
+                utfS = rS.replace("]_","]")
+                print(utfS); self.calcS += utfS + "\n"; continue
+            print(rS); self.calcS += rS + "\n"     
 
         return (self.calcS, self.setsectD)
+
 
     def r_summary(self, rL):
         utfS = "Summary\n"
@@ -245,28 +252,29 @@ class I_utf:
        Returns:
             tuple :  a string and 3 dictionaries
         """
-        endflgB = False; itmpS = ""; iL = []; indxI = -1
+        iL = []; itmp=[] 
         icmdL = ["sympy", "latex", "table", "image", "image2"]
-        tagL =  ["[page]_", "[line]_", "[r]_", "[c]_", "[link]_", 
-                                "[cite]_", "[foot]_"] 
         attribL =  [self.i_sympy, self.i_latex, self.i_table, 
-                    self.i_image, self.i_image2]
+                            self.i_image, self.i_image2]
+        tagL =  ["[page]_", "[line]_", "[r]_", "[rn]_", "[c]_",  
+                    "[link]_", "[cite]_", "[foot]_"] 
         for iS in self.strL:
-            iS = iS[4:]                            # remove 4 space indent
-            if len(iS.strip()) == 0:               # if empty line                   
-                if endflgB:                            # add next line 
-                    iL.append(iS.strip())
-                    attribL[indxI](iL)                  # call attribute from list                           
-                    endflgB = False; itmpS = ""; iL = []; indxI = -1
-                    continue
+            iS = iS[4:]                             # remove 4 space indent
+            if len(itmp) > 0:                       # call image2
+                itmp.append(iS.strip())
+                if len(itmp) == 5:
+                    self.i_image2(itmp)
+                    itmp =[]; continue
+                else: continue
+            if len(iS.strip()) == 0:                # if empty line                   
                 print("\n"); self.calcS += "\n"; continue      
-            if endflgB:
-                iL.append(iS); continue
             if iS[0:2] == "||":                     # process a command
                 iL = iS[2:].split("|")
                 callS = ((iL[0].split(":"))[0]).strip()
-                indxI = icmdL.index(callS)            
-                endflgB = True; continue
+                indxI = icmdL.index(callS)
+                if icmdL[indxI] == "image2":
+                    itmp = iL; continue
+                attribL[indxI](iL); continue
             if iS[0] == "#" : continue              # remove comment 
             if iS[0:2] == "::" : continue           # remove preformat 
             if "]_" in iS:                          # process a tag
@@ -275,39 +283,15 @@ class I_utf:
                         str(self.setsectD["footqueL"][-1]) + "]" )
                     print(iS); self.calcS += iS + "\n"
                     incrI = self.setsectD["footqueL"][-1] + 1
-                    self.setsectD["footqueL"].append(incrI)
-                    continue
-            elif any(tag in iS for tag in tagL):
-                self.calcS = _tags(iS, self.calcS, self.setsectD)
-                continue 
-            else:
-                utfS = iS.replace("]_","]")
-                print(utfS); self.calcS += utfS + "\n"
-                continue    
+                    self.setsectD["footqueL"].append(incrI); continue
+                if any(tag in iS for tag in tagL):
+                    self.calcS = _tags(iS, self.calcS, self.setsectD); continue 
+                else:
+                    utfS = iS.replace("]_","]")
+                    print(utfS); self.calcS += utfS + "\n"; continue    
+            print(iS); self.calcS += iS + "\n"
 
         return self.calcS, self.setsectD, self.setcmdD
-
-    def i_text(self, iL: list):
-        """insert text from file
-        
-        Args:
-            iL (list): text command list
-        """
-        try: 
-            widthI = int(iL[0].split(":")[1])
-        except:
-            widthI = self.setcmdD["cwidth"]
-        self.setcmdD.update({"cwidth": widthI})
-        txtpath = Path(self.folderD["xpath"] /  iL[1].strip())
-        with open(txtpath, 'r') as txtf1:
-                utfL = txtf1.readlines()
-        txtS = "".join(utfL)
-        indI = int((80-widthI)/2)
-        indS = " "*indI
-        utfL = textwrap.wrap(txtS, width=widthI)
-        utfL = [s+"\n" for s in utfL]
-        utfS = indS + indS.join(utfL)
-        print(utfS); self.calcS += utfS + "\n"
         
     def i_latex(self,iL: list):
         """insert formated equation from LaTeX string
@@ -360,11 +344,15 @@ class I_utf:
         figI = self.setsectD["fignum"]
         sectI = self.setsectD["sectnum"]
         fileS = iL[1].strip()
-        captionS = iL[2].strip()
-        imgpathS = str(Path(self.folderD["fpath"], fileS))
-        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+        try:
+            captionS = iL[2].strip()
+            imgpathS = str(Path(self.folderD["fpath"], fileS))
+            utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
                + captionS + "\npath: " + imgpathS + "\n")
-        print(utfS+"\n"); self.calcS += utfS + "\n"
+        except:
+            imgpathS = str(Path(self.folderD["fpath"], fileS))
+            utfS = ("Figure: " + imgpathS + "\n")
+        print(utfS); self.calcS += utfS + "\n"
 
     def i_image2(self, iL: list):
         """insert two images side by side from files
@@ -451,6 +439,28 @@ class I_utf:
                         "  " + titleS ) + utfS                                              
         print(utfS); self.calcS += utfS + "\n"  
 
+    def i_text(self, iL: list):
+        """insert text from file
+        
+        Args:
+            iL (list): text command list
+        """
+        try: 
+            widthI = int(iL[0].split(":")[1])
+        except:
+            widthI = self.setcmdD["cwidth"]
+        self.setcmdD.update({"cwidth": widthI})
+        txtpath = Path(self.folderD["xpath"] /  iL[1].strip())
+        with open(txtpath, 'r') as txtf1:
+                utfL = txtf1.readlines()
+        txtS = "".join(utfL)
+        indI = int((80-widthI)/2)
+        indS = " "*indI
+        utfL = textwrap.wrap(txtS, width=widthI)
+        utfL = [s+"\n" for s in utfL]
+        utfS = indS + indS.join(utfL)
+        print(utfS); self.calcS += utfS + "\n"
+
 class V_utf:
     """convert value-string to utf-calc string
         
@@ -488,10 +498,10 @@ class V_utf:
             setcmdD (dict): command settings
          """
 
-        endflgB = False; vL = []; indxI = -1
-        vcmdL = ["values"]
-        methodL =  [self.v_assign]
-
+        vL = []; endflgB = False; indxI = -1 
+        vcmdL = ["values"]; methodL =  [self.v_assign]
+        tagL =  ["[page]_", "[line]_", "[r]_", "[rn]_", "[c]_",  
+                    "[link]_", "[cite]_", "[foot]_"] 
         for vS in self.strL:
             locals().update(self.rivetD)
             if vS[0:2] == "##":  continue           # remove review comment
@@ -517,21 +527,16 @@ class V_utf:
                 valS = str(eval(varS))
                 utfS = str.ljust(varS + " = " + valS, 40) + " | " + descripS
                 print(utfS); self.calcS += utfS + "\n" ; continue
-            if "]_" in iS:                          # process a tag
-                if "[#]_" in iS:
-                    iS = iS.replace("[#]_", "[" + 
-                        str(self.setsectD["footqueL"][-1]) + "]" )
-                    print(iS); self.calcS += iS + "\n"
+            if "]_" in vS:                          # process a tag
+                if "[#]_" in vS:                    # find footnote tag
+                    vS = vS.replace("[#]_", "[" + 
+                        str(self.sectD["footqueL"][-1]) + "]" )
+                    print(vS); self.calcS += vS + "\n"
                     incrI = self.setsectD["footqueL"][-1] + 1
-                    self.setsectD["footqueL"].append(incrI)
-                    continue
-            elif any(tag in iS for tag in tagL):
-                self.calcS = _tags(iS, self.calcS, self.setsectD)
-                continue 
-            else:
-                utfS = iS.replace("]_","]")
-                print(utfS); self.calcS += utfS + "\n"
-                continue    
+                    self.setsectD["footqueL"].append(incrI); continue
+                else:
+                    self.calcS = _tags(vS, self.calcS, self.setsectD); continue  
+            print(vS); self.calcS += vS + "\n"  
         
         return (self.calcS, self.setsectD, self.rivetD, self.exportS, )
         
@@ -553,12 +558,10 @@ class V_utf:
                 if "<=" in vS[0]:
                     varlS = vS[0].split("<=")[0].strip()
                     cmdS, descripS = self.v_lookup(v)
-                    print(99,cmdS)
                     exec(cmdS, globals(), self.rivetD)
                     locals().update(self.rivetD)
                     tempS = cmdS.split("array")[1].strip()
                     tempS = eval(tempS.strip(")").strip("("))
-                    print(90, len(tempS))
                     if len(tempS) > 3:
                         trimL= tempS[:3]
                         trimL.append("...")
@@ -631,13 +634,13 @@ class V_utf:
         return (cmdS, descripS)
 
 class E_utf:
-    """Convert rivet string type **equation** to utf-calc string
+    """convert equation-string to utf-calc string
 
     """
 
     def __init__(self, strL: list, folderD: dict, setcmdD: dict,
                 setsectD: dict, rivetD: dict, exportS: str):     
-        """convert rivet string type **equation** to utf-calc string
+        """convert equation-string to utf-calc string
         
         Args:
             strL (list): rivet strings
@@ -668,27 +671,17 @@ class E_utf:
             rivetD (list): local() dictionary
         """
         locals().update(self.rivetD)                
-
-        endflgB = False; eL = []; indxI = -1
-        ecmdL = ["equation", "func" ]
+        
+        eL = []; indxI = -1
+        ecmdL = ["equation", "func", "format" ]
         attribL = [self.e_symbol, self.e_function]
+        tagL =  ["[page]_", "[line]_", "[r]_", "[rn]_", "[c]_",  
+                            "[link]_", "[cite]_", "[foot]_"] 
 
         for eS in self.strL:
             eS = eS[4:].strip()                    # remove 4 space indent
             if len(eS.strip()) == 0:               # empty line                   
-                if endflgB:                        # accumulate next line
-                    eL.append(eS.strip())
-                    attribL[indxI](eL)             # call attribute                           
-                    if indxI ==1:
-                        if self.setcmdD["sub"]:
-                            e_sub(eL)
-                        else:
-                            e_table(eL)   
-                    endflgB = False; etmpS = ""; eL = []; indxI = -1
-                continue
-                print("\n"); self.calcS += "\n"
-            if endflgB:
-                eL.append(eS.strip()); continue
+                print("\n"); self.calcS += "\n"; continue
             if "||" in eS:                         # command
                 eL = eS[2:].split("|")
                 callS = ((eL[0].split(":"))[0]).strip()
@@ -696,35 +689,35 @@ class E_utf:
             if "=" in eS:                          # equation
                 eL.append(eS.strip())
                 callS = "equation"
-                indxI = ecmdL.index(callS)         
-                endflgB = True; continue            
+                indxI = ecmdL.index(callS)
+                attribL[indxI](eL)
+                #if self.setcmdD["sub"]:
+                #    e_sub(eL)
+                #else:
+                #    e_table(eL)           
+                continue            
             if eS[0] == "#" : continue             # remove comment 
             if eS[0:2] == "::" : continue          # remove preformat 
-            if "]_" in iS:                          # process a tag
-                if "[#]_" in iS:
-                    iS = iS.replace("[#]_", "[" + 
+            if "]_" in eS:                         # process a tag
+                if "[#]_" in eS:
+                    eS = eS.replace("[#]_", "[" + 
                         str(self.setsectD["footqueL"][-1]) + "]" )
-                    print(iS); self.calcS += iS + "\n"
+                    print(eS); self.calcS += eS + "\n"
                     incrI = self.setsectD["footqueL"][-1] + 1
                     self.setsectD["footqueL"].append(incrI)
                     continue
-            elif any(tag in iS for tag in tagL):
-                self.calcS = _tags(iS, self.calcS, self.setsectD)
+            elif any(tag in eS for tag in tagL):
+                self.calcS = _tags(eS, self.calcS, self.setsectD)
                 continue 
             else:
-                utfS = iS.replace("]_","]")
+                utfS = eS.replace("]_","]")
                 print(utfS); self.calcS += utfS + "\n"
-                continue    
+                continue
+            print(eS); self.calcS += eS + "\n"     
         
         return (self.calcS, self.setsectD, self.rivetD, self.exportS)
   
     def e_hdr(self):
-        eqnumI = int(self.setsectD["eqnum"]) + 1
-        self.setsectD["eqnum"] = eqnumI
-        eqnumS = (" [ " + str(self.setsectD["sectnum"]) + "." + 
-                    str(self.setsectD["eqnum"]) + " ] ")
-        utfS = eqnumS.rjust(self.setsectD["swidth"])
-        print(utfS); self.calcS += utfS + "\n"  
     
     def e_symbol(self, eL: list):
         """[summary]
@@ -738,16 +731,21 @@ class E_utf:
         eS =""""""
         eqS = eL[0].strip()
 
-        try:
-            epS = eL[1].strip()                        # update command settings
+        try:                                         # update command settings
+            epS = eL[1].strip()                        
             cmdD = dict(epS.split(":") for epS in epS.split(","))
             self.tmpD = self.setcmdD.update(cmdD)
             if tmpD["default"]:
                 self.sectcmdD = tmpD
         except: pass
         
-        if self.setcmdD["num"]:                     # add equation number
-           self.e_hdr()                               
+        eqnumI = int(self.setsectD["eqnum"]) + 1
+        self.setsectD["eqnum"] = eqnumI
+        eqnumS = (" [ " + str(self.setsectD["sectnum"]) + "." + 
+                    str(self.setsectD["eqnum"]) + " ] ")
+        utfS = eqnumS.rjust(self.setsectD["swidth"])
+        print(utfS); self.calcS += utfS + "\n"  
+
         varS = eqS.split("=")[1].strip()
         resultS = eqS.split("=")[0].strip()
         spS = "Eq(" + resultS + ",(" + varS + "))" 
@@ -914,14 +912,15 @@ class T_utf:
             vcalc (list): list of calculated strings
             local_dict (list): local() dictionary
         """
-        locals().update(self.rivet)
 
         locals().update(self.rivetD)                
 
         endflgB = False; tL = []; indxI = -1
         ecmdL = ["read", "save", "data", "table", "plot", "image", "image2" ]
-        attribL = [self.t_symbol, self.t_save, self.t_data, self.t_table,
+        attribL = [self.t_read, self.t_save, self.t_data, self.t_table,
                                 self.t_plot, self.t_image, self.t_image2]
+        tagL =  ["[page]_", "[line]_", "[r]_", "[rn ]_", "[c]_",  
+                            "[link]_", "[cite]_", "[foot]_"] 
 
         for tS in self.strL:
             tS = tS[4:].strip()                    # remove 4 space indent
@@ -933,31 +932,31 @@ class T_utf:
                 continue
                 print("\n"); self.calcS += "\n"
             if endflgB:
-                eL.append(eS.strip()); continue
-            if "||" in eS:                         # command
-                eL = eS[2:].split("|")
-                callS = ((eL[0].split(":"))[0]).strip()
+                tL.append(tS.strip()); continue
+            if "||" in tS:                         # command
+                tL = tS[2:].split("|")
+                callS = ((tL[0].split(":"))[0]).strip()
                 indxI = ecmdL.index(callS)            
-            if "=" in eS:                          # equation
-                eL.append(eS.strip())
+            if "=" in tS:                          # equation
+                tL.append(tS.strip())
                 callS = "equation"
                 indxI = ecmdL.index(callS)         
                 endflgB = True; continue            
-            if eS[0] == "#" : continue             # remove comment 
-            if eS[0:2] == "::" : continue          # remove preformat 
-            if "]_" in iS:                         # process a tag
-                if "[#]_" in iS:
-                    iS = iS.replace("[#]_", "[" + 
+            if tS[0] == "#" : continue             # remove comment 
+            if tS[0:2] == "::" : continue          # remove preformat 
+            if "]_" in tS:                         # process a tag
+                if "[#]_" in tS:
+                    tS = tS.replace("[#]_", "[" + 
                         str(self.setsectD["footqueL"][-1]) + "]" )
-                    print(iS); self.calcS += iS + "\n"
+                    print(tS); self.calcS += tS + "\n"
                     incrI = self.setsectD["footqueL"][-1] + 1
                     self.setsectD["footqueL"].append(incrI)
                     continue
-            elif any(tag in iS for tag in tagL):
-                self.calcS = _tags(iS, self.calcS, self.setsectD)
+            elif any(tag in tS for tag in tagL):
+                self.calcS = _tags(tS, self.calcS, self.setsectD)
                 continue 
             else:
-                utfS = iS.replace("]_","]")
+                utfS = tS.replace("]_","]")
                 print(utfS); self.calcS += utfS + "\n"
                 continue       
         
@@ -1015,38 +1014,44 @@ class T_utf:
         globals().update(locals())
         return cmdline
 
-    def t_table(self, tline1: str):
-        """[summary]
+    def t_table(self, iL: list):
+        """insert table from inline or csv, rst file 
         
         Args:
-            tline (str): [description]
-        """
-        tline1a = tline1.split("|")
-        if ("png" in tline1a[1]) or ("jpg" in tline1a[1]):
-            plt.close()
-            filename = tline1a[1].split("insert")[1].strip()
-            filepath = self.folderd["fpath"]
-            imgfile = Path(filepath, filename).as_posix()
-            img = mpimg.imread(imgfile)
-            imgplot = plt.imshow(img)
-            plt.pause(0.5)
-            plt.draw()
-            plt.pause(2)
-        else:       
-            tablename = tline1a[1].split("insert")[1].strip()
-            print("ti", tablename)
-            tabletitle = tline1a[2] + "\n"
-            tname = eval(tablename)
+            ipl (list): parameter list
+        """       
+        try:
+            widthI = int(iL[0].split(":")[1])
+        except:
+            widthI = int(self.setcmdD["cwidth"])
+        self.setcmdD.update({"cwidth":widthI})
+        tableS = ""; utfS = ""
+        fileS = iL[1].strip()
+        tfileS = Path(self.folderD["tpath"], fileS)   
+        tableI = self.setsectD["tablenum"] + 1
+        self.setsectD.update({"tablenum":tableI})
+        sectI = self.setsectD["sectnum"]
+        if ".csv" in iL[1]:                        # csv file       
+            format1 = []
+            with open(tfileS,'r') as csvfile:
+                readL = list(csv.reader(csvfile))
+            for row in readL:
+                wrow=[]
+                for i in row:
+                    templist = textwrap.wrap(i, widthI) 
+                    wrow.append("""\n""".join(templist))
+                format1.append(wrow)
             old_stdout = sys.stdout
             output = StringIO()
-            output.write(tabulate(tname, tablefmt="grid", headers="firstrow"))            
-            rstout = output.getvalue()
+            output.write(tabulate(format1, tablefmt="grid", headers="firstrow"))            
+            utfS = output.getvalue()
+            titleS = "  \n"
             sys.stdout = old_stdout
-
-            self.tcalc.append(tabletitle)
-            self.tcalc.append(rstout)
-
-            globals().update(locals())
+            try: titleS = iL[2].strip() + titleS
+            except: pass        
+        utfS = ("\nTable " + str(sectI)+'.' + str(tableI) + 
+                        "  " + titleS ) + utfS                                              
+        print(utfS); self.calcS += utfS + "\n"  
 
     def t_plot(self, tline1: str)-> list:
         """[summary]
@@ -1071,3 +1076,59 @@ class T_utf:
 
         globals().update(locals())
         return cmdline1, cmdline2
+
+    def t_image(self, tL: list):
+        """insert image from file
+        
+        Args:
+            ipl (list): parameter list
+        """
+        try:
+            scaleI = int(tL[0].split(":")[1])
+        except:
+            scaleI = self.setcmdD["scale1"]
+        self.setcmdD.update({"scale1":scaleI})
+        self.setsectD["fignum"] += 1
+        figI = self.setsectD["fignum"]
+        sectI = self.setsectD["sectnum"]
+        fileS = iL[1].strip()
+        captionS = iL[2].strip()
+        imgpathS = str(Path(self.folderD["fpath"], fileS))
+        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+               + captionS + "\npath: " + imgpathS + "\n")
+        print(utfS+"\n"); self.calcS += utfS + "\n"
+
+    def t_image2(self, tL: list):
+        """insert two images side by side from files
+        
+        Args:
+            tL (list): image parameter list
+        """
+        try:                                            # update default scale
+            scaleI= tL[0].split(":")[1]
+            scale1I = int(scaleI.split(","))[0].strip()
+            scale2I = int(scaleI.split(","))[1].strip()
+            self.setcmdD.update({"scale1":scale1I})
+            self.setcmdD.update({"scale2":scale2I})
+        except:
+            scale1I = self.setcmdD["scale1"]
+            scale2I = self.setcmdD["scale2"]
+        self.setsectD["fignum"] += 1                     # image 1
+        figI = self.setsectD["fignum"]
+        sectI = self.setsectD["sectnum"]
+        fileS = iL[1].strip()
+        captionS = iL[3].strip()
+        imgP = str(Path(self.folderD["fpath"], fileS))
+        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+               + captionS + "\npath: " + imgP)
+        print(utfS); self.calcS += utfS + "\n"
+
+        self.setsectD["fignum"] += 1                     # image 2
+        figI = self.setsectD["fignum"]
+        sectI = self.setsectD["sectnum"]
+        fileS = iL[2].strip()
+        captionS = iL[4].strip()
+        imgP = str(Path(self.folderD["fpath"], fileS))
+        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+               + captionS + "\npath: " + imgP)
+        print(utfS); self.calcS += utfS + "\n"

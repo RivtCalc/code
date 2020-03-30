@@ -57,18 +57,20 @@ i__(''' [01]_ Load Sums
                 └── i=4   (γ+ 4)
     
     
+    || table : 50 | ttext1.txt  | Rebar Table from CSV file
+
     Render equations
     ---------------- 
-    || latex : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
     ACI 318-05 5.5.1 [r]_
+    || latex : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
+
 
     ACI 318-05 5.5.2 [r]_
     || sympy : 1 | x = (12 + omega + α) / (14 + gamma)  
 
     Render image file
     -----------------
-    || image : .5 | pic1.png 
-    Inserted png file
+    || image : .5 | pic1.png | Inserted png file
         
     || image | pic2.jpg 
 
@@ -77,17 +79,14 @@ i__(''' [01]_ Load Sums
 
     Insert table or text from csv, rst or txt files
     -----------------------------------------------
-    || table : 50 | mercalli.csv   
-    Rebar Table from CSV file
+    || table : 50 | mercalli.csv  | Rebar Table from CSV file
     
     note1: abc
     note2: def
 
-    || table | rebars.rst     
-    Rebar Table from reST file
+    || table | rebars.rst  | Rebar Table from reST file
     
-    || table | inline 
-    Inline Table Title
+    || table | inline | Inline Table Title
     +-----------+-------+--------+-------------+-----------+
     |   barsize |   dia |   area |   perimeter |   wt/foot |
     +===========+=======+========+=============+===========+
@@ -119,14 +118,15 @@ v__(''' some values
     a11 = 12.23*IN              | description 1 
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
-    BEAM1 <= aisc13.csv[4]      | steel vector from file 
+    BEAM1 <= aisc13.csv[4]      | steel row vector from file 
+    BEAM1 |= aisc13.csv[2]      | steel column vector from file 
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
     V_1 = [1,4,3]*FT            | a vector
 
-    one value from file
+    values from file
     || values | 0103_testvalues.py | Rebar Properties
-    a11 ==                      
+    [a11, a22]                      
 
     ''')
 
@@ -136,13 +136,13 @@ e__(''' equations string
     
     Some introductory text.  Set equation format.
 
-                                            ACI 318-05 1.1 [r]_
-    aa1 = a11*6*IN
-    unit:IN,alt:M,prec:2,trim:2,num:True,prt:0
+    || format | prec:2,trim:2,sub:false
+                                                        ACI 318-05 1.1 [r]_
+    aa1 = a11*6*IN         | unit:IN,alt:M
+    
+    aa2 = a11*14*IN        | unit:FT,alt:mm
 
-    aa2 = a11*14  
-
-                                            ACI 318-05 1.2 [r]_
+                                                       ACI 318-05 1.2 [r]_
     aa3 = (aa2 * 5)/a11             
     
     aa4 = BEAM1 * 7.2
@@ -204,29 +204,25 @@ e__(''' some equations
 #%%
 t__(''' [03]_ Manipulate tables (dataframes) and plots    
 
-    create a dataframe
-    -------------------    
+    create, modify and read tables
+    ------------------------------    
     || data | T2 | description
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
-    || save | test2.csv | T2
+    || save | T2 | test2.csv 
+    || read | T3 | test1.csv 
     
-    insert and save a table from dataframe
-    --------------------------------------
-    || read | test1.csv | T3
-    || table : 20 | T3 | cols = [], rows = []
+    || table : 20 | test1.csv
     Table title goes here
 
-    plot data from dataframe
-    ------------------------
-    || read | plt1.csv | P1
+    plot and save data from dataframe
+    ---------------------------------
+    || read | P1 | plt1.csv
     || plot | P1 | x:len1, y:area1, type:line, grid:true
-    || add | P1  | x:len1, y:prod1, c:blue 
-    || save | plt1.png | P1
+    || add  | P1 | x:len1, y:prod1, c:blue 
+    || save | P1 | plt1.png 
 
-    insert a plot
-    -------------
     || image : 1 | plt1.png  
     Plot title goes here
     ''')
