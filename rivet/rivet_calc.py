@@ -74,6 +74,7 @@ import subprocess
 import tempfile
 import re
 import io
+import logging
 from io import StringIO
 from numpy import *
 import numpy.linalg as la
@@ -86,6 +87,8 @@ from sympy.abc import _clash2
 from tabulate import tabulate 
 from pathlib import Path
 from rivet.rivet_unit import *
+
+logging.getLogger("numexpr").setLevel(logging.WARNING)
 
 
 def _tags(tagS: str, calcS: str, setsectD: dict) -> str:

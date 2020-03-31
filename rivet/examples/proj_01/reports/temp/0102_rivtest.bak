@@ -213,7 +213,7 @@ t__(''' [03]_ Manipulate tables (dataframes) and plots
     || save | T2 | test33.csv 
     | read | T3 | test1.csv 
     
-    || table : 20 | test1.csv
+    || table : 40 | test1.csv
     Table title goes here
 
     plot and save data from dataframe
