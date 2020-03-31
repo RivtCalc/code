@@ -70,7 +70,8 @@ i__(''' [01]_ Load Sums
 
     Render image file
     -----------------
-    || image : .5 | pic1.png | Inserted png file
+    || image : .5 | pic1.png  
+    Inserted png file
         
     || image | pic2.jpg 
 
@@ -118,10 +119,11 @@ v__(''' some values
     a11 = 12.23*IN              | description 1 
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
-    BEAM1 <= aisc13.csv[4]      | steel vector from file 
+    BEAM1 < aisc13.csv[4]       | row vector from file 
+    BEAM2 # aisc13.csv[2]       | column vector from file 
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
-    V_1 = [1,4,3]*FT            | a vector
+    V1 = [1,4,3]*FT             | a vector
 
     values from file
     || values | 0103_testvalues.py | Rebar Properties
@@ -135,19 +137,18 @@ e__(''' equations string
     
     Some introductory text.  Set equation format.
 
-                                            ACI 318-05 1.1 [r]_
-    aa1 = a11*6*IN
-    unit:IN,alt:M,prec:2,trim:2,sub:false
-
-    aa2 = a11*14  
-
-                                            ACI 318-05 1.2 [r]_
+    || format | prec:2,trim:2,sub:false
+                                                        ACI 318-05 1.1 [r]_
+    aa1 = a11*6*IN        | IN,M
+    
+    aa2 = V1*14*IN        | FT,mm
+                                                       ACI 318-05 1.2 [r]_
     aa3 = (aa2 * 5)/a11             
     
     aa4 = BEAM1 * 7.2
 
-    | func | scripts1.py | pin_pin(a11, a22) | prec:2, unit:FT*LB, alt:N*M
-    | func | scripts1.py | fixed_fixed(a11, a22) | prec:2, unit:FT*LB, alt:N*M
+    | func | scripts1.py | pin_pin(a11, a22) | FT*LB, N*M
+    | func | scripts1.py | fixed_fixed(a11, a22) | FT*LB, N*M
 
     ''')
 #%%
@@ -209,8 +210,8 @@ t__(''' [03]_ Manipulate tables (dataframes) and plots
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
-    || save | T2 | test2.csv 
-    || read | T3 | test1.csv 
+    || save | T2 | test33.csv 
+    | read | T3 | test1.csv 
     
     || table : 20 | test1.csv
     Table title goes here
@@ -223,10 +224,10 @@ t__(''' [03]_ Manipulate tables (dataframes) and plots
     || save | P1 | plt1.png 
 
     || image : 1 | plt1.png  
-    Plot title goes here
+    Plot caption goes here
     ''')
 
-#list_values()
+list_values()
 #write_values()
 #write_utfcalc()
 #write_pdfdoc()

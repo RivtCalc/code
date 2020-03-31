@@ -113,9 +113,8 @@ _rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
 
 # command settings
-_setcmdD = {"cwidth": 50, "scale1": 1, "scale2": 1, "row": "[:]", "col": "[:]", 
-    "unit": "", "alt": "", "prec": 2, "trim": 2, "chk": "", 
-    "sub": False, "default": False}
+_setcmdD = {"cwidth": 50, "scale1": 1, "scale2": 1, 
+            "prec": 2, "trim": 2, "chk": "<1", "sub": False}
 
 # section settings
 _setsectD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2:4],

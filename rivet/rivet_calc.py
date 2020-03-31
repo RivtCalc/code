@@ -252,19 +252,23 @@ class I_utf:
        Returns:
             tuple :  a string and 3 dictionaries
         """
-        iL = []; itmp=[] 
+        iL = []; itmpL=[]; indxI =-1 
         icmdL = ["sympy", "latex", "table", "image", "image2"]
         attribL =  [self.i_sympy, self.i_latex, self.i_table, 
                             self.i_image, self.i_image2]
         tagL =  ["[page]_", "[line]_", "[r]_", "[rn]_", "[c]_",  
                     "[link]_", "[cite]_", "[foot]_"] 
+        
         for iS in self.strL:
             iS = iS[4:]                             # remove 4 space indent
-            if len(itmp) > 0:                       # call image2
-                itmp.append(iS.strip())
-                if len(itmp) == 5:
-                    self.i_image2(itmp)
-                    itmp =[]; continue
+            if len(itmpL) > 0:                       # call image or image2
+                itmpL.append(iS.strip())
+                if indxI == 3:
+                    self.i_image(itmpL)
+                    itmpL =[]; indxI = -1; continue
+                if len(itmpL) == 5:
+                    self.i_image2(itmpL)
+                    itmpL =[]; continue
                 else: continue
             if len(iS.strip()) == 0:                # if empty line                   
                 print("\n"); self.calcS += "\n"; continue      
@@ -272,8 +276,10 @@ class I_utf:
                 iL = iS[2:].split("|")
                 callS = ((iL[0].split(":"))[0]).strip()
                 indxI = icmdL.index(callS)
+                if icmdL[indxI] == "image":
+                    itmpL = iL; continue
                 if icmdL[indxI] == "image2":
-                    itmp = iL; continue
+                    itmpL = iL; continue                
                 attribL[indxI](iL); continue
             if iS[0] == "#" : continue              # remove comment 
             if iS[0:2] == "::" : continue           # remove preformat 
@@ -553,11 +559,11 @@ class V_utf:
         valL =[]                            # value list for table
         vpL = vL[0].split("|")
         if "inline" in vpL[1]:
-            for v in vL[1:]:
-                vS = v.split("|")
-                if "<=" in vS[0]:
-                    varlS = vS[0].split("<=")[0].strip()
-                    cmdS, descripS = self.v_lookup(v)
+            for vS in vL[1:]:
+                vL = vS.split("|")
+                if "<" in vL[0]:
+                    varlS = vL[0].split("<=")[0].strip()
+                    cmdS, descripS = self.v_rlookup(vS)
                     exec(cmdS, globals(), self.rivetD)
                     locals().update(self.rivetD)
                     tempS = cmdS.split("array")[1].strip()
@@ -567,13 +573,24 @@ class V_utf:
                         trimL.append("...")
                     else:
                         trimL = tempS
-                        print(94)
-                    valL.append([varlS, trimL, descripS])
-                    continue
-                varS = vS[0].split("=")[0].strip()
-                valS = vS[0].split("=")[1].strip()
+                    valL.append([varlS, trimL, descripS]); continue
+                if "#" in vL[0]:
+                    varlS = vL[0].split("<=")[0].strip()
+                    cmdS, descripS = self.v_clookup(vS)
+                    exec(cmdS, globals(), self.rivetD)
+                    locals().update(self.rivetD)
+                    tempS = cmdS.split("array")[1].strip()
+                    tempS = eval(tempS.strip(")").strip("("))
+                    if len(tempS) > 3:
+                        trimL= tempS[:3]
+                        trimL.append("...")
+                    else:
+                        trimL = tempS
+                    valL.append([varlS, trimL, descripS]); continue                
+                varS = vL[0].split("=")[0].strip()
+                valS = vL[0].split("=")[1].strip()
                 arrayS = "array(" + valS + ")"
-                descripS = vS[1].strip()
+                descripS = vL[1].strip()
                 cmdS = str(varS + " = " + arrayS + "   # " + descripS + "\n")
                 pyS += cmdS
                 exec(cmdS,globals(),self.rivetD)
@@ -608,20 +625,45 @@ class V_utf:
         
         
 
-    def v_lookup(self, v: str ):
-        """assign vector from csv file to variable
+    def v_rlookup(self, vS: str ):
+        """assign row vector from csv file to variable
         
         Args:
-            vpl (list): list of value string items
+            vS (string): value-string
         """
         
         locals().update(self.rivetD)
         
-        varS = v.split("<=")[0].strip()
-        descripS = v.split("|")[1].strip()
-        fileL = v.split("<=")[1].strip()
+        varS = vS.split("<")[0].strip()
+        descripS = vS.split("|")[1].strip()
+        fileL = vS.split("<")[1].strip()
         fileS = fileL.split("[")[0].strip()
-        rowS = v.split("[")[1]
+        rowS = vS.split("[")[1]
+        rowI = int(rowS.split("]")[0].strip())
+        fileP = os.path.join(self.folderD["tpath"], fileS)
+        with open(fileP,'r') as csvf:
+            reader = csv.reader(csvf)
+            for i in range(rowI):
+                rowL = next(reader)
+            rowL = list(next(reader))
+        cmdS = varS + "= array(" + str(rowL) + ")"
+
+        return (cmdS, descripS)
+
+    def v_clookup(self, vS: str ):
+        """assign row vector from csv file to variable
+        
+        Args:
+            vS (string): value-string
+        """
+        
+        locals().update(self.rivetD)
+        
+        varS = vS.split("#")[0].strip()
+        descripS = vS.split("|")[1].strip()
+        fileL = vS.split("#")[1].strip()
+        fileS = fileL.split("[")[0].strip()
+        rowS = vS.split("[")[1]
         rowI = int(rowS.split("]")[0].strip())
         fileP = os.path.join(self.folderD["tpath"], fileS)
         with open(fileP,'r') as csvf:
@@ -674,7 +716,7 @@ class E_utf:
         
         eL = []; indxI = -1
         ecmdL = ["equation", "func", "format" ]
-        attribL = [self.e_symbol, self.e_function]
+        attribL = [self.e_symbol, self.e_function, self.e_format]
         tagL =  ["[page]_", "[line]_", "[r]_", "[rn]_", "[c]_",  
                             "[link]_", "[cite]_", "[foot]_"] 
 
@@ -684,10 +726,11 @@ class E_utf:
                 print("\n"); self.calcS += "\n"; continue
             if "||" in eS:                         # command
                 eL = eS[2:].split("|")
-                callS = ((eL[0].split(":"))[0]).strip()
-                indxI = ecmdL.index(callS)            
+                callS = eL[0].strip()
+                indxI = ecmdL.index(callS)
+                attribL[indxI](eL); continue            
             if "=" in eS:                          # equation
-                eL.append(eS.strip())
+                eL = eS.split("|")
                 callS = "equation"
                 indxI = ecmdL.index(callS)
                 attribL[indxI](eL)
@@ -706,18 +749,16 @@ class E_utf:
                     incrI = self.setsectD["footqueL"][-1] + 1
                     self.setsectD["footqueL"].append(incrI)
                     continue
-            elif any(tag in eS for tag in tagL):
-                self.calcS = _tags(eS, self.calcS, self.setsectD)
-                continue 
-            else:
-                utfS = eS.replace("]_","]")
-                print(utfS); self.calcS += utfS + "\n"
-                continue
+                elif any(tag in eS for tag in tagL):
+                    self.calcS = _tags(eS, self.calcS, self.setsectD)
+                    continue 
+                else:
+                    utfS = eS.replace("]_","]")
+                    print(utfS); self.calcS += utfS + "\n"
+                    continue
             print(eS); self.calcS += eS + "\n"     
         
         return (self.calcS, self.setsectD, self.rivetD, self.exportS)
-  
-    def e_hdr(self):
     
     def e_symbol(self, eL: list):
         """[summary]
@@ -731,21 +772,12 @@ class E_utf:
         eS =""""""
         eqS = eL[0].strip()
 
-        try:                                         # update command settings
-            epS = eL[1].strip()                        
-            cmdD = dict(epS.split(":") for epS in epS.split(","))
-            self.tmpD = self.setcmdD.update(cmdD)
-            if tmpD["default"]:
-                self.sectcmdD = tmpD
-        except: pass
-        
         eqnumI = int(self.setsectD["eqnum"]) + 1
         self.setsectD["eqnum"] = eqnumI
         eqnumS = (" [ " + str(self.setsectD["sectnum"]) + "." + 
                     str(self.setsectD["eqnum"]) + " ] ")
         utfS = eqnumS.rjust(self.setsectD["swidth"])
         print(utfS); self.calcS += utfS + "\n"  
-
         varS = eqS.split("=")[1].strip()
         resultS = eqS.split("=")[0].strip()
         spS = "Eq(" + resultS + ",(" + varS + "))" 
@@ -877,6 +909,11 @@ class E_utf:
     def e_function(self):
         pass
 
+    def e_format(self, eL):        
+        eupL = eL[1].strip()
+        eD = dict(i.split(":") for i in eupL.split(","))
+        self.setcmdD.update(eD)
+
 class T_utf:
     """Process table_strings to utf-calc
 
@@ -912,39 +949,45 @@ class T_utf:
             vcalc (list): list of calculated strings
             local_dict (list): local() dictionary
         """
-
-        locals().update(self.rivetD)                
-
-        endflgB = False; tL = []; indxI = -1
-        ecmdL = ["read", "save", "data", "table", "plot", "image", "image2" ]
+             
+        tL = []; indxI = -1; ttmpL=[]
+        tcmdL = ["read", "save", "data", "table", "plot", "image", "image2" ]
         attribL = [self.t_read, self.t_save, self.t_data, self.t_table,
                                 self.t_plot, self.t_image, self.t_image2]
         tagL =  ["[page]_", "[line]_", "[r]_", "[rn ]_", "[c]_",  
                             "[link]_", "[cite]_", "[foot]_"] 
 
         for tS in self.strL:
-            tS = tS[4:].strip()                    # remove 4 space indent
-            if len(tS.strip()) == 0:               # empty line                   
-                if endflgB:                        # accumulate next line
-                    tL.append(tS.strip())
-                    attribL[indxI](tL)             # call attribute                           
-                    endflgB = False; ttmpS = ""; tL = []; indxI = -1
-                continue
-                print("\n"); self.calcS += "\n"
-            if endflgB:
-                tL.append(tS.strip()); continue
-            if "||" in tS:                         # command
+            locals().update(self.rivetD)
+            tS = tS[4:].strip()                         # remove 4 space indent
+            if len(ttmpL) > 0:                          # call image or image2
+                ttmpL.append(iS.strip())
+                if indxI == 3:
+                    self.t_image(ttmpL)
+                    ttmpL =[]; indxI = -1; continue
+                if len(ttmpL) == 5:
+                    self.t_image2(ttmpL)
+                    ttmpL =[]; continue
+                else: continue
+            if len(tS.strip()) == 0:                    # if empty line                   
+                print("\n"); self.calcS += "\n"; continue      
+            if tS[0:2] == "||":                         # command
                 tL = tS[2:].split("|")
                 callS = ((tL[0].split(":"))[0]).strip()
-                indxI = ecmdL.index(callS)            
-            if "=" in tS:                          # equation
-                tL.append(tS.strip())
-                callS = "equation"
-                indxI = ecmdL.index(callS)         
-                endflgB = True; continue            
-            if tS[0] == "#" : continue             # remove comment 
-            if tS[0:2] == "::" : continue          # remove preformat 
-            if "]_" in tS:                         # process a tag
+                print(100,callS)
+                indxI = tcmdL.index(callS)            
+                if tcmdL[indxI] == "image":
+                    ttmpL = tL; continue
+                if tcmdL[indxI] == "image2":
+                    ttmpL = tL; continue                
+                attribL[indxI](tL); continue            
+            if "=" in tS:                               # equation
+                utfS = tS.strip()
+                exec(utfS)
+                print(utfS); self.calcS += utfS + "\n"; continue       
+            if tS[0] == "#" : continue                  # remove comment 
+            if tS[0:2] == "::" : continue               # remove preformat 
+            if "]_" in tS:                              # process a tag
                 if "[#]_" in tS:
                     tS = tS.replace("[#]_", "[" + 
                         str(self.setsectD["footqueL"][-1]) + "]" )
@@ -960,81 +1003,77 @@ class T_utf:
                 print(utfS); self.calcS += utfS + "\n"
                 continue       
         
+        self.rivetD.update(locals())
         return (self.calcS, self.setsectD, self.rivetD, self.exportS)
        
-    def t_read(self, tline1: str) -> str:
+    def t_read(self, tL: str) -> str:
         """[summary]
         
         Args:
-            tline1 (str): [description]
+            tl (str): [description]
         """
-        tline1a = tline1.split("|")
-        temp1 = tline1a[1].split("read")
-        temp2 = temp1[1].split("to")
-        filename = temp2[0].strip() + ".csv"
-        tablename = temp2[1].strip()
+        locals().update(self.rivetD)
+        
+        df = tL[2].strip
+        filename = tL[3].strip()
         pathname = Path(self.folderd["tpath"], filename).as_posix()
-        cmdline = tablename + " = pd.read_table(" + '"' + \
-                        pathname + '"' +", sep=',')" 
+        exec(str(df) + "= pd.read_csv(" + str(pathname) + ")")     
         
-        df = pd.read_csv(csvfiles, usecols = lambda x: x in list(col), 
-                       skiprows = lambda x: x in list(rowl))     
-        globals().update(locals())        
-        
-        return cmdline
+        self.rivetD.update(locals())
 
-    def t_save(self, tline1: str) -> str:
+    def t_save(self, tL: str):
         """[summary]
         
         Args:
-            tline1 (str): [description]
+            tL (str): [description]
         """
-        tline1a = tline1.split("|")
-        temp1 = tline1a[1].split("write")
-        temp2 = temp1[1].split("to")
-        filename = temp2[1].strip() + ".csv"
-        tablename = temp2[0].strip()
-        pathname =  Path(self.folderd["tpath"], filename ).as_posix()
-        cmdline = tablename + ".to_csv(" +  '"' + \
-                        pathname +  '"' + ", sep=',')"
-        
-        return cmdline
 
-    def t_data(self, tline1:str) -> str:
+        locals().update(self.rivetD)
+
+        dfS = tL[1].strip()
+        eval(dfS)
+        filenameS = tL[2].strip()
+        pathnameS =  Path(self.folderD["tpath"], filenameS ).as_posix()
+        cmdlineS =  dfS + ".to_csv('" + str(pathnameS) +  "',index = False)"
+        exec(cmdlineS)
+
+        self.rivetD.update(locals())
+        
+    def t_data(self, tL:str) -> str:
         """[summary]
         
         Args:
-            tline (str): [description]
+            tLine (str): [description]
         """
-        tline1a = tline1.split("|")
-        temp = tline1a[1].split("new")
-        tablename = temp[1].strip()
-        cmdline = tablename + " = pd.DataFrame()"
-        
-        globals().update(locals())
-        return cmdline
+        locals().update(self.rivetD)
 
-    def t_table(self, iL: list):
+        dfS = tL[1].strip()
+        cmdlineS = dfS + " = pd.DataFrame()"
+        exec(cmdlineS)        
+    
+        self.rivetD.update(locals())
+
+    def t_table(self, tL: list):
         """insert table from inline or csv, rst file 
         
         Args:
             ipl (list): parameter list
         """       
         try:
-            widthI = int(iL[0].split(":")[1])
+            widthI = int(tL[0].split(":")[1])
         except:
             widthI = int(self.setcmdD["cwidth"])
         self.setcmdD.update({"cwidth":widthI})
         tableS = ""; utfS = ""
-        fileS = iL[1].strip()
-        tfileS = Path(self.folderD["tpath"], fileS)   
+        files = tL[1].strip()
+        tfiles = Path(self.folderD["tpath"], files)   
         tableI = self.setsectD["tablenum"] + 1
         self.setsectD.update({"tablenum":tableI})
         sectI = self.setsectD["sectnum"]
-        if ".csv" in iL[1]:                        # csv file       
+        if ".csv" in tL[1]:                        # csv ftLe       
             format1 = []
-            with open(tfileS,'r') as csvfile:
-                readL = list(csv.reader(csvfile))
+            with open(tfiles,'r') as csvfiLe:
+                readL = list(csv.reader(csvfiLe))
             for row in readL:
                 wrow=[]
                 for i in row:
@@ -1047,30 +1086,30 @@ class T_utf:
             utfS = output.getvalue()
             titleS = "  \n"
             sys.stdout = old_stdout
-            try: titleS = iL[2].strip() + titleS
+            try: titleS = tL[2].strip() + titleS
             except: pass        
         utfS = ("\nTable " + str(sectI)+'.' + str(tableI) + 
                         "  " + titleS ) + utfS                                              
         print(utfS); self.calcS += utfS + "\n"  
 
-    def t_plot(self, tline1: str)-> list:
+    def t_plot(self, tL: str)-> list:
         """[summary]
         
         Args:
-            tline (str): [description]
+            tLine (str): [description]
         """                
-        tline1a = tline1.split("|")
-        tline1b = (tline1a[1].strip()).split(" ")
-        if len(tline1b) > 1:
-            self.pltname = tline1b[1]
+        tLa = tL.split("|")
+        tLb = (tLa[1].strip()).split(" ")
+        if len(tLb) > 1:
+            self.pltname = tLb[1]
             filename = self.pltname + ".png"
             filepath = self.folderd["fpath"]
             self.pltfile = Path(filepath, filename).as_posix()
-            pltcmd = tline1a[2].strip()
+            pltcmd = tLa[2].strip()
             cmdline1 = "ax = plt.gca()"
             cmdline2 = self.pltname + ".plot(" + pltcmd + ", ax=ax)"
         else:
-            pltcmd = tline1a[2].strip()
+            pltcmd = tLa[2].strip()
             cmdline1 = ""
             cmdline2 = self.pltname + ".plot(" + pltcmd + ", ax=ax)"
 
@@ -1078,7 +1117,7 @@ class T_utf:
         return cmdline1, cmdline2
 
     def t_image(self, tL: list):
-        """insert image from file
+        """insert image from fiLe
         
         Args:
             ipl (list): parameter list
@@ -1091,15 +1130,19 @@ class T_utf:
         self.setsectD["fignum"] += 1
         figI = self.setsectD["fignum"]
         sectI = self.setsectD["sectnum"]
-        fileS = iL[1].strip()
-        captionS = iL[2].strip()
-        imgpathS = str(Path(self.folderD["fpath"], fileS))
-        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+        files = tL[1].strip()
+        try:
+            captionS = tL[2].strip()
+            imgpathS = str(Path(self.folderD["fpath"], files))
+            utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
                + captionS + "\npath: " + imgpathS + "\n")
-        print(utfS+"\n"); self.calcS += utfS + "\n"
+        except:
+            imgpathS = str(Path(self.folderD["fpath"], files))
+            utfS = ("Figure: " + imgpathS + "\n")
+        print(utfS); self.calcS += utfS + "\n"
 
     def t_image2(self, tL: list):
-        """insert two images side by side from files
+        """insert two images side by side from fiLes
         
         Args:
             tL (list): image parameter list
@@ -1116,9 +1159,9 @@ class T_utf:
         self.setsectD["fignum"] += 1                     # image 1
         figI = self.setsectD["fignum"]
         sectI = self.setsectD["sectnum"]
-        fileS = iL[1].strip()
-        captionS = iL[3].strip()
-        imgP = str(Path(self.folderD["fpath"], fileS))
+        files = tL[1].strip()
+        captionS = tL[3].strip()
+        imgP = str(Path(self.folderD["fpath"], files))
         utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
                + captionS + "\npath: " + imgP)
         print(utfS); self.calcS += utfS + "\n"
@@ -1126,9 +1169,10 @@ class T_utf:
         self.setsectD["fignum"] += 1                     # image 2
         figI = self.setsectD["fignum"]
         sectI = self.setsectD["sectnum"]
-        fileS = iL[2].strip()
-        captionS = iL[4].strip()
-        imgP = str(Path(self.folderD["fpath"], fileS))
+        files = tL[2].strip()
+        captionS = tL[4].strip()
+        imgP = str(Path(self.folderD["fpath"], files))
         utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
                + captionS + "\npath: " + imgP)
         print(utfS); self.calcS += utfS + "\n"
+
