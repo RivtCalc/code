@@ -122,7 +122,7 @@ _setsectD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2
 _setcmdD = {"cwidth": 50, "scale1": 1., "scale2": 1., 
             "prec": 2, "trim": 2, "replace": False, "code": False}
 
-# string of values to save to file
+# string of values for export to file
 _exportS = """"""       
 
 def shorten_path(file_path: str, length: int)-> str:
@@ -160,8 +160,8 @@ logging.info(f"""backup file written : {_rshort}""")
 def _update(hdrS:str):
     """update section setting dictionary
     
-    Arguments:
-        hdrs {str} -- header of rivet string
+    Args:
+        hdrs {str}: rivet-string header
     """
     global _utfcalcS, _setsectD, _rivetD
 
@@ -189,7 +189,7 @@ def r__(rawstrS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    rcalc = _rivcalc.R_utf(strL, _foldD, _setsectD) 
+    rcalc = _rivcalc._R_utf(strL, _foldD, _setsectD) 
     rcalcS, _setsectD = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
@@ -205,7 +205,7 @@ def i__(rawstrS: str):
     if "]_" in sectS: _update(sectS)
 
     strL = strS.split("\n")
-    icalc = _rivcalc.I_utf(strL, _foldD, _setcmdD, _setsectD) 
+    icalc = _rivcalc._I_utf(strL, _foldD, _setcmdD, _setsectD) 
     icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
@@ -221,7 +221,7 @@ def v__(rawstrS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    vcalc = _rivcalc.V_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    vcalc = _rivcalc._V_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
     vcalcS, _setsectD, _rivetD, _exportS = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
@@ -235,7 +235,7 @@ def e__(rawstrS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    ecalc = _rivcalc.E_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    ecalc = _rivcalc._E_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
     ecalcS, _setsectD, _rivetD, _exportS = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
@@ -249,7 +249,7 @@ def t__(rawstrS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    tcalc = _rivcalc.T_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD)
+    tcalc = _rivcalc._T_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD)
     tcalcS, _setsectD, _rivetD = tcalc.t_parse()
     _utfcalcS = _utfcalcS + tcalcS
 

@@ -2,26 +2,26 @@
 """convert rivet-strings to utf-8 calc-strings
 
 This module converts each rivet-string to a utf-8 calc-string using a separate
-class for each string type (5 total). Markup within a string includes commands
-specific to each string type and tags and reStructuredText used in all strings.
+class for each string type (5 total). Markup in a string includes tags and
+reStructuredText used in all strings and string-specific commands.
 
 Commands and syntax by string type and function 
 (commands are single lines except where noted)
 ------------------------------------------------
 
 string   function  class
-type     name      name    commands {notes}
-----     --------  -----   ----------------
-repo     r__()     R_utf   summary {block}, labels {block}, append {block}
-insert   i__()     I_utf   tex, sym, table {block}, image {block}, image2 {block} 
-values   v__()     V_utf   values {block}
-equation e__()     E_utf   format, function, =
-table    t__()     T_utf   read, save, data, plot, add, table, image, image2
+type     name      name     commands {notes}
+----     --------  -----    -----------------------------------------------------
+repo     r__()     _R_utf   summary {block}, labels {block}, append {block}
+insert   i__()     _I_utf   tex, sym, table {block}, image {block}, image2 {block} 
+values   v__()     _V_utf   values {block}
+equation e__()     _E_utf   format, function, =
+table    t__()     _T_utf   read, save, data, plot, add, table, image, image2
 
 
 Command syntax {notes}
 --------------------------
-r__('''r-string''') {repository and calc data}
+r__('''r-string''') {repository data}
     || summary | {toc} sections / strings  
     {paragraph text}
     
@@ -31,7 +31,7 @@ r__('''r-string''') {repository and calc data}
     || append           
     {pdf file list}
 
-i__('''i-string''') {insert text and images}
+i__('''i-string''') {define text and images to insert}
     || tex : 1. {image scale} | \gamma = x + 3 {latex equation text}
 
     || sym : 1. | x = y/2 {sympy equation text}
@@ -89,7 +89,6 @@ t__('''t-string''') (define tables and plots)
     figure2 caption
 
 """
-
 import os
 import sys
 import csv
@@ -113,7 +112,6 @@ from pathlib import Path
 from rivet.rivet_unit import *
 
 logging.getLogger("numexpr").setLevel(logging.WARNING)
-
 
 def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
     """parse tag in line
@@ -168,7 +166,7 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
         #tagx = tag.group(0)
         #modline = tagS.replace(" " + tagx,"")
 
-class R_utf:
+class _R_utf:
     """convert repo-string to utf-calc string
 
     Attributes:
@@ -258,7 +256,7 @@ class R_utf:
         print(utfS + "\n"); self.calcS += utfS
         sys.stdout = old_stdout    
     
-class I_utf:  
+class _I_utf:  
     """convert insert-string to utf-calc string 
 
     Attributes:
@@ -496,7 +494,7 @@ class I_utf:
         utfS = indS + indS.join(utfL)
         print(utfS); self.calcS += utfS + "\n"
 
-class V_utf:
+class _V_utf:
     """convert value-string to utf-calc string
         
     Attributes:
@@ -704,7 +702,7 @@ class V_utf:
 
         return (cmdS, descripS)
 
-class E_utf:
+class _E_utf:
     """convert equation-string to utf-calc string
 
     """
@@ -942,7 +940,7 @@ class E_utf:
         eD = dict(i.split(":") for i in eupL.split(","))
         self.setcmdD.update(eD)
 
-class T_utf:
+class _T_utf:
     """Process table_strings to utf-calc
 
     """

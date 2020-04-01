@@ -224,7 +224,6 @@ t__(''' [03]_ Manipulate tables (dataframes) and plots
     
     || table | test1.csv | 40
     Table title goes here
-
     ''')
 
 list_values()
