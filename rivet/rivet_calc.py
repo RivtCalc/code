@@ -88,18 +88,6 @@ t__('''t-string''') (define tables and plots)
     figure1 caption
     figure2 caption
 
-Tag list {notes}:
------------------------------
-    [xyz123]_  {citation}   
-    [cite]_    {citation description}
-    [#]_       {footnote (auto)} 
-    [foot]_    {footnote description}
-    [page]_    {new doc page)
-    [line]_    {draw horizontal line)
-    [link]_    {insert line of text as url link}
-    [r]_       {right justify line of text)
-    [re]_      {right justify line of text with equation number)
-    [c]_       {center line of text)
 """
 
 import os
@@ -128,21 +116,24 @@ logging.getLogger("numexpr").setLevel(logging.WARNING)
 
 
 def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
-    """parse tags
+    """parse tag in line
     
     Args:
-        tagS (str): line from rivet-string
+        tagS (str): line from rivet-string with tag
     
-    List of tags :
-    [abc]_      (citation name)   
-    [page]_     (new doc page)
-    [line]_     (draw horizontal line)
-    [link]_     (url link)
-    [foot]_     (footnote reference)
-    [r]_        (right justify line of text)
-    [c]_        (center line of text)
-
+    Tag list:
+    [xyz123]_  {citation}   
+    [cite]_    {citation description}
+    [#]_       {footnote (auto)} 
+    [foot]_    {footnote description}
+    [page]_    {new doc page)
+    [line]_    {draw horizontal line)
+    [link]_    {insert line of text as url link}
+    [r]_       {right justify line of text)
+    [re]_      {right justify line of text with equation number)
+    [c]_       {center line of text)
     """
+    
     if "[page]_" in tagS:
         utfS = int(setsectD["swidth"]) * "."
         print(utfS); calcS += utfS + "\n"
@@ -237,7 +228,6 @@ class R_utf:
             print(rS); self.calcS += rS + "\n"     
 
         return (self.calcS, self.setsectD)
-
 
     def r_summary(self, rL):
         utfS = "Summary\n"
@@ -545,7 +535,7 @@ class V_utf:
 
         vL = []; endflgB = False; indxI = -1 
         vcmdL = ["values"]; methodL =  [self.v_assign]
-        tagL =  ["[page]_", "[line]_", "[r]_", "[rn]_", "[c]_",  
+        tagL =  ["[page]_", "[line]_", "[r]_", "[re]_", "[c]_",  
                     "[link]_", "[cite]_", "[foot]_"] 
         for vS in self.strL:
             locals().update(self.rivetD)
@@ -889,7 +879,6 @@ class E_utf:
             epl (list): [description]
             eps (str): [description]
         """
-        
 
         locals().update(self.rivetd)
         utfs = epl[0].strip(); descrips = epl[3]; pard = dict(epl[1])
@@ -956,7 +945,6 @@ class E_utf:
 class T_utf:
     """Process table_strings to utf-calc
 
-    Returns utf string of table results
     """
  
     def __init__(self, strL: list, folderD: dict, 
@@ -975,11 +963,6 @@ class T_utf:
         self.setsectD = setsectD
         self.tcalc = []
         self.tlist = []
-
-        try:
-            plt.close()
-        except:
-            pass
 
     def t_parse(self) -> tuple:
         """compose utf calc string for values
@@ -1000,7 +983,7 @@ class T_utf:
             locals().update(self.rivetD)
             tS = tS[4:].strip()                         # remove 4 space indent
             if len(ttmpL) > 0:                          # call image or image2
-                ttmpL.append(iS.strip())
+                ttmpL.append(tS.strip())
                 if indxI == 3:
                     self.t_image(ttmpL)
                     ttmpL =[]; indxI = -1; continue
@@ -1020,7 +1003,7 @@ class T_utf:
                 if tcmdL[indxI] == "image2":
                     ttmpL = tL; continue                
                 attribL[indxI](tL); continue            
-            if "=" in tS:                               # equation
+            if "=" in tS:                               # statement
                 utfS = tS.strip()
                 exec(utfS)
                 print(utfS); self.calcS += utfS + "\n"; continue       
@@ -1214,4 +1197,3 @@ class T_utf:
         utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
                + captionS + "\npath: " + imgP)
         print(utfS); self.calcS += utfS + "\n"
-

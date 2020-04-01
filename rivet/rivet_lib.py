@@ -8,56 +8,54 @@
     []_). The strings may also include reStructuredText markup (
     https://docutils.sourceforge.io/docs/user/rst/quickref.html ).
 
-    String functions with commands and tags (parameters not shown)
-    --------------------------------------------------------------
+    String functions and commands (see rivet_calc.py for parameter docs)
+    -------------------------------------------------------------------
     r__('''r-string''') : repository and calc data 
         || summary          : summary paragraph and table of contents
-        || labels           : labels for search and database
-        || append           : pdf files to append
+        || labels           : labels for search
+        || append           : append pdf files
     i__('''i-string''') : insert text and images
-        || text             : text from file
         || tex              : LaTeX equation
         || sym              : sympy equation
-        || img              : image from file
-        || table            : table from file or inline
-        || cite             : citation description    
-        || foot             : footnote description
-        [abc]_              : citation        
-        [#]_                : footnote
+        || table            : insert table from file or inline
+        || image            : insert image from file
+        || image2           : insert side by side images from files
     v__('''v-string''') : define values        
+        || values           : value assignments
     e__('''e-string''') : define equations
-        || format           : equation format
-        || cite             : citation description    
-        || foot             : footnote description
-        [abc]_              : citation        
-        [#]_                : footnote
+        || format           : equation format parameters
+        || function         : function from file   
     t__('''t-string''') : define tables and plots
-        || create           : define new table
-        || write            : write table data to file
-        || read             : read table data from file
-        || table            : insert table from data file
-        || plot             : define new plot from data file
-        || add              : add data to plot
+        || data             : define new table
+        || write            : write table data to csv file
+        || read             : read table data from csv file
+        || table            : insert table from csv file
+        || plot             : define new plot for table
+        || add              : add data to plot from table
         || save             : write plot image to file
-        || img              : image from file
-        || cite             : citation description    
-        || foot             : footnote description    
-        [abc]_              : citation        
+        || image            : insert image from file
+        || image2           : insert side by side images from files
+
+    Tags for all string functions
+    ----------------------------
+        [abc123]_           : citation        
         [#]_                : footnote
-    Commands and tags for all rivet-strings
-        || link             : http link
+        [cite]_             : citation description    
+        [foot]_             : footnote description
+        [link]_             : http link
         [page]_             : new doc page
         [line]_             : draw horizontal line
         [r]_                : right justify line
+        [c]_                : center line
+        [re]_               : right justify line with equation number   
 
-    Process functions
-    -----------------
-    utfcalc()    : writes calc to text file
-    pyvalues()   : writes all variable - values relations to python file
-    pdfdoc()     : writes calc to pdf file
-    htmldoc()    : writes calc to html file
-    pdfreport()  : writes report to pdf file
-
+    Output functions
+    ----------------
+        write_values()     : write all value assignments to python file
+        write_calc()       : write calc to utf8 text file
+        write_pdf()        : write calc to pdf file
+        write_html()       : write calc to html file
+        write_report()     : write calcs to pdf report file
 """
 import __main__
 import os
@@ -283,7 +281,7 @@ def list_values():
     print("." * _setsectD["swidth"] + "\n")
 
 def write_values():
-    """ export calculation values to Python file
+    """ export calculation value assignments to Python file
  
         The file may be used for importing output from other
         rivet calcs. File name is the calc file name 
