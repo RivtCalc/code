@@ -21,7 +21,7 @@ table    t__()     _T_utf   read, save, data, plot, add, table, image, image2
 
 Command syntax {notes}
 --------------------------
-r__('''r-string''') {repository data}
+r__('''r-string''') {define repository data}
     || summary | {toc} sections / strings  
     {paragraph text}
     
@@ -31,7 +31,7 @@ r__('''r-string''') {repository data}
     || append           
     {pdf file list}
 
-i__('''i-string''') {define text and images to insert}
+i__('''i-string''') {insert static text, images}
     || tex : 1. {image scale} | \gamma = x + 3 {latex equation text}
 
     || sym : 1. | x = y/2 {sympy equation text}
