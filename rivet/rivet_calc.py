@@ -1,69 +1,105 @@
 #! python
-"""convert rivet strings to utf-8 calcs
+"""convert rivet-strings to utf-8 calc-strings
 
-This module converts each rivet string to a utf-8 calc string, using
-a class for each of the 5 string types. String markup inlcudes commands and 
-tags.  See parse_tag function for tag summary.
+This module converts each rivet-string to a utf-8 calc-string using a separate
+class for each string type (5 total). Markup within a string includes commands
+specific to each string type and tags and reStructuredText used in all strings.
 
-List of commands by string type {notes in braces}:
-type    : commands
-----      --------
-repro   : summary {block}, labels {block}, append {block}, link
-insert  : text, tex, sym, img {block}, table {block}, cite, foot, link,   
-values  : link
-equation: format, link
-table   : create, write, read, plot, add, save, {plus insert commands}
+Commands and syntax by string type and function 
+(commands are single lines except where noted)
+------------------------------------------------
 
-detail {notes}
---------------
+string   function  class
+type     name      name    commands {notes}
+----     --------  -----   ----------------
+repo     r__()     R_utf   summary {block}, labels {block}, append {block}
+insert   i__()     I_utf   tex, sym, table {block}, image {block}, image2 {block} 
+values   v__()     V_utf   values {block}
+equation e__()     E_utf   format, function, =
+table    t__()     T_utf   read, save, data, plot, add, table, image, image2
+
+
+Command syntax {notes}
+--------------------------
 r__('''r-string''') {repository and calc data}
-    || summary | {toc} sections / functions  | {include} docstrings  
-        {paragraph text}
+    || summary | {toc} sections / strings  
+    {paragraph text}
+    
     || labels 
-        {csv list}
+    {csv list}
+    
     || append           
-        x.pdf {pdf file name}, {appendix title text}
+    {pdf file list}
+
 i__('''i-string''') {insert text and images}
-    || latex : ss  {scale} | {latex equation text}
-    || sympy : ss | {sympy equation text}
-    || image2 : ss {scale} | x.png/x.jpg {image file} 
-    figure title text
-    || image : ss | x.png/x.jpg {image file} 
-    figure title text
-    || table : ww {width} | x.txt {text file} 
-    || table : ww | n.csv {file name} 
-    table title text
-    || table  | x.rst {file name}
-    table title text
-    || table  | inline 
-    table title text
+    || tex : 1. {image scale} | \gamma = x + 3 {latex equation text}
+
+    || sym : 1. | x = y/2 {sympy equation text}
+
+    || table | x.txt  {file name} | 60 {character width} 
+
+    || table | x.csv | 60 {max column width - characters} 
+    table title 
+
+    || table | x.rst
+    table title 
+
+    || table | inline {inline rst table}
+    table title
+
+    || image | x.png/x.jpg {image file} | 1. {scale}
+    figure caption
+
+    || image2  | x1.png, x2.jpg  | 1., 1.
+    figure1 caption
+    figure2 caption
+
 v__('''v-string''') {define values}
-    || values | 
+    || values | inline | table title
+    x = 10.1 * IN {list of assigned values}
+
+    || values | x.csv | table title {import values from file}
+
 e__('''e-string''') {define equations}
-    || format | {decimals}e:n, {result}r:n, {check}c:0, {print}p:0/1/2, #:t/f  
-    || func   | {decimals}e:n, {result}r:n, {check}c:0, {print}p:0/1/2, #:t/f  
+    || format | prec:2{precision}, trim:2, replace:False, code:False    
+
+     x = y | units, alt
+
+    || func | x.py {function file} | function_name | units, alt
+
 t__('''t-string''') (define tables and plots)
-    || read   | .csv file name | table name
-    || save   | .csv file name | table name 
-    || data   | table name
+    || read | x.csv | Table Name {dataframe}
+    
+    || save | x.csv/x.png | Table or Plot Name 
+    
+    || data | x.csv | Table Name
+    
+    || plot | table name | x:c1{col},y:c2{col},k:line{kind},g:True{grid}
+    
+    || add {plot data} | Table Name | x:c3, y:c4, c:blue{color}
+    
+    || table | x.csv | 60
+    table title 
+    
+    || image | x.png | 1.
+    figure caption
+    
+    || image2 | x1.png, x2.jpg  | 1., 1.
+    figure1 caption
+    figure2 caption
 
-    || plot   | f.csv {file name} |(col names)x:c1,y:c2,(rows)r:[],(kind)k:line,(grid)g:t/f
-    || add (data to plot) | (col names) x:c3, y:c4, (color)c:blue        
-    || save | n.png / n.jpg {file names} | f {name from plot command} 
-    {plus all insert commands}
-
-List of tags {notes}:
----------------------
-    [xyz123]_               {citation}   
-    [cite]_                 {citation description}
-    [#]_                    {footnote (auto)} 
-    [foot]_                 {footnote description}
-    [page]_                 {new page in docs)
-    [line]_                 {draw horizontal line)
-    [link]_  http://xyz     {url link}
-    [r]_                    {right justify line of text)
-    [re]_                   {right justify line of text and add equation number)
-    [c]_                    {center line of text)
+Tag list {notes}:
+-----------------------------
+    [xyz123]_  {citation}   
+    [cite]_    {citation description}
+    [#]_       {footnote (auto)} 
+    [foot]_    {footnote description}
+    [page]_    {new doc page)
+    [line]_    {draw horizontal line)
+    [link]_    {insert line of text as url link}
+    [r]_       {right justify line of text)
+    [re]_      {right justify line of text with equation number)
+    [c]_       {center line of text)
 """
 
 import os
@@ -95,7 +131,7 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
     """parse tags
     
     Args:
-        tagS (str): line from rivet string
+        tagS (str): line from rivet-string
     
     List of tags :
     [abc]_      (citation name)   

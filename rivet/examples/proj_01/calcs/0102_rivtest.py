@@ -57,7 +57,7 @@ i__(''' [01]_ Load Sums
                 └── i=4   (γ+ 4)
     
     
-    || table : 50 | ttext1.txt  | Rebar Table from CSV file
+    || table | ttext1.txt  | 50
 
     Render equations
     ---------------- 
@@ -70,7 +70,7 @@ i__(''' [01]_ Load Sums
 
     Render image file
     -----------------
-    || image : .5 | pic1.png  
+    || image | pic1.png  | .5
     Inserted png file
         
     || image | pic2.jpg 
@@ -80,7 +80,7 @@ i__(''' [01]_ Load Sums
 
     Insert table or text from csv, rst or txt files
     -----------------------------------------------
-    || table : 50 | mercalli.csv  | Rebar Table from CSV file
+    || table | mercalli.csv  | 50
     
     note1: abc
     note2: def
@@ -163,7 +163,7 @@ i__(''' [02]_ Seismic Analysis
     
     [page]_
 
-    || image2 : .5,.5 | pic1.png | pic2.png 
+    || image2 | pic1.png, pic2.png | .5,.5 
     Inserted png file
     Side by side in docs
 
@@ -190,7 +190,6 @@ v__(''' some values
 
 e__(''' some equations
 
-    
     equation reference [r]_
     xx1 = gg + 4     
 
@@ -210,21 +209,22 @@ t__(''' [03]_ Manipulate tables (dataframes) and plots
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
-    || save | T2 | test33.csv 
-    | read | T3 | test1.csv 
+    || save | test33.csv | T2  
+    | read | test1.csv | T3
     
-    || table : 40 | test1.csv
-    Table title goes here
-
     plot and save data from dataframe
     ---------------------------------
-    || read | P1 | plt1.csv
+    || read | plt1.csv | P1 
     || plot | P1 | x:len1, y:area1, type:line, grid:true
     || add  | P1 | x:len1, y:prod1, c:blue 
-    || save | P1 | plt1.png 
+    || save | plt1.png | P1
 
-    || image : 1 | plt1.png  
+    || image | plt1.png | 1
     Plot caption goes here
+    
+    || table | test1.csv | 40
+    Table title goes here
+
     ''')
 
 list_values()

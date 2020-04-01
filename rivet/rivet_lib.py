@@ -92,7 +92,7 @@ _ppath = Path(_rfull).parent.parent                 # project folder path
 _dpath = Path(_ppath / "docs")                      # doc folder path
 _rpath = Path(_ppath / "reports")                   # report folder path
 _txtfile = Path(_cpath / ".".join((_rname, "txt"))) # calc output
-_pyfile = Path(_cpath / "scripts" / "".join(("v", _rfile))) # pycalc export
+_expfile = Path(_cpath / "scripts" / "".join(("v", _rfile))) # export values
 
 # folders 
 _foldD: dict = {
@@ -109,22 +109,23 @@ _foldD: dict = {
 "apath": Path(_rpath, "append"),
 "mpath": Path(_rpath, "temp")
 }
+
 _rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
 
-# command settings
-_setcmdD = {"cwidth": 50, "scale1": 1, "scale2": 1, 
-            "prec": 2, "trim": 2, "chk": "<1", "sub": False}
-
 # section settings
 _setsectD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2:4],
-"sectnum": 0, "sectname": "",
+"sectnum": 0, "sectname": "", "swidth": 80,
 "eqnum":  0, "fignum": 0, "tablenum" : 0,
-"footnum": 0,"footnote": 0,"footqueL": deque([1]),
-"swidth": 80}
+"footnum": 0,"footnote": 0,"footqueL": deque([1])
+}
 
+# command settings
+_setcmdD = {"cwidth": 50, "scale1": 1., "scale2": 1., 
+            "prec": 2, "trim": 2, "replace": False, "code": False}
 
-_exportS = """"""
+# string of values to save to file
+_exportS = """"""       
 
 def shorten_path(file_path: str, length: int)-> str:
     """split path and return path of depth = length
@@ -155,10 +156,11 @@ with open(_rfull, "r") as f2: calcbak = f2.read()
 with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
 _rshort = shorten_path(_rbak, 4)
 logging.info(f"""backup file written : {_rshort}""")
-# TODO: call check on folder structure here
+
+# todo: check folder structure here
 
 def _update(hdrS:str):
-    """update section dictionary
+    """update section setting dictionary
     
     Arguments:
         hdrs {str} -- header of rivet string
@@ -178,7 +180,7 @@ def _update(hdrS:str):
     _utfcalcS += sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
 
 def r__(rawstrS: str):
-    """convert repo-string to calc or reST string
+    """convert repo-string to utf or rst-string
     
     Args:
         rawstrS (str): repo-string
@@ -194,7 +196,7 @@ def r__(rawstrS: str):
     _utfcalcS = _utfcalcS + rcalcS
 
 def i__(rawstrS: str):
-    """convert insert-string to calc or reST string
+    """convert insert-string to utf or rst-string
     
     Args:
         rawstrS (str): insert-string
@@ -210,7 +212,7 @@ def i__(rawstrS: str):
     _utfcalcS = _utfcalcS + icalcS
 
 def v__(rawstrS: str):
-    """generate calc or reST from value-string
+    """convert value-string to utf or rst-string
     
     Args:
         rawstr (str): value-string
@@ -226,7 +228,7 @@ def v__(rawstrS: str):
     _utfcalcS = _utfcalcS + vcalcS
 
 def e__(rawstrS: str):
-    """evaluate and format an equations rivet-string
+    """convert equation-string to utf or rst-string
 
     """
     global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
@@ -240,7 +242,7 @@ def e__(rawstrS: str):
     _utfcalcS = _utfcalcS + ecalcS
 
 def t__(rawstrS: str):
-    """evaluate and format a tables rivet-string
+    """convert table-string to utf or rst-string
     
     """
     global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD
@@ -254,12 +256,13 @@ def t__(rawstrS: str):
     _utfcalcS = _utfcalcS + tcalcS
 
 def x__(str0: str):
-    """ skip execution of string
-    
+    """skip execution of a rivet-string
     """
     pass
 
 def list_values():
+    """write table of values to terminal 
+    """
         
     rivetL = [[k,v] for k,v in _rivetD.items()]
     for i in rivetL:
@@ -279,20 +282,22 @@ def list_values():
     print(tabulate(rivetL, tablefmt="grid", headers=["variable", "value"]))
     print("." * _setsectD["swidth"] + "\n")
 
-def py_values():
-    """ write rivet independent python file of calculation values
+def write_values():
+    """ export calculation values to Python file
  
-        Write a Python file with values and _equation results.  
-        Used for extensions and importing design information 
-        into other rivet or python files.  File name
-        is the calc file name prepended with 'v'.      
+        The file may be used for importing output from other
+        rivet calcs. File name is the calc file name 
+        prepended with 'v'.      
     """
-    str1 =  ("""\nThis file contains Python _equations 
+    
+    str1 =  ("""\nThis file contains values
             from the rivet design file 
             for lsti in zip(vlistx, vlisty)
             if __name__ == "__main__":\n
             vlist()\n\n""")
-    _rfile.write("\n")
+    str1 = str1 + _exportS
+    with open(_expfile, 'w') as expF:
+        expF.write(str1)
 
 def utfcalc(utfcalc, _txtfile):
     """write utf calc string to file
