@@ -1,15 +1,14 @@
 #! python
-"""Exposes rivet-string functions.
+"""Exposes rivet-string and output functions.
 
-    **rivet** markup is used in the five string functions and 4 processing
-    functions exposed in this module. rivet-strings may include any unicode
-    (UF-8). The first line of each string is a description. Each string type
-    includes a set of commands (lines begin with ||) and tags (bracketed with
-    []_). The strings may also include reStructuredText markup (
-    https://docutils.sourceforge.io/docs/user/rst/quickref.html ).
+    **rivet** markup is used within five string functions exposed in this
+    module. The first line of each string is a descriptor. Markup includes a
+    set of commands (lines begin with ||), key symbols (=) and tags (bracketed
+    with []_). They may also include unicode (UTF-8) and reStructuredText
+    (https://docutils.sourceforge.io/docs/user/rst/quickref.html).
 
-    String functions and commands (see rivet_calc.py for parameter docs)
-    -------------------------------------------------------------------
+    String functions and commands (see rivet_calc.py for doc strings)
+    -----------------------------------------------------------------
     r__('''r-string''') : repository and calc data 
         || summary          : summary paragraph and table of contents
         || labels           : labels for search
@@ -20,42 +19,45 @@
         || table            : insert table from file or inline
         || image            : insert image from file
         || image2           : insert side by side images from files
-    v__('''v-string''') : define values        
-        || values           : value assignments
+    v__('''v-string''') : define values
+         =                  : assign value        
+        || values           : values from file
     e__('''e-string''') : define equations
-        || format           : equation format parameters
-        || function         : function from file   
+         =                  : define equation or function
+        || format           : format parameters
+        || funct            : function from file   
     t__('''t-string''') : define tables and plots
         || data             : define new table
-        || write            : write table data to csv file
         || read             : read table data from csv file
+        || save             : write data or plot image to file
         || table            : insert table from csv file
         || plot             : define new plot for table
         || add              : add data to plot from table
-        || save             : write plot image to file
         || image            : insert image from file
         || image2           : insert side by side images from files
 
-    Tags for all string functions
-    ----------------------------
-        [abc123]_           : citation        
-        [#]_                : footnote
-        [cite]_             : citation description    
-        [foot]_             : footnote description
-        [link]_             : http link
-        [page]_             : new doc page
-        [line]_             : draw horizontal line
-        [r]_                : right justify line
-        [c]_                : center line
-        [re]_               : right justify line with equation number   
+        Tags (* not included in r__)
+        ----------------------------
+        [abc123]_       : citation *        
+        [#]_            : footnote *
+        [cite]_         : citation description *    
+        [foot]_         : footnote description *
+        [link]_         : http link
+        [page]_         : new doc page *
+        [line]_         : draw horizontal line *
+        [r]_            : right justify line
+        [c]_            : center line
+        [t]_            : right justify line with table number *   
+        [e]_            : right justify line with equation number *   
 
     Output functions
     ----------------
-        write_values()     : write all value assignments to python file
-        write_calc()       : write calc to utf8 text file
-        write_pdf()        : write calc to pdf file
-        write_html()       : write calc to html file
-        write_report()     : write calcs to pdf report file
+    list_values()      : write value assignments stdout table
+    write_values()     : write value assignments to python file
+    write_calc()       : write calc to utf8 text file
+    write_pdf()        : write calc to pdf file
+    write_html()       : write calc to html file
+    write_report()     : write calcs to pdf report file
 """
 import __main__
 import os
@@ -73,7 +75,7 @@ import rivet.rivet_calc as _rivcalc
 #import rivet.rivet_reprt as _reprt
 #import rivet.rivet_chk as _rchk
 
-__version__ = "0.9.0"
+__version__ = "0.9.5"
 __author__ = "rholland@structurelabs.com"
 if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
@@ -88,34 +90,36 @@ _rivpath = Path("rivet.rivet_lib.py").parent        # rivet program path
 _cpath =  Path(_rfull).parent                       # calc folder path
 _ppath = Path(_rfull).parent.parent                 # project folder path
 _dpath = Path(_ppath / "docs")                      # doc folder path
-_rpath = Path(_ppath / "reports")                   # report folder path
-_txtfile = Path(_cpath / ".".join((_rname, "txt"))) # calc output
+_rppath = Path(_ppath / "reports")                  # report folder path
+_utffile = Path(_cpath / ".".join((_rname, "txt"))) # utf calc output
 _expfile = Path(_cpath / "scripts" / "".join(("v", _rfile))) # export values
 
 # folders 
 _foldD: dict = {
+"efile": _expfile,   
 "ppath": _ppath,
 "cpath": Path(_rfull).parent,
 "dpath": _dpath,
-"rpath": _rpath,   
+"rpath": _rppath,
 "spath": Path(_cpath, "scripts"),
 "kpath": Path(_cpath, "sketches"),
 "tpath": Path(_cpath, "tables"),
 "xpath": Path(_cpath, "text"),
 "hpath": Path(_dpath, "html"),
 "fpath": Path(_dpath, "html/figures"),
-"apath": Path(_rpath, "append"),
-"mpath": Path(_rpath, "temp")
+"apath": Path(_rppath, "append"),
+"mpath": Path(_rppath, "temp")
 }
 
 _rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
-
+_rstfile = Path(_foldD["mpath"] / ".".join((_rname, "rst"))) 
+ 
 # section settings
-_setsectD: dict = {"rnum": _rname[0:4],"divnum": _rname[0:2],"calcnum": _rname[2:4],
-"sectnum": 0, "sectname": "", "swidth": 80,
-"eqnum":  0, "fignum": 0, "tablenum" : 0,
-"footnum": 0,"footnote": 0,"footqueL": deque([1])
+_setsectD: dict = {"rnum": _rname[0:4],"dnum": _rname[0:2],"cnum": _rname[2:4],
+"snum": 0, "sname": "", "swidth": 80,
+"enum":  0, "fnum": 0, "tnum" : 0,
+"ftnum": 0,"ftqueL": deque([1]), "cite": " ", "ctqueL": deque([1])
 }
 
 # command settings
@@ -154,7 +158,6 @@ with open(_rfull, "r") as f2: calcbak = f2.read()
 with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
 _rshort = shorten_path(_rbak, 4)
 logging.info(f"""backup file written : {_rshort}""")
-
 # todo: check folder structure here
 
 def _update(hdrS:str):
@@ -281,11 +284,11 @@ def list_values():
     print("." * _setsectD["swidth"] + "\n")
 
 def write_values():
-    """ export calculation value assignments to Python file
+    """ write value assignments to Python file
  
-        The file may be used for importing output from other
-        rivet calcs. File name is the calc file name 
-        prepended with 'v'.      
+        The file may be used for exchanging output between files. 
+        The file name is the calc file name prepended with 'v'
+        written to the scripts folder.      
     """
     
     str1 =  ("""\nThis file contains values
@@ -303,22 +306,7 @@ def utfcalc(utfcalc, _txtfile):
     with open(_txtfile, "wb") as f1:
         f1.write(_utfcalcS.encode("UTF-8"))
 
-def htmldoc():
-    """[summary]
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def pdfdoc():
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def pdfreport():
-    """[summary]
-    """
-    pass
-
-def _rstcalc(pline, pp, indent):
+def _rstcalc(_rstcalcS, _rstfile):
     """[summary]
     
     Args:
@@ -336,3 +324,22 @@ def _rstcalc(pline, pp, indent):
         "texmak2":  ".".join((_rbase, ".fls")),
         "texmak3":  ".".join((_rbase, ".fdb_latexmk"))
     }
+    with open(_rstfile, "wb") as f1:
+        f1.write(_rstcalcS.encode("UTF-8"))
+
+def htmldoc():
+    """[summary]
+    """
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def pdfdoc():
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def pdfreport():
+    """[summary]
+    """
+    pass
+
+
