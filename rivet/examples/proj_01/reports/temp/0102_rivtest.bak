@@ -115,7 +115,7 @@ v__(''' some values
     
     Some text about values.
 
-                                                              Steel Values [t]_
+                                                        Steel Values [t]_
     a11 = 12.23*IN              | description 1 
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
@@ -138,11 +138,11 @@ e__(''' equations string
     Some introductory text.  Set equation format.
 
     || format | prec:2,trim:2
-                                                            ACI 318-05 1.1 [e]_
+                                                        ACI 318-05 1.1 [e]_
     aa1 = a11*6*IN        | IN,M
     
     aa2 = V1*14*IN        | FT,mm
-                                                            ACI 318-05 1.2 [e]_
+                                                        ACI 318-05 1.2 [e]_
     aa3 = (aa2 * 5)/a11             
     
     aa4 = BEAM1 * 7.2
@@ -205,7 +205,7 @@ e__(''' some equations
 #%%
 t__(''' [03]_ Manipulate tables and plots    
 
-    xxxxxxxxxxxxxxx
+    Test tables.
 
     create, modify and read tables
     ------------------------------    
@@ -214,21 +214,20 @@ t__(''' [03]_ Manipulate tables and plots
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
     || save | T2 | plt1.csv
-    || read | T3 | test1.csv 
 
-    abc deee
+    Test plots.
 
-    plot and save data from dataframe
-    ---------------------------------
-    || read | P1 | plt1.csv
-    || plot | P1 | x:len1, y:area1, type:line, grid:true
-    || add  | P1 | x:len1, y:prod1, c:blue 
+    plot and save data from table
+    -----------------------------
+    || read | T4 | plt1.csv
+    || plot | T4, P1 | x='len1',y='area1',kind='line',grid=True
+    || add  | T4, P1 | x='len1', y='prod1' 
     || save | P1 | plt1.png
 
     || image | plt1.png | 1
     Plot caption goes here
     
-                                                                Table title [t]_
+                                                        Table title [t]_
     || table | test1.csv | 40
     ''')
 

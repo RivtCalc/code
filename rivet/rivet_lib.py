@@ -246,14 +246,14 @@ def t__(rawstrS: str):
     """convert table-string to utf or rst-string
     
     """
-    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD
+    global _utfcalcS, _setsectD, _foldD, _setcmdD, _exportS
 
     sectS,strS = rawstrS.split("\n",1)
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    tcalc = _rivcalc._T_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD)
-    tcalcS, _setsectD, _rivetD = tcalc.t_parse()
+    tcalc = _rivcalc._T_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    tcalcS, _setsectD, _exportS = tcalc.t_parse()
     _utfcalcS = _utfcalcS + tcalcS
 
 def x__(str0: str):
@@ -266,17 +266,28 @@ def list_values():
     """
         
     rivetL = [[k,v] for k,v in _rivetD.items()]
+    rivetT = []
     for i in rivetL:
         if isinstance(i[1], list):
             if len(i[1]) > 3:
                 i[1] = i[1][0:4] + ["..."]
+                rivetT.append(i)
             else:
                 pass
-        if isinstance(i[1], numpy.ndarray):
+        elif isinstance(i[1], numpy.ndarray):
             if numpy.size(i[1]) > 3:
                 i[1] = numpy.hstack([i[1][:4],["..."]])
-            else:
-                pass    
+                rivetT.append(i)
+        elif isinstance (i[1], int):
+                rivetT.append(i)
+        elif isinstance (i[1], float):
+                rivetT.append(i)
+        elif isinstance (i[1], str):
+                rivetT.append(i)
+        elif isinstance (i[1], bytes):
+                rivetT.append(i)
+        else:
+            continue
     print("." * _setsectD["swidth"])
     print("All Defined Variables")
     print("." * _setsectD["swidth"])                
