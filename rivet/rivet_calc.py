@@ -1020,10 +1020,10 @@ class _T_utf:
             tS = tS[4:].strip()                         # remove 4 space indent
             if len(ttmpL) > 0:                          # call image or image2
                 ttmpL.append(tS.strip())
-                if indxI == 3:
+                if indxI == 5:
                     self.t_image(ttmpL)
                     ttmpL =[]; indxI = -1; continue
-                if len(ttmpL) == 5:
+                if len(ttmpL) == 6:
                     self.t_image2(ttmpL)
                     ttmpL =[]; continue
                 else: continue
@@ -1053,14 +1053,14 @@ class _T_utf:
                     incrI = self.setsectD["ftqueL"][-1] + 1
                     self.setsectD["ftqueL"].append(incrI)
                     continue
-            elif any(tag in tS for tag in tagL):
-                self.calcS, self.setsectD = _tags(tS, self.calcS, self.setsectD)
-                continue 
-            else:
-                utfS = tS.replace("]_","]")
-                print(utfS); self.calcS += utfS + "\n"
-                continue       
-        
+                elif any(tag in tS for tag in tagL):
+                    self.calcS, self.setsectD = _tags(tS, self.calcS, self.setsectD)
+                    continue 
+                else:
+                    utfS = tS.replace("]_","]")
+                    print(utfS); self.calcS += utfS + "\n"; continue
+            print(tS); self.calcS += tS + "\n"         
+            
         self.rivetD.update(locals())
         return (self.calcS, self.setsectD, self.rivetD, self.exportS)
        
@@ -1072,10 +1072,12 @@ class _T_utf:
         """
         locals().update(self.rivetD)
         
-        df = tL[2].strip
-        filename = tL[3].strip()
-        pathname = Path(self.folderd["tpath"], filename).as_posix()
-        exec(str(df) + "= pd.read_csv(" + str(pathname) + ")")     
+        df = tL[1].strip()
+        filenameS = tL[2].strip()
+        pnameS = str(Path(self.folderD["tpath"], filenameS))
+        cmdS = str(df) + "= pd.read_csv('" + pnameS + "')" 
+        print(110,cmdS)
+        exec(cmdS)     
         
         self.rivetD.update(locals())
 

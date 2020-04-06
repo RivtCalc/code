@@ -203,7 +203,9 @@ e__(''' some equations
 
     ''')
 #%%
-t__(''' [03]_ Manipulate tables (dataframes) and plots    
+t__(''' [03]_ Manipulate tables and plots    
+
+    xxxxxxxxxxxxxxx
 
     create, modify and read tables
     ------------------------------    
@@ -211,9 +213,11 @@ t__(''' [03]_ Manipulate tables (dataframes) and plots
     T2["len1"] = range(1,8)  
     T2["area1"] = range(10,17)  
     T2["prod1"] = T2["area1"]*T2["len1"]
-    || save | T2 | test33.csv
-    | read | T3 | test1.csv 
-    
+    || save | T2 | plt1.csv
+    || read | T3 | test1.csv 
+
+    abc deee
+
     plot and save data from dataframe
     ---------------------------------
     || read | P1 | plt1.csv
@@ -224,7 +228,7 @@ t__(''' [03]_ Manipulate tables (dataframes) and plots
     || image | plt1.png | 1
     Plot caption goes here
     
-                                                     Table title goes here [t]_
+                                                                Table title [t]_
     || table | test1.csv | 40
     ''')
 
