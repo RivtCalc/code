@@ -22,6 +22,7 @@
     v__('''v-string''') : define values
          =                  : assign value        
         || values           : values from file
+        || vectors          : vectors from file
     e__('''e-string''') : define equations
          =                  : define equation or function
         || format           : format parameters
@@ -264,34 +265,18 @@ def x__(str0: str):
 def list_values():
     """write table of values to terminal 
     """
-        
     rivetL = [[k,v] for k,v in _rivetD.items()]
     rivetT = []
     for i in rivetL:
-        if isinstance(i[1], list):
-            if len(i[1]) > 3:
-                i[1] = i[1][0:4] + ["..."]
-                rivetT.append(i)
-            else:
-                pass
-        elif isinstance(i[1], numpy.ndarray):
+        if isinstance(i[1], numpy.ndarray):
             if numpy.size(i[1]) > 3:
                 i[1] = numpy.hstack([i[1][:4],["..."]])
-                rivetT.append(i)
-        elif isinstance (i[1], int):
-                rivetT.append(i)
-        elif isinstance (i[1], float):
-                rivetT.append(i)
-        elif isinstance (i[1], str):
-                rivetT.append(i)
-        elif isinstance (i[1], bytes):
-                rivetT.append(i)
-        else:
-            continue
+            rivetT.append(i)
+
     print("." * _setsectD["swidth"])
     print("All Defined Variables")
     print("." * _setsectD["swidth"])                
-    print(tabulate(rivetL, tablefmt="grid", headers=["variable", "value"]))
+    print(tabulate(rivetT, tablefmt="grid", headers=["variable", "value"]))
     print("." * _setsectD["swidth"] + "\n")
 
 def write_values():

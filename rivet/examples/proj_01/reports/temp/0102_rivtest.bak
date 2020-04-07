@@ -116,23 +116,15 @@ v__(''' some values
     Some text about values.
 
                                                         Steel Values [t]_
-    a11 = 12.23*IN              | description 1 
+    a11 = 12.23*IN              | description 1, MM
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
-    V1 = [1,4,3]*FT             | a vector
+    V1 = [1,4,3]*FT             | a vector, M
                  
-    || values | aisc13.csv | BEAM1 : r[4]
-    || values | aisc13.csv | BEAM2 : c[2]
-
-    I_x = BEAM1[2]              | I major
-    I_y = BEAM1[3]              | I minor
-
     || values | v0103_testvalues.py | [:]
 
     ''')
-
 list_values()
-
 e__(''' equations string
     
     Some introductory text.  Set equation format.
@@ -150,6 +142,7 @@ e__(''' equations string
     | fnct | scripts1.py | pin_pin(a11, a22) | FT*LB, N*M
     | fnct | scripts1.py | fixed_fixed(a11, a22) | FT*LB, N*M
     ''')
+list_values()
 #%%
 i__(''' [02]_ Seismic Analysis
     
@@ -179,14 +172,17 @@ v__(''' some values
 
     this is one line 4 γ
 
-    
-    
-    
-    || values | v0103_testvalues.py | [:]
+                                                        variable table [t]_
       
     gg = 5.4    | height of roof 
     hh = 12.2   | height of balcony
     w1 = 2.2    | uniform load 
+    
+    || vector | aisc13a.csv | BEAM1 : r4
+    || vector | aisc13a.csv | BEAM2 : c2
+    
+    I_x = BEAM1[2]              | I major
+    I_y = BEAM1[3]              | I minor
 
     ''')
 
@@ -200,7 +196,6 @@ e__(''' some equations
     [line]_
 
     [link]_ http:google.com
-
     ''')
 #%%
 t__(''' [03]_ Manipulate tables and plots    
@@ -225,12 +220,12 @@ t__(''' [03]_ Manipulate tables and plots
     || save | P1 | plt1.png
 
     || image | plt1.png | 1
-    Plot caption goes here
-    
-                                                        Table title [t]_
+                                                Plot caption goes here [f]
+
+                                                            Table title [t]_
     || table | test1.csv | 40
     ''')
-
+    
 list_values()
 #write_values()
 #write_utfcalc()
