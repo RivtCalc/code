@@ -81,9 +81,10 @@ __author__ = "rholland@structurelabs.com"
 if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
-_rivetD: dict ={}                                   # runtime dictionary
-_exportL: list = []                                 # values
-_utfcalcS = """"""                                  # calc print string
+#start-up variables
+_rivetD: dict ={}                                   # runtime vars dictionary
+_utfcalcS = """"""                                  # utf print string
+_exportS = """"""                                   # values export string
 _rfull = Path(__main__.__file__)                    # calc file path
 _rfile = Path(__main__.__file__).name               # calc file name
 _rname = _rfile.split(".py")[0]                     # calc file basename
@@ -93,9 +94,8 @@ _ppath = Path(_rfull).parent.parent                 # project folder path
 _dpath = Path(_ppath / "docs")                      # doc folder path
 _rppath = Path(_ppath / "reports")                  # report folder path
 _utffile = Path(_cpath / ".".join((_rname, "txt"))) # utf calc output
-_expfile = Path(_cpath / "scripts" / "".join(("v", _rfile))) # export values
-
-# folders 
+_expfile = Path(_cpath / "scripts" / "".join(("v", _rfile))) # export file
+# folder dictionary
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
@@ -111,37 +111,20 @@ _foldD: dict = {
 "apath": Path(_rppath, "append"),
 "mpath": Path(_rppath, "temp")
 }
-
+# temp folder files
 _rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
 _rstfile = Path(_foldD["mpath"] / ".".join((_rname, "rst"))) 
- 
 # section settings
 _setsectD: dict = {"rnum": _rname[0:4],"dnum": _rname[0:2],"cnum": _rname[2:4],
-"snum": 0, "sname": "", "swidth": 80,
+"snum": "", "sname": "", "swidth": 80,
 "enum":  0, "fnum": 0, "tnum" : 0,
 "ftnum": 0,"ftqueL": deque([1]), "cite": " ", "ctqueL": deque([1])
 }
-
 # command settings
 _setcmdD = {"cwidth": 50, "scale1": 1., "scale2": 1., 
             "prec": 2, "trim": 2, "replace": False, "code": False}
-
-# string of values for export to file
-_exportS = """"""       
-
-def shorten_path(file_path: str, length: int)-> str:
-    """split path and return path of depth = length
-    
-    Args:
-        file_path (str): path to shorten
-        length (int): path depth
-    
-    Returns:
-        str: shortened path
-    """
-    return Path(*Path(file_path).parts[-length:])
-
+#logs and checks
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d %H:%M',
@@ -152,13 +135,12 @@ console.setLevel(logging.INFO)
 formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
-
-_rshort = shorten_path(_rfull, 3)
-logging.info(f"""rivet file : {_rshort}""" )
 with open(_rfull, "r") as f2: calcbak = f2.read()
 with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
-_rshort = shorten_path(_rbak, 4)
-logging.info(f"""backup file written : {_rshort}""")
+_rshortP = Path(*Path(_rfull).parts[-3:])
+_bshortP = Path(*Path(_rbak).parts[-4:])
+logging.info(f"""rivet file : {_rshortP}""" )
+logging.info(f"""backup file written : {_bshortP}""")
 # todo: check folder structure here
 
 def _update(hdrS:str):
@@ -167,100 +149,20 @@ def _update(hdrS:str):
     Args:
         hdrs {str}: rivet-string header
     """
-    global _utfcalcS, _setsectD, _rivetD
+    global _utfcalcS, _setsectD
 
-    _setsectD["eqnum"] = 0 
-    _setsectD["fignum"] = 0
-    _setsectD["tablenum"] = 0
+    _setsectD["enum"] = 0 
+    _setsectD["fnum"] = 0
+    _setsectD["tnum"] = 0
     swidthI = int(_setsectD["swidth"])
     rnumS = str(_setsectD["rnum"])
-    snameS = _setsectD["sectname"] = hdrS[hdrS.find("]_") + 2:].strip()
-    snumS = _setsectD["sectnum"] = hdrS[hdrS.find("[")+2:hdrS.find("]_")]
+    snameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
+    snum = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
     sheadS = " " +  snameS + (rnumS + " - " +
-           ("[" + str(snumS) + "]")).rjust(swidthI - len(snameS) - 2)
+            ("[" + str(snum) + "]")).rjust(swidthI - len(snameS) - 2)
     sstrS = swidthI * "="
-    _utfcalcS += sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
-
-def r__(rawstrS: str):
-    """convert repo-string to utf or rst-string
-    
-    Args:
-        rawstrS (str): repo-string
-    """
-    global  _utfcalcS, _setsectD, _rivetD
-    
-    sectS,strS = rawstrS.split("\n",1)
-    if "]_" in sectS: _update(sectS)
-    
-    strL = strS.split("\n")
-    rcalc = _rivcalc._R_utf(strL, _foldD, _setsectD) 
-    rcalcS, _setsectD = rcalc.r_parse()
-    _utfcalcS = _utfcalcS + rcalcS
-
-def i__(rawstrS: str):
-    """convert insert-string to utf or rst-string
-    
-    Args:
-        rawstrS (str): insert-string
-    """
-    global _utfcalcS, _setsectD, _foldD, _setcmdD
-
-    sectS,strS = rawstrS.split("\n",1)
-    if "]_" in sectS: _update(sectS)
-
-    strL = strS.split("\n")
-    icalc = _rivcalc._I_utf(strL, _foldD, _setcmdD, _setsectD) 
-    icalcS, _setsectD, _setcmdD = icalc.i_parse()
-    _utfcalcS = _utfcalcS + icalcS
-
-def v__(rawstrS: str):
-    """convert value-string to utf or rst-string
-    
-    Args:
-        rawstr (str): value-string
-    """
-    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
-
-    sectS,strS = rawstrS.split("\n",1)
-    if "]_" in sectS: _update(sectS)
-    
-    strL = strS.split("\n")
-    vcalc = _rivcalc._V_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
-    vcalcS, _setsectD, _rivetD, _exportS = vcalc.v_parse()
-    _utfcalcS = _utfcalcS + vcalcS
-
-def e__(rawstrS: str):
-    """convert equation-string to utf or rst-string
-
-    """
-    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
-
-    sectS,strS = rawstrS.split("\n",1)
-    if "]_" in sectS: _update(sectS)
-    
-    strL = strS.split("\n")
-    ecalc = _rivcalc._E_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
-    ecalcS, _setsectD, _rivetD, _exportS = ecalc.e_parse()
-    _utfcalcS = _utfcalcS + ecalcS
-
-def t__(rawstrS: str):
-    """convert table-string to utf or rst-string
-    
-    """
-    global _utfcalcS, _setsectD, _foldD, _setcmdD, _exportS
-
-    sectS,strS = rawstrS.split("\n",1)
-    if "]_" in sectS: _update(sectS)
-    
-    strL = strS.split("\n")
-    tcalc = _rivcalc._T_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
-    tcalcS, _setsectD, _exportS = tcalc.t_parse()
-    _utfcalcS = _utfcalcS + tcalcS
-
-def x__(str0: str):
-    """skip execution of a rivet-string
-    """
-    pass
+    utfS = sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
+    print(utfS); _utfcalcS += utfS
 
 def list_values():
     """write table of values to terminal 
@@ -274,7 +176,7 @@ def list_values():
             rivetT.append(i)
 
     print("." * _setsectD["swidth"])
-    print("All Defined Variables")
+    print("Values List")
     print("." * _setsectD["swidth"])                
     print(tabulate(rivetT, tablefmt="grid", headers=["variable", "value"]))
     print("." * _setsectD["swidth"] + "\n")
@@ -338,4 +240,83 @@ def pdfreport():
     """
     pass
 
+def r__(rawS: str):
+    """convert repo-string to utf or rst-string
+    
+    Args:
+        rawstrS (str): repo-string
+    """
+    global  _utfcalcS, _setsectD, _rivetD
+    
+    sectS,strS = rawS.split("\n",1)
+    if "]_" in sectS: _update(sectS)
+    
+    strL = strS.split("\n")
+    rcalc = _rivcalc._R_utf(strL, _foldD, _setsectD) 
+    rcalcS, _setsectD = rcalc.r_parse()
+    _utfcalcS = _utfcalcS + rcalcS
 
+def i__(rawS: str):
+    """convert insert-string to utf or rst-string
+    
+    Args:
+        rawstrS (str): insert-string
+    """
+    global _utfcalcS, _setsectD, _foldD, _setcmdD
+
+    sectS,strS = rawS.split("\n",1)
+    if "]_" in sectS: _update(sectS)
+
+    strL = strS.split("\n")
+    icalc = _rivcalc._I_utf(strL, _foldD, _setcmdD, _setsectD) 
+    icalcS, _setsectD, _setcmdD = icalc.i_parse()
+    _utfcalcS = _utfcalcS + icalcS
+
+def v__(rawS: str):
+    """convert value-string to utf or rst-string
+    
+    Args:
+        rawstr (str): value-string
+    """
+    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
+
+    sectS,strS = rawS.split("\n",1)
+    if "]_" in sectS: _update(sectS)
+    
+    strL = strS.split("\n")
+    vcalc = _rivcalc._V_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    vcalcS, _setsectD, _rivetD, _exportS = vcalc.v_parse()
+    _utfcalcS = _utfcalcS + vcalcS
+
+def e__(rawS: str):
+    """convert equation-string to utf or rst-string
+
+    """
+    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
+
+    sectS,strS = rawS.split("\n",1)
+    if "]_" in sectS: _update(sectS)
+    
+    strL = strS.split("\n")
+    ecalc = _rivcalc._E_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    ecalcS, _setsectD, _rivetD, _exportS = ecalc.e_parse()
+    _utfcalcS = _utfcalcS + ecalcS
+
+def t__(rawS: str):
+    """convert table-string to utf or rst-string
+    
+    """
+    global _utfcalcS, _setsectD, _foldD, _setcmdD, _exportS
+
+    sectS,strS = rawS.split("\n",1)
+    if "]_" in sectS: _update(sectS)
+    
+    strL = strS.split("\n")
+    tcalc = _rivcalc._T_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    tcalcS, _setsectD, _exportS = tcalc.t_parse()
+    _utfcalcS = _utfcalcS + tcalcS
+
+def x__(rawS: str):
+    """skip execution of a rivet-string
+    """
+    pass

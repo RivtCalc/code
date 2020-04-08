@@ -2,7 +2,6 @@
 #%%
 from rivet.rivet_lib import *
 r__(''' repository data
-
     || summary | section 
     The r__ function contains summary calc information
     used in repositories and dababases. It writes an .rst file that can be
@@ -27,11 +26,9 @@ r__(''' repository data
     || append | cover.pdf
     myreport1.pdf, A. Some Data
     myreport2.pdf, B. Some Tables 
-
     ''')
 #%%  
 i__(''' [01]_ Load Sums 
-    
     The need to distinguish between the various meanings of "frame of
     reference" has led to a variety of terms. For example, sometimes the type
     of coordinate system is attached as a modifier, as in Cartesian frame of
@@ -41,6 +38,8 @@ i__(''' [01]_ Load Sums
 
     Sometimes the state of motion asfda asd s fdas sfdfasdfasdf is emphasized,
     as in rotating frame of reference.
+
+    [line]_
 
     :: 
 
@@ -56,6 +55,7 @@ i__(''' [01]_ Load Sums
              ζ= >     ────────────                            
                 └── i=4   (γ+ 4)
     
+    [line]_
     
     || table | ttext1.txt  | 50
 
@@ -66,6 +66,7 @@ i__(''' [01]_ Load Sums
 
                                                           ACI 318-05 5.5.2 [e]_
     || sympy : 1 | x = (12 + omega + α) / (14 + gamma)  
+
 
     Render image file
     -----------------
@@ -112,21 +113,17 @@ i__(''' [01]_ Load Sums
     ''')
 
 v__(''' some values 
-    
-    Some text about values.
-
+    Some text about values. slsa sadlfksd sadfsfas  sadflkm sdflm saf
+    afdak asdfas asflkm asf.
                                                         Steel Values [t]_
     a11 = 12.23*IN              | description 1, MM
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
-    V1 = [1,4,3]*FT             | a vector, M
-                 
+    V1 = [1,4,3]*FT             | a vector, M         
     || values | v0103_testvalues.py | [:]
-
     ''')
-list_values()
+
 e__(''' equations string
-    
     Some introductory text.  Set equation format.
 
     || format | prec:2,trim:2
@@ -142,10 +139,8 @@ e__(''' equations string
     | fnct | scripts1.py | pin_pin(a11, a22) | FT*LB, N*M
     | fnct | scripts1.py | fixed_fixed(a11, a22) | FT*LB, N*M
     ''')
-list_values()
 #%%
 i__(''' [02]_ Seismic Analysis
-    
     This is a test γ = 2*Σ of the system and this is a further test and
     another greek letter Γ₂.
 
@@ -165,41 +160,31 @@ i__(''' [02]_ Seismic Analysis
     frames of reference [CIT2000]_.
 
     [cite]_ citation text
-
     ''')
 
 v__(''' some values
-
     this is one line 4 γ
-
                                                         variable table [t]_
-      
     gg = 5.4    | height of roof 
     hh = 12.2   | height of balcony
     w1 = 2.2    | uniform load 
-    
     || vector | aisc13a.csv | BEAM1 : r4
     || vector | aisc13a.csv | BEAM2 : c2
-    
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
-
+    I_z = BEAM1[2]              | I diagonal
     ''')
 
 e__(''' some equations
-
                                                     equation reference [e]_
     xx1 = gg + 4     
 
     xx2 = hh + 10    
-    
-    [line]_
 
     [link]_ http:google.com
     ''')
 #%%
 t__(''' [03]_ Manipulate tables and plots    
-
     Test tables.
 
     create, modify and read tables
