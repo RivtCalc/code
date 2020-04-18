@@ -163,16 +163,12 @@ def list_values():
 def write_values():
     """ write value assignments to Python file
  
-        The file may be used for exchanging output between files. 
-        The file name is the calc file name prepended with 'v'
+        Use file for exchanging values between calcs. 
+        File name is the calc file name prepended with 'v'
         written to the scripts folder.      
     """
     
-    str1 =  ("""\nThis file contains values
-            from the rivet design file 
-            for lsti in zip(vlistx, vlisty)
-            if __name__ == "__main__":\n
-            vlist()\n\n""")
+    str1 =  ("""header string""")
     str1 = str1 + _exportS
     with open(_expfile, 'w') as expF:
         expF.write(str1)
@@ -199,7 +195,7 @@ def pdfreport():
     pass
 
 def _update(hdrS:str):
-    """update section setting dictionary
+    """update section settings
     
     Args:
         hdrs {str}: rivet-string header
@@ -220,7 +216,7 @@ def _update(hdrS:str):
     print(utfS); _utfcalcS += utfS
 
 def _rstcalc(_rstcalcS, _rstfile):
-    """[summary]
+    """write reST calc strig to file
     
     Args:
         pline ([type]): [description]
