@@ -143,27 +143,6 @@ logging.info(f"""rivet file : {_rshortP}""" )
 logging.info(f"""backup file written : {_bshortP}""")
 # todo: check folder structure here
 
-def _update(hdrS:str):
-    """update section setting dictionary
-    
-    Args:
-        hdrs {str}: rivet-string header
-    """
-    global _utfcalcS, _setsectD
-
-    _setsectD["enum"] = 0 
-    _setsectD["fnum"] = 0
-    _setsectD["tnum"] = 0
-    swidthI = int(_setsectD["swidth"])
-    rnumS = str(_setsectD["rnum"])
-    snameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
-    snum = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
-    sheadS = " " +  snameS + (rnumS + " - " +
-            ("[" + str(snum) + "]")).rjust(swidthI - len(snameS) - 2)
-    sstrS = swidthI * "="
-    utfS = sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
-    print(utfS); _utfcalcS += utfS
-
 def list_values():
     """write table of values to terminal 
     """
@@ -184,16 +163,12 @@ def list_values():
 def write_values():
     """ write value assignments to Python file
  
-        The file may be used for exchanging output between files. 
-        The file name is the calc file name prepended with 'v'
+        Use file for exchanging values between calcs. 
+        File name is the calc file name prepended with 'v'
         written to the scripts folder.      
     """
     
-    str1 =  ("""\nThis file contains values
-            from the rivet design file 
-            for lsti in zip(vlistx, vlisty)
-            if __name__ == "__main__":\n
-            vlist()\n\n""")
+    str1 =  ("""header string""")
     str1 = str1 + _exportS
     with open(_expfile, 'w') as expF:
         expF.write(str1)
@@ -204,8 +179,44 @@ def utfcalc(utfcalc, _txtfile):
     with open(_txtfile, "wb") as f1:
         f1.write(_utfcalcS.encode("UTF-8"))
 
-def _rstcalc(_rstcalcS, _rstfile):
+def htmldoc():
     """[summary]
+    """
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def pdfdoc():
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def pdfreport():
+    """[summary]
+    """
+    pass
+
+def _update(hdrS:str):
+    """update section settings
+    
+    Args:
+        hdrs {str}: rivet-string header
+    """
+    global _utfcalcS, _setsectD
+
+    _setsectD["enum"] = 0 
+    _setsectD["fnum"] = 0
+    _setsectD["tnum"] = 0
+    swidthI = int(_setsectD["swidth"])
+    rnumS = str(_setsectD["rnum"])
+    snameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
+    snum = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
+    sheadS = " " +  snameS + (rnumS + " - " +
+            ("[" + str(snum) + "]")).rjust(swidthI - len(snameS) - 2)
+    sstrS = swidthI * "="
+    utfS = sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
+    print(utfS); _utfcalcS += utfS
+
+def _rstcalc(_rstcalcS, _rstfile):
+    """write reST calc strig to file
     
     Args:
         pline ([type]): [description]
@@ -224,21 +235,6 @@ def _rstcalc(_rstcalcS, _rstfile):
     }
     with open(_rstfile, "wb") as f1:
         f1.write(_rstcalcS.encode("UTF-8"))
-
-def htmldoc():
-    """[summary]
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def pdfdoc():
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def pdfreport():
-    """[summary]
-    """
-    pass
 
 def r__(rawS: str):
     """convert repo-string to utf or rst-string
