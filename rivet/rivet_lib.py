@@ -85,38 +85,38 @@ if sys.version_info < (3, 7):
 _rivetD: dict ={}                                   # runtime vars dictionary
 _utfcalcS = """"""                                  # utf print string
 _exportS = """"""                                   # values export string
-_rfull = Path(__main__.__file__)                    # calc file path
-_rfile = Path(__main__.__file__).name               # calc file name
-_rname = _rfile.split(".py")[0]                     # calc file basename
+_cfull = Path(__main__.__file__)                    # calc file path
+_cfile = Path(__main__.__file__).name               # calc file name
+_cname = _cfile.split(".py")[0]                     # calc file basename
 _rivpath = Path("rivet.rivet_lib.py").parent        # rivet program path
-_cpath =  Path(_rfull).parent                       # calc folder path
-_ppath = Path(_rfull).parent.parent                 # project folder path
+_cpath =  Path(_cfull).parent                       # calc folder path
+_ppath = Path(_cfull).parent.parent                 # project folder path
 _dpath = Path(_ppath / "docs")                      # doc folder path
 _rppath = Path(_ppath / "reports")                  # report folder path
-_utffile = Path(_cpath / ".".join((_rname, "txt"))) # utf calc output
-_expfile = Path(_cpath / "scripts" / "".join(("v", _rfile))) # export file
+_utffile = Path(_cpath / ".".join((_cname, "txt"))) # utf calc output
+_expfile = Path(_cpath / "scripts" / "".join(("v", _cfile))) # export file
 # folder dictionary
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
-"cpath": Path(_rfull).parent,
+"cpath": Path(_cfull).parent,
 "dpath": _dpath,
 "rpath": _rppath,
 "spath": Path(_cpath, "scripts"),
 "kpath": Path(_cpath, "sketches"),
-"tpath": Path(_cpath, "tables"),
+"tpath": Path(_cpath, "data"),
 "xpath": Path(_cpath, "text"),
+"mpath": Path(_cpath, "tmp"),
 "hpath": Path(_dpath, "html"),
 "fpath": Path(_dpath, "html/figures"),
-"apath": Path(_rppath, "append"),
-"mpath": Path(_rppath, "temp")
+"apath": Path(_rppath, "append")
 }
 # temp folder files
-_rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
-_logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
-_rstfile = Path(_foldD["mpath"] / ".".join((_rname, "rst"))) 
+_rbak = Path(_foldD["mpath"] / ".".join((_cname, "bak")))
+_logfile = Path(_foldD["mpath"] / ".".join((_cname, "log")))
+_rstfile = Path(_foldD["mpath"] / ".".join((_cname, "rst"))) 
 # section settings
-_setsectD: dict = {"rnum": _rname[0:4],"dnum": _rname[0:2],"cnum": _rname[2:4],
+_setsectD: dict = {"rnum": _cname[0:4],"dnum": _cname[0:2],"cnum": _cname[2:4],
 "snum": "", "sname": "", "swidth": 80,
 "enum":  0, "fnum": 0, "tnum" : 0,
 "ftnum": 0,"ftqueL": deque([1]), "cite": " ", "ctqueL": deque([1])
@@ -135,9 +135,9 @@ console.setLevel(logging.INFO)
 formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
-with open(_rfull, "r") as f2: calcbak = f2.read()
+with open(_cfull, "r") as f2: calcbak = f2.read()
 with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
-_rshortP = Path(*Path(_rfull).parts[-3:])
+_rshortP = Path(*Path(_cfull).parts[-3:])
 _bshortP = Path(*Path(_rbak).parts[-4:])
 logging.info(f"""rivet file : {_rshortP}""" )
 logging.info(f"""backup file written : {_bshortP}""")

@@ -61,10 +61,10 @@ i__(''' [01]_ Load Sums
 
     Render equations
     ---------------- 
-                                                          ACI 318-05 5.5.1 [e]_
+                                                           ACI 318-05 5.5.1 [e]_
     || latex : 1 | x = \\frac{1 + \\omega}{2 + \\gamma} 
 
-                                                          ACI 318-05 5.5.2 [e]_
+                                                           ACI 318-05 5.5.2 [e]_
     || sympy : 1 | x = (12 + omega + α) / (14 + gamma)  
 
 
@@ -78,16 +78,16 @@ i__(''' [01]_ Load Sums
     Some added text xxxx is put here and a bit of nonsense to make some words
     for a paragraph.
 
-                           Insert table or text from csv, rst or txt files [t]_
+                            Insert table or text from csv, rst or txt files [t]_
     || table | mercalli.csv  | 50
     
     note1: abc
     note2: def
 
-                                                Rebar Table from reST file [t]_
+                                                 Rebar Table from reST file [t]_
     || table | rebars.rst  | 
     
-                                                        Inline Table Title [t]_
+                                                         Inline Table Title [t]_
     || table | inline  
     +-----------+-------+--------+-------------+-----------+
     |   barsize |   dia |   area |   perimeter |   wt/foot |
@@ -115,23 +115,24 @@ i__(''' [01]_ Load Sums
 v__(''' some values 
     Some text about values. slsa sadlfksd sadfsfas  sadflkm sdflm saf
     afdak asdfas asflkm asf.
-                                                        Steel Values [t]_
+                                                               Steel Values [t]_
     a11 = 12.23*IN              | description 1, MM
     a22 = 2.2                   | description 2 
     a33 = 14                    | description 3 
-    V1 = [1,4,3]*FT             | a vector, M         
+    V1  = [1,4,3]*FT             | a vector, M         
     || values | v0103_testvalues.py | [:]
     ''')
 
 e__(''' equations string
     Some introductory text.  Set equation format.
 
-    || format | prec:2,trim:2
-                                                        ACI 318-05 1.1 [e]_
+    || format | prec:2,trim:2                            
+                                 
+                                 ACI 318-05 1.1     [e]_                       
     aa1 = a11*6*IN        | IN,M
     
     aa2 = V1*14*IN        | FT,mm
-                                                        ACI 318-05 1.2 [e]_
+                                                             ACI 318-05 1.2 [e]_
     aa3 = (aa2 * 5)/a11             
     
     aa4 = BEAM1 * 7.2
@@ -164,7 +165,8 @@ i__(''' [02]_ Seismic Analysis
 
 v__(''' some values
     this is one line 4 γ
-                                                        variable table [t]_
+
+                                                   variable table reference [t]_
     gg = 5.4    | height of roof 
     hh = 12.2   | height of balcony
     w1 = 2.2    | uniform load 
@@ -176,7 +178,7 @@ v__(''' some values
     ''')
 
 e__(''' some equations
-                                                    equation reference [e]_
+                                                         equation reference [e]_
     xx1 = gg + 4     
 
     xx2 = hh + 10    
@@ -205,16 +207,13 @@ t__(''' [03]_ Manipulate tables and plots
     || save | P1 | plt1.png
 
     || image | plt1.png | 1
-                                                Plot caption goes here [f]
+                                                     Plot caption goes here [f]_
 
-                                                            Table title [t]_
+                                                                Table title [t]_
     || table | test1.csv | 40
     ''')
     
 list_values()
-#write_values()
 #write_utfcalc()
 #write_pdfdoc()
 #write_htmldoc()
-#write_pdfreport()
-
