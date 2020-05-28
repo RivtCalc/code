@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(
-    name='rivet-docs',
+    name='rivetcalcs',
     version='0.9dev',
     packages=['rivet','rivet.unum','rivet.unum.units','rivet.unum.units.si'],
     license='GPLv3',
