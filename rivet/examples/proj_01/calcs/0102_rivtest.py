@@ -2,17 +2,16 @@
 #%%
 from rivet.rivet_lib import *
 r__(''' repository data
-    || summary | section 
-    The r__ function contains summary calc information
-    used in repositories and dababases. It writes an .rst file that can be
-    uploaded to a GitHub gist or repository. The **summary** command includes
-    this paragraph, an optional a table of contents at the level of sections or
-    functions, and an optional listing of docstrings used in imported
-    functions. The file contents are also appended to the front of the calc
-    output.
+    || summary | sections
+    The r__ function contains summary calc information used in repositories and
+    dababases. It writes an .rst file that can be uploaded to a GitHub gist or
+    repository. The **summary** command includes this paragraph, an optional a
+    table of contents at the level of sections or functions, and an optional
+    listing of docstrings used in imported functions. The file contents are
+    also appended to the front of the calc output.
 
-    || label | rivet
-    field, structures, buildings
+    || label | rivet-docs
+    domain, structures, buildings
     assemblies,  floor, wall  
     materials, concrete, steel 
     components, beams, columns 
@@ -78,7 +77,7 @@ i__(''' [01]_ Load Sums
     Some added text xxxx is put here and a bit of nonsense to make some words
     for a paragraph.
 
-                            Insert table or text from csv, rst or txt files [t]_
+                                  Insert table or text from csv, rst or txt [t]_
     || table | mercalli.csv  | 50
     
     note1: abc
@@ -116,10 +115,11 @@ v__(''' some values
     Some text about values. slsa sadlfksd sadfsfas  sadflkm sdflm saf
     afdak asdfas asflkm asf.
                                                                Steel Values [t]_
-    a11 = 12.23*IN              | description 1, MM
-    a22 = 2.2                   | description 2 
-    a33 = 14                    | description 3 
-    V1  = [1,4,3]*FT             | a vector, M         
+    a11 = 12.23*IN, MM              | description
+    a22 = 2.2                       | description 
+    a33 = 14                        | description 
+    V1  = [1,4,3]*FT, M             | a vector         
+    
     || values | v0103_testvalues.py | [:]
     ''')
 
@@ -170,8 +170,10 @@ v__(''' some values
     gg = 5.4    | height of roof 
     hh = 12.2   | height of balcony
     w1 = 2.2    | uniform load 
+    
     || vector | aisc13a.csv | BEAM1 : r4
     || vector | aisc13a.csv | BEAM2 : c2
+    
     I_x = BEAM1[2]              | I major
     I_y = BEAM1[3]              | I minor
     I_z = BEAM1[2]              | I diagonal

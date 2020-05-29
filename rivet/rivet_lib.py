@@ -66,6 +66,7 @@ import sys
 import textwrap
 import logging
 import numpy
+import warnings
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
@@ -125,6 +126,7 @@ _setsectD: dict = {"rnum": _cname[0:4],"dnum": _cname[0:2],"cnum": _cname[2:4],
 _setcmdD = {"cwidth": 50, "scale1": 1., "scale2": 1., 
             "prec": 2, "trim": 2, "replace": False, "code": False}
 #logs and checks
+warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d %H:%M',
@@ -132,15 +134,20 @@ logging.basicConfig(level=logging.DEBUG,
                     filemode='w')
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
-formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+#formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+formatter = logging.Formatter('%(levelname)-8s: %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
+
 with open(_cfull, "r") as f2: calcbak = f2.read()
-with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
+with open(_rbak, "w") as f3: f3.write(calcbak)          # write backup
+
 _rshortP = Path(*Path(_cfull).parts[-3:])
 _bshortP = Path(*Path(_rbak).parts[-4:])
-logging.info(f"""rivet file : {_rshortP}""" )
-logging.info(f"""backup file written : {_bshortP}""")
+logging.info("Calc File Paths")
+logging.info(f"""file: {_rshortP}""" )
+logging.info(f"""backup: {_bshortP}""")
+print("_"*80 + "\n")
 # todo: check folder structure here
 
 def list_values():
@@ -179,44 +186,8 @@ def utfcalc(utfcalc, _txtfile):
     with open(_txtfile, "wb") as f1:
         f1.write(_utfcalcS.encode("UTF-8"))
 
-def htmldoc():
-    """[summary]
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def pdfdoc():
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def pdfreport():
-    """[summary]
-    """
-    pass
-
-def _update(hdrS:str):
-    """update section settings
-    
-    Args:
-        hdrs {str}: rivet-string header
-    """
-    global _utfcalcS, _setsectD
-
-    _setsectD["enum"] = 0 
-    _setsectD["fnum"] = 0
-    _setsectD["tnum"] = 0
-    swidthI = int(_setsectD["swidth"])
-    rnumS = str(_setsectD["rnum"])
-    snameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
-    snum = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
-    sheadS = " " +  snameS + (rnumS + " - " +
-            ("[" + str(snum) + "]")).rjust(swidthI - len(snameS) - 2)
-    sstrS = swidthI * "="
-    utfS = sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
-    print(utfS); _utfcalcS += utfS
-
 def _rstcalc(_rstcalcS, _rstfile):
-    """write reST calc strig to file
+    """write reST calc string to file
     
     Args:
         pline ([type]): [description]
@@ -236,8 +207,44 @@ def _rstcalc(_rstcalcS, _rstfile):
     with open(_rstfile, "wb") as f1:
         f1.write(_rstcalcS.encode("UTF-8"))
 
+def htmldoc():
+    """[summary]
+    """
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def pdfdoc():
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def pdfreport():
+    """[summary]
+    """
+    pass
+
+def _update(hdrS:str):
+    """update and reset section settings
+    
+    Args:
+        hdrs {str}: rivet-string header
+    """
+    global _utfcalcS, _setsectD
+
+    _setsectD["enum"] = 0   # equation number
+    _setsectD["fnum"] = 0   # figure number
+    _setsectD["tnum"] = 0   # table number
+    swidthI = int(_setsectD["swidth"])
+    rnumS = str(_setsectD["rnum"])
+    snameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
+    snum = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
+    sheadS = " " +  snameS + (rnumS + " - " +
+            ("[" + str(snum) + "]")).rjust(swidthI - len(snameS) - 2)
+    sstrS = swidthI * "="
+    utfS = sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
+    print(utfS); _utfcalcS += utfS
+
 def r__(rawS: str):
-    """convert repo-string to utf or rst-string
+    """convert report-string to utf and rst-string
     
     Args:
         rawstrS (str): repo-string
@@ -248,12 +255,12 @@ def r__(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    rcalc = _rivcalc._R_utf(strL, _foldD, _setsectD) 
+    rcalc = _rivcalc._Rutf(strL, _foldD, _setsectD) 
     rcalcS, _setsectD = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
 def i__(rawS: str):
-    """convert insert-string to utf or rst-string
+    """convert insert-string to utf and rst-string
     
     Args:
         rawstrS (str): insert-string
@@ -264,12 +271,12 @@ def i__(rawS: str):
     if "]_" in sectS: _update(sectS)
 
     strL = strS.split("\n")
-    icalc = _rivcalc._I_utf(strL, _foldD, _setcmdD, _setsectD) 
+    icalc = _rivcalc._Iutf(strL, _foldD, _setcmdD, _setsectD) 
     icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
 def v__(rawS: str):
-    """convert value-string to utf or rst-string
+    """convert value-string to utf and rst-string
     
     Args:
         rawstr (str): value-string
@@ -280,12 +287,12 @@ def v__(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    vcalc = _rivcalc._V_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    vcalc = _rivcalc._Vutf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
     vcalcS, _setsectD, _rivetD, _exportS = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
 def e__(rawS: str):
-    """convert equation-string to utf or rst-string
+    """convert equation-string to utf and rst-string
 
     """
     global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
@@ -294,12 +301,12 @@ def e__(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    ecalc = _rivcalc._E_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    ecalc = _rivcalc._Eutf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
     ecalcS, _setsectD, _rivetD, _exportS = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
 def t__(rawS: str):
-    """convert table-string to utf or rst-string
+    """convert table-string to utf and rst-string
     
     """
     global _utfcalcS, _setsectD, _foldD, _setcmdD, _exportS
@@ -308,11 +315,11 @@ def t__(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    tcalc = _rivcalc._T_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    tcalc = _rivcalc._Tutf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
     tcalcS, _setsectD, _exportS = tcalc.t_parse()
     _utfcalcS = _utfcalcS + tcalcS
 
 def x__(rawS: str):
-    """skip execution of a rivet-string
+    """skip execution of rivet-string
     """
     pass
