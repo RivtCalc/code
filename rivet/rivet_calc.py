@@ -407,7 +407,11 @@ class _Iutf:
         txS = iL[1].strip()
         #txs = txs.encode('unicode-escape').decode()
         ltxS = parse_latex(txS)
-        utfS = sp.pretty(sp.sympify(ltxS, _clash2, evaluate=False))
+        utfS2 = sp.pretty(sp.sympify(ltxS, _clash2, evaluate=False))
+        utfS = ""
+        for iS in utfS2.split('\n'):
+            if "ANTLR runtime and generated code versions" in iS: continue
+            utfS += (iS+"\n")
         print(utfS+"\n"); self.calcS += utfS + "\n"   
 
     def i_sympy(self,iL):
