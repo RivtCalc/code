@@ -1,8 +1,8 @@
 #! python
 """Exposes rivet-string and output functions.
 
-    **rivet** markup is used within five string functions exposed in this
-    module. The first line of each string is a descriptor. Markup includes a
+    **RivetCalc** markup is used inside the functions below where 
+    the first line of each string is a descriptor and strings. Markup includes a
     set of commands (lines begin with ||), key symbols (=) and tags (bracketed
     with []_). They may also include unicode (UTF-8) and reStructuredText
     (https://docutils.sourceforge.io/docs/user/rst/quickref.html).
@@ -11,7 +11,6 @@
     -----------------------------------------------------------------
     r__('''r-string''') : repository and calc data 
         || summary          : summary paragraph and table of contents
-        || labels           : labels for search
         || append           : append pdf files
     i__('''i-string''') : insert text and images
         || tex              : LaTeX equation
