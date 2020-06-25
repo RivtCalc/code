@@ -1,8 +1,0 @@
-project:
-title:
-client:
-date:
-engineer:
-startpage:
-totalpages:
-coverfile:
