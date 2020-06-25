@@ -20,6 +20,19 @@
 
 # brazil_codes
 
+
+# universities
+
+
+
+# US government
+    Federal Highway Administration
+    FHA
+    OSHA
+    National Institute of Standards and Technology
+    NIST
+
+
 * construction
     temporary
     steel
