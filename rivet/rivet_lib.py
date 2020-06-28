@@ -1,5 +1,5 @@
 #! python
-"""Exposes rivet-string and output functions.
+"""Exposes rivet-string and output functions.x
 
     **RivetCalc** markup is used inside the functions below where 
     the first line of each string is a descriptor and strings. Markup includes a
