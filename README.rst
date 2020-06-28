@@ -60,28 +60,27 @@ http://www.rivet-calcs.net. The overall program flow is::
 
                      /--------------------------------\                    
                      |                                |                    
-                     |    Read rivet file, or         |
-                     |    rivet strings in            |                    
+                     |    Process RivetCalc file, or  |
+                     |    strings (cells) in IDE      |                    
                      |    interactive mode.           |                    
                      |                                |                    
-                     |   String types:                |                    
-                     |   r__, i__, v__, e__, t__      |                    
+                     |    String types:               |                    
+                     |    r__, i__, v__, e__, t__     |                    
                      |                                |                    
                      \----------------+---------------/                    
                                       |                                    
-  +---------------+  +----------------\/--------------+  +-------------+   
+  +---------------+  +---------------\/---------------+  +-------------+   
   |               |Y |                                |  |             |   
-  |    Process    |E |    Is string type r__?         | N| Parse and   |   
-  |    Python     |S |                                | O| process     |   
-  |    code       <--+                                +--> rivet       |   
-  |               |  |                                |  | strings     |   
+  |    Process    |E |    Working in IDE (VSCode,     | N|  Process    |   
+  |    cell or    |S |    Spyder, Pyzo)               | O|  complete   |   
+  |    complete   <--+    interactively?              +-->  file       |   
+  |    file       |  |                                |  |             |   
   +------+--------+  +--------------------------------+  +------+------+   
          |                                                      |          
          |           +================================+         |          
          |           |                                |         |          
-         |           |                                |         |          
          |           |   Write utf-8 calc to          |         |          
-         |           |   terminal and file            |         |          
+         |           |   terminal and/or file.        |         |          
          +===========>                                <=========+          
                      |                                |                    
                      |================================|                    
@@ -89,9 +88,9 @@ http://www.rivet-calcs.net. The overall program flow is::
                                       ||                                    
                      +================\/==============+                    
                      |                                |                    
-                     |                                |                    
-                     |    Write reST calc file        |                    
-                     |                                |                    
+                     |    Write reST calc file if     |
+                     |    complete file is            |       
+                     |    processed.                  |                    
                      |                                |                    
                      |================================|                    
                      +================================+                    
@@ -108,7 +107,7 @@ http://www.rivet-calcs.net. The overall program flow is::
         |            +--------------------------------+  /-------------\   
         |            |                                |  |             |   
         |            |                                | N|             |   
-        |            |     Write reports?             | O|   End       |   
+        |            |     Write report?              | O|   End       |   
         +============>                                +==>             |   
                      |                                |  |             |   
                      +----------------+---------------+  \-------------/ 
