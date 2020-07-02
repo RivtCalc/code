@@ -11,6 +11,7 @@ setup(
    'sympy',
    'pandas',
    'tabulate',
-   'matplotlib'
+   'matplotlib',
+   'jupyter'
    ]
 )
