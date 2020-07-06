@@ -12,6 +12,7 @@ setup(
    'pandas',
    'tabulate',
    'matplotlib',
-   'jupyter'
+   'jupyter',
+   'docutils'
    ]
 )
