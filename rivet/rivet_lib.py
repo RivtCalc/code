@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #! python
 """Exposes rivet-string and output functions.
 
