@@ -7,12 +7,5 @@ setup(
     license='GPLv3',
     long_description=open('README.rst').read(),
     install_requires=[
-   'numpy',
-   'sympy',
-   'pandas',
-   'tabulate',
-   'matplotlib',
-   'jupyter',
-   'docutils'
    ]
 )
