@@ -1,0 +1,291 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document http://www.reportlab.com
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R /F3 4 0 R /F4 5 0 R /F5 8 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/BaseFont /Courier /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
+>>
+endobj
+5 0 obj
+<<
+/BaseFont /Courier-Bold /Encoding /WinAnsiEncoding /Name /F4 /Subtype /Type1 /Type /Font
+>>
+endobj
+6 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://github.com/r-i-v-e-t)
+>> /Border [ 0 0 0 ] /Rect [ 256.6829 604.6236 379.6997 616.6236 ] /Subtype /Link /Type /Annot
+>>
+endobj
+7 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://github.com/on-c-e)
+>> /Border [ 0 0 0 ] /Rect [ 62.69291 592.6236 172.7429 604.6236 ] /Subtype /Link /Type /Annot
+>>
+endobj
+8 0 obj
+<<
+/BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding /Name /F5 /Subtype /Type1 /Type /Font
+>>
+endobj
+9 0 obj
+<<
+/Annots [ 6 0 R 7 0 R ] /Contents 13 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 12 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 
+  /Trans <<
+
+>> /Type /Page
+>>
+endobj
+10 0 obj
+<<
+/PageLabels 14 0 R /PageMode /UseNone /Pages 12 0 R /Type /Catalog
+>>
+endobj
+11 0 obj
+<<
+/Author () /CreationDate (D:20191021084229+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20191021084229+00'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
+  /Subject (\(unspecified\)) /Title () /Trapped /False
+>>
+endobj
+12 0 obj
+<<
+/Count 1 /Kids [ 9 0 R ] /Type /Pages
+>>
+endobj
+13 0 obj
+<<
+/Length 7295
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 62.69291 741.0236 cm
+q
+BT 1 0 0 1 0 14 Tm .477765 Tw 12 TL /F2 10 Tf 0 0 0 rg (r-i-v-e-t) Tj /F1 10 Tf ( is a writing tool for engineering calculation reports that may be used either as a Python library or) Tj T* 0 Tw (as a command line program. It is designed to work with ) Tj /F2 10 Tf (on-c-e) Tj /F1 10 Tf ( \() Tj /F2 10 Tf (O) Tj /F1 10 Tf (pe) Tj /F2 10 Tf (N) Tj /F1 10 Tf ( ) Tj /F2 10 Tf (C) Tj /F1 10 Tf (alculation ) Tj /F2 10 Tf (E) Tj /F1 10 Tf (cosystem\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 62.69291 723.0236 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (From the command line:) Tj T* ET
+Q
+Q
+q
+1 0 0 1 62.69291 689.8236 cm
+q
+q
+1 0 0 1 0 0 cm
+q
+1 0 0 1 6.6 6.6 cm
+q
+.662745 .662745 .662745 RG
+.5 w
+.960784 .960784 .862745 rg
+n -6 -6 468.6898 24 re B*
+Q
+q
+.960784 .960784 .862745 rg
+n 0 0 36 12 re f*
+.960784 .960784 .862745 rg
+n 42 0 30 12 re f*
+.960784 .960784 .862745 rg
+n 78 0 30 12 re f*
+.960784 .960784 .862745 rg
+n 114 0 78 12 re f*
+.960784 .960784 .862745 rg
+n 192 0 6 12 re f*
+.960784 .960784 .862745 rg
+n 198 0 12 12 re f*
+.960784 .960784 .862745 rg
+n 222 0 6 12 re f*
+.960784 .960784 .862745 rg
+n 228 0 12 12 re f*
+.960784 .960784 .862745 rg
+n 246 0 84 12 re f*
+.960784 .960784 .862745 rg
+n 330 0 6 12 re f*
+.960784 .960784 .862745 rg
+n 336 0 18 12 re f*
+.960784 .960784 .862745 rg
+n 354 0 6 12 re f*
+BT 1 0 0 1 0 2 Tm 12 TL /F3 10 Tf 0 0 0 rg (python) Tj 0 0 0 rg ( ) Tj 0 0 0 rg (rivet) Tj 0 0 0 rg ( ) Tj 0 0 0 rg (ddcc_) Tj 0 0 0 rg ( ) Tj 0 0 0 rg (rivetfilename) Tj .4 .4 .4 rg (.) Tj 0 0 0 rg (py) Tj 0 0 0 rg (  ) Tj 0 0 0 rg (\() Tj /F4 10 Tf .666667 .133333 1 rg (or) Tj /F3 10 Tf 0 0 0 rg ( ) Tj 0 0 0 rg (batch_of_files) Tj .4 .4 .4 rg (.) Tj 0 0 0 rg (txt) Tj 0 0 0 rg (\)) Tj T* ET
+Q
+Q
+Q
+Q
+Q
+q
+1 0 0 1 62.69291 669.8236 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (As a library:) Tj T* ET
+Q
+Q
+q
+1 0 0 1 62.69291 636.6236 cm
+q
+q
+1 0 0 1 0 0 cm
+q
+1 0 0 1 6.6 6.6 cm
+q
+.662745 .662745 .662745 RG
+.5 w
+.960784 .960784 .862745 rg
+n -6 -6 468.6898 24 re B*
+Q
+q
+.960784 .960784 .862745 rg
+n 0 0 24 12 re f*
+.960784 .960784 .862745 rg
+n 30 0 54 12 re f*
+.960784 .960784 .862745 rg
+n 90 0 36 12 re f*
+.960784 .960784 .862745 rg
+n 132 0 6 12 re f*
+BT 1 0 0 1 0 2 Tm 12 TL /F4 10 Tf 0 .501961 0 rg (from) Tj /F3 10 Tf 0 0 0 rg ( ) Tj /F4 10 Tf 0 0 1 rg (rivet_lib) Tj /F3 10 Tf 0 0 0 rg ( ) Tj /F4 10 Tf 0 .501961 0 rg (import) Tj /F3 10 Tf 0 0 0 rg ( ) Tj .4 .4 .4 rg (*) Tj T* ET
+Q
+Q
+Q
+Q
+Q
+q
+1 0 0 1 62.69291 592.6236 cm
+q
+BT 1 0 0 1 0 26 Tm 1.166651 Tw 12 TL /F1 10 Tf 0 0 0 rg (Like ) Tj /F2 10 Tf (on-c-e) Tj /F1 10 Tf ( its focus is on improving the resuse, review, reach and reliability of engineering calculation) Tj T* 0 Tw 1.516136 Tw (reports. Code and documentation are here: ) Tj 0 0 .501961 rg (https://github.com/r-i-v-e-t) Tj 0 0 0 rg ( . For an overview of ) Tj /F2 10 Tf (on-c-e) Tj /F1 10 Tf ( see) Tj T* 0 Tw 0 0 .501961 rg (https://github.com/on-c-e) Tj 0 0 0 rg ( .) Tj T* ET
+Q
+Q
+q
+1 0 0 1 62.69291 502.6236 cm
+q
+BT 1 0 0 1 0 74 Tm .18936 Tw 12 TL /F1 10 Tf 0 0 0 rg (A ) Tj /F2 10 Tf (r-i-v-e-t) Tj /F1 10 Tf ( file is a Python text file containing engineering design and analysis calculations written in ASCII) Tj T* 0 Tw -0.069059 Tw (or UTF-8. Any text processor \(i.e. Notepad\) can be used to create and edit a design file but an IDE or code) Tj T* 0 Tw 1.643615 Tw (editor significantly improves efficiency and is strongly recommended. ) Tj /F2 10 Tf (r-i-v-e-t) Tj /F1 10 Tf ( documentation is written) Tj T* 0 Tw 4.742126 Tw (around the code editor Microsoft VS Code. The ) Tj /F5 10 Tf (rivet) Tj /F1 10 Tf ( program has a single primary function,) Tj T* 0 Tw .392209 Tw /F5 10 Tf (__r\("rivet-string"\)) Tj /F1 10 Tf (, which takes a single string as argument. The first character of each string is one of ) Tj /F2 10 Tf (r, i,) Tj T* 0 Tw 2.098735 Tw (v, e, t) Tj /F1 10 Tf (, which controls the rivet syntax and operations within that context. The characters signify the) Tj T* 0 Tw (following:) Tj T* ET
+Q
+Q
+q
+1 0 0 1 62.69291 421.4236 cm
+q
+q
+1 0 0 1 0 0 cm
+q
+1 0 0 1 6.6 6.6 cm
+q
+.662745 .662745 .662745 RG
+.5 w
+.960784 .960784 .862745 rg
+n -6 -6 468.6898 72 re B*
+Q
+q
+BT 1 0 0 1 0 50 Tm 12 TL /F3 10 Tf 0 0 0 rg (r -) Tj (>) Tj ( run Python code) Tj T* (i -) Tj (>) Tj ( insert text, tables and figures) Tj T* (v -) Tj (>) Tj ( assign values to variables) Tj T* (e -) Tj (>) Tj ( evaluate equations) Tj T* (t -) Tj (>) Tj ( generate and manipulate tables and plots) Tj T* ET
+Q
+Q
+Q
+Q
+Q
+q
+1 0 0 1 62.69291 353.4236 cm
+q
+BT 1 0 0 1 0 50 Tm -0.126682 Tw 12 TL /F2 10 Tf 0 0 0 rg (r-i-v-e-t) Tj /F1 10 Tf ( evaluates rivet files \(designs\) and outputs calculation files \(calcs\) in UTF-8, HTML or PDF formats.) Tj T* 0 Tw 2.425318 Tw (Design files have names of the form ) Tj /F5 10 Tf (ddcc_rivetfilename.py) Tj /F1 10 Tf ( where dd and cc are two digit numbers) Tj T* 0 Tw 1.366647 Tw (identifying the division and calculation number respectively. Division numbers apply to ) Tj /F2 10 Tf (r-i-v-e-t) Tj /F1 10 Tf ( reports,) Tj T* 0 Tw 1.19686 Tw (which are organized compilations of calcs. Calc output files retain the design file name with a modified) Tj T* 0 Tw (file-type suffix \(txt, html, pdf\), depending on the output type selected.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 62.69291 323.4236 cm
+q
+BT 1 0 0 1 0 14 Tm .307356 Tw 12 TL /F2 10 Tf 0 0 0 rg (r-i-v-e-t) Tj /F1 10 Tf ( files exisit within the context of a project. The user initially sets up a ) Tj /F2 10 Tf (r-i-v-e-t) Tj /F1 10 Tf ( project by creating a) Tj T* 0 Tw (project folder structure using the following naming conventions:) Tj T* ET
+Q
+Q
+q
+1 0 0 1 62.69291 182.2236 cm
+q
+q
+1 0 0 1 0 0 cm
+q
+1 0 0 1 6.6 6.6 cm
+q
+.662745 .662745 .662745 RG
+.5 w
+.960784 .960784 .862745 rg
+n -6 -6 468.6898 132 re B*
+Q
+q
+0 0 0 rg
+BT 1 0 0 1 0 110 Tm /F3 10 Tf 12 TL (User_project_name) Tj T* (    |- calcs) Tj T* (      |- scripts) Tj T* (      |- sketches) Tj T* (      |- tables) Tj T* (    |- reports) Tj T* (      |- html) Tj T* (        |- figures) Tj T* (        |- append) Tj T* (      |- temp) Tj T* ET
+Q
+Q
+Q
+Q
+Q
+q
+1 0 0 1 62.69291 138.2236 cm
+q
+BT 1 0 0 1 0 26 Tm 1.191163 Tw 12 TL /F1 10 Tf 0 0 0 rg (Design \(input\) files and utf8 calc \(output\) files are read from and written to the ) Tj /F5 10 Tf (calcs) Tj /F1 10 Tf ( folder. Supporting) Tj T* 0 Tw -0.044223 Tw (design files are stored in the ) Tj /F5 10 Tf (calcs) Tj /F1 10 Tf ( sub-folders. All supporting files are ASCII or UTF-8 files, as are the rivet) Tj T* 0 Tw (design and utf8-calc files. A zip of the ) Tj /F5 10 Tf (calc) Tj /F1 10 Tf ( folder and sub-folders may be uploaded to a shared database.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 62.69291 96.22362 cm
+q
+BT 1 0 0 1 0 26 Tm 1.404987 Tw 12 TL /F2 10 Tf 0 0 0 rg (pdf-) Tj /F1 10 Tf ( calcs and reports are written to the ) Tj /F5 10 Tf (reports) Tj /F1 10 Tf ( folder. ) Tj /F2 10 Tf (html-) Tj /F1 10 Tf ( calcs and reports are written to the ) Tj /F5 10 Tf (html) Tj /F1 10 Tf  T* 0 Tw .047633 Tw (folder. Images \(png and jpg\) and PDF reference documents, used in ) Tj /F2 10 Tf (pdf-) Tj /F1 10 Tf ( and ) Tj /F2 10 Tf (html-) Tj /F1 10 Tf ( calcs and reports, are) Tj T* 0 Tw (stored in the ) Tj /F5 10 Tf (figures) Tj /F1 10 Tf ( and ) Tj /F5 10 Tf (append) Tj /F1 10 Tf ( folders respectively.) Tj T* ET
+Q
+Q
+ 
+endstream
+endobj
+14 0 obj
+<<
+/Nums [ 0 15 0 R ]
+>>
+endobj
+15 0 obj
+<<
+/S /D /St 1
+>>
+endobj
+xref
+0 16
+0000000000 65535 f 
+0000000073 00000 n 
+0000000144 00000 n 
+0000000251 00000 n 
+0000000363 00000 n 
+0000000468 00000 n 
+0000000578 00000 n 
+0000000758 00000 n 
+0000000935 00000 n 
+0000001050 00000 n 
+0000001279 00000 n 
+0000001368 00000 n 
+0000001626 00000 n 
+0000001686 00000 n 
+0000009033 00000 n 
+0000009074 00000 n 
+trailer
+<<
+/ID 
+[<d1e4602c6c241e41ee58de220de31869><d1e4602c6c241e41ee58de220de31869>]
+% ReportLab generated PDF document -- digest (http://www.reportlab.com)
+
+/Info 11 0 R
+/Root 10 0 R
+/Size 16
+>>
+startxref
+9108
+%%EOF
