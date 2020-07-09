@@ -83,17 +83,17 @@ if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
 #start-up variables
-_rivetD: dict ={}                                   # runtime vars dictionary
-_utfcalcS = """"""                                  # utf print string
+_rivetD: dict ={}                                    # runtime vars dictionary
+_utfcalcS = """"""                                   # utf print string
 _exportS  = """"""                                   # values export string
-_cfull    = Path(__main__.__file__)                    # calc file path
-_cfile    = Path(__main__.__file__).name               # calc file name
-_cname    = _cfile.split(".py")[0]                     # calc file basename
+_cfull    = Path(__main__.__file__)                  # calc file path
+_cfile    = Path(__main__.__file__).name             # calc file name
+_cname    = _cfile.split(".py")[0]                   # calc file basename
 _rivpath  = Path("rivet.rivet_lib.py").parent        # rivet program path
-_cpath    =  Path(_cfull).parent                       # calc folder path
-_ppath    = Path(_cfull).parent.parent                 # project folder path
-_dpath    = Path(_ppath / "docs")                      # doc folder path
-_rppath   = Path(_ppath / "reports")                  # report folder path
+_cpath    =  Path(_cfull).parent                     # calc folder path
+_ppath    = Path(_cfull).parent.parent               # project folder path
+_dpath    = Path(_ppath / "docs")                    # doc folder path
+_rppath   = Path(_ppath / "reports")                 # report folder path
 _utffile  = Path(_cpath / ".".join((_cname, "txt"))) # utf calc output
 _expfile  = Path(_cpath / "scripts" / "".join(("v", _cfile))) # export file
 # folder dictionary

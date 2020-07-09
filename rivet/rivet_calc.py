@@ -12,38 +12,38 @@ Commands and syntax by string type and function
 string   function  class
 type     name      name     commands {comment}
 -------  --------  -----    -----------------------------------------------------
-repo     r__()     _Rutf   summary {block}, labels {block}, append {block}
-insert   i__()     _Iutf   tex, sym, table, image {block}, image2 {block} 
-values   v__()     _Vutf   values
-equation e__()     _Eutf   =, format, function
-table    t__()     _Tutf   =, read, save, data, plot, add, table, image, image2
+repo     r__       _Rutf   summary {block}, labels {block}, append {block}
+insert   i__       _Iutf   tex, sym, table, image {block}, image2 {block} 
+values   v__       _Vutf   values
+equation e__       _Eutf   =, format, function
+table    t__       _Tutf   =, read, save, data, plot, add, table, image, image2
 
-Command syntax {comment}
+Command syntax # comment
 -----------------------
-r__(''' {r-string defines repository and report data}
+r__(''' #r-string defines repository and report data
     
     May include arbitrary text that does not start with double bar.  It
     will be treated as a comment and will not be processed.
     
-    || summary | section / string  {toc type}
-    {paragraphs}
+    || summary | section / string  # toc type
+    # paragraphs
     
     || labels 
-    {csv list used in repo read.me and other databases}
+    # csv list used in repo read.me and other databases
     
     || append           
-    {pdf file list}
+    # pdf file list
     ''')
 
-i__(''' {i-string inserts static text, tables and images}
+i__(''' # i-string inserts static text, tables and images
     
     May include arbitrary text that does not start a line with double bar.
     
-    || tex | \gamma = x + 3 {latex equation} | 1. {image scale}
-    || sym | x = y/2 {sympy equation} | 1.
-    || table | x.txt | 60 {max paragraph width - characters}
-    || table | x.csv | 60,[:] {max column width - characters, line range}  
-    || table | x.rst | [:] {line range}
+    || tex | \gamma = x + 3 # latex equation | 1. # image scale
+    || sym | x = y/2 # sympy equation | 1.
+    || table | x.txt | 60 # max paragraph width - characters 
+    || table | x.csv | 60,[:] # max column width - characters, line range  
+    || table | x.rst | [:] # line range
 
     || image | x.png/x.jpg {image file} | 1. {scale}
     figure caption
