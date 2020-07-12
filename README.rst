@@ -50,7 +50,7 @@ structure either by copying a template or from scratch::
       |- reports
           |- attachments
 
-A template for sharing a project on Github under the MIT license has the form:
+A template for sharing a project on Github under the MIT license has the form::
 
   RivetCalcTemplate_nnn (Repository name where nnn are numbers)
       |- calcs
