@@ -18,21 +18,24 @@ values   v__       _Vutf   values
 equation e__       _Eutf   =, format, function
 table    t__       _Tutf   =, read, save, data, plot, add, table, image, image2
 
-Command syntax # comment
------------------------
-r__(''' #r-string defines repository and report data
+Command syntax  
+---------------
+r__(''' r-string defines repository and report data
     
     May include arbitrary text that does not start with double bar.  It
     will be treated as a comment and will not be processed.
     
-    || summary | section / string  # toc type
-    # paragraphs
+    || summary | calc title
+    paragraph
     
-    || labels 
-    # csv list used in repo read.me and other databases
+    || toc | section or string
+
+    || scope | # csv list used in repo read.me and other databases
     
-    || append           
-    # pdf file list
+    || append | calccover.pdf         
+    pdf_file1 | A. Appendix label
+    pdf_file2 | B. Appendix label
+    functions or docstrings | C. Appendix label
     ''')
 
 i__(''' # i-string inserts static text, tables and images
@@ -249,7 +252,7 @@ class _Rutf:
             string :  formatted utf-calc string
         """
         endflgB = False; rtmpS = ""; rL = []; indxI = -1
-        rcmdL = ["summary", "label", "append" ]
+        rcmdL = ["summary", "scope", "append", "toc" ]
         methodL =  [self.r_summary, self.r_label, self.r_append]
         tagL =  [ "[r]_", "[c]_", "[link]_"] 
         
@@ -303,7 +306,7 @@ class _Rutf:
         utfS += rL[2].strip()
         print(utfS + "\n"); self.calcS += utfS
 
-    def r_label(self, rL):
+    def r_scope(self, rL):
         csvL = rL[2].split("\n")
         tabL = [x.split(",") for x in csvL]
         maxlenI = max(len(x) for x in tabL)

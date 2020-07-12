@@ -110,8 +110,8 @@ _foldD: dict = {
 "mpath": Path(_cpath, "tmp"),
 "hpath": Path(_dpath, "html"),
 "fpath": Path(_dpath, "html/figures"),
-"apath": Path(_rppath, "append")
-}
+"apath": Path(_rppath, "append")    
+    }
 # temp folder files
 _rbak = Path(_foldD["mpath"] / ".".join((_cname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_cname, "log")))
@@ -121,10 +121,11 @@ _setsectD: dict = {"rnum": _cname[0:4],"dnum": _cname[0:2],"cnum": _cname[2:4],
 "snum": "", "sname": "", "swidth": 80,
 "enum":  0, "fnum": 0, "tnum" : 0,
 "ftnum": 0,"ftqueL": deque([1]), "cite": " ", "ctqueL": deque([1])
-}
+                    }
 # command settings
 _setcmdD = {"cwidth": 50, "scale1": 1., "scale2": 1., 
-            "prec": 2, "trim": 2, "replace": False, "code": False}
+            "prec": 2, "trim": 2, "replace": False, "code": False
+            }
 #logs and checks
 warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.DEBUG,
