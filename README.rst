@@ -1,17 +1,17 @@
-**RivetCalc** (https://github.com/rivetcalc/rivetcalc-code) is a cross-platform,
-open source calculation tool for writing engineering calculation documents.  
-It is implemented is a Python package and produces formatted calculation documents 
-and reports in  UTF8, HTML and PDF file formats from Python files written 
-in the **rivet** light-weight markup language. The program is designed  
-to improve calculation editing, reuse, review and clarity, and 
-eliminate the problem of unreadable calculation input files 
-arising from binary formats or program changes.
+**RivetCalc** (https://github.com/rivetcalc/rivetcalc-code) is a 
+cross-platform, open source tool for writing engineering calculation documents.  
+It is implemented as a Python library and produces formatted calculation 
+documents and reports in  UTF8, HTML and PDF file formats.  Calculations are 
+written in a **rivet**, a UTF-8 light-weight markup language. The tool
+is designed  to improve calculation editing, reuse, review and clarity, 
+and eliminate the problem of unreadable calculation input files 
+arising from binary input formats or program changes.
 
 The minimum working version of **RivetCalc** includes a Python installation 
-with science libraries (conda is an example), and a text editor.  code 
-editor (VS Code and Pyzo are examples), a LaTeX distribution (TexLive or 
-MikTex are examples) and the **rivet** package. If docs 
-(see below) are not needed then the LaTeX distribution may be omitted.
+with a dozen science libraries and a text editor.  If an IDE code 
+editor is used the calculations can be executed and output interactively 
+and in stages. If a LaTeX distribution is installed, formatted PDF documents
+and reports can be generated. 
 
 **RivetCalc** components may be individually installed and configured 
 by the user on a workstation, downloaded as a no-install Windows expanded 
@@ -25,6 +25,13 @@ output (calc) files have names of the form *ddcc_calcname.py*  and
 *ddcc_calcname.txt* respectively, where dd (division) and 
 cc (calculation) are two digit numbers that organize the 
 PDF and HTML documents (docs) and reports. 
+
+| File name | file description                                      |
+|-----------|-------------------------------------------------------|
+| design    | text input file written in rivet                      |
+| calc      | formatted UTF-8 formatted output to screen (and file) |
+| doc       | formatted HTML or PDF output to file                  |
+| report    | organized PDF output to file                          |
 
 The program may be run in interactive mode, using an interactive 
 code editor like VS Code and importing *rivet-lib*, or from the 
@@ -72,14 +79,14 @@ front end at http://www.on-c-e.net/distribute/. For a **on-c-e** overview see
 http://www.rivet-calcs.net. The program flow is::
 
                      /--------------------------------\                    
-                     |    Process RivetCalc file or   |
+                     |    Run RivetCalc file or       |
                      |    cells in interactive mode.  |                   
-                     |    
+                     |                                |
                      |    cell types:                 |                    
                      |    r__, i__, v__, e__, t__     |                    
                      \--------------------------------/                    
-                                     ||                                    
-                     +---------------\/---------------+     
+                                     \/                                    
+                     +--------------------------------+     
   +--------------+|  |    Working in IDE              |  +-------------+
   |    Process    |  |    interactively?              |  |  Process    |   
   |    cell or    |  |    (VSCode, Spyder, Pyzo)      |  |  file       |   
@@ -90,7 +97,6 @@ http://www.rivet-calcs.net. The program flow is::
          +===========>  terminal (and file).          <=========+            
                      |================================|                    
                      +================================+                    
-                                      || 
                                       \/
                      +================================+                    
                      |    Write reST calc file if     |
@@ -98,7 +104,6 @@ http://www.rivet-calcs.net. The program flow is::
                      |    processed.                  |                    
                      |================================|                    
                      +================================+                    
-                                      ||
                                       \/
   +===============+  +--------------------------------+                    
   | Write HTML    |  |                                |  /---------\    
@@ -110,14 +115,12 @@ http://www.rivet-calcs.net. The program flow is::
         |            |     Write report?              |  |   End   |   
         +============>                             NO +==>         |   
                      +----------------+---------------+  \---------/ 
-                                     || Yes                                   
-                                     \/
+                                     \/ YES
                      +================================+                    
                      |    Write PDF report file?      |                    
                      |================================|                    
                      +================================+                    
-                                      || Yes
-                                      \/
+                                     \/ YES
                      /--------------------------------\                    
                      |           End                  |                    
                      \--------------------------------/                       
