@@ -1,51 +1,56 @@
 **RivetCalc** (https://github.com/rivetcalc/rivetcalc-code) is a 
 cross-platform, open source tool for writing engineering calculation documents.  
 It is implemented as a Python library and produces formatted calculation 
-documents and reports in  UTF8, HTML and PDF file formats.  Calculations are 
-written in a **rivet**, a UTF-8 light-weight markup language. The tool
-is designed  to improve calculation editing, reuse, review and clarity, 
-and eliminate the problem of unreadable calculation input files 
-arising from binary input formats or program changes.
+documents and reports in  UTF8, HTML and PDF file formats.  
+The tool is designed  to improve editing, reuse, review and clarity, 
+and eliminate the problem of unreadable calculation inputs
+that arise from binary input files and program incompatibiilties.
+Calculations are written in **rivet**, a light-weight and 
+context sensitve markup language. 
 
-The minimum working version of **RivetCalc** includes a Python installation 
-with a dozen science libraries and a text editor.  If an IDE code 
-editor is used the calculations can be executed and output interactively 
-and in stages. If a LaTeX distribution is installed, formatted PDF documents
-and reports can be generated. 
+The **rivet** language includes a dozen commands and tags and a subset of 
+reStructuredText that are used within five funtions that take a text
+string as an argument. The functions are:
 
-**RivetCalc** components may be individually installed and configured 
-by the user on a workstation, downloaded as a no-install Windows expanded 
-zip folder (**r-i-v-e-t-s_32.zip** or **r-i-v-e-t-s_64.zip**), or used 
-remotely (paid service) with a VS Code front end, support and private 
-cloud storage (http://www.rivet-calcs.net).   
+========== =======================================================
+Function    Description
+========== =======================================================
+r __        repository, report and calc summary informtion
+
+i __        insert descriptive text, tables, figures and equations
+
+v __        define and import values 
+
+e __        define and import equations and functions
+
+t __        define tables and plots 
+
+========== =======================================================
 
 A **RivetCalc** file is a Python file that imports the *rivet* library
 and contains **rivet** calculation strings. The input (rivet) and 
 output (calc) files have names of the form *ddcc_calcname.py*  and 
 *ddcc_calcname.txt* respectively, where dd (division) and 
-cc (calculation) are two digit numbers that organize the 
-PDF and HTML documents (docs) and reports. 
+cc (calculation) are two digit numbers used to organize the 
+PDF and HTML documents and reports. 
 
-===========  ======================================================
-File name    File description                                      
-===========  ======================================================
-design       text input file written in rivet                      
-calc         formatted UTF-8 formatted output to screen (and file) 
-doc          formatted HTML or PDF output to file                  
-report       organized PDF output to file
-===========  ======================================================   
+===================  =====================================================
+File type             File description                                      
+===================  =====================================================
+design (.py)          text input, written in rivet                      
+calc (.txt)           formatted UTF-8 output, written to screen (and file) 
+doc (.pdf or .html)   formatted HTML or PDF output, written to file                  
+report (.pdf)         organized and formatted PDF docs, written to file
+===================  =====================================================       
 
-The program may be run in interactive mode, using an interactive 
-code editor like VS Code and importing *rivet-lib*, or from the 
-command line:: 
-
-    python -m rivet ddcc_calcname.py 
-
-Supporting files used in calcs are stored in a project folder 
-tree.  Calcs are written to the *calcs* folder in UTF8 format, 
-and the *docs* and *reports* folders in PDF and HTML formats 
-when specified. The user creates the folder
-structure either by copying a template or from scratch::
+Design and supporting files are stored in a project folder 
+tree.  Calcs are written to the *calcs* folder in UTF8 format.  
+The *calcs* folder also contains calculation supporting files.
+Docs and reports are written to their respective folders in 
+PDF and HTML formats when specified. Binary image files used
+in the calcs are stored in the *html* folder. The user 
+initially creates the complete folder
+tree either by copying a template or from scratch::
 
   Project_Name (chosen by user)
       |- calcs
@@ -59,9 +64,13 @@ structure either by copying a template or from scratch::
       |- reports
           |- attachments
 
-A template for sharing a project on Github under the MIT license has the form::
+Folders are restricted in the types of files they contain. A calc folder 
+contains only ASCII or UTF-8 files. Templates are full project trees with 
+*calc* folders they fully define the desing and only default config files 
+in the *docs* and *reports* folders. Templates shared and discovered on 
+Github have the form::
 
-  RivetCalcTemplate_nnn (Repository name where nnn are numbers)
+  RivetCalcTemplate_nnn (Github repository name, where nnn are numbers)
       |- calcs
           |- sketches
           |- scripts
@@ -73,59 +82,71 @@ A template for sharing a project on Github under the MIT license has the form::
       |- reports
           |- attachments
 
-Files in the *calcs* folder are in  ASCII or UTF-8 format only. The 
-folder tree *calcs* 
-folder may be uploaded to a personal github repository and shared 
-under the MIT open source license through the **on-c-e** (OpeN Calculation Exchange) database 
-front end at http://www.on-c-e.net/distribute/. For a **on-c-e** overview see 
-http://www.rivet-calcs.net. The program flow is::
+The minimum working version of **RivetCalc** includes a Python 
+installation with a dozen Python science libraries 
+(https://github.com/rivetcalcs/rivet-code/requirements.txt) 
+and a text editor. If a LaTeX distribution is installed, 
+formatted PDF documents and reports can be generated. If an IDE 
+code editor is used the calculations can be executed and output 
+interactively and in stages. Documentation addresses the use case
+of the VSCode IDE, which dramatically increases efficiency.
+
+The program may be run in interactive mode, using an interactive 
+code editor like VS Code and importing *rivet-lib*, or from the 
+command line:: 
+
+    python -m rivet ddcc_calcname.py 
+
+The program execution flow is::
 
                      /--------------------------------\                    
                      |    Run RivetCalc file or       |
                      |    cells in interactive mode.  |                   
                      |                                |
-                     |    cell types:                 |                    
+                     |          cell types:           |                    
                      |    r__, i__, v__, e__, t__     |                    
                      \--------------------------------/                    
                                      \/                                    
-                     +--------------------------------+     
-  +--------------+|  |    Working in IDE              |  +-------------+
-  |    Process    |  |    interactively?              |  |  Process    |   
-  |    cell or    |  |    (VSCode, Spyder, Pyzo)      |  |  file       |   
+  +--------------+|  +--------------------------------+  +-------------+
+  |    Process    |  |   Working in interactive IDE?  |  |  Process    |   
+  |    cell or    |  |     (VSCode, Spyder, Pyzo)     |  |  file       |   
   |    file       <--+ YES                         NO +-->             |   
   +------+--------+  +--------------------------------+  +------+------+   
          |           +================================+         |          
-         |           |   Write utf-8 calc to          |         |          
-         +===========>  terminal (and file).          <=========+            
+         |           |  Write utf-8 calc to :         |         |          
+         +===========>    terminal   |  file          <=========+            
                      |================================|                    
                      +================================+                    
-                                      \/
+                                     \/
                      +================================+                    
                      |    Write reST calc file if     |
-                     |    complete file is            |       
-                     |    processed.                  |                    
+                     |    complete file is output.    |       
                      |================================|                    
                      +================================+                    
-                                      \/
+                                     \/
   +===============+  +--------------------------------+                    
   | Write HTML    |  |                                |  /---------\    
-  | or PDF doc    |  |     Write docs?                |  |   End   |   
+  | or PDF doc    |  |         Write docs?            |  |   End   |   
   | files         <==+ YES                         NO +==>         |   
   |===============|  +--------------------------------+  \---------/ 
   +=====+=========+        
         |            +--------------------------------+  /---------\   
-        |            |     Write report?              |  |   End   |   
+        |            |         Write report?          |  |   End   |   
         +============>                             NO +==>         |   
                      +----------------+---------------+  \---------/ 
                                      \/ YES
                      +================================+                    
-                     |    Write PDF report file?      |                    
+                     |    Write PDF report file       |                    
                      |================================|                    
-                     +================================+                    
-                                     \/ YES
-                     /--------------------------------\                    
-                     |           End                  |                    
-                     \--------------------------------/                       
+                     +================================+    
+                     
+                     
+*RivetCalc** components may be individually installed and configured 
+by the user on a workstation, downloaded as a single no-install zip file 
+for Windows (**r-i-v-e-t-s_32.zip** or **r-i-v-e-t-s_64.zip**), or accessed
+remotely through the browser in a private container as a paid, supported 
+service (**RivetCloud.net**).
+
                                
                                                                            
                                                                           
