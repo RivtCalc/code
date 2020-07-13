@@ -1,21 +1,21 @@
 **RivetCalc** (https://github.com/rivetcalc/rivetcalc-code) is a 
 cross-platform, open source tool for writing engineering calculation documents.  
-It is implemented as a Python library and produces formatted calculation 
+It's implemented as a Python library that produces formatted calculation 
 documents and reports in  UTF8, HTML and PDF file formats.  
-The tool is designed  to improve editing, reuse, review and clarity, 
-and eliminate the problem of unreadable calculation inputs
-that arise from binary input files and program incompatibiilties.
-Calculations are written in **rivet**, a light-weight and 
-context sensitve markup language. 
+The tool is designed  to improve editing, clarity, reuse and review.
+It eliminates the problem of unusable calculations 
+that arise from incompatible binary input files and other program 
+version incompatibiilties. Calculations are written in **rivet**, 
+a light-weight and context based markup language. 
 
-The **rivet** language includes a dozen commands and tags and a subset of 
-reStructuredText that are used within five funtions that take a text
+The **rivet** language includes a dozen commands and tags (and a subset of 
+reStructuredText) that may be used within funtions that take a text
 string as an argument. The functions are:
 
 ========== =======================================================
 Function    Description
 ========== =======================================================
-r __        repository, report and calc summary informtion
+r __        repository, report and calc summary information
 
 i __        insert descriptive text, tables, figures and equations
 
@@ -27,12 +27,12 @@ t __        define tables and plots
 
 ========== =======================================================
 
-A **RivetCalc** file is a Python file that imports the *rivet* library
-and contains **rivet** calculation strings. The input (rivet) and 
-output (calc) files have names of the form *ddcc_calcname.py*  and 
-*ddcc_calcname.txt* respectively, where dd (division) and 
-cc (calculation) are two digit numbers used to organize the 
-PDF and HTML documents and reports. 
+A **RivetCalc** file is a Python file that imports *rivet_lib* 
+from the *rivet* library and contains **rivet** calculation strings. 
+The input and output file names have the form *rddcc_calcname.py*  and 
+*rddcc_calcname.txt, rddcc_calcname.html*,or *rddcc_calcname.txt* 
+respectively, where dd (division) and cc (calculation) are two digit 
+numbers used to organize the PDF and HTML documents and reports. 
 
 ===================  =====================================================
 File type             File description                                      
@@ -143,9 +143,9 @@ The program execution flow is::
                      
 A **RivetCalc** may be installed by:
 
-1. Individually installing and configuring the open source components
-2. Downloading and unzipping a single no-install file for Windows (**r-i-v-e-t-s_32.zip** or **r-i-v-e-t-s_64.zip**) 
-3. Running as a cloud service in a container (also available with paid support, see **RivetCloud.net**)
+1. Individually installing and configuring the open source components.
+2. Downloading and unzipping a single no-install file for Windows (**r-i-v-e-t-s_32.zip** or **r-i-v-e-t-s_64.zip**).
+3. Running as a cloud service in a container (also available with paid support, see **RivetCloud.net**).
 
 Refer to the User Manual for details.
 
