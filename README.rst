@@ -26,12 +26,14 @@ output (calc) files have names of the form *ddcc_calcname.py*  and
 cc (calculation) are two digit numbers that organize the 
 PDF and HTML documents (docs) and reports. 
 
-| File name | file description                                      |
-|-----------|-------------------------------------------------------|
-| design    | text input file written in rivet                      |
-| calc      | formatted UTF-8 formatted output to screen (and file) |
-| doc       | formatted HTML or PDF output to file                  |
-| report    | organized PDF output to file                          |
+===========  ======================================================
+File name    File description                                      
+===========  ======================================================
+design       text input file written in rivet                      
+calc         formatted UTF-8 formatted output to screen (and file) 
+doc          formatted HTML or PDF output to file                  
+report       organized PDF output to file
+===========  ======================================================   
 
 The program may be run in interactive mode, using an interactive 
 code editor like VS Code and importing *rivet-lib*, or from the 
