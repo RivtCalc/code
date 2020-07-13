@@ -61,7 +61,7 @@ Folders are restricted in the types of files they contain. The *calcs* folder
 only contains UTF-8 files. Binary files, including image and PDF files, are
 stored in the *docs* and *reports* folders.
 
-**RivetCalc** templates are full project trees with  UTF-8 *calc* folders that
+**RivetCalc** templates are full project trees with  UTF-8 *calcs* folders that
 fully define the calculation. The *docs* and *reports* folders are empty except 
 for a few default config files. Templates can be shared and discovered on 
 Github and have the form::
@@ -78,8 +78,9 @@ Github and have the form::
       |- reports
           |- attachments
 
-Where RivetCalcTemplate_nnn is the explicit Github repository name that
-facilitates search.
+Where RivetCalcTemplate_nnn is the explicit Github repository 
+name that facilitates searching.  Multiple repositories can 
+be stored in one account.
 
 A minimum working version of **RivetCalc** includes a Python 
 installation with a dozen Python science libraries 
@@ -87,19 +88,20 @@ installation with a dozen Python science libraries
 and a text editor. If a LaTeX distribution is installed, 
 formatted PDF documents and reports can be generated. If an IDE 
 code editor is used the calculations can be executed and output 
-interactively and in stages. Documentation addresses the use case
-of the VSCode IDE, which dramatically increases efficiency.
+interactively and in stages by marking functions or groups 
+of funcitons as cells. The documentation focuses on the use 
+case of a **VSCode** IDE, which dramatically increases efficiency.
 
-The program may be run in interactive mode, using an interactive 
-code editor like VS Code or from the command line:: 
+**RivetCalc** may be run in interactive mode, using an interactive 
+code editor like VSCode, or from the command line:: 
 
     python -m rivet ddcc_calcname.py 
 
-The program execution flow is::
+The program execution flow follows::
 
                      /--------------------------------\                    
-                     |    Run RivetCalc file or       |
-                     |    cells in interactive mode.  |                   
+                     |   Run RivetCalc design file    |
+                     |   or cells.                    |                   
                      |                                |
                      |          cell types:           |                    
                      |    r__, i__, v__, e__, t__     |                    
@@ -117,8 +119,8 @@ The program execution flow is::
                      +================================+                    
                                      \/
                      +================================+                    
-                     |    Write reST calc file if     |
-                     |    complete file is output.    |       
+                     |   Write reST calc file if      |
+                     |   complete file is processed.  |       
                      |================================|                    
                      +================================+                    
                                      \/
@@ -139,12 +141,13 @@ The program execution flow is::
                      +================================+    
                      
                      
-A **RivetCalc** may be installed by:
+**RivetCalc** may be installed by:
 
-1. Individually installing and configuring the open source components.
-2. Downloading and unzipping a single no-install file for Windows (**r-i-v-e-t-s_32.zip** or **r-i-v-e-t-s_64.zip**).
-3. Running as a cloud service in a container (also available with paid support, see **RivetCloud.net**).
+1. Locally Installing and configuring the individual open source components (about a half dozen steps).
+2. Locally downloading and unzipping a single no-install file for Windows (a couple of steps).
+3. Remotely running a cloud service in a container (about a dozen steps). 
 
+A cloud installation (**RivetCloud.net**) is available with paid support. 
 Refer to the User Manual for details.
 
                                
