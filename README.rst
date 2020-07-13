@@ -141,11 +141,13 @@ The program execution flow is::
                      +================================+    
                      
                      
-*RivetCalc** components may be individually installed and configured 
-by the user on a workstation, downloaded as a single no-install zip file 
-for Windows (**r-i-v-e-t-s_32.zip** or **r-i-v-e-t-s_64.zip**), or accessed
-remotely through the browser in a private container as a paid, supported 
-service (**RivetCloud.net**).
+A **RivetCalc** may be installed by:
+
+1. Individually installing and configuring the open source components
+2. Downloading and unzipping a single no-install file for Windows (**r-i-v-e-t-s_32.zip** or **r-i-v-e-t-s_64.zip**) 
+3. Running as a cloud service in a container (also available with paid support, see **RivetCloud.net**)
+
+Refer to the User Manual for details.
 
                                
                                                                            
