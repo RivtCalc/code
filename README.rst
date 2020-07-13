@@ -16,23 +16,18 @@ string as an argument. The functions are:
 Function    Description
 ========== =======================================================
 r __        repository, report and calc summary information
-
 i __        insert descriptive text, tables, figures and equations
-
 v __        define and import values 
-
 e __        define and import equations and functions
-
 t __        define tables and plots 
-
 ========== =======================================================
 
-A **RivetCalc** file is a Python file that imports *rivet_lib* 
-from the *rivet* library and contains **rivet** calculation strings. 
-The input and output file names have the form *rddcc_calcname.py*  and 
-*rddcc_calcname.txt, rddcc_calcname.html*,or *rddcc_calcname.txt* 
-respectively, where dd (division) and cc (calculation) are two digit 
-numbers used to organize the PDF and HTML documents and reports. 
+A **RivetCalc** file is a Python file that imports *rivet.rivet_lib* 
+and contains **rivet** calculation strings within the functions. 
+Input file names have the form *rddcc_calcname.py*. Corresponding 
+output files have the names *rddcc_calcname.txt*, *rddcc_calcname.html*, 
+or *rddcc_calcname.pdf*;where dd (division) and cc (calculation) are 
+two digit numbers used to organize the PDF and HTML documents and reports. 
 
 ===================  =====================================================
 File type             File description                                      
@@ -43,14 +38,12 @@ doc (.pdf or .html)   formatted HTML or PDF output, written to file
 report (.pdf)         organized and formatted PDF docs, written to file
 ===================  =====================================================       
 
-Design and supporting files are stored in a project folder 
-tree.  Calcs are written to the *calcs* folder in UTF8 format.  
-The *calcs* folder also contains calculation supporting files.
-Docs and reports are written to their respective folders in 
-PDF and HTML formats when specified. Binary image files used
-in the calcs are stored in the *html* folder. The user 
-initially creates the complete folder
-tree either by copying a template or from scratch::
+All files needed for a calcuation are stored in a project folder tree.  Calcs 
+are written to the *calcs* folder in UTF8 format.  Docs and reports are written 
+to their respective folders in PDF and HTML formats when specified. Binary 
+image files used in the calcs are stored in the *html* folder. The user 
+initially creates the complete folder tree either by copying a template 
+or from scratch::
 
   Project_Name (chosen by user)
       |- calcs
@@ -64,13 +57,16 @@ tree either by copying a template or from scratch::
       |- reports
           |- attachments
 
-Folders are restricted in the types of files they contain. A calc folder 
-contains only ASCII or UTF-8 files. Templates are full project trees with 
-*calc* folders they fully define the desing and only default config files 
-in the *docs* and *reports* folders. Templates shared and discovered on 
-Github have the form::
+Folders are restricted in the types of files they contain. The *calcs* folder 
+only contains UTF-8 files. Binary files, including image and PDF files, are
+stored in the *docs* and *reports* folders.
 
-  RivetCalcTemplate_nnn (Github repository name, where nnn are numbers)
+**RivetCalc** templates are full project trees with  UTF-8 *calc* folders that
+fully define the calculation. The *docs* and *reports* folders are empty except 
+for a few default config files. Templates can be shared and discovered on 
+Github and have the form::
+
+  RivetCalcTemplate_nnn (nnn is a unique three digit number)
       |- calcs
           |- sketches
           |- scripts
@@ -82,7 +78,10 @@ Github have the form::
       |- reports
           |- attachments
 
-The minimum working version of **RivetCalc** includes a Python 
+Where RivetCalcTemplate_nnn is the explicit Github repository name that
+facilitates search.
+
+A minimum working version of **RivetCalc** includes a Python 
 installation with a dozen Python science libraries 
 (https://github.com/rivetcalcs/rivet-code/requirements.txt) 
 and a text editor. If a LaTeX distribution is installed, 
@@ -92,8 +91,7 @@ interactively and in stages. Documentation addresses the use case
 of the VSCode IDE, which dramatically increases efficiency.
 
 The program may be run in interactive mode, using an interactive 
-code editor like VS Code and importing *rivet-lib*, or from the 
-command line:: 
+code editor like VS Code or from the command line:: 
 
     python -m rivet ddcc_calcname.py 
 
