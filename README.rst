@@ -11,17 +11,23 @@ context and index based markup language. The language includes
 a dozen commands, tags, and a subset of reStructuredText that 
 may be mixed arbitrarily with utf-8 text strings.
 
-The **RivetCalc** API essentially consists of five string functions:
+The **RivetCalc** API consists of five string input functions
+and several functions that control output:
 
-========== =======================================================
- API        Description
-========== =======================================================
-  R()       repository, report and calc summary information
-  I()       insert descriptive text, tables, figures and equations
-  V()       define and import values 
-  E()       define and import equations and functions
-  T()       define tables and plots 
-========== =======================================================
+================ =======================================================
+ API              Description
+================ =======================================================
+  R()            repository, report and calc summary information
+  I()            insert descriptive text, tables, figures and equations
+  V()            define and import values 
+  E()            define and import equations and functions
+  T()            define tables and plots   
+list_values()    a
+write_utfcalc()  b
+write_pdfdoc()   c
+write_htmldoc()  d
+write_readme()   e
+================ =======================================================
 
 A **RivetCalc** file is a Python file that typically imports 
 *rivetcalc.rc_lib as rc* and calls the API functions as e.g. 
