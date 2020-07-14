@@ -16,11 +16,11 @@ The **RivetCalc** API essentially consists of five string functions:
 ========== =======================================================
 Function    Description
 ========== =======================================================
- R()        repository, report and calc summary information
- I()        insert descriptive text, tables, figures and equations
- V()        define and import values 
- E()        define and import equations and functions
- T()        define tables and plots 
+  R()       repository, report and calc summary information
+  I()       insert descriptive text, tables, figures and equations
+  V()       define and import values 
+  E()       define and import equations and functions
+  T()       define tables and plots 
 ========== =======================================================
 
 A **RivetCalc** file is a Python file that typically imports 
