@@ -43,7 +43,7 @@
 
         Tags
         --------------------------------------------
-        [nn]_                : section number
+        abc def [s]_         : designates section and title
         [abc123]_            : citation        
         abc def [cite]_      : citation description    
         [#]_                 : autonumbered footnote
@@ -116,13 +116,8 @@ _foldD: dict = {
 "mpath": Path(_cpath, "tmp"),
 "hpath": Path(_dpath, "html"),
 "fpath": Path(_dpath, "html/figures"),
-<<<<<<< HEAD:rivet/rc_lib.py
 "apath": Path(_rppath, "attach"),
 }
-=======
-"apath": Path(_rppath, "append")    
-    }
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
 # temp folder files
 _rbak = Path(_foldD["mpath"] / ".".join((_cname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_cname, "log")))
@@ -135,16 +130,11 @@ _setsectD: dict = {"rnum": _cname[0:4],"dnum": _cname[0:2],"cnum": _cname[2:4],
                     }
 # command settings
 _setcmdD = {"cwidth": 50, "scale1": 1., "scale2": 1., 
-<<<<<<< HEAD:rivet/rc_lib.py
             "prec": 2, "trim": 2, "replace": False, "code": False}
 
 with open(_rfull, "r") as f2: calcbak = f2.read() 
 with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
 
-=======
-            "prec": 2, "trim": 2, "replace": False, "code": False
-            }
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
 #logs and checks
 warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.DEBUG,
@@ -154,7 +144,6 @@ logging.basicConfig(level=logging.DEBUG,
                     filemode='w')
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
-<<<<<<< HEAD:rivet/rc_lib.py
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
@@ -186,23 +175,6 @@ def _update(hdrS:str):
     bordrS = widthI * "="
     utfS = bordrS + "\n" + headS + "\n" + bordrS +"\n"
     print(utfS); _utfcalcS += utfS
-=======
-#formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-formatter = logging.Formatter('%(levelname)-8s: %(message)s')
-console.setFormatter(formatter)
-logging.getLogger('').addHandler(console)
-
-with open(_cfull, "r") as f2: calcbak = f2.read()
-with open(_rbak, "w") as f3: f3.write(calcbak)          # write backup
-
-_rshortP = Path(*Path(_cfull).parts[-3:])
-_bshortP = Path(*Path(_rbak).parts[-4:])
-logging.info("Calc File Paths")
-logging.info(f"""file: {_rshortP}""" )
-logging.info(f"""backup: {_bshortP}""")
-print("_"*80 + "\n")
-# todo: check folder structure here
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
 
 def list_values():
     """write table of values to terminal 
@@ -276,34 +248,8 @@ def pdfreport():
     """
     pass
 
-<<<<<<< HEAD:rivet/rc_lib.py
 def R(rawS: str):
     """transform repository-string to utf and reST calc
-=======
-def _update(hdrS:str):
-    """update and reset section settings
-    
-    Args:
-        hdrs {str}: rivet-string header
-    """
-    global _utfcalcS, _setsectD
-
-    _setsectD["enum"] = 0   # equation number
-    _setsectD["fnum"] = 0   # figure number
-    _setsectD["tnum"] = 0   # table number
-    swidthI = int(_setsectD["swidth"])
-    rnumS = str(_setsectD["rnum"])
-    snameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
-    snum = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
-    sheadS = " " +  snameS + (rnumS + " - " +
-            ("[" + str(snum) + "]")).rjust(swidthI - len(snameS) - 2)
-    sstrS = swidthI * "="
-    utfS = sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
-    print(utfS); _utfcalcS += utfS
-
-def r__(rawS: str):
-    """convert report-string to utf and rst-string
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
     
     Args:
         rawstrS (str): repository-string
@@ -318,13 +264,8 @@ def r__(rawS: str):
     rcalcS, _setsectD = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
-<<<<<<< HEAD:rivet/rc_lib.py
 def I(rawS: str):
     """transform insert-string to utf and reST calc
-=======
-def i__(rawS: str):
-    """convert insert-string to utf and rst-string
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
     
     Args:
         rawstrS (str): insert-string
@@ -339,13 +280,8 @@ def i__(rawS: str):
     icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
-<<<<<<< HEAD:rivet/rc_lib.py
 def V(rawS: str):
     """transform insert-string to utf and reST calc
-=======
-def v__(rawS: str):
-    """convert value-string to utf and rst-string
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
     
     Args:
         rawstr (str): value-string
@@ -360,13 +296,8 @@ def v__(rawS: str):
     vcalcS, _setsectD, _rivetD, _exportS = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
-<<<<<<< HEAD:rivet/rc_lib.py
 def E(rawS: str):
     """convert equation-string to utf or rst-string
-=======
-def e__(rawS: str):
-    """convert equation-string to utf and rst-string
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
 
     """
     global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
@@ -379,13 +310,8 @@ def e__(rawS: str):
     ecalcS, _setsectD, _rivetD, _exportS = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
-<<<<<<< HEAD:rivet/rc_lib.py
 def T(rawS: str):
     """convert table-string to utf or rst-string
-=======
-def t__(rawS: str):
-    """convert table-string to utf and rst-string
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
     
     """
     global _utfcalcS, _setsectD, _foldD, _setcmdD, _exportS
@@ -398,12 +324,7 @@ def t__(rawS: str):
     tcalcS, _setsectD, _exportS = tcalc.t_parse()
     _utfcalcS = _utfcalcS + tcalcS
 
-<<<<<<< HEAD:rivet/rc_lib.py
-def x(rawS: str):
-    """skip execution of a rivet-string
-=======
-def x__(rawS: str):
+def X(rawS: str):
     """skip execution of rivet-string
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
     """
     pass

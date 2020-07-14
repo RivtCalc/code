@@ -1,40 +1,22 @@
 #! python
-"""convert rivet-string to utf-8 calc-string
+"""transform rivet-string to calc-string
 
-This module converts each rivet-string to a utf-8 calc-string using a separate
-class for each string type (5 total). Markup in a string includes tags and
-reStructuredText used in all strings and string-specific commands.
+A separate class transforms each rivet-string type to a utf-8 calc-string. 
+Commands are single lines except where noted as block below.
 
-Commands and syntax by string type and function 
-(commands are single lines except where noted)
-------------------------------------------------
-
+-------  --------  -----  ----------------------------------------------------
 string   function  class
-type     name      name     commands {comment}
--------  --------  -----    -----------------------------------------------------
-<<<<<<< HEAD:rivet/rc_calc.py
-repo     r__()     _R_utf   summary {block}, labels {block}, append {block}
-insert   i__()     _I_utf   tex, sym, table, image {block}, image2 {block} 
-values   v__()     _V_utf   values
-equation e__()     _E_utf   =, format, function
-table    t__()     _T_utf   =, read, save, data, plot, add, table, image, image2
-
-Command syntax {notes}
------------------------
-R('''r-string''') {define repository and report data}
-    || summary | section / string  {toc}
-    {paragraph text}
-=======
-repo     r__       _Rutf   summary {block}, labels {block}, append {block}
-insert   i__       _Iutf   tex, sym, table, image {block}, image2 {block} 
-values   v__       _Vutf   values
-equation e__       _Eutf   =, format, function
-table    t__       _Tutf   =, read, save, data, plot, add, table, image, image2
+type     name      name    commands {comments}
+-------  --------  -----   ---------------------------------------------------
+Repo      R       _R_utf   scope, toc, summary {block}, attach {block}
+Insert    I       _I_utf   tex, sym, table, image {block}, image2 {block} 
+Values    V       _V_utf   =, values, 
+Equation  E       _E_utf   =, format, function
+Table     T       _T_utf   table, image, image2, {any Python simple statement}
 
 Command syntax  
 ---------------
-r__(''' r-string defines repository and report data
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
+R(''' r-string defines repository and report data
     
     May include arbitrary text that does not start with double bar.  It
     will be treated as a comment and will not be processed.
@@ -46,21 +28,13 @@ r__(''' r-string defines repository and report data
 
     || scope | # csv list used in repo read.me and other databases
     
-    || append | calccover.pdf         
+    || attach | calccover.pdf         
     pdf_file1 | A. Appendix label
     pdf_file2 | B. Appendix label
-    functions or docstrings | C. Appendix label
+    functions {or} docstrings | C. Appendix label
     ''')
 
-<<<<<<< HEAD:rivet/rc_calc.py
-I('''i-string''') {insert static text, tables and images}
-    || tex | \gamma = x + 3 {latex equation} | 1. {image scale}
-    || sym | x = y/2 {sympy equation} | 1.
-    || table | x.txt | 60 {max paragraph width - characters}
-    || table | x.csv | 60,[:] {max column width - characters, line range}  
-    || table | x.rst | [:] {line range}
-=======
-i__(''' # i-string inserts static text, tables and images
+I(''' # i-string inserts static text, tables and images
     
     May include arbitrary text that does not start a line with double bar.
     
@@ -69,7 +43,6 @@ i__(''' # i-string inserts static text, tables and images
     || table | x.txt | 60 # max paragraph width - characters 
     || table | x.csv | 60,[:] # max column width - characters, line range  
     || table | x.rst | [:] # line range
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
 
     || image | x.png/x.jpg {image file} | 1. {scale}
     figure caption
@@ -79,11 +52,7 @@ i__(''' # i-string inserts static text, tables and images
     figure2 caption
     ''')
 
-<<<<<<< HEAD:rivet/rc_calc.py
 V('''v-string''') {define values}
-=======
-v__(''' {v-string defines values}
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
 
     May include arbitrary text that does not start line with a double bar
     or include equal sign.
@@ -94,7 +63,7 @@ v__(''' {v-string defines values}
     || vector | x.csv | VECTORNAME c[n] {assign column in file to vector}    
     || values | vfile.py  | [:] {assignment lines to read}
 
-e('''e-string''') {define equations}
+E('''e-string''') {define equations}
     
     May include arbitrary text that does not start a line with double bar
     or include equal sign.
@@ -106,7 +75,7 @@ e('''e-string''') {define equations}
 
     || script | x.py | func_name | units, alt  {import function from file}
 
-t('''t-string''') {define tables and plots}
+T('''t-string''') {define tables and plots}
     
     May include arbitrary text that does not start a line with a double bar
     or include equal sign.
@@ -258,13 +227,8 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
     else:
         return tagS, setsectD
 
-<<<<<<< HEAD:rivet/rc_calc.py
 class _R_utf:
     """transform Repository-string to calc-string
-=======
-class _Rutf:
-    """convert repo-string to utf-calc string
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
 
     Attributes:
         strL (list): rivet-strings
@@ -284,11 +248,7 @@ class _Rutf:
             string :  formatted utf-calc string
         """
         endflgB = False; rtmpS = ""; rL = []; indxI = -1
-<<<<<<< HEAD:rivet/rc_calc.py
         rcmdL = ["summary", "scope", "attach", "toc" ]
-=======
-        rcmdL = ["summary", "scope", "append", "toc" ]
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
         methodL =  [self.r_summary, self.r_label, self.r_append]
         tagL =  [ "[r]_", "[c]_", "[link]_"] 
         
@@ -360,13 +320,8 @@ class _Rutf:
         print(utfS + "\n"); self.calcS += utfS
         sys.stdout = old_stdout    
     
-<<<<<<< HEAD:rivet/rc_calc.py
 class _I_utf:  
     """convert Insert-string to utf-calc string 
-=======
-class _Iutf:  
-    """convert insert-string to utf-calc string 
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
 
     Attributes:
         strL (list): rivet-string
@@ -605,13 +560,8 @@ class _Iutf:
         utfS = indS + indS.join(utfL)
         print(utfS); self.calcS += utfS + "\n"
 
-<<<<<<< HEAD:rivet/rc_calc.py
 class _V_utf:
     """convert Value-string to utf-calc string
-=======
-class _Vutf:
-    """convert value-string to utf-calc string
->>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
         
     Attributes:
         strL (list): rivet strings
