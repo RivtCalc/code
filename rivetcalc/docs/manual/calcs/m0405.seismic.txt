@@ -1,0 +1,200 @@
+[s] Base shear and vertical distribution
+    The floor area at each level is 32,224 square feet. The perimeter of the exterior
+    curtain wal
+
+    l is 728 feet. The roof parapet height is 4 feet. The curtain-wall
+    weights are distributed to each floor by tributary height.  Values are organized
+    from top to bottom (floors 5 to 1).
+
+
+        #- 02 insert building figure
+
+
+    [t] wall length [ft]        | wall_length = 728.0
+    [t] wall unit weight [psf]  | wallUnitWt = 20.0
+    [t] floor area  [sf]        | floor_area = 32224.0
+    [t] floor unit weight [psf] | floor_uweight = array([74.0] + [76.0]*4)
+    [t] wall height [ft]        | wall_ht = array([10.0] + [12.0]*3 + [13.0])
+
+    [a] Table - floor weight (kips)  #- 90
+        floor = ['roof',5,4,3,2]
+        floorWeight = (1/1000) * floor_area * floor_uweight
+
+    [a] Table - wall weight (kips)   #- 90
+        floor = ['roof',5,4,3,2]
+        wallWeight = (1/1000.) * wall_length * wall_ht * wallUnitWt
+
+    [a] Table - story weight (kips)   #- 90
+        floor = ['roof',5,4,3,2]
+        storyWeight = floorWeight + wallWeight
+
+    [e] sum of story weights (kips)   #- 03
+        totalStorywt = sum(storyWeight)*KIPS
+
+        Import loads from model 0402
+
+        #- 01 import model
+
+[s] Design base shear V_1 = C_S * W (Eq 12.8-1)
+
+    [e] total base shear  #- 23
+        V_1 = C_S  * totalStorywt
+
+[s] Vertical distribution of shear
+    The total lateral force (i.e., design base shear) is distributed over the height
+    of the building in accordance with IBC 12.8.3.
+    k is a distribution exponent related to building period as follows:
+    k = 1 for buildings with a period of 0.5 second or less
+    k = 2 for buildings with a period of 2.5 seconds or greater
+    k = is interpolated between these values for buildings with period between 0.5
+    second and 2.5 seconds
+
+    [t] height above ground [ft]      | h_x = array([62, 50, 38, 26, 14])
+
+    [e] story weight [kips]  #- 21
+            w_x = array(storyWeight)
+
+    [a] Table - w_x h_x (kip-ft)  #- 90
+            floor = ['roof',5,4,3,2]
+            wxhx = w_x * h_x
+
+    [e] sum of w_x h_x (kips)    #- 01
+            wxhx_sum = sum(wxhx)
+
+    Vertical distribution coefficient
+
+    [y] s | C_vx = (w_x * h_x__k) / Sum(w_x * h_x__k ,(i, 1, n))
+
+    [a] Table - Percent vertical load distribution - C_vx   #- 90
+        floor = ['roof',5,4,3,2]
+        C_dist = wxhx * (1/wxhx_sum) * 100
+
+    [a] Table - Story Force F_x (kips)   #- 90
+            floor = ['roof',5,4,3,2]
+            F_x = C_dist * V_1 / 100
+
+    [a] Table - Story Shears (kips)   #- 90
+            floor = ['roof',5,4,3,2]
+        V_x = [F_x[0], sum(F_x[0:2]), sum(F_x[0:3]), sum(F_x[0:4]), sum(F_x[0:5])]
+
+    [e] base shear (kips)   #- 01
+            Vbase = sum(F_x)
+
+[s] Horizontal distribution of shear
+    IBC 12.8.4.2 requires inclusion of an accidental torsional eccentricity, e, equal
+    to 5 percent of the building dimension perpendicular to the direction of force.
+    It is assumed that the four frames in the transverse direction are each 25
+    percent stiffer than the six in the longitudinal direction because they are more
+    heavily loaded.
+
+    [t] e/w c.m. distance to frame          | d_ew = 105*FT
+    [t] n/s c.m. distance to frame          | d_ns = 75*FT
+    [t] accidental ecc  e/w                 | e_ew = 0.05 * 2*d_ew
+    [t] accidental ecc  n/s                 | e_ns = 0.05 * 2*d_ns
+    [t] rel stiffness-trans frames          | R_i = 1.25
+
+[s] Transverse frames-shear plus torsion
+
+    [e] rel. torsional resistance - 4 transverse frames  #- 03
+            transR_i = R_i * d_ew**2
+
+    [e] rel. torsional resistance - 6 longitudinal frames  #- 03
+            longR_i = d_ns**2
+
+    [e] sum of rel. torsion resistances
+            SumR_i = 4*transR_i + 6*longR_i
+
+    [e] Percent torsion force at single transverse frame  #- 23
+            Ttrans_y = 100 * (e_ew / d_ew) * transR_i / SumR_i
+
+    [e] Percent torsion force at single transverse frame  #- 23
+            Tlong_y = 100 * (e_ew / d_ns)  * longR_i / SumR_i
+
+    Torsion distribution relation
+
+    [y] s | Viy = Sum(Vy,(i,0,n))*(Riy/Sum(Riy,(i,0,n))+(e_real*Ri*di)/(Sum(Ri*di**2,(i,0,n)))
+                       + Abs((e_acc*Ri*di)/(Sum(Ri*di**2,(i,0,n)))))
+
+    [a] Table - Forces at each level at frame BF-2 (kips)  #- 90
+            floor = ['roof',5,4,3,2]
+            F_xbf2 = F_x * ((1/4) + Ttrans_y/100)
+
+    [a] Table - Story shears at each level at frame BF-2 (kips)  #- 90
+            floor = ['roof',5,4,3,2]
+            V_xbf2 = array(V_x) * ((1/4) + Ttrans_y/100)
+
+[s] Combined forces (IBC 12.4.2)
+    For convenience, the seismic design load combinations can be reformulated to
+    combine the vertical component of the seismic motion with the dead load. Also,
+    as the overstrength factor is not considered in combination with the
+    redundancy factor (and the results of the analysis include the redundancy factor),
+    it is sometimes convenient to recalculate the overstrength factor to account
+    for this difference (if rho > 1.0).
+
+    [e] combined effects - redundancy  #- 13
+            E2 = rho * Q_E - 0.28 * DL
+
+    [e] combined effects - overstrength  #- 13
+            E1_m = Omega_0 * Q_E + 0.28 * DL
+
+    [e] combined effects - overstrength  #- 13
+            E2_m = Omega_0 * Q_E - 0.28 * DL
+
+    Basic Seismic Load Combinations:
+
+    [e] 1.2D+ 1.0E + 0.5L (Eq 16-5)  #- 13
+            E1_B = 1.48*DL + rho*Q_E + f_1L
+
+    [e] 0.9 D + 1.0 E (Eq 16-7)  #- 13
+            E2_B = 0.62*DL + rho*Q_E
+
+    Special Seismic Load Combinations (Amplified Seismic Load)
+
+    [e] 1.2D + 1.0Em + 0.5L (Eq 16-22)  #- 13
+            E1_M = 1.48*DL + 2.0*Q_E + f_1L
+
+    [e] 0.9D + 1.0Em (Eq 16-23)  #- 13
+            E2_M = 0.62*DL + 2.0*Q_E
+
+    The formulae that include the redundancy factor are used for brace design, and
+    those that do not include it are used for column and beam design. The forces that
+    the framing members are likely to see are greater for a frame with larger braces
+    than for one with smaller ones, and the same overstrength factor should be applied
+    to the two frames.
+
+    It is apparent from the reformulations that the redundancy factor actually
+    decreases the effective overstrength required of these members and makes
+    unfavorable yield modes more likely. A redundancy factor of 1.3 decreases the
+    effective overstrength factor to 1.54, an extremely low value for a braced frame;
+    use of such a low value in determining column design forces may not be sufficient
+    to preclude column buckling. Designers should not lose sight of the
+    purpose of the required overstrength, even when code provisions permit its
+    reduction.
+
+#- formateq | 3,3 |  1.0
+#-    03| 0,0    |       | 3
+#-    13| 0,0   |       | 3
+#-    23| 2,0    |       | 3
+#-    33| 3,0    |       | 3
+#-    02| 0,0    |       | 2
+#-    12| 1,0    |       | 2
+#-    22| 2,0    |       | 2
+#-    32| 3,0    |       | 2
+#-    01| 0,0   |       | 1
+#-    11| 1,0     |       | 1
+#-    21| 1,0   |       | 1
+#-    31| 3,0    |       | 1
+#-    90| 0,0    | lvl   | 3
+#-    91| 2,0    | lvl   | 3
+#-    92| 0,0    | frm   | 3
+
+
+#- fileop
+#- 01 | i | 0402.seismic.txt | | |
+#- 02 | f | bldg.png | Building Structural Scheme  | 100 |
+
+# This file contains a on-c-e public domain template (the template).
+# The template is distributed under the CCO 1.0 Public Domain Dedication
+# at http://creativecommons.org/publicdomain/zero/1.0/
+# The template is not a structural design calculation.
+# The template user assumes sole responsibility for all inputs and results.

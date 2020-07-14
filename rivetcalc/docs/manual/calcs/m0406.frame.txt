@@ -1,0 +1,59 @@
+#- 
+
+[s] Frame analysis
+    Small eccentricities occur at the connections to facilitate detailing.
+    These eccentricities result in flexural forces in the framing
+    members, as well as larger drifts than those for frames without eccentricities. It is
+    therefore necessary to include the eccentricities in the frame model.
+    Using the frame forces from Table 1 A4, the frame shown in Figure 1A-5 is analyzed.
+    Columns are modeled as fixed at the base and braces as pinned at each end. Although
+    in-plane rotation of the gusseted beam-to-column connection may induce some
+    flexural forces in the brace, these are small at the elastic drift level. Beams are
+    modeled as having fixed connections at their gusseted connections to the columns;
+    these details include beam-to-column joint flange welds. (AISC 341, 7.2)
+
+[s] Story drifts
+    In this design example a second-order analysis has been
+    performed, and the B2 amplification factor is not required.
+    The displacements from the model are converted to design story drifts and compared
+    to the allowable drift from ASCE/SEI 7-05 Table 12.2-1. The story drifts are
+    calculated from the displacements, and divided by the reliability/redundancy factor,
+    rho and I. The drifts from the elastic analysis are multiplied by the displacement
+    amplification factor, Cd. The design story drift for each level of this frame is less
+    than the allowable drift. Because the building design is symmetrical and
+    has rigid diaphragms, the average story drift will not exceed the drift of this frame.
+    Thus, the building will meet the drift limitations of Table 12.12-1.
+
+    [t] response mod coef (T 12.2-1)   | R_1 = 6.0
+    [t] story height (inch)            | h_sx = array([12]*4+[14]) * 12
+    [t] model displacement (inch)      | disp_xe = array([2.19, 1.70, 1.24, 0.77, 0.35])
+    [t] model drift (inch)             | Delta_xe = array([0.50, 0.45, 0.47, 0.43, 0.35])
+
+    [e] displacement amplification factor #- 23
+        C_d = R_1 * 0.7
+
+#page
+
+    [a] design story drift (inch)  #- 91
+        story = ['roof',4,3,2,1]
+        delta_x = C_d * Delta_xe
+
+    [a] allowable story drift (inch)  #- 91
+        story = ['roof',4,3,2,1]
+        delta_Ax = .020 * h_sx
+
+
+#- formateq |  2,2  |  1.0
+#- 23  |  2,2     |       | 3
+#- 33  |  3,3     |       | 3
+#- 02  |  0,0     |       | 2
+#- 90  |  0,0     | lvl   | 3
+#- 91  |  1,0     | stry  | 3
+#- 92  |  0,0     | frm   | 3
+
+
+# This file contains a on-c-e public domain template (the template).
+# The template is distributed under the CCO 1.0 Public Domain Dedication
+# at http://creativecommons.org/publicdomain/zero/1.0/
+# The template is not a structural design calculation.
+# The template user assumes sole responsibility for all inputs and results.

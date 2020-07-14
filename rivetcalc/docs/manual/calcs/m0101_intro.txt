@@ -1,0 +1,331 @@
+CONTENTS 
+
+1.Introduction5 2.Calc example (no LaTeX input)7 3.Calc example (with 
+LaTeX input)14 4.on-c-e overview15 5.Files17 6.Operations - overview19 
+7.Operations - syntax21 8. Databases30 9. Resources31 10.Diagrams32 11. 
+SymPy, reST, and LaTeX32 Appendix A - Write a UTF calc using Pyzo34 
+Appendix B - Add a template to calc-db35 Appendix C - Write a calc in 
+the cloud36 Appendix D Write calcs using Komodo 39 Appendix E Evaluate 
+calc equations interactively43 Appendix F Generate PDF calcs on 
+workstations45 Appendix G Write UTF calcs on Android and iOS46 Appendix 
+H Minimum Programs and Libraries49 Appendix I Licenses50 Appendix J 
+Security and Namespaces52 Appendix K Examples (separate document)53 
+Index54 
+
+Figures 
+
+Figure 1. Individual and project calcs7 Figure 2. Calc input (with 
+Komodo with syntax coloring)8 Figure 3. UTF calc output9 Figure 4. PDF 
+calc output11 Figure 5. PDF calc output12 Figure 6. PDF calc output13 
+Figure 7. Primary inputs and outputs17 Figure 9. Database Schemas sqlite 
+(left), mongoDB (right)30 Figure 10. Dia screenshot32 Figure 11. 
+Texmaker screenshot33 Figure 12. IEP screenshot34 Figure 13. Wakari 
+terminal and editor in split windows37 Figure 14. PythonAnywhere side by 
+side browser windows38 Figure 15. Komodo interface39 Figure 16. 
+Screenshots of model equations in IPython shells44 Figure 17. Screenshot 
+of onceutf calc on iPhone46 Figure 18. DroidEdit screenshot of onceutf 
+calc on Android tablet48 Figure 19. http://opensource.org/licenses/MIT50 
+Figure 20. http://creativecommons.org/publicdomain/zero/1.0/51 
+
+Tables 
+
+Table 1. Comparison of oneutf.py and oncepyError! Bookmark not defined. 
+Table 2. Open Source components16 Table 3. Operations summary20 Table 4. 
+File and folder structure18 Table 5. Minimum required programs and 
+libraries49 
+
+Version 0.8.1 February 28, 2017 - page 54 
+
+1.Introduction Structural calculations and drawings are at the heart of 
+any design and construction project and their clarity, completeness and 
+responsiveness to changed conditions can have a significant impact on 
+project cost. Developments in open source software over the last decade 
+have provided effective tools that can be applied to improve 
+foundational construction document productivity. on-c-e (pronounced 
+once) implements a simple, text based markup language and program for 
+publishing and sharing searchable structural engineering calculations. 
+It is built on open source tools and programs in the following areas: 
+- Interactive Development Environments (IDE)- Python and its scientific 
+libraries- LaTex distributions- Local and cloud database and file 
+systems referred to as calcs. Because calc input is written in text they 
+are easily stored and searched in a database. Because it generates 
+formal LaTeX output, calcs can be used for reports and building permit 
+documentation. on-c-e was started as part of a research and development 
+effort to address factors contributing to the decades-long slide in 
+construction productivity. Calc inputs generate two searchable output 
+formats; UTF-8 and PDF. A UTF-8 calc is instantly generated and is 
+intended for rapid design checks and iteration. It can be edited, 
+annotated and inserted in other documents. The same calc input can also 
+produce PDF calcs formal reports and construction documents. They 
+include graphics and LaTeX math and. on-c-e writes formatted UTF-8 and 
+PDF calcs. Sections 2 and 3 show example calc inputs and outputs. 
+Additional examples are provided in Appendix J and they can be browsed 
+in the online database at on-c-e.org . Compared to Mathematica , Mathcad 
+or MATLAB , on-c-e reduces the effort needed to publish and share 
+calculations and insure that older models always run. Compared to Excel 
+and hand calculations it improves legibility, search, review, 
+navigation, organization and re-use. Calcs may also be interactively 
+processed within Python interactive shells and notebooks including IEP 
+
+, Komodo Edit and IPython 
+
+. Multiple related PDF calcs may be organized in a project calc with 
+title blocks, page numbers, table of contents and links. 
+
+Table 1 . Platform capabilities Calc inputs are prepared by typing 
+equations and explanatory narrative in any IDE or text processor using 
+ASCII text. The user controls calculation flow and formatting by 
+inserting single letter markup tags in the text (Table 4). This manual 
+describes on-c-e design objectives, syntax and how to use it on all 
+major operating systems and devices including Windows, OS-X, Linux, 
+Android, and iOS. The interface is a text processor or Interactive 
+Development Environment (IDE) on workstations, a web browser or IDE on 
+networks, and an app on mobile platforms. Instructions for using the 
+program on different platforms are provided in the appendices 
+
+The half-dozen tags ([ r ] [ i ] [ v ] [ e ] [ t ] [ s ]) control calc 
+formatting and interaction with external programs and files. on-c-e 
+knows how to handle text, equations, units, significant figures, tables, 
+functions and figures 
+
+APPENDIX A - GENERATE CALCS USING PYZO APPENDIX B - ADD A TEMPLATE TO 
+CALC-DB APPENDIX C - GENERATE CALCS IN THE CLOUD APPENDIX D GENERATE 
+CALCS USING KOMODO APPENDIX E GENERATE CALCS INTERACTIVELY APPENDIX F 
+GENERATE CALCS ON WORKSTATIONS APPENDIX G GENERATE CALCS ON ANDROID AND 
+IOS 
+
+2. Calc example (no LaTeX input) 
+
+Version 0.8.1 February 28, 2017 - page 54 
+
+Version 0.8.1 February 28, 2017 - page 54 
+
+Version 0.8.1 February 28, 2017 - page 54 
+
+3. Calc example (with LaTeX input) 
+
+4. on-c-e overview Program Objectives- automate calc formatting, 
+including symbolic representations, arithmetic and algebra- make it easy 
+to search and share the program and calcs- stay out of the way of 
+thinking and writing- produce clear, organized documents- run on 
+workstations, mobile devices and in browsers - integrate with Python and 
+IPython engineering and scientific libraries- develop a general tool 
+that can replicate single purpose software tools- integrate with other 
+structural engineering programsDesign Approach- produce UTF-8 results 
+for fast design iteration and platform simplification- produce LaTeX 
+results for clarity, expressiveness and formal documents- use a simple, 
+readable, loosely structured markup language- build on mature, open 
+source platforms and interfaces- use online databases for calc template 
+sharing The OpeN Calc Environment is defined by on-c-e modules, calc 
+inputs, the calc database and Open Source components. on-c-e parses calc 
+inputs into dictionaries of equations and operations and processes them 
+through the Python numpy andsympy scientific libraries to produce UTF 
+and reStructuredText files. The reST file is further processed through 
+docutils, LaTeX andPyPDF2 libraries to produce PDF calcs. Typical calc 
+inputs are a few hundred lines of text and can be stored and searched in 
+many types of databases (see calc-db ). Calc inputs may be combined with 
+other inputs, files and results from external structural engineering 
+programs. Templates are shared inputs with public domain licenses. 
+on-c-e components: -ffcc.input.txt: calc input or template file that 
+produces a calc. -oncepy: Python package installed in the site-packages 
+directory of Python by a simple folder copy. -onceutf.py: single file 
+Python module produces UTF calcs and simplifies exploration and testing. 
+-calcipy.py: module updates the IPython history database with on-c-e 
+equations. 
+
+-calcsqlite.py: adds calc input to a calcdb SQLite database 
+
+-calcdb-n.sqlite3 and calc-db: local and online calc databases. Open 
+Source components (except where noted): -Anaconda 1.9.2: scientific 
+Python distribution for Windows , Linux , OSX. -Pyzo: Python IDE with 
+integrated introspection, interactive help and portable installation. 
+-IPython: Interactive shell and notebooks for Python and Julia. -Komodo 
+Edit / Komodo IDE (commercial): multilanguage IDE for Windows , Linux , 
+OSX. -Wakari: web based scientific Python distribution with browser 
+interface. -DejaVu Fonts: complete UTF-8 math fonts. -Tex Live: LaTeX 
+distribution required for LaTeX and PDF calcs. -Dia: vector drawing 
+program -SQLite and SQLiteStudio: database and front end manager 
+-Pythonista (commercial): Python platform for iOS runs onceutf.py. 
+-QPython (commercial): Python platform for Android runs onceutf.py 
+
+For comparison of Python with other numerical computing environments, 
+see: http://www.stat.washington.edu/~hoytak/blog/whypython.html 
+
+https://sites.google.com/site/pythonforscientists/python-vs-matlab 
+
+----------------------------------- 
+
+| Komodo EditIDE | Anaconda Python Platform | oncepy 
+once-db onceutf.py onceipy.py 
+| 
+
+----------------------------------- 
+
+| Links | activestate.com | anaconda(ver. 1.9.2) | on-c-e.org | oncedb | 
+
+----------------------------------- 
+
+| OS | Windows, Linux and OSX | 
+
+----------------------------------- 
+
+| Details | Full featured open source IDE for multiple languages | 
+Enterprise-ready distribution for scientific computing | Python package 
+for writing structural calculations | Online template database with web 
+interface | 
+
+----------------------------------- 
+
+| Sponsor | Active State Canada | ContinuumUSA | StructureLabsUSA | 
+
+----------------------------------- 
+
+| License | Mozilla Public License | Various Open Source Licenses | 
+Program: MIT LicenseModels: CCO1.0 Public Domain | 
+
+----------------------------------- 
+
+5. Files The fundamental on-c-e component is a calc input file 
+
+ffcc.name.txt, where ffcc is the calc designation, ff is the two digit 
+folder number, cc is the two digit calc number and name is a 
+user-created calc name. The calc designation is used for calc and 
+project organization and must be unique in a project. Calcs are stored 
+in folders which in turn are stored in a project folder (Table 4). 
+Standalone calcs do not require a folder structure but do require a 
+leading calc designation. When a calc is run it produces the following 
+output files in its folder (Figure 3, Table 2): - calc ffcc.name 
+.calc.txt -Optional PDF calc ffccc.name .calc.pdf and temporary files 
+(removed by default) -IPython input file _equations .py for interactive 
+analysis and database summaries 
+
+-Execution log file _calclog.txt, also (partially) echoed to the 
+terminal during execution - Optional .rst, .tex, .log, .out, fls, 
+fdb_latexmk see Appendix F -Optional project calc project.pdf assembled 
+from a specified set of division folders 
+
+Related calcs may be grouped in division folders. Calcs may incorporate 
+other calcs in the project, external functions, data, and batch or 
+script control files. Externally referenced files (i.e. figures) must be 
+located in the calc folder, and external calcs must be located in a 
+project division folder. External files are identified by file name 
+only. The program recreates the full path name internally, which allows 
+division folders to be moved to new projects without changing the calc. 
+The exceptions include those files processed by the file operation 
+options r (read) and e (edit). These two operations typically use files 
+produced by other programs with their own preferred file structure. To 
+work with these files in their natural location a full path name is 
+required (see file operations , Appendix B). 
+
+A calc folder has the name ff.foldername where ff is the unique folder 
+number. Each project folder may contain up to 100 calc folders each with 
+100 models using unique numbers 00 to 99. The project folder contains an 
+optional project definition file that defines the structure of the 
+project calculation documents. It may contain the project wide unit and 
+PDF style definition files (unitc.py, once.sty) that override program 
+defaults. If unit and style definition files are also included in a calc 
+folder they will override both the project folder and built-in defaults 
+for those calcs. 
+
+Figure 8 . Primary inputs and outputs 
+
+----------------------------------- 
+
+| Project Files | Project / Calc Folder Structure | Calc Files | 
+
+----------------------------------- 
+
+| ddmm.input.txtinput | 
+
+----------------------------------- 
+
+| (project.txt) Project file | 
+
+----------------------------------- 
+
+| (background.pdf) Calc background | (once.sty)PDF style | 
+
+----------------------------------- 
+
+| ddmm.name.calc.txtUTF-8 calc | 
+
+----------------------------------- 
+
+| (ddmm.name.calc.pdf)PDF calc | 
+
+----------------------------------- 
+
+| (project.pdf)Project calc | equations.pyPython equation file | 
+
+----------------------------------- 
+
+| (project.log.txt)Project execution log | _calclog.txtCalc execution 
+log | 
+
+----------------------------------- 
+
+| Notes:1. Input files are in blue; output in green2. Optional files are 
+in parenthesis | 
+
+----------------------------------- 
+
+Table 3 . File and folder structure 
+
+6.Operations - overview There are six on-c-e markup tags used to produce 
+calcs: 
+
+[r]ublish [i]ection [v]erm [e]quation [t]rray [s]rray Tags are processed 
+in the order entered. During processing, sections and equations are 
+automatically numbered and formatted. Equations are rendered both 
+symbolically and with numerical substitution, similar to a hand 
+calculation. 1D and 2D tables are generated from equations, imported 
+data and spreadsheet-like formats. Units and decimals are controlled at 
+the equation level by format statements positioned at the end of the 
+calc input to improve readability. Table 3 and Sec tion 7 provide 
+further details. 
+
+A bracketed tag ([]) specifies printable content. Hash-dash tags (#-) 
+tags specify formatting and file processing operations. Operations may 
+occur in any order, without nesting, as long as each variable or 
+parameter was previously defined. Operation parameters are separated by 
+vertical bars (|). Default parameters may be omitted but the bar 
+delimiters (with at least one space between) must be provided. Tags 
+include [s], [y], [t] (single line operations) and [c], [a], [f], [e] 
+(multiple line operations terminated with a blank line). 
+
+Tables (arrays) can be manually configured like a spreadsheet or 
+generated using equations and range variables. If variables with units 
+are used in a generated array they are stripped before evaluation. 
+
+The file operation tag #- nn designates a file operation definition 
+number that includes the options b, r, o, w, n, i, e, s. For example, 
+the option parameter |s| processes a Python file or script that defines 
+function imported into defines functions available to the model. A 
+loaded function is processed in the model by the function tag [f]. The 
+option |i| imports a comodel into the main model. A comodel is an 
+imported model that co-executes with the main model, but does not itself 
+import other models (only one level of model import is permitted). Other 
+options import figures and text and execute read, write, edit and run 
+operations on external files and program (PDF calcs insert figures; UTF 
+calcs insert references) 
+
+Any text in the model not associated with an operation tag is passed 
+through to the output unchanged. reStructuredText (reST ) markup is 
+retained and used when processing PDF calcs. For example, surrounding 
+text with **double asterisks** will print bold, *single asterisks* will 
+print italics and a vertical bar at the beginning of a line will force a 
+new line. reST directives, i.e. raw latex, are also processed by PDF 
+calcs but not echoed in UTF calcs. See the reST reference for further 
+documentation. 
+
+Project operations use tags [p] , [n] . Project calcs are grouped sets 
+of numbered PDF calcs with a title page, table of contents, title blocks 
+and navigational links. The [p] operation writes a project calc with the 
+name project_file_name.pdf to the project folder, overwriting any 
+existing file. The project operation is divided into a project data 
+definition section and a calc folder inclusion list (Table 4 and 
+Appendix B ). Project defaults can be overridden in each calc. Project 
+data is defined by a dictionary of keyword-data pairs. The project 
+format operation [n] defines the page print location for specific 
+project data. 
+

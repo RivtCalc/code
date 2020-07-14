@@ -1,0 +1,350 @@
+8. Databases Calcs and projects can be organized and shared as zipped 
+files or in searchable databases. Because calc inputs are text it is 
+relatively straightforward to build searchable databases for sharing and 
+re-use. on-c-e currently implements two types of databases (Figure 9). 
+The first type is structured for web browsing and sharing and the second 
+is designed for local use within an office or project. 
+
+A web-accessible database that uses mongoDB with the schema shown in 
+Figure 4 is available here and is further discussed in Appendix B. The 
+database and interface is useful for browsing complete calcs and their 
+inputs. 
+
+SQLite is used for local database storage. The schema for the local 
+database is similar to the cloud but omits the records that are intended 
+for online viewing and browsing. A convenience script, calcsqlite.py, 
+adds calc input to the local SQLite database. It can be invoked from the 
+command line in the folder containing the calc or through a tool bar 
+button in Komodo. It has the form 
+
+python m calcsqlite_database_path calc_file_designation [-c contactinfo 
+z zipfile] 
+
+where the terms in parenthesis add the specified information to the 
+database and are optional. Date and equation summary records are added 
+automatically. 
+
+SQLite mongoDB 
+
+9. Resources 
+
+Share models Download Models http://on-c-e.org 
+
+Upload Modelshttp://on-c-e.org/upload-model 
+
+Run locally Download and install Anaconda 1.9.2. Using pip, install 
+Unum, tabulate and PyPDF2. Install Tex Live 2014. Download and install 
+Pyzo and Komodo Edit (see Section 2 and Appendices D and F). 
+
+Although any text editor is adequate for composing and running models, 
+the most effective editor is an interactive development environment (IDE 
+). It provides project , file management and font management, code 
+navigation, templates, custom toolbars and macros, syntax coloring, 
+window layout controls and remote file access. Komodo Edit is a 
+full-featured, cleanly designed, open source IDE which can manage Python 
+, TCL, Ruby and other programing languages applicable to on-c-e and 
+other structural engineering work. A number of on-c-e specific tools and 
+convenience macros are provided for Komodo (Appendix C ). Although 
+Komodo is discussed in this manual, other IDEs or text editors may be 
+used. Commercial support for installing and running the program is 
+available on an annual basis at StructureLabs . It includes phone 
+support and a private oncepy installation on a Webfaction server that is 
+accessed over SSH and SFTP and will be used for interactive support. 
+
+Find Abouton-c-e .org User manualhttp://on-c-e.info 
+
+onceutf.py http://on-c-e.info oncepyhttp://on-c-e.org/programs/ model 
+databasehttp:// on-c-e.org/Code and docshttp://on-c-e.github.io/ Road 
+maphttp://on-c-e.us/ 
+
+Komodo Edithttp://activestate.com/komodo-edit DejaVu Fonts 
+http://dejavu-fonts .org/wiki/Main_Page Workstation (Anaconda 
+1.9.2)http://repo.continuum.io/archive/index.html Web Platform 
+(Wakari)https://wakari.io/ Pyzo http://www.pyzo.org/index.html TeX 
+Livehttps://www.tug.org/texlive/ 10.Diagrams 
+
+Diagrams are incorporated into on-c-e PDF calcs as bitmaps (png, jpg 
+etc.) using the figure option |f| of the file operation #- file. 
+Structural diagrams are often drawn to scale and can be efficiently 
+reused when described in vector and parametric form that is exported as 
+a bitmap. 
+
+2D The Open Source Dia Diagram Editor 
+
+may be used to interactively create and edit vector diagrams. 
+
+It writes SVG and DXF, the two common scalable vector file formats for 
+2D diagrams . Parameterized diagrams can be created in both formats 
+using Python scripts and the svgwrite, dxfwrite and ezdxf libraries. 
+Custom shapes for structural engineering can be added to its library. 
+The freely available vector drawing program DraftSight may also be used 
+to produce SVG, DXF and bitmapped drawings. 
+
+3D 3D diagrams can be created using SketchUp or SketchUp Make (skp 
+format), or the Open Source FreeCAD 
+
+(variety of formats). Drawing files can be exchanged between the two 
+programs using the COLLADA dae format. The Python pycollada library is 
+required for FreeCAD translation (use pip install pycollada). 
+
+Diagram files (svg, dxf, skp, dae) prepared for on-c-e templates may be 
+uploaded to a separate field in once-db or included in a template zip 
+folder. 
+
+Figure 10 . Dia screenshot 11. SymPy, reST, and LaTeX 
+
+on-c-e 
+
+incorporates LaTeX into calcs through the SymPy and reST libraries. 
+Since most of the LaTeX formating operations for equations are built 
+into the program, LaTeX only needs to be written in on-c-e calcs when it 
+is convenient for explanatory purposes or specific formatting. LaTeX 
+equations are available from a number of sources including Wikipedia 
+articles (use show source in browser) and online libraries i.e. 
+http://www.equationsheet.com/ http://latexsearch.com/ 
+
+They can be pasted into models and rendered using the [y] symbolic 
+operation. Texmaker is useful tool for learning and practicing LaTeX. It 
+is a free, modern, cross-platform LaTeX editor for Linux, OSX and 
+Windows systems that integrates tools needed to develop documents with 
+LaTeX, in one application. Texmakerincludes Unicode support, spell 
+checking, auto-completion, code folding and a built-in pdf viewer with 
+syntax support and continuous view mode. Texmakereasy to use and to 
+configure and is released under the GPL license. The integrated, 
+interactive, interface includes three panes. The left pane shows the 
+document structure, the central pane contains the document template and 
+contents, and the right pane shows the generated pdf. 
+
+Appendix A - Write a UTF calc using Pyzo 
+
+IEP : Interactive Editor for Python is a self-contained interactive 
+interface for running Python programs on a workstation. It is installed 
+as part of the Pyzo 
+
+science and engineering distribution (based on Python 3). Pyzo can be 
+installed in any folder without administration rights and does not 
+affect existing Python installations. If you want to install a limited 
+Python science platform this is a good placed to start. For a full 
+installation Anaconda (see Appendix D) and Komodo Edit are recommended. 
+A large set of convenience macros have been written for Komodo (see 
+Appendix C ). See Section 4 to try on-c-e without installation. 
+
+The IEP interface consists of four panes that contain various tools 
+arranged by the user. The upper left pane (Figure 3) is an interactive 
+IPython shell and the lower left pane is a code editor. When code is run 
+the results are executed and displayed in the shell where they can be 
+interactively explored. As code is typed in the shell or editor, the 
+upper right pane automatically displays code help if the help tab is 
+selected. Other tools display workspace variables and code structure. 
+The lower right pane is a file browser. 
+
+1.Download onceutf.py and example templates from http://on-c-e.info . 
+Copy onceutf.py to pyzo/Lib/site-packages/ and the examples to any 
+folder with write privileges. 2.Open the calc input and calc by double 
+clicking on the files in the file browser. Edit the model and re-run it 
+by scrolling to the run command entered in the shell. Variable values 
+are stored in the shell. Equations can be copied from the calc to the 
+shell for interactive evaluation. 3.Open the calc input and calc by 
+double clicking on the files in the file browser. Edit the model and 
+re-run it by scrolling to the run command entered in the shell. Variable 
+values are stored in the shell. Equations can be copied from the calc to 
+the shell for interactive evaluation. 4.Run conda or pip from the shell 
+or Scripts folder to install additional packages without affecting other 
+Python installations. The basic Pyzo works with onceutf. 
+
+Appendix B - Add a template to calc-db This section describes the 
+simplest approach to adding a template to the database calc-db. The 
+purpose of the exercise is to gain an initial familiarity with the 
+process. We will use the template 0101.basic.txt and modify it to make a 
+new template. Everything is done in a browser no installation is needed. 
+Step 1. Go to http://on-c-e.org . Click on [Download Model Templates] 
+at the top of the page. Step 2. Scroll down to search once-db, click on 
+the description dropdown box and select contains. Enter the search term 
+basic template. Click on the Search button. One or more results should 
+appear at the bottom of the page. If you search only on example you will 
+see a number of templates. Step 3. Look for the template name 
+0101.basic.txt and the associated calc names cal0101.basic.txt and 
+cal0101.basic.pdf. Click on the links that begin with cal to view the 
+two different calc formats in a browser window. Step 4. Select the 
+window for cal0101.basic.txt. Press the keys CTRL-A or select all of the 
+template text by dragging the mouse. Press CTRL-C or right click in the 
+browser window and select copy to copy the text to the clipboard. Step 
+5. Click on [Upload Model Templates] at the top of the page. Scroll down 
+to the box labeled Template Text and enlarge it by left clicking on the 
+handle in the lower right corner and dragging it. Click in the box and 
+press CTRL-V or right click and select paste. You should now have a copy 
+of the template in the box. Edit Template Step 6. Edit the text, terms, 
+and equations. Leave the tags and vertical bars in place and edit the 
+text between them. Section 6 provides an overview of tags and Appendix B 
+describes tag syntax. When you finish editing the template, type a brief 
+template summary in the Template Summary Description box above. Include 
+the phrase learning template in the description. Delete all of the words 
+example from the template and description (so it doesnt show up in a 
+search). The learning templates will be removed from the database every 
+few days. UploadTemplate Step 7. Click on the Submit button. You will 
+receive a confirmation message that the template was submitted. 
+
+Thats it! Thanks for learning how to contribute. (note: typically the 
+template file will be prepared on your computer and upload 
+
+Appendix C - Write a calc in the cloud This section describes a basic 
+approach to running an example template when a Python platform is not 
+available. It uses a web platform that does not require program 
+installation. on-c-e is designed to run on workstations with Python 
+installed, but it can also run in the cloud on Python web platforms like 
+Wakari and PythonAnywhere . They provide an in-browser editor and shell 
+terminal interface. Wakari and PythonAnywhere are discussed in the 
+manual but other Python web platforms can be used. Appendix E provides 
+additional details for web execution. Appendix D discusses installation 
+of the program on a computer or mobile device. For this exercise a 
+simple example model is run on a Python web platform using the program 
+onceutfnnn.py. You can preview and download other models at 
+http://on-c-e.org . Printed example models and calc output are provided 
+in Appendix I. onceutf.py is a single file subset of on-c-e that does 
+not include project options, PDF calcs, or unit overrides. It was 
+written to simplify program testing and implementation on web and mobile 
+platforms. Run template 1.Sign up for a free Wakari account at 
+http://continuum.io/ or PythonAnywhere at 
+https://www.pythonanywhere.com/ 
+
+2.Download onceutfnnn.py and 0101.basic.txt or 0101.basic .txt from 
+http://on-c-e.info 
+
+3.Upload the program and template files to a folder on your Wakari or 
+PythonAnywhere account. Choose a bash shell terminal from the drop-down 
+list and open it (Appendix E). At the shell command line check that both 
+files are in the folder you selected (type ls or dir). Enter the command 
+python onceutfnnn.py 0101.basic.txt -e 
+
+where nnn is the program version number (i.e. 040). 
+
+Processing a calc input will write several files to the directory (Table 
+2) and echo the log file and calc output, cal0101.basic.txt, to the 
+screen. You can open the calc outptu using the browser editor provided 
+by the web platform. The switches following the model name echo the calc 
+to the console (e) or browser (b). The browser option works when run on 
+local computer. Congratulations on running your first model! 
+
+(note: refer to Appendix D for on-c-e installation instructions on a 
+computer 
+
+onceutf.py runs on Python web platforms. Wakari and PythonAnywhere are 
+discussed. 
+
+Wakari is a Python -Linux web platform that runs in the browser. Upload 
+onceutfnnn.py and mode.01.txt to your Wakari account. Open a bash shell 
+window (not Ipython) and type python onceutfnnn.py 0101.simple.txt c 
+
+at the command prompt, where nnn is the version number (i.e. 040). The 
+program will output a model summary followed by the calc output (the c 
+option echoes the output to stdout; use b to echo output to the browser 
+when using the program locally). Use the browser file editor to review 
+and modify the files. 
+
+Version 0.8.1 February 28, 2017 - page 54 
+
+Figure 13 . Wakari terminal and editor in split windows 
+
+PythonAnywhere is a Python -Linux web platform that runs in the browser. 
+Upload onceutfnnn.py and mode.001.txt to your PythonAnywhere account. 
+Open a bash shell window (not Ipython or Python) and type python 
+onceutfnnn.py 0101.simple.txt c 
+
+at the command prompt, where nnn is the version number (i.e. 040). The 
+program will output a model summary followed by the calc output (the c 
+option echoes the output to stdout). Edit files in the file editor. 
+
+Figure 14 . PythonAnywhere side by side browser windows 
+
+Appendix D Write calcs using Komodo 
+
+Figure 15 . Komodo interface 
+
+Model files can be prepared using any text editor however Komodo Edit or 
+Komodo IDE provide a significant number of useful capabilities and a 
+number of on-c-e convenience macros have been written. Toolbar and 
+menus, key binding , syntax coloring, operation tag templates and 
+processing macros are provided to improve readability and workflow. 
+
+Install on-c-e utilities and fonts in Komodo and set preferences 
+
+1. 
+
+Download and install DejaVu fonts from http://dejavu-fonts 
+.org/wiki/Main_Page 
+
+Appendix H Minimum Programs and Libraries 
+
+Note: If the standard scientific distribution does not include a 
+library, use the pip install method or in the case of Anaconda use conda 
+management tool. Other scientific libraries including SciPy, pandas, rpy 
+etc. may be installed by the distribution or installed separately and 
+will be available to on-c-e through functions and script operations (see 
+file operations, Appendix B). 
+
+----------------------------------- 
+
+| Program | Python 2 | Python 3 | Notes | 
+
+----------------------------------- 
+
+| onceutf | 0.4.6 | 0.4.6 | 
+
+----------------------------------- 
+
+| Python | 2.7.x and above | 3.4 and above | Python Platform | 
+
+----------------------------------- 
+
+| Numpy | 1.7.x and above | 1.8 and above | Python Library | 
+
+----------------------------------- 
+
+| SymPy | 0.7.x and above | 0.7.5 and above | Python Library | 
+
+----------------------------------- 
+
+| Matplotlib | 1.2.x and above | 1.3.1 and above | Python Library | 
+
+----------------------------------- 
+
+| DejaVu fontsUnum and tabulate are built-in | 2.3.4 and above | 2.3.4 
+and above | UTF math fonts (external program) | 
+
+----------------------------------- 
+
+| oncepyin addition to above | 0.4.6 | 0.4.6 | 
+
+----------------------------------- 
+
+| Unum | 4.1.x and above | 4.1.x and above | pip install | 
+
+----------------------------------- 
+
+| Tabulate | 0.7.x and above | 0.7.x and above | pip install | 
+
+----------------------------------- 
+
+| oncepy with PDFin addition to above | 0.4.6 | 0.4.6 | 
+
+----------------------------------- 
+
+| PyPDF2 | 1.1x and above | 1.1x and above | pip install | 
+
+----------------------------------- 
+
+| PIL | 1.1.7 and above | 
+
+----------------------------------- 
+
+| Pillow | 2.5.1 and above | 
+
+----------------------------------- 
+
+| TeX Live | 2013 and above | 2013 and above | Network install (external 
+program) | 
+
+----------------------------------- 
+
+Table 5 . Minimum required programs and libraries 
+
