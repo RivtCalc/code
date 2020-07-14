@@ -78,7 +78,7 @@ fully define a calc or set of calcs. The *docs* and *reports* folders are
 empty, except for a few default config files (needed to keep the folder 
 structure intact on Github). Templates have the form::
 
-  RivetCalcTemplate_nnn (nnn is a unique three digit number)
+  RivetCalcTemplate_nnnn (nnn is a unique three digit number)
       |- calcs
           |- sketches
           |- scripts
@@ -90,13 +90,14 @@ structure intact on Github). Templates have the form::
       |- reports
           |- attachments
 
-***RivetCalcTemplate_nnn*** is the literal Github repository 
-name with a unique number.  The common name across all Github accounts
-facilitates searches within calculations. Each account may contain many
-templates (repositories). RivetCalc templates may be cloned, downloaded 
-as a zip file, or run on Gitpod by the addition of a few setup files.
+***RivetCalcTemplate_nnnn*** is the actual Github repository 
+name appended with a unique three digit number.  This common name root 
+across all Github accounts and repositories facilitates searches. 
+Each account may contain many repositories (templates). RivetCalc 
+templates may be cloned, downloaded as a zip file, or run on Gitpod
+or repl.it with the addition of a few setup files.
 
-A minimum working version of **RivetCalc** includes a Python 
+The minimum working version of **RivetCalc** includes a Python 
 installation with a dozen Python science libraries 
 (https://github.com/rivetcalcs/rivet-code/requirements.txt) 
 and a text editor. In this case the input model is run from 
@@ -108,8 +109,8 @@ If a LaTeX distribution is installed, formatted PDF documents and
 reports can be generated. If an IDE or full-featured code editor 
 is used the calculations can be executed interactively and in stages 
 by tagging the API functions as cells. The program documentation, 
-for example, focuses on the use case of **VSCode**, which 
-dramatically increases calculation efficiency. Execution steps 
+for example, focuses on the use case of **VSCode** and extensions, 
+which dramatically increases calculation efficiency. Execution steps 
 include::
 
                      /--------------------------------\                    
@@ -117,7 +118,7 @@ include::
                      |   model file or cells.         |                   
                      |                                |
                      |          cell types:           |                    
-                     |    r__, i__, v__, e__, t__     |                    
+                     |    R(), I(), V(), E(), T()     |                    
                      \--------------------------------/                    
                                      \/                                    
   +--------------+|  +--------------------------------+  +-------------+
@@ -160,7 +161,7 @@ include::
 2. Locally downloading and unzipping a single no-install file for Windows (a couple of steps).
 3. Remotely running a cloud service in a container (a dozen steps). 
 
-A cloud installation (**RivetCloud.net**) is available with paid support. 
+Pre-installed cloud installations (**RivetCloud.net**) are available with paid support. 
 Refer to the **RivetCalc User Manual** for details.
 
                                
