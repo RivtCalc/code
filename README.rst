@@ -1,29 +1,33 @@
-**RivetCalc** (https://github.com/rivetcalc/rivetcalc-code) is a 
-cross-platform, open source tool for writing engineering calculation documents.  
-It's implemented as a Python library that produces formatted calculation 
-documents and reports in  UTF8, HTML and PDF file formats.  
-The tool is designed  to improve editing, clarity, reuse and review.
-It eliminates the problem of unusable calculations 
-that arise from incompatible binary input files and other program 
-version incompatibiilties. Calculations are written in **rivet**, 
-a light-weight and context based markup language. 
+**RivetCalc** is a cross-platform, open source tool for writing 
+engineering calculation documents.  It's implemented as a Python 
+library that produces formatted calculation documents and reports 
+in  UTF8, HTML and PDF file formats.  The tool is designed  to 
+improve editing, explicitness, clarity, reuse and review.  It 
+eliminates the problem of unusable calculations arising from incompatible 
+binary input files and other program version incompatibiilties. 
 
-The **rivet** language includes a dozen commands and tags (and a subset of 
-reStructuredText) that may be used within funtions that take a text
-string as an argument. The functions are:
+Calculations are written in **rivet**, a light-weight, context based,
+indexed markup language. The language includes a dozen commands, tags, 
+and a subset of reStructuredText that may be mixed arbitrarily with
+utf-8 text strings.
+
+The RivetCalc API consistes of five functions:
 
 ========== =======================================================
 Function    Description
 ========== =======================================================
-r __        repository, report and calc summary information
-i __        insert descriptive text, tables, figures and equations
-v __        define and import values 
-e __        define and import equations and functions
-t __        define tables and plots 
+ R()        repository, report and calc summary information
+ I()        insert descriptive text, tables, figures and equations
+ V()        define and import values 
+ E()        define and import equations and functions
+ T()        define tables and plots 
 ========== =======================================================
 
-A **RivetCalc** file is a Python file that imports *rivet.rivet_lib* 
-and contains **rivet** calculation strings within the functions. 
+A **RivetCalc** file is a Python file that typically imports 
+*rivetcalc.rc_lib as rc* and calls the API functions as 
+rc.R('''**rivet-string**''') where **rivet-string** contains **rivet**
+commands and tags.
+
 Input file names have the form *rddcc_calcname.py*. Corresponding 
 output files have the names *rddcc_calcname.txt*, *rddcc_calcname.html*, 
 or *rddcc_calcname.pdf*;where dd (division) and cc (calculation) are 
@@ -39,11 +43,11 @@ report (.pdf)         organized and formatted PDF docs, written to file
 ===================  =====================================================       
 
 All files needed for a calcuation are stored in a project folder tree.  Calcs 
-are written to the *calcs* folder in UTF8 format.  Docs and reports are written 
+are written to the *calcs* folder in UTF-8 format.  Docs and reports are written 
 to their respective folders in PDF and HTML formats when specified. Binary 
-image files used in the calcs are stored in the *html* folder. The user 
-initially creates the complete folder tree either by copying a template 
-or from scratch::
+image files used in the docs and reports are stored in the *html* folder. The user 
+initially creates the complete folder tree either by scratch or starting with
+a template::
 
   Project_Name (chosen by user)
       |- calcs
@@ -58,13 +62,13 @@ or from scratch::
           |- attachments
 
 Folders are restricted in the types of files they contain. The *calcs* folder 
-only contains UTF-8 files. Binary files, including image and PDF files, are
-stored in the *docs* and *reports* folders.
+and sub-folders contain only UTF-8 files. Binary files, including image and 
+PDF files, are stored in the *docs* and *reports* folders.
 
 **RivetCalc** templates are full project trees with  UTF-8 *calcs* folders that
-fully define the calculation. The *docs* and *reports* folders are empty except 
-for a few default config files. Templates can be shared and discovered on 
-Github and have the form::
+fully define a calc or set of calcs. The *docs* and *reports* folders are 
+empty except for a few default config files (needed to keep the folder structure 
+intact on Github). Templates have the form::
 
   RivetCalcTemplate_nnn (nnn is a unique three digit number)
       |- calcs
@@ -78,9 +82,10 @@ Github and have the form::
       |- reports
           |- attachments
 
-Where RivetCalcTemplate_nnn is the explicit Github repository 
-name that facilitates searching.  Multiple repositories can 
-be stored in one account.
+Where RivetCalcTemplate_nnn is the literal Github repository 
+name with a unique number that facilitates searching for terms within
+the calculations. RivetCalc templates may be cloned, downloaded as a zip
+file or run on Gitpod.
 
 A minimum working version of **RivetCalc** includes a Python 
 installation with a dozen Python science libraries 
