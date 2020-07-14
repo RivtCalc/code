@@ -11,8 +11,28 @@ context and index based markup language. The language includes
 a dozen commands, tags, and a subset of reStructuredText that 
 may be mixed arbitrarily with utf-8 text strings.
 
-The **RivetCalc** API consists of five string input functions
-and several functions that control output:
+A **RivetCalc** file is a Python file that typically imports 
+*rivetcalc.rc_lib as rc* and calls the API functions as e.g. 
+rc.R('''**rivet-string**'''), where **rivet-string** contains 
+arbitrary text and **rivet** commands and tags.
+
+Input file names (models) have the form *rddcc_calcname.py*. Corresponding 
+output files (calcs and docs) have the names *rddcc_calcname.txt*, 
+*rddcc_calcname.html*, or *rddcc_calcname.pdf*; where dd (division) 
+and cc (calculation) are two digit numbers used to organize PDF documents 
+into collated reports. 
+
+===================  =====================================================
+File type             File description                                      
+===================  =====================================================
+design (.py)          text input model, written in rivet                      
+calc (.txt)           formatted UTF-8 output, written to screen (and file) 
+doc (.pdf or .html)   formatted HTML or PDF output, written to file                  
+report (.pdf)         organized and formatted PDF docs, written to file
+===================  =====================================================       
+
+The **RivetCalc** API consists of five functions that take a **rivet** 
+string as input and several functions that control output:
 
 ================ =======================================================
  API              Description
@@ -22,32 +42,12 @@ and several functions that control output:
   V()            define and import values 
   E()            define and import equations and functions
   T()            define tables and plots   
-list_values()    a
-write_utfcalc()  b
-write_pdfdoc()   c
-write_htmldoc()  d
-write_readme()   e
+list_values()    summary table of current evaluated values  
+write_utfcalc()  write utf calc to file
+write_pdfdoc()   write pdf doc to file (includes images)
+write_htmldoc()  write html doc to file (include images) 
+write_report()   compile pdf docs into a report
 ================ =======================================================
-
-A **RivetCalc** file is a Python file that typically imports 
-*rivetcalc.rc_lib as rc* and calls the API functions as e.g. 
-rc.R('''**rivet-string**'''), where **rivet-string** contains 
-arbitrary text and **rivet** commands and tags.
-
-Input file names (models) have the form *rddcc_calcname.py*. Corresponding 
-output files (calcs) have the names *rddcc_calcname.txt*, 
-*rddcc_calcname.html*, or *rddcc_calcname.pdf*; where dd (division) 
-and cc (calculation) are two digit numbers used to organize PDF documents 
-into collated reports. 
-
-===================  =====================================================
-File type             File description                                      
-===================  =====================================================
-design (.py)          text input, written in rivet                      
-calc (.txt)           formatted UTF-8 output, written to screen (and file) 
-doc (.pdf or .html)   formatted HTML or PDF output, written to file                  
-report (.pdf)         organized and formatted PDF docs, written to file
-===================  =====================================================       
 
 Any file needed for a calcuation is stored in a project folder tree.  Calcs 
 are written to the *calcs* folder in UTF-8 format.  Docs and reports are written 
