@@ -49,9 +49,9 @@ write_htmldoc()  write html doc to file (include images)
 write_report()   compile pdf docs into a report
 ================ =======================================================
 
-Any file needed for a calcuation is stored in a project folder tree.  Calcs 
-are written to the *calcs* folder in UTF-8 format.  Docs and reports are written 
-to their respective folders in PDF and HTML formats when specified. Binary 
+Any file needed for a calcuation is stored in a project folder tree.  UTF-8 calcs 
+are written to the *calcs* folder. Docs are written to their respective folders 
+in PDF or HTML formts. PDF reports are written to the *reports* folder. Binary  
 image files used in docs and reports are stored in the *html* folder. The user 
 initially creates the complete folder tree either from scratch or starting with
 an existing project or template::
