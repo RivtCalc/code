@@ -1,10 +1,10 @@
 **RivetCalc** is a cross-platform, open source tool for writing 
-engineering calculation documents.  It's implemented as a Python 
+engineering calculation documents.  The toolis implemented as a Python 
 library that produces formatted calculation documents and reports 
-in  UTF8, HTML and PDF file formats from plain text input.  The tool 
-is designed  to improve editing, explicitness, clarity, reuse and review.
+in  UTF8, HTML and PDF file formats from plain text input.  It is
+designed to improve editing, explicitness, clarity, reuse and review.
 It eliminates the problem of unusable calculation inputs arising from 
-incompatible binary files and programs. 
+incompatible binary files, programs and program versions. 
 
 **RivetCalc** calculations are written in **rivet**, a light-weight, 
 context and index based markup language. The language includes 
