@@ -1,64 +1,70 @@
 #! python
-"""Exposes rivet-string and output functions.
+"""Exposes rivet functions.
 
-    **rivet** markup is used within five string functions exposed in this
-    module. The first line of each string is a descriptor. Markup includes a
-    set of commands (lines begin with ||), key symbols (=) and tags (bracketed
-    with []_). They may also include unicode (UTF-8) and reStructuredText
+    This module exposes five string functions that take **rivet** markup as
+    arguments. The first line of each string is a descriptor. The remaining
+    lines include arbitrary unicode text or Python code along with the following
+    commands and tags.
+    
+    Unicode text may include reStructuredText markup.  See here for details:
     (https://docutils.sourceforge.io/docs/user/rst/quickref.html).
 
-    String functions and commands (see rivet_calc.py for doc strings)
+    Functions and inputs (see rivet_calc.py for doc strings)
     -----------------------------------------------------------------
+    #%%                 : designates start of an interactive cell
     r__('''r-string''') : repository and calc data 
-        || summary          : summary paragraph and table of contents
-        || labels           : labels for search
-        || append           : append pdf files
+        link tag
+        || summary |         : summary paragraph and table of contents
+        || toc |             : table of contents
+        || labels |          : labels for search
+        || attach |          : attach pdf files
     i__('''i-string''') : insert text and images
-        || tex              : LaTeX equation
-        || sym              : sympy equation
-        || table            : insert table from file or inline
-        || image            : insert image from file
-        || image2           : insert side by side images from files
+        Unicode text and tags
+        || tex |             : LaTeX equation
+        || sym |             : sympy equation
+        || table |           : insert table from file or inline
+        || image |           : insert image from file
+        || image2 |          : insert side by side images from files
     v__('''v-string''') : define values
+        Unicode text (except equal sign) and tags
          =                  : assign value        
         || values           : values from file
         || vectors          : vectors from file
     e__('''e-string''') : define equations
+        Unicode text (except equal sign) and tags
          =                  : define equation or function
-        || format           : format parameters
-        || funct            : function from file   
+        || format |         : format settings
+        || func |           : import function from file   
     t__('''t-string''') : define tables and plots
-        || data             : define new table
-        || read             : read table data from csv file
-        || save             : write data or plot image to file
+        Single line Python statements (no blocks)
         || table            : insert table from csv file
-        || plot             : define new plot for table
-        || add              : add data to plot from table
         || image            : insert image from file
         || image2           : insert side by side images from files
 
-        Tags (* not included in r__)
-        ----------------------------
-        [abc123]_       : citation *        
-        [#]_            : footnote *
-        [cite]_         : citation description *    
-        [foot]_         : footnote description *
-        [link]_         : http link
-        [page]_         : new doc page *
-        [line]_         : draw horizontal line *
-        [r]_            : right justify line
-        [c]_            : center line
-        [t]_            : right justify line with table number *   
-        [e]_            : right justify line with equation number *   
+        Tags
+        --------------------------------------------
+        [nn]_                : section number
+        [abc123]_            : citation        
+        abc def [cite]_      : citation description    
+        [#]_                 : autonumbered footnote
+        abc def [foot]_      : footnote description
+        abc def [r]_         : right justify line
+        abc def [c]_         : center line
+        abc def [t]_         : right justify title with table number   
+        abc def [e]_         : right justify lable with equation number
+        abc def [f]_         : caption with figure number   
+        [page]_              : new doc page
+        [line]_              : draw horizontal line
+        http://abc [link]_   : link
 
+    
     Output functions
-    ----------------
-    list_values()      : write value assignments stdout table
-    write_values()     : write value assignments to python file
+    -----------------------------------------------------------------
+    write_values()     : write values to python file for import
     write_calc()       : write calc to utf8 text file
-    write_pdf()        : write calc to pdf file
-    write_html()       : write calc to html file
-    write_report()     : write calcs to pdf report file
+    write_pdf()        : write doc to pdf file
+    write_html()       : write doc to html file
+    write_report()     : write docs to pdf report file
 """
 import __main__
 import os
@@ -106,10 +112,10 @@ _foldD: dict = {
 "kpath": Path(_cpath, "sketches"),
 "tpath": Path(_cpath, "tables"),
 "xpath": Path(_cpath, "text"),
+"mpath": Path(_cpath, "tmp"),
 "hpath": Path(_dpath, "html"),
 "fpath": Path(_dpath, "html/figures"),
-"apath": Path(_rppath, "append"),
-"mpath": Path(_rppath, "temp")
+"apath": Path(_rppath, "attach"),
 }
 # temp folder files
 _rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
@@ -124,6 +130,10 @@ _setsectD: dict = {"rnum": _rname[0:4],"dnum": _rname[0:2],"cnum": _rname[2:4],
 # command settings
 _setcmdD = {"cwidth": 50, "scale1": 1., "scale2": 1., 
             "prec": 2, "trim": 2, "replace": False, "code": False}
+
+with open(_rfull, "r") as f2: calcbak = f2.read() 
+with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
+
 #logs and checks
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
@@ -132,36 +142,36 @@ logging.basicConfig(level=logging.DEBUG,
                     filemode='w')
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
-formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+formatter = logging.Formatter('%(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
-with open(_rfull, "r") as f2: calcbak = f2.read()
-with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
 _rshortP = Path(*Path(_rfull).parts[-3:])
 _bshortP = Path(*Path(_rbak).parts[-4:])
-logging.info(f"""rivet file : {_rshortP}""" )
-logging.info(f"""backup file written : {_bshortP}""")
+logging.info(f"""file: {_rshortP}""" )
+logging.info(f"""backup: {_bshortP}""")
+print("logfile:", _logfile)
+
 # todo: check folder structure here
 
 def _update(hdrS:str):
-    """update section setting dictionary
-    
+    """format section heading and update settings
+
     Args:
-        hdrs {str}: rivet-string header
+        hdrS (str): section heading line
     """
     global _utfcalcS, _setsectD
 
     _setsectD["enum"] = 0 
     _setsectD["fnum"] = 0
     _setsectD["tnum"] = 0
-    swidthI = int(_setsectD["swidth"])
+    nameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
+    snumS = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
     rnumS = str(_setsectD["rnum"])
-    snameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
-    snum = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
-    sheadS = " " +  snameS + (rnumS + " - " +
-            ("[" + str(snum) + "]")).rjust(swidthI - len(snameS) - 2)
-    sstrS = swidthI * "="
-    utfS = sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
+    widthI = int(_setsectD["swidth"])
+    headS = " " +  nameS + (rnumS + " - " +
+            ("[" + snumS + "]")).rjust(widthI - len(nameS) - 2)
+    bordrS = widthI * "="
+    utfS = bordrS + "\n" + headS + "\n" + bordrS +"\n"
     print(utfS); _utfcalcS += utfS
 
 def list_values():
@@ -240,11 +250,11 @@ def pdfreport():
     """
     pass
 
-def r__(rawS: str):
-    """convert repo-string to utf or rst-string
+def R(rawS: str):
+    """transform repository-string to utf and reST calc
     
     Args:
-        rawstrS (str): repo-string
+        rawstrS (str): repository-string
     """
     global  _utfcalcS, _setsectD, _rivetD
     
@@ -256,8 +266,8 @@ def r__(rawS: str):
     rcalcS, _setsectD = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
-def i__(rawS: str):
-    """convert insert-string to utf or rst-string
+def I(rawS: str):
+    """transform insert-string to utf and reST calc
     
     Args:
         rawstrS (str): insert-string
@@ -272,8 +282,8 @@ def i__(rawS: str):
     icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
-def v__(rawS: str):
-    """convert value-string to utf or rst-string
+def V(rawS: str):
+    """transform insert-string to utf and reST calc
     
     Args:
         rawstr (str): value-string
@@ -288,7 +298,7 @@ def v__(rawS: str):
     vcalcS, _setsectD, _rivetD, _exportS = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
-def e__(rawS: str):
+def E(rawS: str):
     """convert equation-string to utf or rst-string
 
     """
@@ -302,7 +312,7 @@ def e__(rawS: str):
     ecalcS, _setsectD, _rivetD, _exportS = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
-def t__(rawS: str):
+def T(rawS: str):
     """convert table-string to utf or rst-string
     
     """
@@ -316,7 +326,7 @@ def t__(rawS: str):
     tcalcS, _setsectD, _exportS = tcalc.t_parse()
     _utfcalcS = _utfcalcS + tcalcS
 
-def x__(rawS: str):
+def x(rawS: str):
     """skip execution of a rivet-string
     """
     pass

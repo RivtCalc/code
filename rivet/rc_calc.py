@@ -1,5 +1,5 @@
 #! python
-"""convert rivet-strings to utf-8 calc-strings
+"""convert rivet-string to utf-8 calc-string
 
 This module converts each rivet-string to a utf-8 calc-string using a separate
 class for each string type (5 total). Markup in a string includes tags and
@@ -20,7 +20,7 @@ table    t__()     _T_utf   =, read, save, data, plot, add, table, image, image2
 
 Command syntax {notes}
 -----------------------
-r__('''r-string''') {define repository and report data}
+R('''r-string''') {define repository and report data}
     || summary | section / string  {toc}
     {paragraph text}
     
@@ -30,7 +30,7 @@ r__('''r-string''') {define repository and report data}
     || append           
     {pdf file list}
 
-i__('''i-string''') {insert static text, tables and images}
+I('''i-string''') {insert static text, tables and images}
     || tex | \gamma = x + 3 {latex equation} | 1. {image scale}
     || sym | x = y/2 {sympy equation} | 1.
     || table | x.txt | 60 {max paragraph width - characters}
@@ -44,7 +44,7 @@ i__('''i-string''') {insert static text, tables and images}
     figure1 caption
     figure2 caption
 
-v__('''v-string''') {define values}
+V('''v-string''') {define values}
 
     x = 10.1 * IN   | description, M {alt units}
 
@@ -52,7 +52,7 @@ v__('''v-string''') {define values}
     || vector | x.csv | VECTORNAME c[n] {assign column in file to vector}    
     || values | vfile.py  | [:] {assignment lines to read}
 
-e__('''e-string''') {define equations}
+e('''e-string''') {define equations}
     
     || format | prec:2{result precision}, trim:2, replace:False, code:False    
 
@@ -61,7 +61,7 @@ e__('''e-string''') {define equations}
 
     || fnct | x.py | function_name | units, alt  {import function from file}
 
-t__('''t-string''') {define tables and plots}
+t('''t-string''') {define tables and plots}
     
     || data | VAR1 {define} | description   
     || read | VAR2 {assign} | file.csv 
@@ -213,11 +213,11 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
         return tagS, setsectD
 
 class _R_utf:
-    """convert repo-string to utf-calc string
+    """transform Repository-string to calc-string
 
     Attributes:
-        rstrL (list): rivet-strings
-        folderD (dict): folder structure
+        strL (list): rivet-strings
+        folderD (dict): folder names
         sectD (dict): header information
     """
     def __init__(self, strL :list, folderD :dict, setsectD :dict) -> str:
@@ -227,13 +227,13 @@ class _R_utf:
         self.setsectD = setsectD
 
     def r_parse(self) -> str:
-        """ parse repo string
+        """ parse repository string
        
        Returns:
             string :  formatted utf-calc string
         """
         endflgB = False; rtmpS = ""; rL = []; indxI = -1
-        rcmdL = ["summary", "label", "append" ]
+        rcmdL = ["summary", "scope", "attach", "toc" ]
         methodL =  [self.r_summary, self.r_label, self.r_append]
         tagL =  [ "[r]_", "[c]_", "[link]_"] 
         
@@ -282,12 +282,12 @@ class _R_utf:
         print(utfS + "\n"); self.calcS += utfS
         
     def r_append(self, rL):
-        utfS = "Appendices\n"
-        utfS += "----------\n" 
+        utfS = "Attach\n"
+        utfS += "------\n" 
         utfS += rL[2].strip()
         print(utfS + "\n"); self.calcS += utfS
 
-    def r_label(self, rL):
+    def r_scope(self, rL):
         csvL = rL[2].split("\n")
         tabL = [x.split(",") for x in csvL]
         maxlenI = max(len(x) for x in tabL)
@@ -306,7 +306,7 @@ class _R_utf:
         sys.stdout = old_stdout    
     
 class _I_utf:  
-    """convert insert-string to utf-calc string 
+    """convert Insert-string to utf-calc string 
 
     Attributes:
         strL (list): rivet-string
@@ -542,7 +542,7 @@ class _I_utf:
         print(utfS); self.calcS += utfS + "\n"
 
 class _V_utf:
-    """convert value-string to utf-calc string
+    """convert Value-string to utf-calc string
         
     Attributes:
         strL (list): rivet strings
