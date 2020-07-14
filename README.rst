@@ -14,7 +14,7 @@ may be mixed arbitrarily with utf-8 text strings.
 The **RivetCalc** API essentially consists of five string functions:
 
 ========== =======================================================
-Function    Description
+ API        Description
 ========== =======================================================
   R()       repository, report and calc summary information
   I()       insert descriptive text, tables, figures and equations
