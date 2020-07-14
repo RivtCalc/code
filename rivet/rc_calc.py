@@ -10,8 +10,9 @@ Commands and syntax by string type and function
 ------------------------------------------------
 
 string   function  class
-type     name      name     commands {notes}
+type     name      name     commands {comment}
 -------  --------  -----    -----------------------------------------------------
+<<<<<<< HEAD:rivet/rc_calc.py
 repo     r__()     _R_utf   summary {block}, labels {block}, append {block}
 insert   i__()     _I_utf   tex, sym, table, image {block}, image2 {block} 
 values   v__()     _V_utf   values
@@ -23,19 +24,52 @@ Command syntax {notes}
 R('''r-string''') {define repository and report data}
     || summary | section / string  {toc}
     {paragraph text}
-    
-    || labels 
-    {csv list}
-    
-    || append           
-    {pdf file list}
+=======
+repo     r__       _Rutf   summary {block}, labels {block}, append {block}
+insert   i__       _Iutf   tex, sym, table, image {block}, image2 {block} 
+values   v__       _Vutf   values
+equation e__       _Eutf   =, format, function
+table    t__       _Tutf   =, read, save, data, plot, add, table, image, image2
 
+Command syntax  
+---------------
+r__(''' r-string defines repository and report data
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
+    
+    May include arbitrary text that does not start with double bar.  It
+    will be treated as a comment and will not be processed.
+    
+    || summary | calc title
+    paragraph
+    
+    || toc | section or string
+
+    || scope | # csv list used in repo read.me and other databases
+    
+    || append | calccover.pdf         
+    pdf_file1 | A. Appendix label
+    pdf_file2 | B. Appendix label
+    functions or docstrings | C. Appendix label
+    ''')
+
+<<<<<<< HEAD:rivet/rc_calc.py
 I('''i-string''') {insert static text, tables and images}
     || tex | \gamma = x + 3 {latex equation} | 1. {image scale}
     || sym | x = y/2 {sympy equation} | 1.
     || table | x.txt | 60 {max paragraph width - characters}
     || table | x.csv | 60,[:] {max column width - characters, line range}  
     || table | x.rst | [:] {line range}
+=======
+i__(''' # i-string inserts static text, tables and images
+    
+    May include arbitrary text that does not start a line with double bar.
+    
+    || tex | \gamma = x + 3 # latex equation | 1. # image scale
+    || sym | x = y/2 # sympy equation | 1.
+    || table | x.txt | 60 # max paragraph width - characters 
+    || table | x.csv | 60,[:] # max column width - characters, line range  
+    || table | x.rst | [:] # line range
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
 
     || image | x.png/x.jpg {image file} | 1. {scale}
     figure caption
@@ -43,10 +77,18 @@ I('''i-string''') {insert static text, tables and images}
     || image2  | x1.png, x2.jpg  | 1., 1.
     figure1 caption
     figure2 caption
+    ''')
 
+<<<<<<< HEAD:rivet/rc_calc.py
 V('''v-string''') {define values}
+=======
+v__(''' {v-string defines values}
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
 
-    x = 10.1 * IN   | description, M {alt units}
+    May include arbitrary text that does not start line with a double bar
+    or include equal sign.
+
+    x = 10.1*IN, M  {alt units} | description  
 
     || vector | x.csv | VECTORNAME r[n] {assign row in file to vector}
     || vector | x.csv | VECTORNAME c[n] {assign column in file to vector}    
@@ -54,19 +96,25 @@ V('''v-string''') {define values}
 
 e('''e-string''') {define equations}
     
-    || format | prec:2{result precision}, trim:2, replace:False, code:False    
+    May include arbitrary text that does not start a line with double bar
+    or include equal sign.
 
-     x = y + 4 * M          | units, alt {result units and alt units}
-     f(x) = x * 4 * FT      | units, alt
+    || format | prec:2 {result precision}, trim:2, replace:False, code:False    
 
-    || fnct | x.py | function_name | units, alt  {import function from file}
+     x = v1 + 4*M               | units, alt units {apply to result}
+     y = v2 / 4                 | units, alt units
+
+    || script | x.py | func_name | units, alt  {import function from file}
 
 t('''t-string''') {define tables and plots}
     
+    May include arbitrary text that does not start a line with a double bar
+    or include equal sign.
+
     || data | VAR1 {define} | description   
     || read | VAR2 {assign} | file.csv 
     || save | VAR1 | file.csv or file.png {table or plot}
-    || plot | VAR2 | x:c1{col}, y:c2{col}, kind:line, grid:True
+    || plot | VAR2 | x:c1 {col}, y:c2 {col}, kind:line, grid:True
     || add  | VAR2 | x:c3, y:c4
     
     VAR3 = pandas_function(VARS)    {pandas library operations}
@@ -80,19 +128,20 @@ t('''t-string''') {define tables and plots}
     figure1 caption
     figure2 caption
 
-    Tags Syntax {notes}
-    -------------------
-    some text in line [abc123]_     {citation}
-    some text in line [#]_          {footnote}
-    [cite]_  citation text          {citation description (FILO)}    
-    [foot]_  foot note text         {footnote description (FILO)}
-    [link]_  http:\\url             {http link}
-    [page]_                         {new doc page}
-    [line]_                         {draw horizontal line}
-    some text in line [r]_          {right justify line}
-    some text in line [c]_          {center line}
-    table title [t]_                {right justify line with table number}   
-    label for equation [e]_         {right justify line with equation number}
+Tags Syntax {comment}
+-------------------
+some text in line [abc123]_     {citation}
+some text in line [#]_          {autoincremented footnote}
+some text in line [r]_          {right justify line}
+some text in line [c]_          {center line}
+table title [t]_                {autoincremented table number}   
+label for equation [e]_         {autoincremented equation number}
+[s]_  section title             {first line in string function}
+[cite]_  citation text          {citation description (FIFO)}    
+[foot]_  foot note text         {footnote description (FIFO)}
+[link]_  http:\\url             {http link}
+[page]_                         {start new doc page}
+[line]_                         {insert horizontal line}
 
 """
 import os
@@ -104,23 +153,20 @@ import tempfile
 import re
 import io
 import logging
-from io import StringIO
-from numpy import *
 import numpy.linalg as la
 import pandas as pd
 import sympy as sp
 import matplotlib.pyplot as plt 
 import matplotlib.image as mpimg
+from numpy import *
+from rivet.rivet_unit import *
+from io import StringIO
 from sympy.parsing.latex import parse_latex
 from sympy.abc import _clash2
 from tabulate import tabulate 
 from pathlib import Path
-from rivet.rivet_unit import *
 
 logging.getLogger("numexpr").setLevel(logging.WARNING)
-
-
-
 
 def _refs(onumI: int, setsectD: dict, typeS: str) -> str:
     """[summary]
@@ -212,8 +258,13 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
     else:
         return tagS, setsectD
 
+<<<<<<< HEAD:rivet/rc_calc.py
 class _R_utf:
     """transform Repository-string to calc-string
+=======
+class _Rutf:
+    """convert repo-string to utf-calc string
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
 
     Attributes:
         strL (list): rivet-strings
@@ -233,7 +284,11 @@ class _R_utf:
             string :  formatted utf-calc string
         """
         endflgB = False; rtmpS = ""; rL = []; indxI = -1
+<<<<<<< HEAD:rivet/rc_calc.py
         rcmdL = ["summary", "scope", "attach", "toc" ]
+=======
+        rcmdL = ["summary", "scope", "append", "toc" ]
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
         methodL =  [self.r_summary, self.r_label, self.r_append]
         tagL =  [ "[r]_", "[c]_", "[link]_"] 
         
@@ -305,8 +360,13 @@ class _R_utf:
         print(utfS + "\n"); self.calcS += utfS
         sys.stdout = old_stdout    
     
+<<<<<<< HEAD:rivet/rc_calc.py
 class _I_utf:  
     """convert Insert-string to utf-calc string 
+=======
+class _Iutf:  
+    """convert insert-string to utf-calc string 
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
 
     Attributes:
         strL (list): rivet-string
@@ -391,7 +451,11 @@ class _I_utf:
         txS = iL[1].strip()
         #txs = txs.encode('unicode-escape').decode()
         ltxS = parse_latex(txS)
-        utfS = sp.pretty(sp.sympify(ltxS, _clash2, evaluate=False))
+        utfS2 = sp.pretty(sp.sympify(ltxS, _clash2, evaluate=False))
+        utfS = ""
+        for iS in utfS2.split('\n'):
+            if "ANTLR runtime and generated code versions" in iS: continue
+            utfS += (iS+"\n")
         print(utfS+"\n"); self.calcS += utfS + "\n"   
 
     def i_sympy(self,iL):
@@ -541,8 +605,13 @@ class _I_utf:
         utfS = indS + indS.join(utfL)
         print(utfS); self.calcS += utfS + "\n"
 
+<<<<<<< HEAD:rivet/rc_calc.py
 class _V_utf:
     """convert Value-string to utf-calc string
+=======
+class _Vutf:
+    """convert value-string to utf-calc string
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_calc.py
         
     Attributes:
         strL (list): rivet strings
@@ -744,7 +813,7 @@ class _V_utf:
         self.rivetD.update(locals())                        # update rivetD
         return([[varS, valS, descripS]])        
 
-class _E_utf:
+class _Eutf:
     """convert equation-string to utf-calc string
 
     """
@@ -978,7 +1047,7 @@ class _E_utf:
         eD = dict(i.split(":") for i in eupL.split(","))
         self.setcmdD.update(eD)
 
-class _T_utf:
+class _Tutf:
     """convert table-strings to utf-calc
 
     """

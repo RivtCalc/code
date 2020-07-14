@@ -72,6 +72,7 @@ import sys
 import textwrap
 import logging
 import numpy
+import warnings
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
@@ -88,53 +89,64 @@ if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
 #start-up variables
-_rivetD: dict ={}                                   # runtime vars dictionary
-_utfcalcS = """"""                                  # utf print string
-_exportS = """"""                                   # values export string
-_rfull = Path(__main__.__file__)                    # calc file path
-_rfile = Path(__main__.__file__).name               # calc file name
-_rname = _rfile.split(".py")[0]                     # calc file basename
-_rivpath = Path("rivet.rivet_lib.py").parent        # rivet program path
-_cpath =  Path(_rfull).parent                       # calc folder path
-_ppath = Path(_rfull).parent.parent                 # project folder path
-_dpath = Path(_ppath / "docs")                      # doc folder path
-_rppath = Path(_ppath / "reports")                  # report folder path
-_utffile = Path(_cpath / ".".join((_rname, "txt"))) # utf calc output
-_expfile = Path(_cpath / "scripts" / "".join(("v", _rfile))) # export file
+_rivetD: dict ={}                                    # runtime vars dictionary
+_utfcalcS = """"""                                   # utf print string
+_exportS  = """"""                                   # values export string
+_cfull    = Path(__main__.__file__)                  # calc file path
+_cfile    = Path(__main__.__file__).name             # calc file name
+_cname    = _cfile.split(".py")[0]                   # calc file basename
+_rivpath  = Path("rivet.rivet_lib.py").parent        # rivet program path
+_cpath    =  Path(_cfull).parent                     # calc folder path
+_ppath    = Path(_cfull).parent.parent               # project folder path
+_dpath    = Path(_ppath / "docs")                    # doc folder path
+_rppath   = Path(_ppath / "reports")                 # report folder path
+_utffile  = Path(_cpath / ".".join((_cname, "txt"))) # utf calc output
+_expfile  = Path(_cpath / "scripts" / "".join(("v", _cfile))) # export file
 # folder dictionary
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
-"cpath": Path(_rfull).parent,
 "dpath": _dpath,
 "rpath": _rppath,
+"cpath": Path(_cfull).parent,
 "spath": Path(_cpath, "scripts"),
 "kpath": Path(_cpath, "sketches"),
-"tpath": Path(_cpath, "tables"),
+"tpath": Path(_cpath, "data"),
 "xpath": Path(_cpath, "text"),
 "mpath": Path(_cpath, "tmp"),
 "hpath": Path(_dpath, "html"),
 "fpath": Path(_dpath, "html/figures"),
+<<<<<<< HEAD:rivet/rc_lib.py
 "apath": Path(_rppath, "attach"),
 }
+=======
+"apath": Path(_rppath, "append")    
+    }
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
 # temp folder files
-_rbak = Path(_foldD["mpath"] / ".".join((_rname, "bak")))
-_logfile = Path(_foldD["mpath"] / ".".join((_rname, "log")))
-_rstfile = Path(_foldD["mpath"] / ".".join((_rname, "rst"))) 
+_rbak = Path(_foldD["mpath"] / ".".join((_cname, "bak")))
+_logfile = Path(_foldD["mpath"] / ".".join((_cname, "log")))
+_rstfile = Path(_foldD["mpath"] / ".".join((_cname, "rst"))) 
 # section settings
-_setsectD: dict = {"rnum": _rname[0:4],"dnum": _rname[0:2],"cnum": _rname[2:4],
+_setsectD: dict = {"rnum": _cname[0:4],"dnum": _cname[0:2],"cnum": _cname[2:4],
 "snum": "", "sname": "", "swidth": 80,
 "enum":  0, "fnum": 0, "tnum" : 0,
 "ftnum": 0,"ftqueL": deque([1]), "cite": " ", "ctqueL": deque([1])
-}
+                    }
 # command settings
 _setcmdD = {"cwidth": 50, "scale1": 1., "scale2": 1., 
+<<<<<<< HEAD:rivet/rc_lib.py
             "prec": 2, "trim": 2, "replace": False, "code": False}
 
 with open(_rfull, "r") as f2: calcbak = f2.read() 
 with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
 
+=======
+            "prec": 2, "trim": 2, "replace": False, "code": False
+            }
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
 #logs and checks
+warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d %H:%M',
@@ -142,6 +154,7 @@ logging.basicConfig(level=logging.DEBUG,
                     filemode='w')
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
+<<<<<<< HEAD:rivet/rc_lib.py
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
@@ -173,6 +186,23 @@ def _update(hdrS:str):
     bordrS = widthI * "="
     utfS = bordrS + "\n" + headS + "\n" + bordrS +"\n"
     print(utfS); _utfcalcS += utfS
+=======
+#formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+formatter = logging.Formatter('%(levelname)-8s: %(message)s')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
+
+with open(_cfull, "r") as f2: calcbak = f2.read()
+with open(_rbak, "w") as f3: f3.write(calcbak)          # write backup
+
+_rshortP = Path(*Path(_cfull).parts[-3:])
+_bshortP = Path(*Path(_rbak).parts[-4:])
+logging.info("Calc File Paths")
+logging.info(f"""file: {_rshortP}""" )
+logging.info(f"""backup: {_bshortP}""")
+print("_"*80 + "\n")
+# todo: check folder structure here
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
 
 def list_values():
     """write table of values to terminal 
@@ -194,16 +224,12 @@ def list_values():
 def write_values():
     """ write value assignments to Python file
  
-        The file may be used for exchanging output between files. 
-        The file name is the calc file name prepended with 'v'
+        Use file for exchanging values between calcs. 
+        File name is the calc file name prepended with 'v'
         written to the scripts folder.      
     """
     
-    str1 =  ("""\nThis file contains values
-            from the rivet design file 
-            for lsti in zip(vlistx, vlisty)
-            if __name__ == "__main__":\n
-            vlist()\n\n""")
+    str1 =  ("""header string""")
     str1 = str1 + _exportS
     with open(_expfile, 'w') as expF:
         expF.write(str1)
@@ -215,7 +241,7 @@ def utfcalc(utfcalc, _txtfile):
         f1.write(_utfcalcS.encode("UTF-8"))
 
 def _rstcalc(_rstcalcS, _rstfile):
-    """[summary]
+    """write reST calc string to file
     
     Args:
         pline ([type]): [description]
@@ -250,8 +276,34 @@ def pdfreport():
     """
     pass
 
+<<<<<<< HEAD:rivet/rc_lib.py
 def R(rawS: str):
     """transform repository-string to utf and reST calc
+=======
+def _update(hdrS:str):
+    """update and reset section settings
+    
+    Args:
+        hdrs {str}: rivet-string header
+    """
+    global _utfcalcS, _setsectD
+
+    _setsectD["enum"] = 0   # equation number
+    _setsectD["fnum"] = 0   # figure number
+    _setsectD["tnum"] = 0   # table number
+    swidthI = int(_setsectD["swidth"])
+    rnumS = str(_setsectD["rnum"])
+    snameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
+    snum = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
+    sheadS = " " +  snameS + (rnumS + " - " +
+            ("[" + str(snum) + "]")).rjust(swidthI - len(snameS) - 2)
+    sstrS = swidthI * "="
+    utfS = sstrS + "\n" + sheadS + "\n" + sstrS +"\n"
+    print(utfS); _utfcalcS += utfS
+
+def r__(rawS: str):
+    """convert report-string to utf and rst-string
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
     
     Args:
         rawstrS (str): repository-string
@@ -262,12 +314,17 @@ def R(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    rcalc = _rivcalc._R_utf(strL, _foldD, _setsectD) 
+    rcalc = _rivcalc._Rutf(strL, _foldD, _setsectD) 
     rcalcS, _setsectD = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
+<<<<<<< HEAD:rivet/rc_lib.py
 def I(rawS: str):
     """transform insert-string to utf and reST calc
+=======
+def i__(rawS: str):
+    """convert insert-string to utf and rst-string
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
     
     Args:
         rawstrS (str): insert-string
@@ -278,12 +335,17 @@ def I(rawS: str):
     if "]_" in sectS: _update(sectS)
 
     strL = strS.split("\n")
-    icalc = _rivcalc._I_utf(strL, _foldD, _setcmdD, _setsectD) 
+    icalc = _rivcalc._Iutf(strL, _foldD, _setcmdD, _setsectD) 
     icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
+<<<<<<< HEAD:rivet/rc_lib.py
 def V(rawS: str):
     """transform insert-string to utf and reST calc
+=======
+def v__(rawS: str):
+    """convert value-string to utf and rst-string
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
     
     Args:
         rawstr (str): value-string
@@ -294,12 +356,17 @@ def V(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    vcalc = _rivcalc._V_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    vcalc = _rivcalc._Vutf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
     vcalcS, _setsectD, _rivetD, _exportS = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
+<<<<<<< HEAD:rivet/rc_lib.py
 def E(rawS: str):
     """convert equation-string to utf or rst-string
+=======
+def e__(rawS: str):
+    """convert equation-string to utf and rst-string
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
 
     """
     global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
@@ -308,12 +375,17 @@ def E(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    ecalc = _rivcalc._E_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    ecalc = _rivcalc._Eutf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
     ecalcS, _setsectD, _rivetD, _exportS = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
+<<<<<<< HEAD:rivet/rc_lib.py
 def T(rawS: str):
     """convert table-string to utf or rst-string
+=======
+def t__(rawS: str):
+    """convert table-string to utf and rst-string
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
     
     """
     global _utfcalcS, _setsectD, _foldD, _setcmdD, _exportS
@@ -322,11 +394,16 @@ def T(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    tcalc = _rivcalc._T_utf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    tcalc = _rivcalc._Tutf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
     tcalcS, _setsectD, _exportS = tcalc.t_parse()
     _utfcalcS = _utfcalcS + tcalcS
 
+<<<<<<< HEAD:rivet/rc_lib.py
 def x(rawS: str):
     """skip execution of a rivet-string
+=======
+def x__(rawS: str):
+    """skip execution of rivet-string
+>>>>>>> ce78e68ceb5a5aefc7b0c9e92d521e11cd09a98f:rivet/rivet_lib.py
     """
     pass
