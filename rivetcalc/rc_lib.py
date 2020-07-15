@@ -1,66 +1,65 @@
 #! python
-"""Exposes rivet functions.
+"""RivetCalc API. Exposes 11 functions.
 
-    This module exposes five string functions that take **rivet** markup as
-    arguments. The first line of each string is a descriptor. The remaining
-    lines include arbitrary unicode text or Python code along with the following
-    commands and tags.
-    
-    Unicode text may include reStructuredText markup.  See here for details:
-    (https://docutils.sourceforge.io/docs/user/rst/quickref.html).
+    This module exposes 6 string and 5 write functions. The string
+    functions take **rivet** markup strings as arguments. The first line of
+    each string is a descriptor (may be designated as a section title). The
+    remaining lines of string depend on the string type and include 
+    unicode text, commands, tags and Python code. Text may include
+    reStructuredText markup. The write functions control calculation
+    output type e.g. UTF-8, PDF, HTML.
 
-    Functions, commmands, tags (see rivet_calc.py for doc strings)
-    -----------------------------------------------------------------
-    #%%               : designates an interactive cell
+    Functions, commmands, tags (see rc_calc.py for doc strings)
+    -------------------------------------------------------------------
+    #%%               : designates an interactive cell for some editors
     R('''R-string''') : repository and calc data 
-        link tag
-        || summary |         : summary paragraph and table of contents
-        || toc |             : table of contents
-        || labels |          : labels for search
+        || summary |         : summary paragraphs 
+        || scope |           : search labels
         || attach |          : attach pdf files
     I('''I-string''') : insert text and images
-        Unicode text and tags
+        Any text and tag
         || tex |             : LaTeX equation
         || sym |             : sympy equation
         || table |           : insert table from file or inline
         || image |           : insert image from file
-        || image2 |          : insert side by side images from files
     V('''V-string''') : define values
-        Unicode text (except equal sign) and tags
+        Any text and tag except equal sign
          =                  : assign value        
-        || values           : values from file
-        || vectors          : vectors from file
+        || values |         : values from file
+        || vectors |        : vectors from file
+        || table |          : insert table from file or inline
     E('''E-string''') : define equations
-        Unicode text (except equal sign) and tags
+        Any text and tag except equal sign
          =                  : define equation or function
         || format |         : format settings
         || func |           : import function from file   
+        || table |          : insert table from csv file
+        || image |          : insert image from file    
     T('''T-string''') : define tables and plots
-        Single line Python statements (no blocks)
+        Simple Python statements (single line)
         || table            : insert table from csv file
         || image            : insert image from file
-        || image2           : insert side by side images from files
-    X('''X-string''') : skip string processing
+    X('''X-string''') : do not process string 
 
-        Tags
-        --------------------------------------------
-        abc def [s]_         : section title
-        [abc123]_            : citation        
-        abc def [cite]_      : citation description    
-        [#]_                 : autonumbered footnote
-        abc def [foot]_      : footnote description
-        abc def [r]_         : right justify line
-        abc def [c]_         : center line
-        abc def [t]_         : right justify title with table number   
-        abc def [e]_         : right justify lable with equation number
-        abc def [f]_         : caption with figure number   
-        [page]_              : new doc page
-        [line]_              : draw horizontal line
-        http://abc [link]_   : link
+    Tags
+    -------------------------------------------------------------------
+    [nn]_ abc def      : section title and number
+    [abc123]_          : citation        
+    abc def [cite]_    : citation description    
+    [#]_               : autonumbered footnote
+    abc def [foot]_    : footnote description
+    abc def [t]_       : right justify table title, autoincrement number   
+    abc def [e]_       : right justify equation label, autoincrement number
+    abc def [f]_       : right justify caption, autoincrment figure number   
+    abc def [r]_       : right justify line
+    abc def [c]_       : center line
+    [line]_            : draw horizontal line
+    [page]_            : new doc page
+    http://abc [link]_ : link
 
     
     Output functions
-    -----------------------------------------------------------------
+    -------------------------------------------------------------------
     write_values()     : write values to python file for import
     write_calc()       : write calc to utf8 text file
     write_pdf()        : write doc to pdf file
@@ -73,6 +72,7 @@ import sys
 import textwrap
 import logging
 import warnings
+import numpy as np
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
@@ -103,7 +103,7 @@ _expfile  = Path(_cpath / "scripts" / "".join(("v", _cfile))) # export file
 # global variable dictionary
 _rivetD: dict ={}
 # global section dictionary
-_setsectD: dict = {"rnum": _cname[0:4],"dnum": _cname[0:2],"cnum": _cname[2:4],
+_setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
 "snum": "", "sname": "", "swidth": 80,
 "enum":  0, "fnum": 0, "tnum" : 0,
 "ftnum": 0,"ftqueL": deque([1]), "cite": " ", "ctqueL": deque([1])}
@@ -149,6 +149,7 @@ _lshortP = Path(*Path(_logfile).parts[-4:])
 logging.info(f"""model: {_rshortP}""" )
 logging.info(f"""backup: {_bshortP}""")
 logging.info(f"""logging: {_lshortP}""")
+print(" ")
 
 # todo: check folder structure here
 
@@ -179,9 +180,9 @@ def list_values():
     rivetL = [[k,v] for k,v in _rivetD.items()]
     rivetT = []
     for i in rivetL:
-        if isinstance(i[1], numpy.ndarray):
-            if numpy.size(i[1]) > 3:
-                i[1] = numpy.hstack([i[1][:4],["..."]])
+        if isinstance(i[1], np.ndarray):
+            if np.size(i[1]) > 3:
+                i[1] = np.hstack([i[1][:4],["..."]])
             rivetT.append(i)
 
     print("." * _setsectD["swidth"])
@@ -257,7 +258,7 @@ def R(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    rcalc = _rivcalc._Rutf(strL, _foldD, _setsectD) 
+    rcalc = _rivcalc._R_utf(strL, _foldD, _setsectD) 
     rcalcS, _setsectD = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
@@ -273,7 +274,7 @@ def I(rawS: str):
     if "]_" in sectS: _update(sectS)
 
     strL = strS.split("\n")
-    icalc = _rivcalc._Iutf(strL, _foldD, _setcmdD, _setsectD) 
+    icalc = _rivcalc._I_utf(strL, _foldD, _setcmdD, _setsectD) 
     icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 

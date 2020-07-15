@@ -1,42 +1,38 @@
 #! python
-"""transform rivet-string to calc-string
+"""transform model-string to calc-string
 
-A separate class transforms each rivet-string type to a utf-8 calc-string. 
-Commands are single lines except where noted as block below.
+A class associated with each string function transforms each model-string type
+to a utf-8 calc-string. Commands within strings start with a double bar (||) in
+the indented fourth column and are single lines, except where noted as a block.
 
--------  --------  -----  ----------------------------------------------------
+-------  --------  ------  ----------------------------------------------------
 string   function  class
-type     name      name    commands {comments}
--------  --------  -----   ---------------------------------------------------
-Repo      R       _R_utf   scope, toc, summary {block}, attach {block}
-Insert    I       _I_utf   tex, sym, table, image {block}, image2 {block} 
-Values    V       _V_utf   =, values, 
-Equation  E       _E_utf   =, format, function
-Table     T       _T_utf   table, image, image2, {any Python simple statement}
+type     name      name     commands {comment}
+-------  --------  ------   ---------------------------------------------------
+Repo       R()     _R_utf   scope, attach, summary {block}
+Insert     I()     _I_utf   table, tex, sym, image {block}
+Values     V()     _V_utf   =, table, values, vector
+Equation   E()     _E_utf   =, table, format, func, image {block}
+Table      T()     _T_utf   table, image {block}, {Python simple statement}
 
 Command syntax  
 ---------------
 R(''' r-string defines repository and report data
+    || summary | calc title | toc
+    May include arbitrary text. Text is read until encountering the ||scope
+    command. The |toc argument generates a table of contents from the section
+    tags. The first paragraph is included in the Github README.rst file.
     
-    May include arbitrary text that does not start with double bar.  It
-    will be treated as a comment and will not be processed.
+    || scope | discipline, object, state, intent, assembly, component 
     
-    || summary | calc title
-    paragraph
-    
-    || toc | section or string
-
-    || scope | # csv list used in repo read.me and other databases
-    
-    || attach | calccover.pdf         
-    pdf_file1 | A. Appendix label
-    pdf_file2 | B. Appendix label
-    functions {or} docstrings | C. Appendix label
+    || attach | front | calccover.pdf         
+    || attach | back | functions 
+    || attach | back | docstrings
+    || attach | back | appendix1.pdf 
     ''')
 
-I(''' # i-string inserts static text, tables and images
-    
-    May include arbitrary text that does not start a line with double bar.
+I(''' i-string inserts static text, tables and images  
+    May include arbitrary text.
     
     || tex | \gamma = x + 3 # latex equation | 1. # image scale
     || sym | x = y/2 # sympy equation | 1.
@@ -44,70 +40,54 @@ I(''' # i-string inserts static text, tables and images
     || table | x.csv | 60,[:] # max column width - characters, line range  
     || table | x.rst | [:] # line range
 
-    || image | x.png/x.jpg {image file} | 1. {scale}
+    || image | x.png {image file} | 1. {scale}
     figure caption
-
-    || image2  | x1.png, x2.jpg  | 1., 1.
-    figure1 caption
-    figure2 caption
     ''')
 
-V('''v-string''') {define values}
-
-    May include arbitrary text that does not start line with a double bar
-    or include equal sign.
+V(''' v-string defines values
+    May include arbitrary text that does not include an equal sign.
 
     x = 10.1*IN, M  {alt units} | description  
 
     || vector | x.csv | VECTORNAME r[n] {assign row in file to vector}
     || vector | x.csv | VECTORNAME c[n] {assign column in file to vector}    
     || values | vfile.py  | [:] {assignment lines to read}
+    || table | x.csv | 60    
+    ''')
 
-E('''e-string''') {define equations}
-    
-    May include arbitrary text that does not start a line with double bar
-    or include equal sign.
+E(''' e-string defines equations
+    May include arbitrary text that does not include an equal sign.
 
     || format | prec:2 {result precision}, trim:2, replace:False, code:False    
 
      x = v1 + 4*M               | units, alt units {apply to result}
      y = v2 / 4                 | units, alt units
 
-    || script | x.py | func_name | units, alt  {import function from file}
+    || func | x.py | func_name | units, alt  {import function from file}
+    || table | x.csv | 60    
+    || image | x.png | 1.
+    ''') 
 
-T('''t-string''') {define tables and plots}
-    
-    May include arbitrary text that does not start a line with a double bar
-    or include equal sign.
+T('''t-string defines tables and plots
+    May include any simple Python statement (single line). 
 
-    || data | VAR1 {define} | description   
-    || read | VAR2 {assign} | file.csv 
-    || save | VAR1 | file.csv or file.png {table or plot}
-    || plot | VAR2 | x:c1 {col}, y:c2 {col}, kind:line, grid:True
-    || add  | VAR2 | x:c3, y:c4
-    
-    VAR3 = pandas_function(VARS)    {pandas library operations}
-    
-    || table | x.csv | 60
-    
+    || table | x.csv | 60    
     || image | x.png | 1.
     figure caption
-    
-    || image2 | x1.png, x2.jpg  | 1., 1.
-    figure1 caption
-    figure2 caption
+    ''')
 
 Tags Syntax {comment}
 -------------------
+[nn]_  section title            {first line in string function}
 some text in line [abc123]_     {citation}
+[cite]_  citation text          {citation description (FIFO)}    
 some text in line [#]_          {autoincremented footnote}
+[foot]_  foot note text         {footnote description (FIFO)}
+figure caption [f]_             {autoincremented figure number}
+table title [t]_                {autoincremented table number}   
+equation label [e]_             {autoincremented equation number}
 some text in line [r]_          {right justify line}
 some text in line [c]_          {center line}
-table title [t]_                {autoincremented table number}   
-label for equation [e]_         {autoincremented equation number}
-[s]_  section title             {first line in string function}
-[cite]_  citation text          {citation description (FIFO)}    
-[foot]_  foot note text         {footnote description (FIFO)}
 [link]_  http:\\url             {http link}
 [page]_                         {start new doc page}
 [line]_                         {insert horizontal line}
@@ -137,7 +117,7 @@ from pathlib import Path
 
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 
-def _refs(onumI: int, setsectD: dict, typeS: str) -> str:
+def _refs(objnumI: int, setsectD: dict, typeS: str) -> str:
     """[summary]
     
     Args:
@@ -149,10 +129,10 @@ def _refs(onumI: int, setsectD: dict, typeS: str) -> str:
         str: [description]
     """
 
-    ofillS = str(onumI).zfill(2)
+    objfillS = str(objnumI).zfill(2)
     sfillS = str(setsectD["snum"]).strip().zfill(2)
     rnumS = str(setsectD["rnum"])
-    refS = "[" + typeS + rnumS + "." + sfillS + "." + ofillS + "]"
+    refS = "[" + typeS + rnumS + "." + sfillS + "." + objfillS + "]"
 
     return refS
 
@@ -184,8 +164,8 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
         print(utfS); calcS += utfS + "\n"
         return calcS, setsectD        
     elif "[link]_" in tagS:
-        tagL = tagS.strip().split("]_")
-        utfS = "link: "+ tagL[1].strip()
+        tgS = tagS.strip("[link]_").strip()
+        utfS = "link: "+ tgS
         print(utfS); calcS += utfS + "\n"
         return calcS, setsectD
     elif "[r]_" in tagS:
@@ -247,78 +227,55 @@ class _R_utf:
        Returns:
             string :  formatted utf-calc string
         """
-        endflgB = False; rtmpS = ""; rL = []; indxI = -1
-        rcmdL = ["summary", "scope", "attach", "toc" ]
-        methodL =  [self.r_summary, self.r_label, self.r_append]
-        tagL =  [ "[r]_", "[c]_", "[link]_"] 
+        blkflgB = False; rsL = []; indxI = -1
+        rcmdL = ["summary", "scope", "attach" ]
+        attribL =  [self.r_summary, self.r_scope, self.r_attach]
         
         for rS in self.strL:
-            if rS[0:2] == "##":  continue           # remove review comment
-            rS = rS[4:]                             # remove indent
-            if len(rS.strip()) == 0:                # blank line, end block
-                if endflgB:
-                    rL.append(rtmpS.strip())
-                    methodL[indxI](rL)              # call attribute from list                          
-                    endflgB = False; rtmpS = ""; rL = []; indxI = -1      
-                print(""); self.calcS += "\n" 
+            if rS[0:2] == "##":  continue               # remove review comment
+            rS = rS[4:]                                 # remove indent
+            if blkflgB:
+                if rS[0:2] == "||":
+                    attribL[0](rsL)
+                    blkflgB = False
+                    rsL = rS[2:].split("|")    
+                    indxI = rcmdL.index(rsL[0].strip())    
+                    attribL[indxI](rsL)                 # call attribute                          
+                    continue
+                rsL.append(rS.strip())
                 continue
-            if endflgB:                             # add lines until blank
-                rtmpS = rtmpS + rS + "\n"; continue
-            if rS[0:2] == "||":                     # find command
-                rL = rS[2:].split("|")
-                indxI = rcmdL.index(rL[0].strip())            
-                endflgB = True; continue
-            # commands
-            if rS[0] == "#" : continue              # remove comment 
-            if rS[0:2] == "::" : continue           # remove preformat 
-            if "]_" in rS:                          # process a tag
-                if "[#]_" in rS:
-                    rS = rS.replace("[#]_", "[" + 
-                        str(self.setsectD["ftqueL"][-1]) + "]" )
-                    print(rS); self.calcS += rS + "\n"
-                    incrI = self.setsectD["ftqueL"][-1] + 1
-                    self.setsectD["ftqueL"].append(incrI); continue
-            elif any(tag in rS for tag in tagL):
-                self.calcS, self.setsectD = _tags(rS, self.calcS, self.setsectD)
-                continue 
-            else:
-                utfS = rS.replace("]_","]")
-                print(utfS); self.calcS += utfS + "\n"; continue
-                citeS = utfS.strip("[]_")
-                self.setsectD["ftqueL"].append(citeS); continue
-            print(rS); self.calcS += rS + "\n"     
-
+            if rS[0:2] == "||":
+                rsL.append(rS[2:].split("|"))
+                if rsL[0][0].strip() == rcmdL[0]:       # check summary block
+                    blkflgB = True
+                    continue
+                indxI = rcmdL.index(rsL[0].strip()) 
+                attribL[indxI](rsL)                     # call attribute                          
+  
         return (self.calcS, self.setsectD)
 
-    def r_summary(self, rL):
-        utfS = "Summary\n"
-        utfS += "-------\n"
-        utfS += rL[2]
-        print(utfS + "\n"); self.calcS += utfS
-        
-    def r_append(self, rL):
-        utfS = "Attach\n"
-        utfS += "------\n" 
-        utfS += rL[2].strip()
-        print(utfS + "\n"); self.calcS += utfS
+    def r_summary(self, rsL):
+        tagL =  [ "[link]_","[line]_"]
+        for utfS in rsL[1:]:
+            chk = any(tgS in utfS for tgS in tagL)
+            if True in chk:
+                self.calcS, self.setsectD = _tags(utfS, self.calcS, self.setsectD)
+                continue 
+            elif "]_" in utfS:
+                utfS = utfS.replace("]_","]")           # command not recognized
+                print(utfS); self.calcS += utfS + "\n"
+                continue
+            else:
+                print(utfS); self.calcS += utfS + "\n"
 
-    def r_scope(self, rL):
-        csvL = rL[2].split("\n")
-        tabL = [x.split(",") for x in csvL]
-        maxlenI = max(len(x) for x in tabL)
-        for idx,val in enumerate(tabL):
-            if len(val) < maxlenI:
-                addL = maxlenI - len(val)
-                tabL[idx].extend("-"*addL)
-        headers = ["category"]
-        for i in range(maxlenI-1) : headers.append("label") 
-        sys.stdout.flush()
-        old_stdout = sys.stdout
-        output = StringIO()
-        output.write(tabulate(tabL, headers, tablefmt="grid"))            
-        utfS = output.getvalue()
-        print(utfS + "\n"); self.calcS += utfS
-        sys.stdout = old_stdout    
+    def r_scope(self, rsL):
+        pass
+    
+    def r_attach(self, rsL):
+        pass
+
+    def r_readme(self, rsL):
+        pass
     
 class _I_utf:  
     """convert Insert-string to utf-calc string 
@@ -344,23 +301,18 @@ class _I_utf:
             tuple :  a string and 3 dictionaries
         """
         iL = []; itmpL=[]; indxI =-1 
-        icmdL = ["sympy", "latex", "table", "image", "image2"]
-        attribL = [self.i_sympy, self.i_latex, self.i_table, 
-                            self.i_image, self.i_image2]
+        icmdL = ["sympy", "latex", "table", "image"]
+        attribL = [self.i_sympy, self.i_latex, self.i_table, self.i_image]
         tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                     "[r]_", "[c]_", "[e]_","[t]" ] 
         
         for iS in self.strL:
             iS = iS[4:]                             # remove 4 space indent
-            if len(itmpL) > 0:                      # call image or image2
+            if len(itmpL) > 0:                      # call image
                 itmpL.append(iS.strip())
                 if indxI == 3:
                     self.i_image(itmpL)
                     itmpL =[]; indxI = -1; continue
-                if len(itmpL) == 5:
-                    self.i_image2(itmpL)
-                    itmpL =[]; continue
-                else: continue
             if len(iS.strip()) == 0:                # if empty line                   
                 print(""); self.calcS += "\n"; continue      
             if iS[0:2] == "||":                     # process a command
@@ -369,8 +321,7 @@ class _I_utf:
                 indxI = icmdL.index(callS)
                 if icmdL[indxI] == "image":
                     itmpL = iL; continue
-                if icmdL[indxI] == "image2":
-                    itmpL = iL; continue                
+                else: continue
                 attribL[indxI](iL); continue
             if iS[0] == "#" : continue              # remove comment 
             if iS[0:2] == "::" : continue           # remove preformat 
@@ -456,13 +407,8 @@ class _I_utf:
             utfS = ("Figure: " + imgpathS + "\n")
         print(utfS); self.calcS += utfS + "\n"
 
-    def i_image2(self, iL: list):
-        """insert two images side by side from files
-        
-        Args:
-            iL (list): image parameter list
-        """
-        try:                                            # update default scale
+    """       
+            try:                                        # update default scale
             scaleL= iL[3].split(",")
             scale1I = int(scaleL[0].strip())
             scale1I = int(scaleL[0].strip())
@@ -490,6 +436,7 @@ class _I_utf:
         utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
                + captionS + "\npath: " + imgP)
         print(utfS); self.calcS += utfS + "\n"
+    """
 
     def i_table(self, iL: list):
         """insert table from inline or csv, rst file 
@@ -1029,24 +976,19 @@ class _Tutf:
         """
              
         tL = []; indxI = -1; ttmpL=[]
-        tcmdL = ["read", "save", "data", "table", "plot", "add", 
-                                                "image", "image2" ]
-        attribL = [self.t_read, self.t_save, self.t_data, self.t_table,
-                     self.t_plot, self.t_add, self.t_image, self.t_image2]
+        tcmdL = ["table", "image", ]
+        attribL = [self.t_table, self.t_image]
         tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                         "[r]_", "[c]_", "[e]_","[t]" ] 
 
         for tS in self.strL:
             locals().update(self.rivetD)
             tS = tS[4:].strip()                         # remove 4 space indent
-            if len(ttmpL) > 0:                          # call image or image2
+            if len(ttmpL) > 0:                          # call image
                 ttmpL.append(tS.strip())
-                if indxI == 6:
+                if indxI == 2:
                     self.t_image(ttmpL)
                     ttmpL =[]; indxI = -1; continue
-                if len(ttmpL) == 7:
-                    self.t_image2(ttmpL)
-                    ttmpL =[]; continue
                 else: continue
             if len(tS.strip()) == 0:                    # if empty line                   
                 print(""); self.calcS += "\n"; continue      
@@ -1055,9 +997,7 @@ class _Tutf:
                 callS = ((tL[0].split(":"))[0]).strip()
                 indxI = tcmdL.index(callS)            
                 if tcmdL[indxI] == "image":
-                    ttmpL = tL; continue
-                if tcmdL[indxI] == "image2":
-                    ttmpL = tL; continue                
+                    ttmpL = tL; continue           
                 attribL[indxI](tL); continue            
             if "=" in tS:                               # statement
                 utfS = tS.strip()
