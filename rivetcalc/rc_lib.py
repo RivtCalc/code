@@ -1,7 +1,7 @@
 #! python
-"""RivetCalc API. Exposes 11 functions.
+"""RivetCalc API, exposes a dozen functions.
 
-    This module exposes 6 string and 5 write functions. The string
+    This module exposes 6 string and 6 write functions. The string
     functions take **rivet** markup strings as arguments. The first line of
     each string is a descriptor (may be designated as a section title). The
     remaining lines of string depend on the string type and include 
@@ -57,7 +57,6 @@
     [page]_            : new doc page
     http://abc [link]_ : link
 
-    
     Output functions
     -------------------------------------------------------------------
     write_values()     : write values to python file for import
@@ -65,6 +64,7 @@
     write_pdf()        : write doc to pdf file
     write_html()       : write doc to html file
     write_report()     : write docs to pdf report file
+    write_template()   : make template from project
 """
 import __main__
 import os
@@ -100,14 +100,16 @@ _dpath    = Path(_ppath / "docs")                    # doc folder path
 _rppath   = Path(_ppath / "reports")                 # report folder path
 _utffile  = Path(_cpath / ".".join((_cname, "txt"))) # utf calc output
 _expfile  = Path(_cpath / "scripts" / "".join(("v", _cfile))) # export file
-# global variable dictionary
-_rivetD: dict ={}
-# global section dictionary
+# calc names global dictionary
+rivetcalcD: dict ={}
+# section settings global dictionary
 _setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
-"snum": "", "sname": "", "swidth": 80,
-"enum":  0, "fnum": 0, "tnum" : 0,
-"ftnum": 0,"ftqueL": deque([1]), "cite": " ", "ctqueL": deque([1])}
-# global folder dictionary
+"sname": "", "snum": "", "swidth": 80,
+"enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
+"ftqueL": deque([1]), "ctqueL": deque([1])}
+# command settings global dictionary
+_setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,"truncin": 2,"truncout": 2}
+# folders global dictionary
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
@@ -122,9 +124,6 @@ _foldD: dict = {
 "hpath": Path(_dpath, "html"),
 "fpath": Path(_dpath, "html/figures"),
 "apath": Path(_rppath, "attach")}
-# global command settings
-_setcmdD = {"cwidth": 50, "scale1": 1., "scale2": 1., 
-            "prec": 2, "trim": 2, "replace": False, "code": False}
 # temp files
 _rbak = Path(_foldD["mpath"] / ".".join((_cname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_cname, "log")))
@@ -177,7 +176,7 @@ def _update(hdrS:str):
 def list_values():
     """write table of values to terminal 
     """
-    rivetL = [[k,v] for k,v in _rivetD.items()]
+    rivetL = [[k,v] for k,v in rivetcalcD.items()]
     rivetT = []
     for i in rivetL:
         if isinstance(i[1], np.ndarray):
@@ -194,9 +193,8 @@ def list_values():
 def write_values():
     """ write value assignments to Python file
  
-        Use file for exchanging values between calcs. 
-        File name is the calc file name prepended with 'v'
-        written to the scripts folder.      
+        File name: calc file name prepended with 'v'
+        File path: scipts folder      
     """
     
     str1 =  ("""header string""")
@@ -252,7 +250,7 @@ def R(rawS: str):
     Args:
         rawstrS (str): repository-string
     """
-    global  _utfcalcS, _setsectD, _rivetD
+    global  _utfcalcS, _setsectD, rivetcalcD
     
     sectS,strS = rawS.split("\n",1)
     if "]_" in sectS: _update(sectS)
@@ -274,7 +272,7 @@ def I(rawS: str):
     if "]_" in sectS: _update(sectS)
 
     strL = strS.split("\n")
-    icalc = _rivcalc._I_utf(strL, _foldD, _setcmdD, _setsectD) 
+    icalc = _rivcalc._I_utf(strL, _foldD, _setcmdD, _setsectD)
     icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
@@ -284,28 +282,28 @@ def V(rawS: str):
     Args:
         rawstr (str): value-string
     """
-    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
+    global _utfcalcS, _setsectD, _foldD, rivetcalcD, _setcmdD, _exportS
 
     sectS,strS = rawS.split("\n",1)
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    vcalc = _rivcalc._Vutf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
-    vcalcS, _setsectD, _rivetD, _exportS = vcalc.v_parse()
+    vcalc = _rivcalc._V_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
+    vcalcS, _setsectD, rivetcalcD, _exportS = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
 def E(rawS: str):
     """convert equation-string to utf or rst-string
 
     """
-    global _utfcalcS, _setsectD, _foldD, _rivetD, _setcmdD, _exportS
+    global _utfcalcS, _setsectD, _foldD, rivetcalcD, _setcmdD, _exportS
 
     sectS,strS = rawS.split("\n",1)
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    ecalc = _rivcalc._Eutf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
-    ecalcS, _setsectD, _rivetD, _exportS = ecalc.e_parse()
+    ecalc = _rivcalc._E_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
+    ecalcS, _setsectD, rivetcalcD, _exportS = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
 def T(rawS: str):
@@ -318,7 +316,7 @@ def T(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    tcalc = _rivcalc._Tutf(strL, _foldD, _setcmdD, _setsectD, _rivetD, _exportS)
+    tcalc = _rivcalc._T_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
     tcalcS, _setsectD, _exportS = tcalc.t_parse()
     _utfcalcS = _utfcalcS + tcalcS
 

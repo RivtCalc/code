@@ -216,9 +216,9 @@ class _R_utf:
         sectD (dict): header information
     """
     def __init__(self, strL :list, folderD :dict, setsectD :dict) -> str:
-        self.calcS = """"""
-        self.strL = strL
-        self.folderD = folderD
+        self.calcS = """"""         # calc string
+        self.strL = strL            # list of model strings
+        self.folderD = folderD      
         self.setsectD = setsectD
 
     def r_parse(self) -> str:
@@ -234,25 +234,33 @@ class _R_utf:
         for rS in self.strL:
             if rS[0:2] == "##":  continue               # remove review comment
             rS = rS[4:]                                 # remove indent
+            try: 
+                if rS[0] == "#" : continue              # remove comment 
+                if rS[0:2] == "::" : continue           # remove preformat         
+            except:
+                print(" "); self.calcS += "\n"
+        
             if blkflgB:
                 if rS[0:2] == "||":
                     attribL[0](rsL)
                     blkflgB = False
-                    rsL = rS[2:].split("|")    
-                    indxI = rcmdL.index(rsL[0].strip())    
+                    rsL = []
+                    rsL.append(rS[2:].split("|"))    
+                    indxI = rcmdL.index(rsL[0][0].strip())    
                     attribL[indxI](rsL)                 # call attribute                          
                     continue
                 rsL.append(rS.strip())
                 continue
             if rS[0:2] == "||":
+                rsL = []
                 rsL.append(rS[2:].split("|"))
                 if rsL[0][0].strip() == rcmdL[0]:       # check summary block
                     blkflgB = True
                     continue
-                indxI = rcmdL.index(rsL[0].strip()) 
+                indxI = rcmdL.index(rsL[0][0].strip()) 
                 attribL[indxI](rsL)                     # call attribute                          
   
-        return (self.calcS, self.setsectD)
+        return self.calcS, self.setsectD
 
     def r_summary(self, rsL):
         tagL =  [ "[link]_","[line]_"]
@@ -288,8 +296,8 @@ class _I_utf:
     """
 
     def __init__(self, strL: list, folderD: dict, setcmdD: dict, setsectD: dict):
-        self.calcS = """"""
-        self.strL = strL
+        self.calcS = """"""             # calc string
+        self.strL = strL                # list of model strings
         self.folderD = folderD
         self.setsectD = setsectD
         self.setcmdD = setcmdD
@@ -300,48 +308,45 @@ class _I_utf:
        Returns:
             tuple :  a string and 3 dictionaries
         """
-        iL = []; itmpL=[]; indxI =-1 
-        icmdL = ["sympy", "latex", "table", "image"]
-        attribL = [self.i_sympy, self.i_latex, self.i_table, self.i_image]
+        blkflgB = False; isL = []; indxI = -1
+        icmdL = ["image", "sympy", "latex", "table"]
+        attribL = [self.i_image, self.i_sympy, self.i_latex, self.i_table]
         tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                     "[r]_", "[c]_", "[e]_","[t]" ] 
-        
+                
         for iS in self.strL:
-            iS = iS[4:]                             # remove 4 space indent
-            if len(itmpL) > 0:                      # call image
-                itmpL.append(iS.strip())
-                if indxI == 3:
-                    self.i_image(itmpL)
-                    itmpL =[]; indxI = -1; continue
-            if len(iS.strip()) == 0:                # if empty line                   
-                print(""); self.calcS += "\n"; continue      
-            if iS[0:2] == "||":                     # process a command
-                iL = iS[2:].split("|")
-                callS = ((iL[0].split(":"))[0]).strip()
-                indxI = icmdL.index(callS)
-                if icmdL[indxI] == "image":
-                    itmpL = iL; continue
-                else: continue
-                attribL[indxI](iL); continue
-            if iS[0] == "#" : continue              # remove comment 
-            if iS[0:2] == "::" : continue           # remove preformat 
-            if "]_" in iS:                          # process a tag
-                if "[#]_" in iS:
-                    iS = iS.replace("[#]_", "[" + 
-                        str(self.setsectD["ftqueL"][-1]) + "]" )
-                    print(iS); self.calcS += iS + "\n"
-                    incrI = self.setsectD["ftqueL"][-1] + 1
-                    self.setsectD["ftqueL"].append(incrI); continue
-                if any(tag in iS for tag in tagL):
-                    self.calcS, self.setsectD = _tags(iS, self.calcS, self.setsectD)
-                    continue 
-                else:
-                    utfS = iS.replace("]_","]")
-                    print(utfS); self.calcS += utfS + "\n"; continue    
-            print(iS); self.calcS += iS + "\n"
+            if iS[0:2] == "##":  continue              # remove review comment
+            iS = iS[4:]                                # remove indent
+            try: 
+                if iS[0] == "#" : continue             # remove comment 
+                if iS[0:2] == "::" : continue          # remove preformat         
+            except:
+                print(" "); self.calcS += "\n"
+                continue
+            if blkflgB:
+                if iS[0:2] == "||":
+                    attribL[0](isL)
+                    blkflgB = False
+                    isL = []
+                    isL.append(iS[2:].split("|"))    
+                    indxI = icmdL.index(isL[0][0].strip())
+                    attribL[indxI](isL)                 # call attribute                          
+                    continue
+                isL.append(iS.strip())
+                continue
+            if iS[0:2] == "||":
+                isL = []
+                isL.append(iS[2:].split("|"))
+                if isL[0][0].strip() == icmdL[0]:       # check image block
+                    blkflgB = True
+                    continue
+                indxI = icmdL.index(isL[0][0].strip()) 
+                attribL[indxI](isL)                     # call attribute                          
+                continue
+            print(iS.rstrip()); self.calcS += iS.rstrip() + "\n"
 
-        return self.calcS, self.setsectD, self.setcmdD
-        
+        return self.calcS, self.setsectD, self.setcmdD 
+
     def i_latex(self,iL: list):
         """insert formated equation from LaTeX string
         
@@ -350,19 +355,15 @@ class _I_utf:
 
         """
         try:
-            scaleI = int(iL[2].strip)
+            scaleI = int(iL[0][2].strip)
         except:
             scaleI = self.setcmdD["scale1"]
         self.setcmdD.update({"scale1":scaleI})
-        txS = iL[1].strip()
+        txS = iL[0][1].strip()
         #txs = txs.encode('unicode-escape').decode()
         ltxS = parse_latex(txS)
         utfS2 = sp.pretty(sp.sympify(ltxS, _clash2, evaluate=False))
-        utfS = ""
-        for iS in utfS2.split('\n'):
-            if "ANTLR runtime and generated code versions" in iS: continue
-            utfS += (iS+"\n")
-        print(utfS+"\n"); self.calcS += utfS + "\n"   
+        print(utfS2+"\n"); self.calcS += utfS2 + "\n"   
 
     def i_sympy(self,iL):
         """insert formated equation from sympy string 
@@ -371,11 +372,11 @@ class _I_utf:
             ipL (list): parameter list
         """
         try:
-            scaleI = int(iL[2].strip())
+            scaleI = int(iL[0][2].strip())
         except:
             scaleI = self.setcmdD["scale1"]
         self.setcmdD.update({"scale1":scaleI})
-        spS = iL[1].strip()
+        spS = iL[0][1].strip()
         spL = spS.split("=")
         spS = "Eq(" + spL[0] +",(" + spL[1] +"))" 
         #sps = sps.encode('unicode-escape').decode()
@@ -396,14 +397,16 @@ class _I_utf:
         self.setsectD["fnum"] += 1
         figI = self.setsectD["fnum"]
         sectI = self.setsectD["snum"]
-        fileS = iL[1].strip()
+        fileS = iL[0][1].strip()
         try:
-            captionS = iL[2].strip()
-            imgpathS = str(Path(self.folderD["fpath"], fileS))
+            captionS = iL[0][2].strip()
+            imgpaths = str(Path(self.folderD["fpath"], fileS))
+            imgpathS = str(Path(*Path(imgpaths).parts[-5:]))
             utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
                + captionS + "\npath: " + imgpathS + "\n")
         except:
-            imgpathS = str(Path(self.folderD["fpath"], fileS))
+            imgpaths = str(Path(self.folderD["fpath"], fileS))
+            imgpathS = str(Path(*Path(imgpaths).parts[-5:]))
             utfS = ("Figure: " + imgpathS + "\n")
         print(utfS); self.calcS += utfS + "\n"
 
@@ -445,15 +448,16 @@ class _I_utf:
             ipl (list): parameter list
         """       
         try:
-            widthI = int(iL[2].strip())
+            widthI = int(iL[0][2].strip())
         except:
             widthI = int(self.setcmdD["cwidth"])
+
         self.setcmdD.update({"cwidth":widthI})
         tableS = ""; utfS = ""
-        fileS = iL[1].strip()
+        fileS = iL[0][1].strip()
         tfileS = Path(self.folderD["tpath"], fileS)
         xfileS = Path(self.folderD["xpath"], fileS)  
-        if ".csv" in iL[1]:                        # csv file       
+        if ".csv" in iL[0][1]:                        # csv file       
             format1 = []
             with open(tfileS,'r') as csvfile:
                 readL = list(csv.reader(csvfile))
@@ -470,18 +474,18 @@ class _I_utf:
             utfS = output.getvalue()
             titleS = "  \n"
             sys.stdout = old_stdout
-            try: titleS = iL[2].strip() + titleS
+            try: titleS = iL[0][2].strip() + titleS
             except: pass        
-        elif ".rst" in iL[1]:                        # rst file
+        elif ".rst" in iL[0][1]:                      # rst file
             with open(xfileS,'r') as rst: 
                 utfS = rst.read()
             titleS = "  \n"
-            try: titleS = iL[2].strip() + titleS
+            try: titleS = iL[0][2].strip() + titleS
             except: pass
-        else:                                       # inline reST table 
-            utfs = ""
+        else:                                         # inline reST table 
+            utfS = ""
             titleS = "  "
-            try: titleS = iL[2].strip() + titleS
+            try: titleS = iL[0][2].strip() + titleS
             except: pass
         print(utfS); self.calcS += utfS + "\n"  
 
@@ -492,7 +496,7 @@ class _I_utf:
             iL (list): text command list
         """
         try: 
-           widthI = int(iL[2].strip())
+           widthI = int(iL[0][2].strip())
         except:
             widthI = self.setcmdD["cwidth"]
         self.setcmdD.update({"cwidth": widthI})
@@ -710,7 +714,7 @@ class _V_utf:
         self.rivetD.update(locals())                        # update rivetD
         return([[varS, valS, descripS]])        
 
-class _Eutf:
+class _E_utf:
     """convert equation-string to utf-calc string
 
     """
@@ -944,7 +948,7 @@ class _Eutf:
         eD = dict(i.split(":") for i in eupL.split(","))
         self.setcmdD.update(eD)
 
-class _Tutf:
+class _T_utf:
     """convert table-strings to utf-calc
 
     """
