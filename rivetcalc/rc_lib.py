@@ -256,7 +256,7 @@ def R(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    rcalc = _rivcalc._R_utf(strL, _foldD, _setsectD) 
+    rcalc = _rivcalc.R_utf(strL, _foldD, _setsectD) 
     rcalcS, _setsectD = rcalc.r_parse()
     _utfcalcS = _utfcalcS + rcalcS
 
@@ -272,7 +272,7 @@ def I(rawS: str):
     if "]_" in sectS: _update(sectS)
 
     strL = strS.split("\n")
-    icalc = _rivcalc._I_utf(strL, _foldD, _setcmdD, _setsectD)
+    icalc = _rivcalc.I_utf(strL, _foldD, _setcmdD, _setsectD)
     icalcS, _setsectD, _setcmdD = icalc.i_parse()
     _utfcalcS = _utfcalcS + icalcS
 
@@ -288,7 +288,7 @@ def V(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    vcalc = _rivcalc._V_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
+    vcalc = _rivcalc.V_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
     vcalcS, _setsectD, rivetcalcD, _exportS = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
@@ -302,7 +302,7 @@ def E(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    ecalc = _rivcalc._E_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
+    ecalc = _rivcalc.E_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
     ecalcS, _setsectD, rivetcalcD, _exportS = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
@@ -316,7 +316,7 @@ def T(rawS: str):
     if "]_" in sectS: _update(sectS)
     
     strL = strS.split("\n")
-    tcalc = _rivcalc._T_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
+    tcalc = _rivcalc.T_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
     tcalcS, _setsectD, _exportS = tcalc.t_parse()
     _utfcalcS = _utfcalcS + tcalcS
 

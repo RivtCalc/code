@@ -1,25 +1,26 @@
 #! python
 """transform model-string to calc-string
 
-A separate class transforms each model-string type to a utf-8 calc-string.
-Commands within strings start with a double bar (||) in an indented (4 spaces)
-and are single lines, except where noted as a block.
+The ParseUTF class transforms model-strings to a utf-8 calc-string.
+
+**rivet** model-strings are indented 4 spaces. Commands start with a 
+double bar (||) and are single lines, except where noted as a block.
 
 ------- -------- ------ -------- --------------------------------------------
-string  function  class  general
+string  function method  general
 type     name      name   text            commands {comment}
 ------- -------- ------ -------- --------------------------------------------
-Repo       R()   _R_utf   no     scope, attach, summary {block}
-Insert     I()   _I_utf   yes    table, tex, sym, image {block}
-Values     V()   _V_utf   yes    =, table, values, vector, image {block}
-Equation   E()   _E_utf   yes    =, table, format, func, image {block}
-Table      T()   _T_utf   no     table, image {blk}, {Python simple statement} 
+Repo       R()    r_utf   no     scope, attach, summary {block}
+Insert     I()    i_utf   yes    table, tex, sym, text, image {block}
+Values     V()    v_utf   yes    =, table, values, vector, image {block}
+Equation   E()    e_utf   yes    =, table, format, func, image {block}
+Table      T()    t_utf   no     table, image {blk}, {Python simple statement} 
 
 Command syntax  
 ---------------
 R(''' r-string defines repository and report data
     || summary | calc title | toc
-    May include general text. Text is read until encountering the next
+    May include general text in block. Text is read until encountering the next
     command. The |toc argument generates a table of contents from section
     tags. The first paragraph is included in the Github README.rst file.
     
@@ -208,120 +209,19 @@ def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
     else:
         return tagS, setsectD
 
-class _R_utf:
-    """transform Repository-string to calc-string
-
-    Attributes:
-        strL (list): rivet-strings
-        folderD (dict): folder names
-        sectD (dict): header information
-
-    Commands: summary, scope, attach
-    Tags: [nn]_, [page]_, [link]_
+class ParseUTF:
+    """[summary]
     """
-    def __init__(self, strL :list, folderD :dict, setsectD :dict) -> str:
-        self.calcS = """"""         # calc string
-        self.strL = strL            # list of model strings
-        self.folderD = folderD      
-        self.setsectD = setsectD
-
-    def r_parse(self) -> str:
-        """ parse repository string
-       
-       Returns:
-            calcS (list): utf formatted calc strings
-            setsectD (dict): section settings
-            setcmdD (dict): command settings
-        """
-        blkflgB = False; rsL = []; indxI = -1
-        rcmdL = ["summary", "scope", "attach" ]
-        attribL =  [self.r_summary, self.r_scope, self.r_attach]
-        tagL =  ["[page]_", "[link]_" ] 
-        
-        for rS in self.strL:
-            if rS[0:2] == "##":  continue               # remove review comment
-            rS = rS[4:]                                 # remove indent
-            try: 
-                if rS[0] == "#" : continue              # remove comment 
-                if rS[0:2] == "::" : continue           # remove preformat         
-            except:
-                print(" "); self.calcS += "\n"
-            if blkflgB:
-                if rS[0:2] == "||":
-                    attribL[0](rsL)
-                    blkflgB = False
-                    rsL = []
-                    rsL.append(rS[2:].split("|"))    
-                    indxI = rcmdL.index(rsL[0][0].strip())    
-                    attribL[indxI](rsL)                 # call attribute                          
-                    continue
-                rsL.append(rS.strip())
-                continue
-            if rS[0:2] == "||":
-                rsL = []
-                rsL.append(rS[2:].split("|"))
-                indxI = rcmdL.index(rsL[0][0].strip())
-                if rsL[0][indxI].strip() == "summary":   # check summary block
-                    blkflgB = True
-                    continue
-            attribL[indxI](rsL)                          # call attribute                          
-  
-        return self.calcS, self.setsectD
-
-    def r_summary(self, rsL, tagL):
-        for utfS in rsL[1:]:
-            chk = any(tgS in utfS for tgS in tagL)
-            if True in chk:
-                self.calcS, self.setsectD = _tags(utfS, self.calcS, self.setsectD)
-                continue 
-            elif "]_" in utfS:
-                utfS = utfS.replace("]_","]")           # command not recognized
-                print(utfS); self.calcS += utfS + "\n"
-                continue
-            else:
-                print(utfS); self.calcS += utfS + "\n"
-
-    def r_scope(self, rsL):
-        pass
     
-    def r_attach(self, rsL):
-        pass
+    self.calcS = """"""
+    self.exportS = exportS
+    self.strL = strL
+    self.folderD = folderD
+    self.setsectD = setsectD
+    self.setcmdD = setcmdD
+    self.rivetD = rivetD  
 
-    def r_readme(self, rsL):
-        pass
-    
-class _I_utf:  
-    """convert Insert-string to utf-calc string 
-
-    Attributes:
-        strL (list): rivet-string
-        folderD (dict): folder structure
-        sectD (dict):  header information
-        cmdD (dict): command settings
-
-    Commands: tex, sym, table, image
-    Tags: all except [e]_
-    """
-
-    def __init__(self, strL: list, folderD: dict, setcmdD: dict, setsectD: dict):
-        self.calcS = """"""             # calc string
-        self.strL = strL                # list of model strings
-        self.folderD = folderD
-        self.setsectD = setsectD
-        self.setcmdD = setcmdD
-
-    def i_parse(self) -> tuple:
-        """ parse insert-string
-       
-       Returns:
-            tuple :  calc str, section dict, command dict
-        """
-        blkflgB = False; isL = []; indxI = -1
-        icmdL = ["table","sym", "tex", "image"]
-        attribL = [self.i_table, self.i_sympy, self.i_latex, self.i_image]
-        tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-                    "[r]_", "[c]_", "[t]_", "[f]_", "[#]_" ] 
-                
+    def parseutf(self):
         for iS in self.strL:
             if iS[0:2] == "##":  continue              # remove review comment
             iS = iS[4:]                                # remove indent
@@ -368,6 +268,55 @@ class _I_utf:
                     continue
             print(iS.rstrip()); self.calcS += iS.rstrip() + "\n"
 
+    def r_utf(self) -> str:
+        """ parse repository string
+       
+       Returns:
+            calcS (list): utf formatted calc strings
+            setsectD (dict): section settings
+            setcmdD (dict): command settings
+        """
+        blkflgB = False; rsL = []; indxI = -1
+        rcmdL = ["summary", "scope", "attach" ]
+        attribL =  [self.r_summary, self.r_scope, self.r_attach]
+        tagL =  ["[page]_", "[link]_" ]                        
+  
+        return self.calcS, self.setsectD
+
+    def r_summary(self, rsL, tagL):
+        for utfS in rsL[1:]:
+            chk = any(tgS in utfS for tgS in tagL)
+            if True in chk:
+                self.calcS, self.setsectD = _tags(utfS, self.calcS, self.setsectD)
+                continue 
+            elif "]_" in utfS:
+                utfS = utfS.replace("]_","]")           # command not recognized
+                print(utfS); self.calcS += utfS + "\n"
+                continue
+            else:
+                print(utfS); self.calcS += utfS + "\n"
+
+    def r_scope(self, rsL):
+        pass
+    
+    def r_attach(self, rsL):
+        pass
+
+    def r_readme(self, rsL):
+        pass
+    
+        def i_parse(self) -> tuple:
+        """ parse insert-string
+       
+       Returns:
+            tuple :  calc str, section dict, command dict
+        """
+        blkflgB = False; isL = []; indxI = -1
+        icmdL = ["table","sym", "tex", "image"]
+        attribL = [self.i_table, self.i_sympy, self.i_latex, self.i_image]
+        tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
+                    "[r]_", "[c]_", "[t]_", "[f]_", "[#]_" ] 
+                
         return self.calcS, self.setsectD, self.setcmdD 
 
     def i_latex(self,iL: list):
@@ -406,7 +355,32 @@ class _I_utf:
         utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
         print(utfS); self.calcS += utfS + "\n"   
             
-    def i_image(self, iL: list):
+    def i_text(self, iL: list):
+        """insert text from file
+        
+        Args:
+            iL (list): text command list
+        """
+        try: 
+           widthI = int(iL[0][2].strip())
+        except:
+            widthI = self.setcmdD["cwidth"]
+        self.setcmdD.update({"cwidth": widthI})
+        txtpath = Path(self.folderD["xpath"] /  iL[1].strip())
+        with open(txtpath, 'r') as txtf1:
+                utfL = txtf1.readlines()
+        txtS = "".join(utfL)
+        indI = int((80-widthI)/2)
+        indS = " "*indI
+        utfL = textwrap.wrap(txtS, width=widthI)
+        utfL = [s+"\n" for s in utfL]
+        utfS = indS + indS.join(utfL)
+        print(utfS); self.calcS += utfS + "\n"
+    
+    
+    
+    
+    def p_image(self, iL: list):
         """insert image from file
         
         Args:
@@ -464,7 +438,7 @@ class _I_utf:
         print(utfS); self.calcS += utfS + "\n"
     """
 
-    def i_table(self, iL: list):
+    def p_table(self, iL: list):
         """insert table from inline or csv, rst file 
         
         Args:
@@ -512,29 +486,52 @@ class _I_utf:
             except: pass
         print(utfS); self.calcS += utfS + "\n"  
 
-    def i_text(self, iL: list):
-        """insert text from file
-        
-        Args:
-            iL (list): text command list
-        """
-        try: 
-           widthI = int(iL[0][2].strip())
-        except:
-            widthI = self.setcmdD["cwidth"]
-        self.setcmdD.update({"cwidth": widthI})
-        txtpath = Path(self.folderD["xpath"] /  iL[1].strip())
-        with open(txtpath, 'r') as txtf1:
-                utfL = txtf1.readlines()
-        txtS = "".join(utfL)
-        indI = int((80-widthI)/2)
-        indS = " "*indI
-        utfL = textwrap.wrap(txtS, width=widthI)
-        utfL = [s+"\n" for s in utfL]
-        utfS = indS + indS.join(utfL)
-        print(utfS); self.calcS += utfS + "\n"
 
-class _V_utf:
+    
+
+
+class R_utf(ParseUTF):
+    """transform Repository-string to calc-string
+
+    Attributes:
+        strL (list): rivet-strings
+        folderD (dict): folder names
+        sectD (dict): header information
+
+    Commands: summary, scope, attach
+    Tags: [nn]_, [page]_, [link]_
+    """
+    def __init__(self, strL :list, folderD :dict, setsectD :dict) -> str:
+        self.calcS = """"""         # calc string
+        self.strL = strL            # list of model strings
+        self.folderD = folderD      
+        self.setsectD = setsectD
+
+ 
+    
+class I_utf(ParseUTF):  
+    """convert Insert-string to utf-calc string 
+
+    Attributes:
+        strL (list): rivet-string
+        folderD (dict): folder structure
+        sectD (dict):  header information
+        cmdD (dict): command settings
+
+    Commands: tex, sym, table, image
+    Tags: all except [e]_
+    """
+
+    def __init__(self, strL: list, folderD: dict, setcmdD: dict, setsectD: dict):
+        self.calcS = """"""             # calc string
+        self.strL = strL                # list of model strings
+        self.folderD = folderD
+        self.setsectD = setsectD
+        self.setcmdD = setcmdD
+
+
+
+class V_utf(ParseUTF):
     """convert Value-string to utf-calc string
         
     Attributes:
@@ -580,52 +577,6 @@ class _V_utf:
                     "[r]_", "[c]_","[t]_", "[f]_", "[#]_" ] 
 
         locals().update(self.rivetD)
-
-        for vS in self.strL:
-            if vS[0:2] == "##":  continue              # remove review comment
-            vS = vS[4:]                                # remove indent
-            try: 
-                if vS[0] == "#" : continue             # remove comment 
-                if vS[0:2] == "::" : continue          # remove preformat         
-            except:
-                print(" "); self.calcS += "\n"
-                continue
-            if blkflgB:
-                if vS[0:2] == "||":
-                    attribL[0](vsL)
-                    blkflgB = False
-                    vsL = []
-                    vsL.append(vS[2:].split("|"))    
-                    indxI = vcmdL.index(vsL[0][0].strip())
-                    attribL[indxI](vsL)                 # call attribute                          
-                    continue
-                vsL.append(vS.strip())
-                continue
-            if vS[0:2] == "||":
-                vsL = []
-                vsL.append(vS[2:].split("|"))
-                indxI = vcmdL.index(vsL[0][0].strip()) 
-                if vsL[0][indxI].strip() == "image":       # check image block
-                    blkflgB = True
-                    continue
-                attribL[indxI](vsL)                     # call attribute                          
-                continue
-            if "]_" in vS:                              # process a tag
-                if "[#]_" in vS:
-                    vS = vS.replace("[#]_", "[" + 
-                        str(self.setsectD["ftqueL"][-1]) + "]" )
-                    print(vS); self.calcS += vS + "\n"
-                    incrI = self.setsectD["ftqueL"][-1] + 1
-                    self.setsectD["ftqueL"].append(incrI); continue
-                chk = any(tag in tagL for tag in vS)
-                if True in chk:
-                    self.calcS, self.setsectD = _tags(vS, self.calcS, self.setsectD)
-                    continue 
-                else:
-                    utfS = vS.replace("]_","]")
-                    print(utfS); self.calcS += utfS + "\n"
-                    continue
-            print(vS.rstrip()); self.calcS += vS.rstrip() + "\n"
 
         df = pd.DataFrame(vsL)                             # write value table
         hdrL = ["variable", "value", "value" "description"]
@@ -752,7 +703,7 @@ class _V_utf:
         self.rivetD.update(locals())                        # update rivetD
         return([[varS, valS, descripS]])        
 
-class _E_utf:
+class E_utf(ParseUTF):
     """convert equation-string to utf-calc string
 
     """
@@ -798,51 +749,6 @@ class _E_utf:
         attribL = [self.e_symbol, self.e_function, self.e_format]
         tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                         "[r]_", "[c]_", "[e]_", "[t]_", "[f]_" ] 
-        for eS in self.strL:
-            if eS[0:2] == "##":  continue              # remove review comment
-            eS = vS[4:]                                # remove indent
-            try: 
-                if vS[0] == "#" : continue             # remove comment 
-                if vS[0:2] == "::" : continue          # remove preformat         
-            except:
-                print(" "); self.calcS += "\n"
-                continue
-            if blkflgB:
-                if vS[0:2] == "||":
-                    attribL[0](vsL)
-                    blkflgB = False
-                    vsL = []
-                    vsL.append(vS[2:].split("|"))    
-                    indxI = vcmdL.index(vsL[0][0].strip())
-                    attribL[indxI](vsL)                 # call attribute                          
-                    continue
-                vsL.append(vS.strip())
-                continue
-            if vS[0:2] == "||":
-                vsL = []
-                vsL.append(vS[2:].split("|"))
-                indxI = vcmdL.index(vsL[0][0].strip()) 
-                if vsL[0][indxI].strip() == "image":       # check image block
-                    blkflgB = True
-                    continue
-                attribL[indxI](vsL)                     # call attribute                          
-                continue
-            if "]_" in vS:                              # process a tag
-                if "[#]_" in vS:
-                    vS = vS.replace("[#]_", "[" + 
-                        str(self.setsectD["ftqueL"][-1]) + "]" )
-                    print(vS); self.calcS += vS + "\n"
-                    incrI = self.setsectD["ftqueL"][-1] + 1
-                    self.setsectD["ftqueL"].append(incrI); continue
-                chk = any(tag in tagL for tag in vS)
-                if True in chk:
-                    self.calcS, self.setsectD = _tags(vS, self.calcS, self.setsectD)
-                    continue 
-                else:
-                    utfS = vS.replace("]_","]")
-                    print(utfS); self.calcS += utfS + "\n"
-                    continue
-            print(vS.rstrip()); self.calcS += vS.rstrip() + "\n" 
         
         self.rivetD.update(locals())
         return (self.calcS, self.setsectD, self.rivetD, self.exportS)
@@ -995,7 +901,7 @@ class _E_utf:
         eD = dict(i.split(":") for i in eupL.split(","))
         self.setcmdD.update(eD)
 
-class _T_utf:
+class T_utf(ParseUTF):
     """convert table-strings to utf-calc
 
     """
@@ -1031,234 +937,6 @@ class _T_utf:
         attribL = [self.t_table, self.t_image]
         tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                         "[r]_", "[c]_", "[e]_","[t]" ] 
-
-        for tS in self.strL:
-            locals().update(self.rivetD)
-            tS = tS[4:].strip()                         # remove 4 space indent
-            if len(ttmpL) > 0:                          # call image
-                ttmpL.append(tS.strip())
-                if indxI == 2:
-                    self.t_image(ttmpL)
-                    ttmpL =[]; indxI = -1; continue
-                else: continue
-            if len(tS.strip()) == 0:                    # if empty line                   
-                print(""); self.calcS += "\n"; continue      
-            if tS[0:2] == "||":                         # command
-                tL = tS[2:].split("|")
-                callS = ((tL[0].split(":"))[0]).strip()
-                indxI = tcmdL.index(callS)            
-                if tcmdL[indxI] == "image":
-                    ttmpL = tL; continue           
-                attribL[indxI](tL); continue            
-            if "=" in tS:                               # statement
-                utfS = tS.strip()
-                exec(utfS)
-                print(utfS); self.calcS += utfS + "\n"; continue       
-            if tS[0] == "#" : continue                  # remove comment 
-            if tS[0:2] == "::" : continue               # remove preformat 
-            if "]_" in tS:                              # process a tag
-                if "[#]_" in tS:
-                    tS = tS.replace("[#]_", "[" + 
-                        str(self.setsectD["ftqueL"][-1]) + "]" )
-                    print(tS); self.calcS += tS + "\n"
-                    incrI = self.setsectD["ftqueL"][-1] + 1
-                    self.setsectD["ftqueL"].append(incrI)
-                    continue
-                elif any(tag in tS for tag in tagL):
-                    self.calcS, self.setsectD = _tags(tS, self.calcS, self.setsectD)
-                    continue 
-                else:
-                    utfS = tS.replace("]_","]")
-                    print(utfS); self.calcS += utfS + "\n"; continue
-            print(tS); self.calcS += tS + "\n"         
             
         return (self.calcS, self.setsectD, self.exportS)
        
-    def t_read(self, tL: str) -> str:
-        """[summary]
-        
-        Args:
-            tl (str): [description]
-        """
-        locals().update(self.rivetD)
-        
-        df = tL[1].strip()
-        filenameS = tL[2].strip()
-        pnameS = str(Path(self.folderD["tpath"], filenameS).as_posix())
-        pnameS 
-        cmdS = str(df) + "= pd.read_csv('" + pnameS + "')" 
-        exec(cmdS)     
-        
-        self.rivetD.update(locals())
-
-    def t_save(self, tL: str):
-        """[summary]
-        
-        Args:
-            tL (str): [description]
-        """
-
-        locals().update(self.rivetD)
-
-        dfS = tL[1].strip()
-        eval(dfS)
-        filenameS = tL[2].strip()
-        if ".csv" in filenameS:
-            pathnameS =  Path(self.folderD["tpath"], filenameS ).as_posix()
-            cmdlineS =  dfS + ".to_csv('" + str(pathnameS) +  "',index = False)"
-            exec(cmdlineS)
-        elif ".png" or ".jpg" in filenameS:
-            pathnameS =  Path(self.folderD["fpath"], filenameS ).as_posix()
-            cmdline1 = "fig =" + dfS + ".get_figure()"
-            cmdline2 =  "fig.savefig('" + str(pathnameS) +  "')"
-            exec(cmdline1)
-            exec(cmdline2) 
-
-        self.rivetD.update(locals())
-        
-    def t_data(self, tL:str) -> str:
-        """[summary]
-        
-        Args:
-            tLine (str): [description]
-        """
-        locals().update(self.rivetD)
-
-        dfS = tL[1].strip()
-        cmdlineS = dfS + " = pd.DataFrame()"
-        exec(cmdlineS)        
-    
-        self.rivetD.update(locals())
-
-    def t_table(self, tL: list):
-        """insert table from inline or csv, rst file 
-        
-        Args:
-            ipl (list): parameter list
-        """       
-        locals().update(self.rivetD)
-        
-        try:
-            widthI = int(tL[0].split(":")[1])
-        except:
-            widthI = int(self.setcmdD["cwidth"])
-        self.setcmdD.update({"cwidth":widthI})
-        tableS = ""; utfS = ""
-        files = tL[1].strip()
-        tfiles = Path(self.folderD["tpath"], files)   
-        if ".csv" in tL[1]:                        # csv ftLe       
-            format1 = []
-            with open(tfiles,'r') as csvfiLe:
-                readL = list(csv.reader(csvfiLe))
-            for row in readL:
-                wrow=[]
-                for i in row:
-                    templist = textwrap.wrap(i, widthI) 
-                    wrow.append("""\n""".join(templist))
-                format1.append(wrow)
-            sys.stdout.flush()
-            old_stdout = sys.stdout
-            output = StringIO()
-            output.write(tabulate(format1, tablefmt="grid", headers="firstrow"))            
-            utfS = output.getvalue()
-            titleS = "  \n"
-            sys.stdout = old_stdout
-            try: titleS = tL[2].strip() + titleS
-            except: pass        
-        print(utfS); self.calcS += utfS + "\n"  
-    
-    def t_plot(self, tL: str)-> list:
-        """[summary]
-        
-        Args:
-            tL (str): [description]
-        """                
- 
-        locals().update(self.rivetD)
-        
-        pltL = tL[1].split(",")
-        dfS, pltS = pltL[0].strip(),pltL[1].strip()
-        pltcmd = tL[2].strip()
-        cmdline1 = "ax = plt.gca()"
-        cmdline2 = pltS + "=" + dfS + ".plot(" + pltcmd + ", ax=ax)"
-        exec(cmdline1)
-        exec(cmdline2)
-
-        self.rivetD.update(locals())
-
-    def t_add(self, tL: str)-> list:
-        """[summary]
-        
-        Args:
-            tL (str): [description]
-        """                
-
-        locals().update(self.rivetD)
-
-        pltL = tL[1].split(",")
-        dfS, pltS = pltL[0].strip(),pltL[1].strip()
-        pltcmd = tL[2].strip()
-        cmdline2 = pltS +"=" + dfS + ".plot(" + pltcmd + ", ax=ax)"
-        exec(cmdline2)
-
-        self.rivetD.update(locals())
-
-    def t_image(self, tL: list):
-        """insert image from fiLe
-        
-        Args:
-            ipl (list): parameter list
-        """
-        try:
-            scaleI = int(tL[2].strip())
-        except:
-            scaleI = self.setcmdD["scale1"]
-        self.setcmdD.update({"scale1":scaleI})
-        self.setsectD["fnum"] += 1
-        figI = self.setsectD["fnum"]
-        sectI = self.setsectD["snum"]
-        files = tL[1].strip()
-        try:
-            captionS = tL[2].strip()
-            imgpathS = str(Path(self.folderD["fpath"], files))
-            utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
-               + captionS + "\npath: " + imgpathS + "\n")
-        except:
-            imgpathS = str(Path(self.folderD["fpath"], files))
-            utfS = ("Figure: " + imgpathS + "\n")
-        print(utfS); self.calcS += utfS + "\n"
-
-    def t_image2(self, tL: list):
-        """insert two images side by side from fiLes
-        
-        Args:
-            tL (list): image parameter list
-        """
-        try:                                            # update default scale
-            scaleI= tL[2].strip()
-            scale1I = int(scaleI.split(","))[0].strip()
-            scale2I = int(scaleI.split(","))[1].strip()
-            self.setcmdD.update({"scale1":scale1I})
-            self.setcmdD.update({"scale2":scale2I})
-        except:
-            scale1I = self.setcmdD["scale1"]
-            scale2I = self.setcmdD["scale2"]
-        self.setsectD["fnum"] += 1                     # image 1
-        figI = self.setsectD["fnum"]
-        sectI = self.setsectD["snum"]
-        files = tL[1].strip()
-        captionS = tL[3].strip()
-        imgP = str(Path(self.folderD["fpath"], files))
-        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
-               + captionS + "\npath: " + imgP)
-        print(utfS); self.calcS += utfS + "\n"
-
-        self.setsectD["fnum"] += 1                     # image 2
-        figI = self.setsectD["fnum"]
-        sectI = self.setsectD["snum"]
-        files = tL[2].strip()
-        captionS = tL[4].strip()
-        imgP = str(Path(self.folderD["fpath"], files))
-        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
-               + captionS + "\npath: " + imgP)
-        print(utfS); self.calcS += utfS + "\n"
