@@ -127,11 +127,11 @@ __version__ = "0.9.5"
 __author__ = "rholland@structurelabs.com"
 if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
-
-#start-up variables
-_rgx = r'\[\d\d\]\_'                                 # section tag
+# calc variables - global 
+exportS  = """"""                                   # calc values export string
+rivetcalcD: dict ={}                                # calc values dictonary
+# start variables
 _utfcalcS = """"""                                   # utf calc string
-_exportS  = """"""                                   # values export string
 _cfull    = Path(__main__.__file__)                  # calc file path
 _cfile    = Path(__main__.__file__).name             # calc file name
 _cname    = _cfile.split(".py")[0]                   # calc file basename
@@ -142,16 +142,12 @@ _dpath    = Path(_ppath / "docs")                    # doc folder path
 _rppath   = Path(_ppath / "reports")                 # report folder path
 _utffile  = Path(_cpath / ".".join((_cname, "txt"))) # utf calc output
 _expfile  = Path(_cpath / "scripts" / "".join(("v", _cfile))) # export file
-# calc names global dictionary
-rivetcalcD: dict ={}
-# section settings global dictionary
+# settings - global 
 _setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
 "sname": "", "snum": "", "swidth": 80,
 "enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
 "ftqueL": deque([1]), "ctqueL": deque([1])}
-# command settings global dictionary
 _setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,"truncin": 2,"truncout": 2}
-# folders global dictionary
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
@@ -194,6 +190,8 @@ print(" ")
 
 # todo: check folder structure here
 
+
+
 def _update(hdrS:str):
     """format section heading and update section settings
 
@@ -202,18 +200,36 @@ def _update(hdrS:str):
     """
     global _utfcalcS, _setsectD
 
-    _setsectD["enum"] = 0 
-    _setsectD["fnum"] = 0
-    _setsectD["tnum"] = 0
-    nameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
-    snumS = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
-    rnumS = str(_setsectD["rnum"])
-    widthI = int(_setsectD["swidth"])
-    headS = " " +  nameS + (rnumS + " - " +
-            ("[" + snumS + "]")).rjust(widthI - len(nameS) - 2)
-    bordrS = widthI * "="
-    utfS = bordrS + "\n" + headS + "\n" + bordrS +"\n"
-    print(utfS); _utfcalcS += utfS
+    _rgx = r'\[\d\d\]\_'
+    if re.search(_rgx,hrsS):        
+        _setsectD["enum"] = 0 
+        _setsectD["fnum"] = 0
+        _setsectD["tnum"] = 0
+        nameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
+        snumS = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
+        rnumS = str(_setsectD["rnum"])
+        widthI = int(_setsectD["swidth"])
+        headS = " " +  nameS + (rnumS + " - " +
+                ("[" + snumS + "]")).rjust(widthI - len(nameS) - 2)
+        bordrS = widthI * "="
+        utfS = bordrS + "\n" + headS + "\n" + bordrS +"\n"
+        print(utfS); _utfcalcS += utfS
+
+def _callclass(rawS: str):
+    """updates sections and returns class instance for rivet string
+
+    Args:
+        rawstr (str): rivet string
+
+    Returns:
+        class instance: string type instance
+    """
+    sectS,strS = rawS.split("\n",1);
+    _update(sectS)
+    strL = strS.split("\n")
+    ucalc = _rc_calc.ParseUTF(strL, _foldD, _setcmdD, _setsectD, 
+                                        rivetcalcD, exportS)
+    return ucalc
 
 def _rstcalc(_rstcalcS, _rstfile):
     """write reST calc string to file
@@ -256,10 +272,11 @@ def write_values():
     with open(_expfile, 'w') as expF:
         expF.write(str1)
 
-def write_utfcalc(utfcalc, _txtfile):
+def write_utfcalc(utfcalc, _pyfile):
     """write utf calc string to file
     """
-    with open(_txtfile, "wb") as f1:
+    pyfile = " "
+    with open(pyfile, "wb") as f1:
         f1.write(_utfcalcS.encode("UTF-8"))
 
 def write_htmldoc():
@@ -269,7 +286,8 @@ def write_htmldoc():
         f1.write(utfcalc.encode("UTF-8"))
 
 def write_pdfdoc():
-    with open(_txtfile, "wb") as f1:
+    txtfile = " "
+    with open(txtfile, "wb") as f1:
         f1.write(utfcalc.encode("UTF-8"))
     pdf_files = {
         "cpdf":  ".".join((_rbase, "pdf")),
@@ -287,77 +305,69 @@ def write_pdfreport():
     pass
 
 def R(rawS: str):
-    """transform repository-string to utf and reST calc
+    """transform repository-string to utf and reST-string
     
     Args:
         rawstrS (str): repository-string
     """
-    global  _utfcalcS, _setsectD, rivetcalcD
+    global  _utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
     
-    sectS,strS = rawS.split("\n",1)
-    if re.search(_rgx,sectS): _update(sectS)
-    strL = strS.split("\n")
-    rcalc = _rc_calc.ParseUTF(strL, _foldD, _setsectD) 
+    rcalc = _callclass(rawS)
     rcalcS, _setsectD = rcalc.r_utf()
-    _utfcalcS = _utfcalcS + rcalcS
+    _utfcalcS += rcalcS
 
 def I(rawS: str):
-    """transform insert-string to utf and reST calc
+    """transform insert-string to utf and reST-string
     
     Args:
         rawstrS (str): insert-string
     """
-    global _utfcalcS, _setsectD, _foldD, _setcmdD
-
-    sectS,strS = rawS.split("\n",1)
-    if re.search(_rgx,sectS): _update(sectS)
-    strL = strS.split("\n")
-    icalc = _rc_calc.ParseUTF(strL, _foldD, _setcmdD, _setsectD)
+    global _utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
+    
+    icalc = _callclass(rawS)
     icalcS, _setsectD, _setcmdD = icalc.i_utf()
-    _utfcalcS = _utfcalcS + icalcS
+    _utfcalcS += icalcS
 
 def V(rawS: str):
-    """transform insert-string to utf and reST calc
+    """transform value-string to utf and reST-string
     
     Args:
         rawstr (str): value-string
     """
-    global _utfcalcS, _setsectD, _foldD, rivetcalcD, _setcmdD, _exportS
+    global _utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
 
-    sectS,strS = rawS.split("\n",1)
-    if re.search(_rgx,sectS): _update(sectS)
-    strL = strS.split("\n")
-    vcalc = _rc_calc.ParseUTF(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
-    vcalcS, _setsectD, rivetcalcD, _exportS = vcalc.v_parse()
-    _utfcalcS = _utfcalcS + vcalcS
+    vcalc = _callclass(rawS)
+    vcalcS, _setsectD, rivetcalcD, exportS = vcalc.v_utf()
+   _utfcalcS += vcalcS
 
 def E(rawS: str):
-    """convert equation-string to utf or rst-string
+    """convert equation-string to utf and reST-string
 
+    Args:
+        rawstr (str): equation-string
     """
-    global _utfcalcS, _setsectD, _foldD, rivetcalcD, _setcmdD, _exportS
+    global _utfcalcS, _setsectD, _foldD, rivetcalcD, _setcmdD, exportS
 
-    sectS,strS = rawS.split("\n",1)
-    if re.search(_rgx,sectS): _update(sectS)
-    strL = strS.split("\n")
-    ecalc = _rivetcalc.ParseUTF(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
-    ecalcS, _setsectD, rivetcalcD, _exportS = ecalc.e_parse()
-    _utfcalcS = _utfcalcS + ecalcS
+    ecalc = _callclass(rawS)
+    ecalcS, _setsectD, rivetcalcD, exportS = ecalc.e_utf()
+    _utfcalcS += ecalcS
 
 def T(rawS: str):
-    """convert table-string to utf or rst-string
-    
+    """convert table-string to utf and reST-string
+     
+     Args:
+        rawstr (str): table-string   
     """
-    global _utfcalcS, _setsectD, _foldD, _setcmdD, _exportS
+    global _utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
 
-    sectS,strS = rawS.split("\n",1)
-    if re.search(_rgx,sectS): _update(sectS)
-    strL = strS.split("\n")
-    tcalc = _rivetcalc.ParseUTF(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
-    tcalcS, _setsectD, _exportS = tcalc.t_parse()
-    _utfcalcS = _utfcalcS + tcalcS
+    tcalc = _callclass(rawS)
+    tcalcS, _setsectD, exportS = tcalc.t_utf()
+    _utfcalcS += tcalcS
 
 def X(rawS: str):
-    """skip rivet-string
+    """exclude string
+     
+     Args:
+        rawstr (str): any string to exclude
     """
     pass

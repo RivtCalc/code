@@ -5,7 +5,6 @@ The ParseUTF class converts model-strings to calc-string.
 Model-strings must be indented 4 spaces. Commands start with
 a double bar (||) and are single line, except where noted. Tags
 are included inline, with the associated text.
-
 """
 
 import os
@@ -33,18 +32,29 @@ from pathlib import Path
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 
 class ParseUTF:
-    """transform model-string to calc-string
+        """transform model-string to calc-string
 
-    The ParseUTF class converts model-strings to calc-string.
-    Model-strings must be indented 4 spaces. Commands start with
-    a double bar (||) and are single line, except where noted. Tags
-    are included inline, with the associated text.
-    """
-    def __init__(self, strL: list, folderD: dict, setcmdD: dict,
-                setsectD: dict, rivetD: dict, exportS: str):
+        """
+    def __init__(self, strL: list, folderD: dict, 
+                    setcmdD: dict, setsectD: dict, 
+                    rivetD: dict, exportS: str):
+        
+        """transform model-string to calc-string
+
+        The ParseUTF class converts model-strings to calc-string.
+        Model-strings must be indented 4 spaces. Commands start with
+        a double bar (||) and are single line, except where noted. Tags
+        are included inline, with the associated text.
+        
+        Args:
+            exportS (str): exportS
+            strL (list): strL
+            folderD (dict): folderD
+            setsectD (dict): setsectD
+            setcmdD (dict): setcmdD
+            rivetD (dict): rivetD
+        """
     
-
-
         self.calcS = """"""
         self.exportS = exportS
         self.strL = strL
@@ -55,12 +65,12 @@ class ParseUTF:
     
     def _refs(self, objnumI: int, setsectD: dict, typeS: str) -> str:
         """[summary]
-        
+
         Args:
-            refS (str): [description]
+            objnumI (int): [description]
             setsectD (dict): [description]
             typeS (str): [description]
-        
+
         Returns:
             str: [description]
         """
@@ -144,11 +154,11 @@ class ParseUTF:
             return tagS, setsectD
     
     def _parseutf(self, cmdL: list, attrL:list ):
-        """[summary]
+        """parse model-string
 
         Args:
-            cmdL (list): [description]
-            attrL (list): [description]
+            cmdL (list): command list
+            attrL (list): attribute list
         """
         
         uL = []; indxI = -1
@@ -194,7 +204,7 @@ class ParseUTF:
                     self.setsectD["ftqueL"].append(incrI); continue
                 chk = any(tag in tagL for tag in uS)
                 if True in chk:
-                    self.calcS, self.setsectD = _tags(uS, self.calcS, self.setsectD)
+                    self.calcS, self.setsectD = self._tags(uS, self.calcS, self.setsectD)
                     continue 
                 else:
                     utfS = uS.replace("]_","]")
@@ -213,7 +223,7 @@ class ParseUTF:
         
         rcmdL = ["summary", "scope", "attach"]
         rattrL = [self._r_summary, self._r_scope, self._r_attach]
-        _parseutf(rcmdL, rattrL)
+        self._parseutf(rcmdL, rattrL)
         
         return self.calcS, self.setsectD
 
