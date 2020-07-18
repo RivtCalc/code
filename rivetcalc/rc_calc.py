@@ -64,12 +64,12 @@ class ParseUTF:
         self.rivetD = rivetD
     
     def _refs(self, objnumI: int, setsectD: dict, typeS: str) -> str:
-        """[summary]
+        """reference labels for equations, tables and figures
 
         Args:
-            objnumI (int): [description]
-            setsectD (dict): [description]
-            typeS (str): [description]
+            objnumI (int): equation, table or figure numbers
+            setsectD (dict): section dictionary
+            typeS (str): label type
 
         Returns:
             str: [description]
@@ -78,7 +78,7 @@ class ParseUTF:
         objfillS = str(objnumI).zfill(2)
         sfillS = str(setsectD["snum"]).strip().zfill(2)
         rnumS = str(setsectD["rnum"])
-        refS = "[" + typeS + rnumS + "." + sfillS + "." + objfillS + "]"
+        refS = typeS + rnumS + "." + sfillS + "." + objfillS 
 
         return refS
 
@@ -153,7 +153,7 @@ class ParseUTF:
         else:
             return tagS, setsectD
     
-    def _parseutf(self, cmdL: list, attrL:list ):
+    def _parseutf(self, cmdL: list, attrL: list, tagsL: list ):
         """parse model-string
 
         Args:
@@ -161,10 +161,9 @@ class ParseUTF:
             attrL (list): attribute list
         """
         
-        uL = []; indxI = -1
-        blkflgB = False; rsL = []; indxI = -1
-        tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-                        "[r]_", "[c]_", "[e]_", "[t]_", "[f]_" ] 
+        uL = []; indxI = -1; blkflgB = False; rsL = []; indxI = -1
+        #tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
+        #                "[r]_", "[c]_", "[e]_", "[t]_", "[f]_" ] 
 
         for uS in self.strL:
             if uS[0:2] == "##":  continue              # remove review comment
@@ -222,6 +221,7 @@ class ParseUTF:
         """
         
         rcmdL = ["summary", "scope", "attach"]
+        tagsL = ["[links]_", "[literal]_"]
         rattrL = [self._r_summary, self._r_scope, self._r_attach]
         self._parseutf(rcmdL, rattrL)
         
@@ -263,7 +263,7 @@ class ParseUTF:
                 
         return self.calcS, self.setsectD, self.setcmdD 
 
-    def i_latex(self,iL: list):
+    def _i_latex(self,iL: list):
         """insert formated equation from LaTeX string
         
         Args:
@@ -281,7 +281,7 @@ class ParseUTF:
         utfS2 = sp.pretty(sp.sympify(ltxS, _clash2, evaluate=False))
         print(utfS2+"\n"); self.calcS += utfS2 + "\n"   
 
-    def i_sympy(self,iL):
+    def _i_sympy(self,iL):
         """insert formated equation from sympy string 
         
         Args:
@@ -299,7 +299,7 @@ class ParseUTF:
         utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
         print(utfS); self.calcS += utfS + "\n"   
             
-    def i_text(self, iL: list):
+    def _i_text(self, iL: list):
         """insert text from file
         
         Args:
@@ -353,7 +353,7 @@ class ParseUTF:
         self.rivetD.update(locals())
         return self.calcS, self.setsectD, self.rivetD, self.exportS
         
-    def v_assign(self, vL: list):
+    def _v_assign(self, vL: list):
         """assign values to variables
         
         Args:
@@ -385,7 +385,7 @@ class ParseUTF:
         self.exportS += pyS
         return(valL)        
 
-    def v_values(self, vL: list):
+    def _v_values(self, vL: list):
         """read values from file
         
         Args:
@@ -421,7 +421,7 @@ class ParseUTF:
         self.rivetD.update(locals())                        # update rivetD
         return(valL)        
 
-    def v_vector(self, vL: list):
+    def _v_vector(self, vL: list):
         """read vector from file
         
         Args:
@@ -486,7 +486,7 @@ class ParseUTF:
         self.rivetD.update(locals())
         return (self.calcS, self.setsectD, self.rivetD, self.exportS)
     
-    def e_symbol(self, eL: list):
+    def _e_symbol(self, eL: list):
         """[summary]
     
         Args:
@@ -507,7 +507,7 @@ class ParseUTF:
 
         self.rivetD.update(locals())   
 
-    def e_sub(self, epl: list, eps: str):
+    def _e_sub(self, epl: list, eps: str):
         """process equations and substitute variables
         
         Args:
@@ -569,10 +569,10 @@ class ParseUTF:
         except:
             pass   
 
-    def e_function(self):
+    def _e_function(self):
         pass
 
-    def e_format(self, eL):        
+    def _e_format(self, eL):        
         eupL = eL[1].strip()
         eD = dict(i.split(":") for i in eupL.split(","))
         self.setcmdD.update(eD)
@@ -593,7 +593,7 @@ class ParseUTF:
             
         return (self.calcS, self.setsectD, self.exportS)
 
-    def p_table(self, iL: list):
+    def _p_table(self, iL: list):
         """insert table from inline or csv, rst file 
         
         Args:
@@ -641,7 +641,7 @@ class ParseUTF:
             except: pass
         print(utfS); self.calcS += utfS + "\n"  
 
-    def p_image(self, iL: list):
+    def _p_image(self, iL: list):
         """insert image from file
         
         Args:

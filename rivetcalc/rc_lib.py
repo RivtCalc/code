@@ -91,8 +91,9 @@ T('''t-string defines tables and plots
     abc def [t]_       : right justify table title, autoincrement number   
     abc def [e]_       : right justify equation label, autoincrement number
     abc def [f]_       : right justify caption, autoincrment figure number   
-    abc def [r]_       : right justify line
-    abc def [c]_       : center line
+    abc def [r]_       : right justify line of text
+    abc def [c]_       : center line of text
+    [literal]_         : literal text block
     [line]_            : draw horizontal line
     [page]_            : new doc page
     http://abc [link]_ : link
