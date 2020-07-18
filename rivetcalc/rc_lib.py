@@ -1,45 +1,85 @@
 #! python
-"""RivetCalc API, exposes a dozen functions.
+"""This module exposes the API for **RivetCalc**.  
 
-    This module exposes 6 string and 6 write functions. The string
-    functions take **rivet** markup strings as arguments. The first line of
-    each string is a descriptor (may be designated as a section title). The
-    remaining lines of string depend on the string type and include 
-    unicode text, commands, tags and Python code. Text may include
-    reStructuredText markup. The write functions control calculation
-    output type e.g. UTF-8, PDF, HTML.
+    The API includes 6 string and 6 write functions, summarized below. 
+    The string  functions take **rivet** markup strings as arguments. 
+    The first line of a string is a descriptor (may include a 
+    section title). Markup depends on the string type, and 
+    includes unicode text, commands, tags and Python code. Text may 
+    also include reStructuredText markup. The write functions control 
+    calculation output type e.g. UTF-8, PDF, HTML.
 
-    Functions, commmands, tags (see rc_calc.py for doc strings)
-    -------------------------------------------------------------------
-    #%%               : designates an interactive cell for some editors
-    R('''R-string''') : repository and calc data 
-        || summary |         : summary paragraphs 
-        || scope |           : search labels
-        || attach |          : attach pdf files
-    I('''I-string''') : insert text and images
-        Any text and tag
-        || tex |             : LaTeX equation
-        || sym |             : sympy equation
-        || table |           : insert table from file or inline
-        || image |           : insert image from file
-    V('''V-string''') : define values
-        Any text and tag except equal sign
-         =                  : assign value        
-        || values |         : values from file
-        || vectors |        : vectors from file
-        || table |          : insert table from file or inline
-    E('''E-string''') : define equations
-        Any text and tag except equal sign
-         =                  : define equation or function
-        || format |         : format settings
-        || func |           : import function from file   
-        || table |          : insert table from csv file
-        || image |          : insert image from file    
-    T('''T-string''') : define tables and plots
-        Simple Python statements (single line)
-        || table            : insert table from csv file
-        || image            : insert image from file
-    X('''X-string''') : do not process string 
+    ------- -------- ------ -------- ----------------------------------------
+    string    API    method general
+    type    function  name   text            commands {comment}
+    ------- -------- ------ -------- ----------------------------------------
+    Repo       R()    r_utf   no     scope, attach, summary {block}
+    Insert     I()    i_utf   yes    table, tex, sym, text, image {block}
+    Values     V()    v_utf   yes    =, table, values, vector, image {block}
+    Equation   E()    e_utf   yes    =, table, format, func, image {block}
+    Table      T()    t_utf   no     table, image {blk}, {Py simple statement} 
+
+    Command syntax  
+    ---------------
+R(''' r-string defines repository and report data
+    || summary | calc title | toc
+    May include general text in block. Text is read until encountering the next
+    command. The |toc argument generates a table of contents from section
+    tags. The first paragraph is included in the Github README.rst file.
+    
+    || scope | discipline, object, state, intent, assembly, component 
+    
+    || attach | front | calccover.pdf         
+    || attach | back | functions 
+    || attach | back | docstrings
+    || attach | back | appendix1.pdf 
+    ''')
+
+I(''' i-string inserts static text, tables and images  
+    May include arbitrary text.
+    
+    || tex | \gamma = x + 3 # latex equation | 1. # image scale
+    || sym | x = y/2 # sympy equation | 1.
+    || table | x.txt | 60 # max paragraph width - characters 
+    || table | x.csv | 60,[:] # max column width - characters, line range  
+    || table | x.rst | [:] # line range
+
+    || image | x.png {image file} | 1. {scale}
+    figure caption
+    ''')
+
+V(''' v-string defines values
+    May include arbitrary text that does not include an equal sign.
+
+    x = 10.1*IN      | units, alt units  | description 
+
+    || vector | x.csv | VECTORNAME r[n] {row in file to vector}
+    || vector | x.csv | VECTORNAME c[n] {column in file to vector}    
+    || values | vfile.py | [:] {assignment lines to read}
+    || table | x.csv | 60    
+    ''')
+
+E(''' e-string defines equations
+    May include arbitrary text that does not include an equal sign.
+
+    || format | 2 {truncate result}, 2 {truncate terms}     
+
+     x = v1 + 4*M               | units, alt units {applied to result}
+     y = v2 / 4                 | units, alt units
+
+    || func | x.py | func_name | units, alt  {import function from file}
+    || table | x.csv | 60    
+    || image | x.png | 1.
+    ''') 
+
+T('''t-string defines tables and plots
+    {May include any simple Python statement (single line)}
+
+    || table | x.csv | 60    
+    || image | x.png, y.jpg | 0.5,0.5
+    figure1 caption
+    figure2 caption
+    ''')
 
     Tags
     -------------------------------------------------------------------
@@ -72,12 +112,13 @@ import sys
 import textwrap
 import logging
 import warnings
+import re
 import numpy as np
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
 from rivetcalc.rc_unit import *
-import rivetcalc.rc_calc as _rivcalc
+import rivetcalc.rc_calc as _rc_calc
 #import rivet.rivet_doc as _rdoc
 #import rivet.rivet_reprt as _reprt
 #import rivet.rivet_chk as _rchk
@@ -88,7 +129,8 @@ if sys.version_info < (3, 7):
     sys.exit("rivet requires Python version 3.7 or later")
 
 #start-up variables
-_utfcalcS = """"""                                   # utf print string
+_rgx = r'\[\d\d\]\_'                                 # section tag
+_utfcalcS = """"""                                   # utf calc string
 _exportS  = """"""                                   # values export string
 _cfull    = Path(__main__.__file__)                  # calc file path
 _cfile    = Path(__main__.__file__).name             # calc file name
@@ -153,7 +195,7 @@ print(" ")
 # todo: check folder structure here
 
 def _update(hdrS:str):
-    """format section heading and update settings
+    """format section heading and update section settings
 
     Args:
         hdrS (str): section heading line
@@ -172,6 +214,18 @@ def _update(hdrS:str):
     bordrS = widthI * "="
     utfS = bordrS + "\n" + headS + "\n" + bordrS +"\n"
     print(utfS); _utfcalcS += utfS
+
+def _rstcalc(_rstcalcS, _rstfile):
+    """write reST calc string to file
+    
+    Args:
+        pline ([type]): [description]
+        pp ([type]): [description]
+        indent ([type]): [description]
+    """
+
+    with open(_rstfile, "wb") as f1:
+        f1.write(_rstcalcS.encode("UTF-8"))
 
 def list_values():
     """write table of values to terminal 
@@ -202,20 +256,21 @@ def write_values():
     with open(_expfile, 'w') as expF:
         expF.write(str1)
 
-def utfcalc(utfcalc, _txtfile):
+def write_utfcalc(utfcalc, _txtfile):
     """write utf calc string to file
     """
     with open(_txtfile, "wb") as f1:
         f1.write(_utfcalcS.encode("UTF-8"))
 
-def _rstcalc(_rstcalcS, _rstfile):
-    """write reST calc string to file
-    
-    Args:
-        pline ([type]): [description]
-        pp ([type]): [description]
-        indent ([type]): [description]
+def write_htmldoc():
+    """[summary]
     """
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+def write_pdfdoc():
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
     pdf_files = {
         "cpdf":  ".".join((_rbase, "pdf")),
         "chtml":  ".".join((_rbase, "html")),
@@ -224,22 +279,9 @@ def _rstcalc(_rstcalcS, _rstfile):
         "auxfile": ".".join((_rbase, ".aux")),
         "outfile":  ".".join((_rbase, ".out")),
         "texmak2":  ".".join((_rbase, ".fls")),
-        "texmak3":  ".".join((_rbase, ".fdb_latexmk"))
-    }
-    with open(_rstfile, "wb") as f1:
-        f1.write(_rstcalcS.encode("UTF-8"))
+        "texmak3":  ".".join((_rbase, ".fdb_latexmk"))}
 
-def htmldoc():
-    """[summary]
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def pdfdoc():
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-def pdfreport():
+def write_pdfreport():
     """[summary]
     """
     pass
@@ -253,11 +295,10 @@ def R(rawS: str):
     global  _utfcalcS, _setsectD, rivetcalcD
     
     sectS,strS = rawS.split("\n",1)
-    if "]_" in sectS: _update(sectS)
-    
+    if re.search(_rgx,sectS): _update(sectS)
     strL = strS.split("\n")
-    rcalc = _rivcalc.R_utf(strL, _foldD, _setsectD) 
-    rcalcS, _setsectD = rcalc.r_parse()
+    rcalc = _rc_calc.ParseUTF(strL, _foldD, _setsectD) 
+    rcalcS, _setsectD = rcalc.r_utf()
     _utfcalcS = _utfcalcS + rcalcS
 
 def I(rawS: str):
@@ -269,11 +310,10 @@ def I(rawS: str):
     global _utfcalcS, _setsectD, _foldD, _setcmdD
 
     sectS,strS = rawS.split("\n",1)
-    if "]_" in sectS: _update(sectS)
-
+    if re.search(_rgx,sectS): _update(sectS)
     strL = strS.split("\n")
-    icalc = _rivcalc.I_utf(strL, _foldD, _setcmdD, _setsectD)
-    icalcS, _setsectD, _setcmdD = icalc.i_parse()
+    icalc = _rc_calc.ParseUTF(strL, _foldD, _setcmdD, _setsectD)
+    icalcS, _setsectD, _setcmdD = icalc.i_utf()
     _utfcalcS = _utfcalcS + icalcS
 
 def V(rawS: str):
@@ -285,10 +325,9 @@ def V(rawS: str):
     global _utfcalcS, _setsectD, _foldD, rivetcalcD, _setcmdD, _exportS
 
     sectS,strS = rawS.split("\n",1)
-    if "]_" in sectS: _update(sectS)
-    
+    if re.search(_rgx,sectS): _update(sectS)
     strL = strS.split("\n")
-    vcalc = _rivcalc.V_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
+    vcalc = _rc_calc.ParseUTF(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
     vcalcS, _setsectD, rivetcalcD, _exportS = vcalc.v_parse()
     _utfcalcS = _utfcalcS + vcalcS
 
@@ -299,10 +338,9 @@ def E(rawS: str):
     global _utfcalcS, _setsectD, _foldD, rivetcalcD, _setcmdD, _exportS
 
     sectS,strS = rawS.split("\n",1)
-    if "]_" in sectS: _update(sectS)
-    
+    if re.search(_rgx,sectS): _update(sectS)
     strL = strS.split("\n")
-    ecalc = _rivcalc.E_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
+    ecalc = _rivetcalc.ParseUTF(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
     ecalcS, _setsectD, rivetcalcD, _exportS = ecalc.e_parse()
     _utfcalcS = _utfcalcS + ecalcS
 
@@ -313,14 +351,13 @@ def T(rawS: str):
     global _utfcalcS, _setsectD, _foldD, _setcmdD, _exportS
 
     sectS,strS = rawS.split("\n",1)
-    if "]_" in sectS: _update(sectS)
-    
+    if re.search(_rgx,sectS): _update(sectS)
     strL = strS.split("\n")
-    tcalc = _rivcalc.T_utf(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
+    tcalc = _rivetcalc.ParseUTF(strL, _foldD, _setcmdD, _setsectD, rivetcalcD, _exportS)
     tcalcS, _setsectD, _exportS = tcalc.t_parse()
     _utfcalcS = _utfcalcS + tcalcS
 
 def X(rawS: str):
-    """skip execution of rivet-string
+    """skip rivet-string
     """
     pass

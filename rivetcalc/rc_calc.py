@@ -1,100 +1,13 @@
 #! python
 """transform model-string to calc-string
 
-The ParseUTF class transforms model-strings to a utf-8 calc-string.
+The ParseUTF class converts model-strings to calc-string.
+Model-strings must be indented 4 spaces. Commands start with
+a double bar (||) and are single line, except where noted. Tags
+are included inline, with the associated text.
 
-**rivet** model-strings are indented 4 spaces. Commands start with a 
-double bar (||) and are single lines, except where noted as a block.
-
-------- -------- ------ -------- --------------------------------------------
-string  function method  general
-type     name      name   text            commands {comment}
-------- -------- ------ -------- --------------------------------------------
-Repo       R()    r_utf   no     scope, attach, summary {block}
-Insert     I()    i_utf   yes    table, tex, sym, text, image {block}
-Values     V()    v_utf   yes    =, table, values, vector, image {block}
-Equation   E()    e_utf   yes    =, table, format, func, image {block}
-Table      T()    t_utf   no     table, image {blk}, {Python simple statement} 
-
-Command syntax  
----------------
-R(''' r-string defines repository and report data
-    || summary | calc title | toc
-    May include general text in block. Text is read until encountering the next
-    command. The |toc argument generates a table of contents from section
-    tags. The first paragraph is included in the Github README.rst file.
-    
-    || scope | discipline, object, state, intent, assembly, component 
-    
-    || attach | front | calccover.pdf         
-    || attach | back | functions 
-    || attach | back | docstrings
-    || attach | back | appendix1.pdf 
-    ''')
-
-I(''' i-string inserts static text, tables and images  
-    May include arbitrary text.
-    
-    || tex | \gamma = x + 3 # latex equation | 1. # image scale
-    || sym | x = y/2 # sympy equation | 1.
-    || table | x.txt | 60 # max paragraph width - characters 
-    || table | x.csv | 60,[:] # max column width - characters, line range  
-    || table | x.rst | [:] # line range
-
-    || image | x.png {image file} | 1. {scale}
-    figure caption
-    ''')
-
-V(''' v-string defines values
-    May include arbitrary text that does not include an equal sign.
-
-    x = 10.1*IN      | units, alt units  | description 
-
-    || vector | x.csv | VECTORNAME r[n] {row in file to vector}
-    || vector | x.csv | VECTORNAME c[n] {column in file to vector}    
-    || values | vfile.py | [:] {assignment lines to read}
-    || table | x.csv | 60    
-    ''')
-
-E(''' e-string defines equations
-    May include arbitrary text that does not include an equal sign.
-
-    || format | 2 {truncate result}, 2 {truncate terms}     
-
-     x = v1 + 4*M               | units, alt units {applied to result}
-     y = v2 / 4                 | units, alt units
-
-    || func | x.py | func_name | units, alt  {import function from file}
-    || table | x.csv | 60    
-    || image | x.png | 1.
-    ''') 
-
-T('''t-string defines tables and plots
-    May include any simple Python statement (single line). 
-
-    || table | x.csv | 60    
-    || image | x.png, y.jpg | 0.5,0.5
-    figure1 caption
-    figure2 caption
-    ''')
-
---------------------- ----------- -------------------------------------------  
-   Tag Syntax          Type          Comment           
---------------------- ----------- -------------------------------------------
-[nn]_  section title   all           first line in string function
-[page]_                all           start new doc page
-[link]_  url           R,E,V,I       http link
-[line]_                E,V,I,T       insert horizontal line
-some text [abc123]_    E,V,I         citation
-[cite]_  text          E,V,I         citation description (FIFO)    
-some text [#]_         E,V,I         footnote autoincremented 
-[foot]_  text          E,V,I         footnote description (FIFO)
-figure caption [f]_    E,V,I         figure number autoincremented 
-table title [t]_       E,V,I         table number autoincremented    
-some text [r]_         E,V,I         right justify line
-some text [c]_         E,V,I         center line
-equation label [e]_    E             autoincremented equation number
 """
+
 import os
 import sys
 import csv
@@ -119,154 +32,175 @@ from pathlib import Path
 
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 
-def _refs(objnumI: int, setsectD: dict, typeS: str) -> str:
-    """[summary]
-    
-    Args:
-        refS (str): [description]
-        setsectD (dict): [description]
-        typeS (str): [description]
-    
-    Returns:
-        str: [description]
-    """
-
-    objfillS = str(objnumI).zfill(2)
-    sfillS = str(setsectD["snum"]).strip().zfill(2)
-    rnumS = str(setsectD["rnum"])
-    refS = "[" + typeS + rnumS + "." + sfillS + "." + objfillS + "]"
-
-    return refS
-
-def _tags(tagS: str, calcS: str, setsectD: dict) -> str:
-    """parse tag
-    
-    Args:
-        tagS (str): line from rivet-string with included tag
-    
-    Tag list:
-    [page]_                   {new doc page)
-    [line]_                   {draw horizontal line)
-    [cite]_  citation description
-    [foot]_  footnote description
-    [link]_  http:\\www.abc.org
-    line of text   [r]_       {right justify line of text)
-    line of text   [c]_       {center line of text)
-    equation label [e]_       {right justify line of text with equation number)
-    table title    [t]_       {right justify line of text with table number)
-    """
-
-    tagS = tagS.strip()
-    if "[page]_" in tagS:
-        utfS = int(setsectD["swidth"]) * "."
-        print(utfS); calcS += utfS + "\n"
-        return calcS, setsectD
-    elif "[line]_" in tagS:
-        utfS = int(setsectD["swidth"]) * '-'   
-        print(utfS); calcS += utfS + "\n"
-        return calcS, setsectD        
-    elif "[link]_" in tagS:
-        tgS = tagS.strip("[link]_").strip()
-        utfS = "link: "+ tgS
-        print(utfS); calcS += utfS + "\n"
-        return calcS, setsectD
-    elif "[r]_" in tagS:
-        tagL = tagS.strip().split("[r]_")
-        utfS = (tagL[0].strip()).rjust(int(setsectD["swidth"]-1))
-        print(utfS); calcS += utfS + "\n"       
-        return calcS, setsectD    
-    elif "[c]_" in tagS:
-        tagL = tagS.strip().split("[c]_")
-        utfS = (tagL[0].strip()).rjust(int(setsectD["swidth"]-1))
-        print(utfS); calcS += utfS + "\n"       
-        return calcS, setsectD
-    elif "[e]_" in tagS:
-        tagL = tagS.strip().split("[e]_")
-        enumI = int(setsectD["enum"]) + 1
-        setsectD["enum"] = enumI
-        refS = _refs(enumI, setsectD, "Equ: ")
-        utfS = (tagL[0].strip() + " " + refS).rjust(int(setsectD["swidth"]-1))
-        print(utfS); calcS += utfS + "\n"       
-        return calcS, setsectD
-    elif "[t]_" in tagS:
-        tagL = tagS.strip().split("[t]_")
-        tnumI = int(setsectD["tnum"]) + 1
-        setsectD["tnum"] = tnumI
-        refS = _refs(tnumI, setsectD, "Table: ")
-        utfS = (tagL[0].strip() + " " + refS).rjust(int(setsectD["swidth"]-1))
-        print(utfS); calcS += utfS + "\n"       
-        return calcS, setsectD
-    elif "[foot]_" in tagS:
-        tagL = tagS.strip().split("]_")
-        utfS = "[" + str(setsectD["ftqueL"].popleft()) + "] " + tagL[1].strip()
-        print(utfS); calcS += utfS + "\n"
-        return calcS, setsectD
-    elif "[cite]_" in tagS:    
-        tagL = tagS.strip().split("]_")
-        utfS = "[" + str(setsectD["ctqueL"].popleft()) + "] " + tagL[1].strip()
-        print(utfS); calcS += utfS + "\n"
-        return calcS, setsectD
-    else:
-        return tagS, setsectD
-
 class ParseUTF:
-    """[summary]
-    """
-    
-    self.calcS = """"""
-    self.exportS = exportS
-    self.strL = strL
-    self.folderD = folderD
-    self.setsectD = setsectD
-    self.setcmdD = setcmdD
-    self.rivetD = rivetD  
+    """transform model-string to calc-string
 
-    def parseutf(self):
-        for iS in self.strL:
-            if iS[0:2] == "##":  continue              # remove review comment
-            iS = iS[4:]                                # remove indent
+    The ParseUTF class converts model-strings to calc-string.
+    Model-strings must be indented 4 spaces. Commands start with
+    a double bar (||) and are single line, except where noted. Tags
+    are included inline, with the associated text.
+    """
+    def __init__(self, strL: list, folderD: dict, setcmdD: dict,
+                setsectD: dict, rivetD: dict, exportS: str):
+    
+
+
+        self.calcS = """"""
+        self.exportS = exportS
+        self.strL = strL
+        self.folderD = folderD
+        self.setsectD = setsectD
+        self.setcmdD = setcmdD
+        self.rivetD = rivetD
+    
+    def _refs(self, objnumI: int, setsectD: dict, typeS: str) -> str:
+        """[summary]
+        
+        Args:
+            refS (str): [description]
+            setsectD (dict): [description]
+            typeS (str): [description]
+        
+        Returns:
+            str: [description]
+        """
+
+        objfillS = str(objnumI).zfill(2)
+        sfillS = str(setsectD["snum"]).strip().zfill(2)
+        rnumS = str(setsectD["rnum"])
+        refS = "[" + typeS + rnumS + "." + sfillS + "." + objfillS + "]"
+
+        return refS
+
+    def _tags(self, tagS: str, calcS: str, setsectD: dict) -> str:
+        """parse tag
+        
+        Args:
+            tagS (str): line from rivet-string with included tag
+        
+        Tag list:
+        [page]_                   {new doc page)
+        [line]_                   {draw horizontal line)
+        [cite]_  citation description
+        [foot]_  footnote description
+        [link]_  http:\\www.abc.org
+        line of text   [r]_       {right justify line of text)
+        line of text   [c]_       {center line of text)
+        equation label [e]_       {right justify line of text with equation number)
+        table title    [t]_       {right justify line of text with table number)
+        """
+
+        tagS = tagS.strip()
+        if "[page]_" in tagS:
+            utfS = int(setsectD["swidth"]) * "."
+            print(utfS); calcS += utfS + "\n"
+            return calcS, setsectD
+        elif "[line]_" in tagS:
+            utfS = int(setsectD["swidth"]) * '-'   
+            print(utfS); calcS += utfS + "\n"
+            return calcS, setsectD        
+        elif "[link]_" in tagS:
+            tgS = tagS.strip("[link]_").strip()
+            utfS = "link: "+ tgS
+            print(utfS); calcS += utfS + "\n"
+            return calcS, setsectD
+        elif "[r]_" in tagS:
+            tagL = tagS.strip().split("[r]_")
+            utfS = (tagL[0].strip()).rjust(int(setsectD["swidth"]-1))
+            print(utfS); calcS += utfS + "\n"       
+            return calcS, setsectD    
+        elif "[c]_" in tagS:
+            tagL = tagS.strip().split("[c]_")
+            utfS = (tagL[0].strip()).rjust(int(setsectD["swidth"]-1))
+            print(utfS); calcS += utfS + "\n"       
+            return calcS, setsectD
+        elif "[e]_" in tagS:
+            tagL = tagS.strip().split("[e]_")
+            enumI = int(setsectD["enum"]) + 1
+            setsectD["enum"] = enumI
+            refS = _refs(enumI, setsectD, "Equ: ")
+            utfS = (tagL[0].strip() + " " + refS).rjust(int(setsectD["swidth"]-1))
+            print(utfS); calcS += utfS + "\n"       
+            return calcS, setsectD
+        elif "[t]_" in tagS:
+            tagL = tagS.strip().split("[t]_")
+            tnumI = int(setsectD["tnum"]) + 1
+            setsectD["tnum"] = tnumI
+            refS = _refs(tnumI, setsectD, "Table: ")
+            utfS = (tagL[0].strip() + " " + refS).rjust(int(setsectD["swidth"]-1))
+            print(utfS); calcS += utfS + "\n"       
+            return calcS, setsectD
+        elif "[foot]_" in tagS:
+            tagL = tagS.strip().split("]_")
+            utfS = "[" + str(setsectD["ftqueL"].popleft()) + "] " + tagL[1].strip()
+            print(utfS); calcS += utfS + "\n"
+            return calcS, setsectD
+        elif "[cite]_" in tagS:    
+            tagL = tagS.strip().split("]_")
+            utfS = "[" + str(setsectD["ctqueL"].popleft()) + "] " + tagL[1].strip()
+            print(utfS); calcS += utfS + "\n"
+            return calcS, setsectD
+        else:
+            return tagS, setsectD
+    
+    def _parseutf(self, cmdL: list, attrL:list ):
+        """[summary]
+
+        Args:
+            cmdL (list): [description]
+            attrL (list): [description]
+        """
+        
+        uL = []; indxI = -1
+        blkflgB = False; rsL = []; indxI = -1
+        tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
+                        "[r]_", "[c]_", "[e]_", "[t]_", "[f]_" ] 
+
+        for uS in self.strL:
+            if uS[0:2] == "##":  continue              # remove review comment
+            uS = uS[4:]                                # remove indent
             try: 
-                if iS[0] == "#" : continue             # remove comment 
-                if iS[0:2] == "::" : continue          # remove preformat         
+                if uS[0] == "#" : continue             # remove comment 
+                if uS[0:2] == "::" : continue          # remove preformat         
             except:
                 print(" "); self.calcS += "\n"
                 continue
             if blkflgB:
-                if iS[0:2] == "||":
-                    attribL[0](isL)
+                if uS[0:2] == "||":
+                    attribL[0](usL)
                     blkflgB = False
-                    isL = []
-                    isL.append(iS[2:].split("|"))    
-                    indxI = icmdL.index(isL[0][0].strip())
-                    attribL[indxI](isL)                 # call attribute                          
+                    usL = []
+                    usL.append(iS[2:].split("|"))    
+                    indxI = ucmdL.index(isL[0][0].strip())
+                    attribL[indxI](usL)                 # call attribute                          
                     continue
-                isL.append(iS.strip())
+                usL.append(uS.strip())
                 continue
-            if iS[0:2] == "||":
-                isL = []
-                isL.append(iS[2:].split("|"))
-                indxI = icmdL.index(isL[0][0].strip()) 
-                if isL[0][indxI].strip() == "image":       # check image block
+            if uS[0:2] == "||":
+                usL = []
+                usL.append(uS[2:].split("|"))
+                indxI = icmdL.index(usL[0][0].strip()) 
+                if usL[0][indxI].strip() == "image":       # check image block
                     blkflgB = True
                     continue
-                attribL[indxI](isL)                     # call attribute                          
+                attribL[indxI](usL)                     # call attribute                          
                 continue
-            if "]_" in iS:                              # process a tag
-                if "[#]_" in iS:
-                    iS = iS.replace("[#]_", "[" + 
+            if "]_" in uS:                              # process a tag
+                if "[#]_" in uS:
+                    uS = uS.replace("[#]_", "[" + 
                         str(self.setsectD["ftqueL"][-1]) + "]" )
-                    print(iS); self.calcS += iS + "\n"
+                    print(uS); self.calcS += uS + "\n"
                     incrI = self.setsectD["ftqueL"][-1] + 1
                     self.setsectD["ftqueL"].append(incrI); continue
-                chk = any(tag in tagL for tag in iS)
+                chk = any(tag in tagL for tag in uS)
                 if True in chk:
-                    self.calcS, self.setsectD = _tags(vS, self.calcS, self.setsectD)
+                    self.calcS, self.setsectD = _tags(uS, self.calcS, self.setsectD)
                     continue 
                 else:
-                    utfS = vS.replace("]_","]")
+                    utfS = uS.replace("]_","]")
                     print(utfS); self.calcS += utfS + "\n"
                     continue
-            print(iS.rstrip()); self.calcS += iS.rstrip() + "\n"
+            print(uS.rstrip()); self.calcS += uS.rstrip() + "\n"
 
     def r_utf(self) -> str:
         """ parse repository string
@@ -276,14 +210,14 @@ class ParseUTF:
             setsectD (dict): section settings
             setcmdD (dict): command settings
         """
-        blkflgB = False; rsL = []; indxI = -1
-        rcmdL = ["summary", "scope", "attach" ]
-        attribL =  [self.r_summary, self.r_scope, self.r_attach]
-        tagL =  ["[page]_", "[link]_" ]                        
-  
+        
+        rcmdL = ["summary", "scope", "attach"]
+        rattrL = [self._r_summary, self._r_scope, self._r_attach]
+        _parseutf(rcmdL, rattrL)
+        
         return self.calcS, self.setsectD
 
-    def r_summary(self, rsL, tagL):
+    def _r_summary(self, rsL, tagL):
         for utfS in rsL[1:]:
             chk = any(tgS in utfS for tgS in tagL)
             if True in chk:
@@ -296,16 +230,16 @@ class ParseUTF:
             else:
                 print(utfS); self.calcS += utfS + "\n"
 
-    def r_scope(self, rsL):
-        pass
+    def _r_scope(self, rsL):
+        a=4
     
-    def r_attach(self, rsL):
-        pass
+    def _r_attach(self, rsL):
+        b=5
 
-    def r_readme(self, rsL):
-        pass
+    def _r_readme(self, rsL):
+        c=6
     
-        def i_parse(self) -> tuple:
+    def i_utf(self) -> tuple:
         """ parse insert-string
        
        Returns:
@@ -376,190 +310,8 @@ class ParseUTF:
         utfL = [s+"\n" for s in utfL]
         utfS = indS + indS.join(utfL)
         print(utfS); self.calcS += utfS + "\n"
-    
-    
-    
-    
-    def p_image(self, iL: list):
-        """insert image from file
-        
-        Args:
-            ipl (list): parameter list
-        """
-        try:
-            scaleI = int(iL[3].strip)
-        except:
-            scaleI = self.setcmdD["scale1"]
-        self.setcmdD.update({"scale1":scaleI})
-        self.setsectD["fnum"] += 1
-        figI = self.setsectD["fnum"]
-        sectI = self.setsectD["snum"]
-        fileS = iL[0][1].strip()
-        try:
-            captionS = iL[0][2].strip()
-            imgpaths = str(Path(self.folderD["fpath"], fileS))
-            imgpathS = str(Path(*Path(imgpaths).parts[-5:]))
-            utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
-               + captionS + "\npath: " + imgpathS + "\n")
-        except:
-            imgpaths = str(Path(self.folderD["fpath"], fileS))
-            imgpathS = str(Path(*Path(imgpaths).parts[-5:]))
-            utfS = ("Figure: " + imgpathS + "\n")
-        print(utfS); self.calcS += utfS + "\n"
 
-    """       
-            try:                                        # update default scale
-            scaleL= iL[3].split(",")
-            scale1I = int(scaleL[0].strip())
-            scale1I = int(scaleL[0].strip())
-            self.setcmdD.update({"scale1":scale1I})
-            self.setcmdD.update({"scale2":scale2I})
-        except:
-            scale1I = self.setcmdD["scale1"]
-            scale2I = self.setcmdD["scale2"]
-        self.setsectD["fnum"] += 1                     # image 1
-        figI = self.setsectD["fnum"]
-        sectI = self.setsectD["snum"]
-        fileS = iL[1].strip()
-        captionS = iL[3].strip()
-        imgP = str(Path(self.folderD["fpath"], fileS))
-        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
-               + captionS + "\npath: " + imgP)
-        print(utfS); self.calcS += utfS + "\n"
-
-        self.setsectD["fnum"] += 1                     # image 2
-        figI = self.setsectD["fnum"]
-        sectI = self.setsectD["snum"]
-        fileS = iL[2].strip()
-        captionS = iL[4].strip()
-        imgP = str(Path(self.folderD["fpath"], fileS))
-        utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
-               + captionS + "\npath: " + imgP)
-        print(utfS); self.calcS += utfS + "\n"
-    """
-
-    def p_table(self, iL: list):
-        """insert table from inline or csv, rst file 
-        
-        Args:
-            ipl (list): parameter list
-        """       
-        try:
-            widthI = int(iL[0][2].strip())
-        except:
-            widthI = int(self.setcmdD["cwidth"])
-
-        self.setcmdD.update({"cwidth":widthI})
-        tableS = ""; utfS = ""
-        fileS = iL[0][1].strip()
-        tfileS = Path(self.folderD["tpath"], fileS)
-        xfileS = Path(self.folderD["xpath"], fileS)  
-        if ".csv" in iL[0][1]:                        # csv file       
-            format1 = []
-            with open(tfileS,'r') as csvfile:
-                readL = list(csv.reader(csvfile))
-            for row in readL:
-                wrow=[]
-                for i in row:
-                    templist = textwrap.wrap(i, widthI) 
-                    wrow.append("""\n""".join(templist))
-                format1.append(wrow)
-            sys.stdout.flush()
-            old_stdout = sys.stdout
-            output = StringIO()
-            output.write(tabulate(format1, tablefmt="grid", headers="firstrow"))            
-            utfS = output.getvalue()
-            titleS = "  \n"
-            sys.stdout = old_stdout
-            try: titleS = iL[0][2].strip() + titleS
-            except: pass        
-        elif ".rst" in iL[0][1]:                      # rst file
-            with open(xfileS,'r') as rst: 
-                utfS = rst.read()
-            titleS = "  \n"
-            try: titleS = iL[0][2].strip() + titleS
-            except: pass
-        else:                                         # inline reST table 
-            utfS = ""
-            titleS = "  "
-            try: titleS = iL[0][2].strip() + titleS
-            except: pass
-        print(utfS); self.calcS += utfS + "\n"  
-
-
-    
-
-
-class R_utf(ParseUTF):
-    """transform Repository-string to calc-string
-
-    Attributes:
-        strL (list): rivet-strings
-        folderD (dict): folder names
-        sectD (dict): header information
-
-    Commands: summary, scope, attach
-    Tags: [nn]_, [page]_, [link]_
-    """
-    def __init__(self, strL :list, folderD :dict, setsectD :dict) -> str:
-        self.calcS = """"""         # calc string
-        self.strL = strL            # list of model strings
-        self.folderD = folderD      
-        self.setsectD = setsectD
-
- 
-    
-class I_utf(ParseUTF):  
-    """convert Insert-string to utf-calc string 
-
-    Attributes:
-        strL (list): rivet-string
-        folderD (dict): folder structure
-        sectD (dict):  header information
-        cmdD (dict): command settings
-
-    Commands: tex, sym, table, image
-    Tags: all except [e]_
-    """
-
-    def __init__(self, strL: list, folderD: dict, setcmdD: dict, setsectD: dict):
-        self.calcS = """"""             # calc string
-        self.strL = strL                # list of model strings
-        self.folderD = folderD
-        self.setsectD = setsectD
-        self.setcmdD = setcmdD
-
-
-
-class V_utf(ParseUTF):
-    """convert Value-string to utf-calc string
-        
-    Attributes:
-        strL (list): rivet strings
-        exportS (string) : values for export
-        folderD (dict): folder structure
-        setsectD (dict): section settings
-        setcmdD (dict): command settings
-        rivetD (dict) : rivet calculation variables
-
-    Commands: tex, sym, table, image
-    Tags: all except [e]_
-    """
- 
-    def __init__(self, strL: list, folderD: dict, setcmdD: dict,
-                setsectD: dict, rivetD: dict, exportS: str):
-        """convert value-string to utf-calc string
-        
-        """
-        self.calcS = """"""
-        self.exportS = exportS
-        self.strL = strL
-        self.folderD = folderD
-        self.setsectD = setsectD
-        self.setcmdD = setcmdD
-        self.rivetD = rivetD
-
-    def v_parse(self)-> tuple:
+    def v_utf(self)-> tuple:
         """parse strings of type value
 
         Return:
@@ -703,36 +455,7 @@ class V_utf(ParseUTF):
         self.rivetD.update(locals())                        # update rivetD
         return([[varS, valS, descripS]])        
 
-class E_utf(ParseUTF):
-    """convert equation-string to utf-calc string
-
-    """
-
-    def __init__(self, strL: list, folderD: dict, setcmdD: dict,
-                setsectD: dict, rivetD: dict, exportS: str):     
-        """convert equation-string to utf-calc string
-        
-        Args:
-            strL (list): rivet strings
-            rivetD (dict): rivet calculation values
-            folderD (dict): folders
-            exportS (str): exported values
-            setcmdD (dict): command settings
-            setsectD (dict): section settings
-
-    Commands: tex, sym, table, image
-    Tags: all
-        """
-        self.calcS = """"""
-        self.exportS = exportS
-        self.strL = strL
-        self.folderD = folderD
-        self.rivetD = rivetD
-        self.setsectD = setsectD
-        self.setcmdD = setcmdD
-        self.tmpD = setcmdD
-
-    def e_parse(self) -> tuple:
+    def e_utf(self) -> tuple:
         """parse equation-strings
         
         Return:  
@@ -773,63 +496,6 @@ class E_utf(ParseUTF):
         print(utfS); self.calcS += utfS + "\n"
 
         self.rivetD.update(locals())   
-
-    def e_table(self, eL):
-        """ process equations and write tables
-        
-        Args:
-            eL (list): list of equation plus parameters
-        
-        """
-
-        locals().update(self.rivetD)
-        
-        print(75,eL)
-        resfS = str(self.setcmdD["prec"].strip())
-        eqfS = str(self.setcmdD["trim"].strip()) 
-        exec("set_printoptions(precision=" + eqfS + ")")
-        exec("Unum.VALUE_FORMAT = '%." + resfS + "f'")
-        eqS = eL[0].strip()
-        exec(eqS, globals(), self.rivetD)
-        locals().update(self.rivetD)
-
-
-        varS = eqS.split("=")[0].strip()
-
-        typeE = type(eval(resS))
-        if typeE == list or typeE == tuple:
-            eF = eval(resS)
-            self._write_utf((var0 + " = "), 1)
-            self._write_utf(' ', 0)
-            plist1 = ppr.pformat(tmp1, width=40)
-            self._write_utf(plist1, 0, 0)
-        if typeE == Unum:
-            exec("Unum.VALUE_FORMAT = '%." + rformat.strip() + "f'")
-            if len(cunit) > 0:
-                tmp = eval(var0).au(eval(cunit))
-            else:
-                tmp = eval(var0)
-            tmp1 = tmp.strUnit()
-            tmp2 = tmp.asNumber()
-            chkunit = str(tmp).split()
-            #print('chkunit', tmp, chkunit)
-            if len(chkunit) < 2: tmp1 = ''
-            resultform = "{:,."+ rformat + "f}"
-            result1 = resultform.format(tmp2)
-            tmp3 = result1 + ' '  + tmp1
-            self._write_utf((var0 + " = " + tmp3).rjust(self.widthc-1), 1, 0)
-        else:
-            if type(eval(var0)) == float or type(eval(var0)) == float64:
-                resultform = "{:,."+rformat + "f}"
-                result1 = resultform.format(eval(var0))
-                self._write_utf((var0 +"="+
-                                 str(result1)).rjust(self.widthc-1), 1, 0)
-            else:
-                    self._write_utf((var0 +"="+
-                                str(eval(var0))).rjust(self.widthc-1), 1, 0)
-        
-        print(eS); self.calcS += eS + "\n"
-
 
     def e_sub(self, epl: list, eps: str):
         """process equations and substitute variables
@@ -901,30 +567,7 @@ class E_utf(ParseUTF):
         eD = dict(i.split(":") for i in eupL.split(","))
         self.setcmdD.update(eD)
 
-class T_utf(ParseUTF):
-    """convert table-strings to utf-calc
-
-    """
- 
-    def __init__(self, strL: list, folderD: dict, setcmdD: dict,
-                 setsectD: dict, rivetD: dict, exportS: str):       
-        """
-
-        Args:
-            tlist (list): list of input lines in table string
-        """
-        
-        self.calcS = """"""
-        self.strL = strL
-        self.rivetD = rivetD
-        self.folderD = folderD
-        self.setcmdD = setcmdD
-        self.setsectD = setsectD
-        self.exportS = exportS
-        self.tcalc = []
-        self.tlist = []
-
-    def t_parse(self) -> tuple:
+    def t_utf(self) -> tuple:
         """parse table-strings
 
         Return:
@@ -939,4 +582,111 @@ class T_utf(ParseUTF):
                         "[r]_", "[c]_", "[e]_","[t]" ] 
             
         return (self.calcS, self.setsectD, self.exportS)
-       
+
+    def p_table(self, iL: list):
+        """insert table from inline or csv, rst file 
+        
+        Args:
+            ipl (list): parameter list
+        """       
+        try:
+            widthI = int(iL[0][2].strip())
+        except:
+            widthI = int(self.setcmdD["cwidth"])
+
+        self.setcmdD.update({"cwidth":widthI})
+        tableS = ""; utfS = ""
+        fileS = iL[0][1].strip()
+        tfileS = Path(self.folderD["tpath"], fileS)
+        xfileS = Path(self.folderD["xpath"], fileS)  
+        if ".csv" in iL[0][1]:                        # csv file       
+            format1 = []
+            with open(tfileS,'r') as csvfile:
+                readL = list(csv.reader(csvfile))
+            for row in readL:
+                wrow=[]
+                for i in row:
+                    templist = textwrap.wrap(i, widthI) 
+                    wrow.append("""\n""".join(templist))
+                format1.append(wrow)
+            sys.stdout.flush()
+            old_stdout = sys.stdout
+            output = StringIO()
+            output.write(tabulate(format1, tablefmt="grid", headers="firstrow"))            
+            utfS = output.getvalue()
+            titleS = "  \n"
+            sys.stdout = old_stdout
+            try: titleS = iL[0][2].strip() + titleS
+            except: pass        
+        elif ".rst" in iL[0][1]:                      # rst file
+            with open(xfileS,'r') as rst: 
+                utfS = rst.read()
+            titleS = "  \n"
+            try: titleS = iL[0][2].strip() + titleS
+            except: pass
+        else:                                         # inline reST table 
+            utfS = ""
+            titleS = "  "
+            try: titleS = iL[0][2].strip() + titleS
+            except: pass
+        print(utfS); self.calcS += utfS + "\n"  
+
+    def p_image(self, iL: list):
+        """insert image from file
+        
+        Args:
+            ipl (list): parameter list
+        """
+        try:
+            scaleI = int(iL[3].strip)
+        except:
+            scaleI = self.setcmdD["scale1"]
+        self.setcmdD.update({"scale1":scaleI})
+        self.setsectD["fnum"] += 1
+        figI = self.setsectD["fnum"]
+        sectI = self.setsectD["snum"]
+        fileS = iL[0][1].strip()
+        try:
+            captionS = iL[0][2].strip()
+            imgpaths = str(Path(self.folderD["fpath"], fileS))
+            imgpathS = str(Path(*Path(imgpaths).parts[-5:]))
+            utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+               + captionS + "\npath: " + imgpathS + "\n")
+        except:
+            imgpaths = str(Path(self.folderD["fpath"], fileS))
+            imgpathS = str(Path(*Path(imgpaths).parts[-5:]))
+            utfS = ("Figure: " + imgpathS + "\n")
+        print(utfS); self.calcS += utfS + "\n"
+
+        """       
+                try:                                 # update default scale
+                scaleL= iL[3].split(",")
+                scale1I = int(scaleL[0].strip())
+                scale1I = int(scaleL[0].strip())
+                self.setcmdD.update({"scale1":scale1I})
+                self.setcmdD.update({"scale2":scale2I})
+            except:
+                scale1I = self.setcmdD["scale1"]
+                scale2I = self.setcmdD["scale2"]
+            self.setsectD["fnum"] += 1                     # image 1
+            figI = self.setsectD["fnum"]
+            sectI = self.setsectD["snum"]
+            fileS = iL[1].strip()
+            captionS = iL[3].strip()
+            imgP = str(Path(self.folderD["fpath"], fileS))
+            utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+                + captionS + "\npath: " + imgP)
+            print(utfS); self.calcS += utfS + "\n"
+
+            self.setsectD["fnum"] += 1                     # image 2
+            figI = self.setsectD["fnum"]
+            sectI = self.setsectD["snum"]
+            fileS = iL[2].strip()
+            captionS = iL[4].strip()
+            imgP = str(Path(self.folderD["fpath"], fileS))
+            utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
+                + captionS + "\npath: " + imgP)
+            print(utfS); self.calcS += utfS + "\n"
+        """
+
+
