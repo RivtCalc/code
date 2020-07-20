@@ -1,7 +1,7 @@
 #! python
 """This module exposes the API for **RivetCalc**.  
 
-    The API includes 6 string and 6 write functions, summarized below. 
+    The API, summarized below, includes 5 string and 6 write functions. 
     The string  functions take **rivet** markup strings as arguments. 
     The first line of a string is a descriptor (may include a 
     section title). Markup depends on the string type, and 
@@ -9,23 +9,26 @@
     also include reStructuredText markup. The write functions control 
     calculation output type e.g. UTF-8, PDF, HTML.
 
-    ------- -------- ------ -------- ----------------------------------------
-    string    API    method general
-    type    function  name   text            commands {comment}
-    ------- -------- ------ -------- ----------------------------------------
-    Repo       R()    r_utf   no     scope, attach, summary {block}
-    Insert     I()    i_utf   yes    table, tex, sym, text, image {block}
-    Values     V()    v_utf   yes    =, table, values, vector, image {block}
-    Equation   E()    e_utf   yes    =, table, format, func, image {block}
-    Table      T()    t_utf   no     table, image {blk}, {Py simple statement} 
+    ------- ----- ------ -------------------------------------------------
+    string   API   gen.
+    type           text            commands {comment}
+    ------- ----- ------ -------------------------------------------------
+    Repo     R()    no     scope, attach, summary {block}
+    Insert   I()    yes    tex, sym, text, table, image {block}
+    Values   V()    yes    =, values, vector, format, func, table, image {blk} 
+    Table    T()    no     {Python simple statements}, table, image {blk} 
+    exclude  X()    --     {skip processing of rivet-string}
 
     Command syntax  
     ---------------
 R(''' r-string defines repository and report data
     || summary | calc title | toc
-    May include general text in block. Text is read until encountering the next
+    May include general text in block. Text is read until next
     command. The |toc argument generates a table of contents from section
-    tags. The first paragraph is included in the Github README.rst file.
+    tags. 
+    
+    The first paragraph of the summary is included in the Github 
+    README.rst file.
     
     || scope | discipline, object, state, intent, assembly, component 
     
@@ -48,26 +51,22 @@ I(''' i-string inserts static text, tables and images
     figure caption
     ''')
 
-V(''' v-string defines values
+V(''' v-string defines values and equations
     May include arbitrary text that does not include an equal sign.
 
     x = 10.1*IN      | units, alt units  | description 
 
     || vector | x.csv | VECTORNAME r[n] {row in file to vector}
     || vector | x.csv | VECTORNAME c[n] {column in file to vector}    
-    || values | vfile.py | [:] {assignment lines to read}
-    || table | x.csv | 60    
-    ''')
+    || val_file.py | [:] {import values from file}
 
-E(''' e-string defines equations
-    May include arbitrary text that does not include an equal sign.
+    || eq | unit, alt unit {applied to result} | n,n {truncate} | sym 
+     x = v1 + 4*M                
 
-    || format | 2 {truncate result}, 2 {truncate terms}     
+    || eq | unit, alt unit
+     y = v2 / 4                 
 
-     x = v1 + 4*M               | units, alt units {applied to result}
-     y = v2 / 4                 | units, alt units
-
-    || func | x.py | func_name | units, alt  {import function from file}
+    || func_file.py | func_call | units, alt  {import function from file}
     || table | x.csv | 60    
     || image | x.png | 1.
     ''') 
@@ -340,18 +339,6 @@ def V(rawS: str):
     vcalc = _callclass(rawS)
     vcalcS, _setsectD, rivetcalcD, exportS = vcalc.v_utf()
    _utfcalcS += vcalcS
-
-def E(rawS: str):
-    """convert equation-string to utf and reST-string
-
-    Args:
-        rawstr (str): equation-string
-    """
-    global _utfcalcS, _setsectD, _foldD, rivetcalcD, _setcmdD, exportS
-
-    ecalc = _callclass(rawS)
-    ecalcS, _setsectD, rivetcalcD, exportS = ecalc.e_utf()
-    _utfcalcS += ecalcS
 
 def T(rawS: str):
     """convert table-string to utf and reST-string

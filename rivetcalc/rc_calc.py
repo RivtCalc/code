@@ -464,29 +464,8 @@ class ParseUTF:
         self.exportS += pyS
         self.rivetD.update(locals())                        # update rivetD
         return([[varS, valS, descripS]])        
-
-    def e_utf(self) -> tuple:
-        """parse equation-strings
-        
-        Return:  
-            calcS (list): utf formatted calc strings
-            exportS (list): 
-            setsectD (dict): updated section settings
-            setcmdD (dict): updated command settings
-            rivetD (list): local() dictionary
-        """
-        locals().update(self.rivetD)                
-        
-        eL = []; indxI = -1
-        ecmdL = ["table", "equation", "func", "format", "image" ]
-        attribL = [self.e_symbol, self.e_function, self.e_format]
-        tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-                        "[r]_", "[c]_", "[e]_", "[t]_", "[f]_" ] 
-        
-        self.rivetD.update(locals())
-        return (self.calcS, self.setsectD, self.rivetD, self.exportS)
     
-    def _e_symbol(self, eL: list):
+    def _v_symbol(self, eL: list):
         """[summary]
     
         Args:
@@ -507,7 +486,7 @@ class ParseUTF:
 
         self.rivetD.update(locals())   
 
-    def _e_sub(self, epl: list, eps: str):
+    def _v_sub(self, epl: list, eps: str):
         """process equations and substitute variables
         
         Args:
@@ -569,10 +548,10 @@ class ParseUTF:
         except:
             pass   
 
-    def _e_function(self):
+    def _v_function(self):
         pass
 
-    def _e_format(self, eL):        
+    def _v_format(self, eL):        
         eupL = eL[1].strip()
         eD = dict(i.split(":") for i in eupL.split(","))
         self.setcmdD.update(eD)
