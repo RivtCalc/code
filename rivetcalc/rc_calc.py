@@ -153,17 +153,17 @@ class ParseUTF:
         else:
             return tagS, setsectD
     
-    def _parseutf(self, ucmdL: list, uattrL: list, utagsL: list ):
-        """parse model-string
+    def _parseutf(self, typeS: str, cmdL: list, attrL: list, tagL: list ):
+        """parse rivet-string
 
         Args:
+            typeS (str): rivet-string type
             cmdL (list): command list
             attrL (list): attribute list
+            tagL (list): tag list
         """
         
-        uL = []; indxI = -1; blkflgB = False; rsL = []; indxI = -1
-        #tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-        #                "[r]_", "[c]_", "[e]_", "[t]_", "[f]_" ] 
+        usL = []; indxI = -1; blkflgB = False
 
         for uS in self.strL:
             if uS[0:2] == "##":  continue              # remove review comment
@@ -176,23 +176,23 @@ class ParseUTF:
                 continue
             if blkflgB:
                 if uS[0:2] == "||":
-                    attribL[0](usL)
+                    attrL[0](usL)
                     blkflgB = False
                     usL = []
-                    usL.append(iS[2:].split("|"))    
-                    indxI = ucmdL.index(isL[0][0].strip())
-                    attribL[indxI](usL)                 # call attribute                          
+                    usL.append(uS[2:].split("|"))    
+                    indxI = cmdL.index(usL[0][0].strip())
+                    attrL[indxI](usL)                 # call attribute                          
                     continue
                 usL.append(uS.strip())
                 continue
             if uS[0:2] == "||":
                 usL = []
                 usL.append(uS[2:].split("|"))
-                indxI = ucmdL.index(usL[0][0].strip()) 
+                indxI = cmdL.index(usL[0][0].strip()) 
                 if usL[0][indxI].strip() == "image":       # check image block
                     blkflgB = True
                     continue
-                attribL[indxI](usL)                     # call attribute                          
+                attrL[indxI](usL)                     # call attribute                          
                 continue
             if "]_" in uS:                              # process a tag
                 if "[#]_" in uS:
@@ -211,46 +211,51 @@ class ParseUTF:
                     continue
             print(uS.rstrip()); self.calcS += uS.rstrip() + "\n"
 
-    def r_utf(self, strL) -> str:
+    def r_utf(self) -> str:
         """ parse repository string
        
        Returns:
             calcS (list): utf formatted calc strings
             setsectD (dict): section settings
-            setcmdD (dict): command settings
         """
         
         rcmdL = ["calc", "scope", "attach"]
-        rtagsL = ["[links]_", "[literal]_"]
-        rattrL = [self._r_calc, self._r_scope, self._r_attach]
-        self._parseutf(rcmdL, rattrL, rtagsL)
+        rtagL = ["[links]_", "[literal]_"]
+        rattrL = [self._rcalc, self._rscope, self._rattach]
+        
+        self._parseutf("repo", rcmdL, rattrL, rtagL)
         
         return self.calcS, self.setsectD
 
-    def _r_calc(self, rsL):
+    def _rcalc(self, rsL):
         c = 2
 
-    def _r_scope(self, rsL):
-        a=4
+    def _rscope(self, rsL):
+        a = 4
     
-    def _r_attach(self, rsL):
-        b=5
+    def _rattach(self, rsL):
+        b = 5
     
-    def i_utf(self) -> tuple:
+    def i_utf(self) -> tuple:                
         """ parse insert-string
        
-       Returns:
-            tuple :  calc str, section dict, command dict
+        Returns:
+            calcS (list): utf formatted calc strings
+            setsectD (dict): section settings
+            setcmdD (dict): command settings
         """
-        blkflgB = False; isL = []; indxI = -1
-        icmdL = ["table","sym", "tex", "image"]
-        attribL = [self.i_table, self.i_sympy, self.i_latex, self.i_image]
-        tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-                    "[r]_", "[c]_", "[t]_", "[f]_", "[#]_" ] 
-                
-        return self.calcS, self.setsectD, self.setcmdD 
 
-    def _i_latex(self,iL: list):
+        icmdL = ["text", "sym", "tex", "table", "image"]
+        iattrL = [self._itext, self._isympy, self._ilatex, 
+                            self._utable, self._uimage, ]
+        itagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
+                    "[r]_", "[c]_", "[t]_", "[f]_" ] 
+        
+        self._parseutf("insert", icmdL, iattrL, itagL)
+        
+        return self.calcS, self.setsectD, self.setcmdD
+
+    def _ilatex(self,iL: list):
         """insert formated equation from LaTeX string
         
         Args:
@@ -268,7 +273,7 @@ class ParseUTF:
         utfS2 = sp.pretty(sp.sympify(ltxS, _clash2, evaluate=False))
         print(utfS2+"\n"); self.calcS += utfS2 + "\n"   
 
-    def _i_sympy(self,iL):
+    def _isympy(self,iL):
         """insert formated equation from sympy string 
         
         Args:
@@ -286,7 +291,7 @@ class ParseUTF:
         utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
         print(utfS); self.calcS += utfS + "\n"   
             
-    def _i_text(self, iL: list):
+    def _itext(self, iL: list):
         """insert text from file
         
         Args:
@@ -309,25 +314,27 @@ class ParseUTF:
         print(utfS); self.calcS += utfS + "\n"
 
     def v_utf(self)-> tuple:
-        """parse strings of type value
+        """parse value-string
 
         Return:
             calcS (list): utf formatted calc strings
-            exportS (list): value strings for export
-            rivetD (list): calculation values
             setsectD (dict): section settings
             setcmdD (dict): command settings
+            rivetD (list): calculation values
+            exportS (list): value strings for export
          """
-
-        blkflgB = False; vsL = []; indxI = -1
-        vcmdL = ["image", "values", "vector", "table"]
-        attribL = [self.v_image, self.v_values, self.v_vector, self.v_table]
-        tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-                    "[r]_", "[c]_","[t]_", "[f]_", "[#]_" ] 
 
         locals().update(self.rivetD)
 
-        df = pd.DataFrame(vsL)                             # write value table
+        vcmdL = ["values", "vector", "func", "table", "image"]
+        attrL = [self._vvalues, self._vvector, self._vfunc, self._vformat, 
+                                self._utable, self._uimage,]
+        vtagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
+                    "[r]_", "[c]_", "[t]_", "[f]_"] 
+
+        self._parseutf("value", vcmdL, attrL, vtagL)
+
+        """  df = pd.DataFrame(vsL)                      # write value table
         hdrL = ["variable", "value", "value" "description"]
         old_stdout = sys.stdout
         output = StringIO()
@@ -335,12 +342,12 @@ class ParseUTF:
         valueS = output.getvalue()
         sys.stdout = old_stdout
         sys.stdout.flush()
-        print(valueS + "\n"); self.calcS += valueS + "\n"
+        print(valueS + "\n"); self.calcS += valueS + "\n" """
 
         self.rivetD.update(locals())
-        return self.calcS, self.setsectD, self.rivetD, self.exportS
+        return self.calcS, self.setsectD, self.setcmdD, self.rivetD, self.exportS
         
-    def _v_assign(self, vL: list):
+    def _vassign(self, vL: list):
         """assign values to variables
         
         Args:
@@ -372,7 +379,7 @@ class ParseUTF:
         self.exportS += pyS
         return(valL)        
 
-    def _v_values(self, vL: list):
+    def _vvalues(self, vL: list):
         """read values from file
         
         Args:
@@ -408,7 +415,7 @@ class ParseUTF:
         self.rivetD.update(locals())                        # update rivetD
         return(valL)        
 
-    def _v_vector(self, vL: list):
+    def _vvector(self, vL: list):
         """read vector from file
         
         Args:
@@ -452,7 +459,7 @@ class ParseUTF:
         self.rivetD.update(locals())                        # update rivetD
         return([[varS, valS, descripS]])        
     
-    def _v_symbol(self, eL: list):
+    def _vsymbol(self, eL: list):
         """[summary]
     
         Args:
@@ -473,7 +480,7 @@ class ParseUTF:
 
         self.rivetD.update(locals())   
 
-    def _v_sub(self, epl: list, eps: str):
+    def _vsub(self, epl: list, eps: str):
         """process equations and substitute variables
         
         Args:
@@ -535,10 +542,10 @@ class ParseUTF:
         except:
             pass   
 
-    def _v_function(self):
+    def _vfunc(self):
         pass
 
-    def _v_format(self, eL):        
+    def _vformat(self, eL):        
         eupL = eL[1].strip()
         eD = dict(i.split(":") for i in eupL.split(","))
         self.setcmdD.update(eD)
@@ -547,19 +554,22 @@ class ParseUTF:
         """parse table-strings
 
         Return:
-            vcalc (list): list of calculated strings
-            local_dict (list): local() dictionary
-        """
-             
-        tL = []; indxI = -1; ttmpL=[]
-        tcmdL = ["table", "image", ]
-        attribL = [self.t_table, self.t_image]
-        tagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-                        "[r]_", "[c]_", "[e]_","[t]" ] 
+            calcS (list): utf formatted calc strings
+            setsectD (dict): section settings
+            setcmdD (dict): command settings
+            rivetD (list): calculation values        
             
-        return (self.calcS, self.setsectD, self.exportS)
+        """
+        tcmdL = ["table", "image", ]
+        attribL = [self._utable, self._uimage]
+        ttagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
+                        "[r]_", "[c]_", "[f]_","[t]" ] 
+    
+        self._parseutf("table", tcmdL, attrL, ttagL)
+        
+        return (self.calcS, self.setsectD, self.rivetD)
 
-    def _p_table(self, iL: list):
+    def _utable(self, iL: list):
         """insert table from inline or csv, rst file 
         
         Args:
@@ -607,7 +617,7 @@ class ParseUTF:
             except: pass
         print(utfS); self.calcS += utfS + "\n"  
 
-    def _p_image(self, iL: list):
+    def _uimage(self, iL: list):
         """insert image from file
         
         Args:

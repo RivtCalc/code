@@ -154,7 +154,7 @@ _setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
 "sname": "", "snum": "", "swidth": 80,
 "enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
 "ftqueL": deque([1]), "ctqueL": deque([1])}
-_setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,"truncin": 2,"truncout": 2}
+_setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,"truncres": 2,"trunctrm": 2}
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
