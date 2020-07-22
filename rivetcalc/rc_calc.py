@@ -32,12 +32,12 @@ from pathlib import Path
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 
 class ParseUTF:
-        """transform model-string to calc-string
+    """transform model-string to calc-string
 
-        """
-    def __init__(self, strL: list, folderD: dict, 
-                    setcmdD: dict, setsectD: dict, 
-                    rivetD: dict, exportS: str):
+    """
+    
+    def __init__(self, strL: list, folderD: dict, setcmdD: dict,
+         setsectD: dict, rivetD: dict, exportS: str):
         
         """transform model-string to calc-string
 
@@ -153,7 +153,7 @@ class ParseUTF:
         else:
             return tagS, setsectD
     
-    def _parseutf(self, cmdL: list, attrL: list, tagsL: list ):
+    def _parseutf(self, ucmdL: list, uattrL: list, utagsL: list ):
         """parse model-string
 
         Args:
@@ -188,7 +188,7 @@ class ParseUTF:
             if uS[0:2] == "||":
                 usL = []
                 usL.append(uS[2:].split("|"))
-                indxI = icmdL.index(usL[0][0].strip()) 
+                indxI = ucmdL.index(usL[0][0].strip()) 
                 if usL[0][indxI].strip() == "image":       # check image block
                     blkflgB = True
                     continue
@@ -211,7 +211,7 @@ class ParseUTF:
                     continue
             print(uS.rstrip()); self.calcS += uS.rstrip() + "\n"
 
-    def r_utf(self) -> str:
+    def r_utf(self, strL) -> str:
         """ parse repository string
        
        Returns:
@@ -220,34 +220,21 @@ class ParseUTF:
             setcmdD (dict): command settings
         """
         
-        rcmdL = ["summary", "scope", "attach"]
-        tagsL = ["[links]_", "[literal]_"]
-        rattrL = [self._r_summary, self._r_scope, self._r_attach]
-        self._parseutf(rcmdL, rattrL)
+        rcmdL = ["calc", "scope", "attach"]
+        rtagsL = ["[links]_", "[literal]_"]
+        rattrL = [self._r_calc, self._r_scope, self._r_attach]
+        self._parseutf(rcmdL, rattrL, rtagsL)
         
         return self.calcS, self.setsectD
 
-    def _r_summary(self, rsL, tagL):
-        for utfS in rsL[1:]:
-            chk = any(tgS in utfS for tgS in tagL)
-            if True in chk:
-                self.calcS, self.setsectD = _tags(utfS, self.calcS, self.setsectD)
-                continue 
-            elif "]_" in utfS:
-                utfS = utfS.replace("]_","]")           # command not recognized
-                print(utfS); self.calcS += utfS + "\n"
-                continue
-            else:
-                print(utfS); self.calcS += utfS + "\n"
+    def _r_calc(self, rsL):
+        c = 2
 
     def _r_scope(self, rsL):
         a=4
     
     def _r_attach(self, rsL):
         b=5
-
-    def _r_readme(self, rsL):
-        c=6
     
     def i_utf(self) -> tuple:
         """ parse insert-string

@@ -1,36 +1,40 @@
 #! python
 """This module exposes the API for **RivetCalc**.  
 
-    The API, summarized below, includes 5 string and 6 write functions. 
-    The string  functions take **rivet** markup strings as arguments. 
+    The API, summarized below, includes string input and write functions. 
+    The string functions take **rivet** markup strings as arguments. 
     The first line of a string is a descriptor (may include a 
-    section title). Markup depends on the string type, and 
+    section title). Markup options depend on the string type, and 
     includes unicode text, commands, tags and Python code. Text may 
     also include reStructuredText markup. The write functions control 
     calculation output type e.g. UTF-8, PDF, HTML.
 
-    ------- ----- ------ -------------------------------------------------
-    string   API   gen.
-    type           text            commands {comment}
-    ------- ----- ------ -------------------------------------------------
-    Repo     R()    no     scope, attach, summary {block}
-    Insert   I()    yes    tex, sym, text, table, image {block}
-    Values   V()    yes    =, values, vector, format, func, table, image {blk} 
-    Table    T()    no     {Python simple statements}, table, image {blk} 
-    exclude  X()    --     {skip processing of rivet-string}
+    String input functions
+    ----------------------
+
+    type     API  text     commands {comment}
+    ======= ===== ===== ================================================
+    repo     R()   yes    calc, scope, attach
+    insert   I()   yes    tex, sym, text, table, image
+    value    V()   yes    =, values, vector, format, func, table, image 
+    table    T()   no     {Python simple statements}, table, image 
+    exclude  X()   --     {skip processing of rivet-string}
 
     Command syntax  
     ---------------
-R(''' r-string defines repository and report data
-    || summary | calc title | toc
-    May include general text in block. Text is read until next
-    command. The |toc argument generates a table of contents from section
-    tags. 
+R(''' The repo-string defines repository and report data
+    
+    May include general text at the start of the string. No text is processed
+    after reading a command. The toc argument generates a table of contents
+    from section tags. The date argument generates a date string before the
+    calc title.
     
     The first paragraph of the summary is included in the Github 
     README.rst file.
     
-    || scope | discipline, object, state, intent, assembly, component 
+    || calc | calc title | date: mm,dd,yy | toc | readme
+
+    || scope | discipline, object, condition, intent, assembly, component 
     
     || attach | front | calccover.pdf         
     || attach | back | functions 
@@ -38,7 +42,8 @@ R(''' r-string defines repository and report data
     || attach | back | appendix1.pdf 
     ''')
 
-I(''' i-string inserts static text, tables and images  
+I(''' The insert-string inserts predefined text, tables and images.  
+    
     May include arbitrary text.
     
     || tex | \gamma = x + 3 # latex equation | 1. # image scale
@@ -47,31 +52,33 @@ I(''' i-string inserts static text, tables and images
     || table | x.csv | 60,[:] # max column width - characters, line range  
     || table | x.rst | [:] # line range
 
+                                                             figure caption [f]_
     || image | x.png {image file} | 1. {scale}
-    figure caption
     ''')
 
-V(''' v-string defines values and equations
+V(''' The value-string defines values and equations
+    
     May include arbitrary text that does not include an equal sign.
 
-    x = 10.1*IN      | units, alt units  | description 
+    x = 10.1*IN      | description | unit, alt unit | {trailing, write to file}
 
     || vector | x.csv | VECTORNAME r[n] {row in file to vector}
     || vector | x.csv | VECTORNAME c[n] {column in file to vector}    
-    || val_file.py | [:] {import values from file}
+    || value | rccdd_values.py | [:] {import values from file}
 
-    || eq | unit, alt unit {applied to result} | n,n {truncate} | sym 
-     x = v1 + 4*M                
+    ||format | 2,2 {truncate result, terms} | sym {symbolic} | 
 
-    || eq | unit, alt unit
-     y = v2 / 4                 
+    v1 = x + 4*M  | unit, alt unit
 
-    || func_file.py | func_call | units, alt  {import function from file}
+    y1 = v1 / 4      | unit, alt unit | {if trailing |, write value to file}         
+
+    || func | func_file.py | func_call | var_name {import function from file}
     || table | x.csv | 60    
     || image | x.png | 1.
     ''') 
 
-T('''t-string defines tables and plots
+T('''The table-string defines tables and plots
+    
     {May include any simple Python statement (single line)}
 
     || table | x.csv | 60    
@@ -89,7 +96,7 @@ T('''t-string defines tables and plots
     abc def [foot]_    : footnote description
     abc def [t]_       : right justify table title, autoincrement number   
     abc def [e]_       : right justify equation label, autoincrement number
-    abc def [f]_       : right justify caption, autoincrment figure number   
+    abc def [f]_       : right justify caption, autoincrement number   
     abc def [r]_       : right justify line of text
     abc def [c]_       : center line of text
     [literal]_         : literal text block
@@ -201,7 +208,7 @@ def _update(hdrS:str):
     global _utfcalcS, _setsectD
 
     _rgx = r'\[\d\d\]\_'
-    if re.search(_rgx,hrsS):        
+    if re.search(_rgx,hdrS):        
         _setsectD["enum"] = 0 
         _setsectD["fnum"] = 0
         _setsectD["tnum"] = 0
@@ -338,7 +345,7 @@ def V(rawS: str):
 
     vcalc = _callclass(rawS)
     vcalcS, _setsectD, rivetcalcD, exportS = vcalc.v_utf()
-   _utfcalcS += vcalcS
+    _utfcalcS += vcalcS
 
 def T(rawS: str):
     """convert table-string to utf and reST-string
