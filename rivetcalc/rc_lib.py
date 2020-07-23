@@ -154,7 +154,8 @@ _setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
 "sname": "", "snum": "", "swidth": 80,
 "enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
 "ftqueL": deque([1]), "ctqueL": deque([1])}
-_setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,"truncres": 2,"trunctrm": 2}
+_setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,
+                            "tres": 2,"ttrm": 2,"sym":""}
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
@@ -196,8 +197,6 @@ logging.info(f"""logging: {_lshortP}""")
 print(" ")
 
 # todo: check folder structure here
-
-
 
 def _update(hdrS:str):
     """format section heading and update section settings
@@ -344,7 +343,7 @@ def V(rawS: str):
     global _utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
 
     vcalc = _callclass(rawS)
-    vcalcS, _setsectD, rivetcalcD, exportS = vcalc.v_utf()
+    vcalcS, _setsectD, _setcmdD, rivetcalcD, exportS = vcalc.v_utf()
     _utfcalcS += vcalcS
 
 def T(rawS: str):
@@ -356,7 +355,7 @@ def T(rawS: str):
     global _utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
 
     tcalc = _callclass(rawS)
-    tcalcS, _setsectD, exportS = tcalc.t_utf()
+    tcalcS, _setsectD, _setcmdD, rivetcalcD = tcalc.t_utf()
     _utfcalcS += tcalcS
 
 def X(rawS: str):

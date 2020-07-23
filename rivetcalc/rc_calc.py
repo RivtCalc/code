@@ -63,7 +63,7 @@ class ParseUTF:
         self.setcmdD = setcmdD
         self.rivetD = rivetD
     
-    def _refs(self, objnumI: int, setsectD: dict, typeS: str) -> str:
+    def _refs(self, objnumI: int, typeS: str) -> str:
         """reference labels for equations, tables and figures
 
         Args:
@@ -76,85 +76,87 @@ class ParseUTF:
         """
 
         objfillS = str(objnumI).zfill(2)
-        sfillS = str(setsectD["snum"]).strip().zfill(2)
-        rnumS = str(setsectD["rnum"])
+        sfillS = str(self.setsectD["snum"]).strip().zfill(2)
+        rnumS = str(self.setsectD["rnum"])
         refS = typeS + rnumS + "." + sfillS + "." + objfillS 
 
         return refS
 
-    def _tags(self, tagS: str, calcS: str, setsectD: dict) -> str:
+    def _tags(self, tagS: str, tagL: list) -> tuple:
         """parse tag
         
         Args:
-            tagS (str): line from rivet-string with included tag
-        
-        Tag list:
-        [page]_                   {new doc page)
-        [line]_                   {draw horizontal line)
-        [cite]_  citation description
-        [foot]_  footnote description
-        [link]_  http:\\www.abc.org
-        line of text   [r]_       {right justify line of text)
-        line of text   [c]_       {center line of text)
-        equation label [e]_       {right justify line of text with equation number)
-        table title    [t]_       {right justify line of text with table number)
+            tagS (str): rivet-string with tag
+            tagL (list): list of tags for string type
+            setsectD (dict): section dictionary
+            
+        Return:
+            uS (str): utf string 
+            setsectD (dict): section dictinoary
         """
 
-        tagS = tagS.strip()
-        if "[page]_" in tagS:
-            utfS = int(setsectD["swidth"]) * "."
-            print(utfS); calcS += utfS + "\n"
-            return calcS, setsectD
-        elif "[line]_" in tagS:
-            utfS = int(setsectD["swidth"]) * '-'   
-            print(utfS); calcS += utfS + "\n"
-            return calcS, setsectD        
-        elif "[link]_" in tagS:
-            tgS = tagS.strip("[link]_").strip()
-            utfS = "link: "+ tgS
-            print(utfS); calcS += utfS + "\n"
-            return calcS, setsectD
-        elif "[r]_" in tagS:
-            tagL = tagS.strip().split("[r]_")
-            utfS = (tagL[0].strip()).rjust(int(setsectD["swidth"]-1))
-            print(utfS); calcS += utfS + "\n"       
-            return calcS, setsectD    
-        elif "[c]_" in tagS:
-            tagL = tagS.strip().split("[c]_")
-            utfS = (tagL[0].strip()).rjust(int(setsectD["swidth"]-1))
-            print(utfS); calcS += utfS + "\n"       
-            return calcS, setsectD
-        elif "[e]_" in tagS:
-            tagL = tagS.strip().split("[e]_")
-            enumI = int(setsectD["enum"]) + 1
-            setsectD["enum"] = enumI
-            refS = _refs(enumI, setsectD, "Equ: ")
-            utfS = (tagL[0].strip() + " " + refS).rjust(int(setsectD["swidth"]-1))
-            print(utfS); calcS += utfS + "\n"       
-            return calcS, setsectD
-        elif "[t]_" in tagS:
-            tagL = tagS.strip().split("[t]_")
-            tnumI = int(setsectD["tnum"]) + 1
-            setsectD["tnum"] = tnumI
-            refS = _refs(tnumI, setsectD, "Table: ")
-            utfS = (tagL[0].strip() + " " + refS).rjust(int(setsectD["swidth"]-1))
-            print(utfS); calcS += utfS + "\n"       
-            return calcS, setsectD
-        elif "[foot]_" in tagS:
-            tagL = tagS.strip().split("]_")
-            utfS = "[" + str(setsectD["ftqueL"].popleft()) + "] " + tagL[1].strip()
-            print(utfS); calcS += utfS + "\n"
-            return calcS, setsectD
-        elif "[cite]_" in tagS:    
-            tagL = tagS.strip().split("]_")
-            utfS = "[" + str(setsectD["ctqueL"].popleft()) + "] " + tagL[1].strip()
-            print(utfS); calcS += utfS + "\n"
-            return calcS, setsectD
-        else:
-            return tagS, setsectD
+        tagS = tagS.rstrip()
+        for tag in tagL:
+            if tag in tagS:
+                if tag == "[page]_":
+                    uS = int(self.setsectD["swidth"]) * "." ; break
+                elif tag == "[line]_":
+                    uS = int(self.setsectD["swidth"]) * '-' ; break   
+                elif tag == "[link]_":
+                    tgS = tagS.strip("[link]_").strip()
+                    uS = "link: "+ tgS ; break
+                elif tag == "[literal]_":
+                    uS = "" ; break
+                elif tag == "[r]_":
+                    tagL = tagS.strip().split("[r]_")
+                    uS = (tagL[0].strip()).rjust(int(self.setsectD["swidth"]-1))
+                    break
+                elif tag ==  "[c]_":
+                    tagL = tagS.strip().split("[c]_")
+                    uS = (tagL[0].strip()).rjust(int(self.setsectD["swidth"]-1))
+                    break
+                elif tag == "[f]_":
+                    tagL = tagS.strip().split("[e]_")
+                    enumI = int(self.setsectD["enum"]) + 1
+                    self.setsectD["enum"] = enumI
+                    refS = self._refs(enumI, "[ Figure: ")
+                    uS = (tagL[0].strip() + " " + refS + " ]").rjust(int(self.setsectD["swidth"]-1))
+                    break
+                elif tag == "[e]_":
+                    tagL = tagS.strip().split("[e]_")
+                    enumI = int(self.setsectD["enum"]) + 1
+                    self.setsectD["enum"] = enumI
+                    refS = self._refs(enumI, "[ Equ: ")
+                    uS = (tagL[0].strip() + " " + refS + " ]").rjust(int(self.setsectD["swidth"]-1))
+                    break
+                elif tag == "[t]_":
+                    tagL = tagS.strip().split("[t]_")
+                    tnumI = int(self.setsectD["tnum"]) + 1
+                    self.setsectD["tnum"] = tnumI
+                    refS = self._refs(tnumI, "[ Table: ")
+                    uS = (tagL[0].strip() + " " + refS + " ]").rjust(int(self.setsectD["swidth"]-1))
+                    break
+                elif tag == "[#]_":
+                    uS = uS.replace("[#]_", "[" + str(self.setsectD["ftqueL"][-1]) + "]")
+                    incrI = self.setsectD["ftqueL"][-1] + 1
+                    self.setsectD["ftqueL"].append(incrI)
+                    break
+                elif tag == "[foot]_":
+                    tagL = tagS.strip().split("]_")
+                    uS = "[" + str(self.setsectD["ftqueL"].popleft()) + "] " + tagL[1].strip()
+                    break
+                elif tag == "[cite]_":    
+                    tagL = tagS.strip().split("]_")
+                    uS = "[" + str(self.setsectD["ctqueL"].popleft()) + "] " + tagL[1].strip()
+                    break
+                else:
+                    pass
+            else:
+                uS = tagS
+        return uS, self.setsectD
     
     def _parseutf(self, typeS: str, cmdL: list, attrL: list, tagL: list ):
-        """parse rivet-string
+        """parse rivet-string`
 
         Args:
             typeS (str): rivet-string type
@@ -162,8 +164,9 @@ class ParseUTF:
             attrL (list): attribute list
             tagL (list): tag list
         """
-        
-        usL = []; indxI = -1; blkflgB = False
+        uL = []            # command arguments
+        indxI = -1         # attribute index
+        uvL = []           # value list 
 
         for uS in self.strL:
             if uS[0:2] == "##":  continue              # remove review comment
@@ -174,41 +177,25 @@ class ParseUTF:
             except:
                 print(" "); self.calcS += "\n"
                 continue
-            if blkflgB:
-                if uS[0:2] == "||":
-                    attrL[0](usL)
-                    blkflgB = False
-                    usL = []
-                    usL.append(uS[2:].split("|"))    
-                    indxI = cmdL.index(usL[0][0].strip())
-                    attrL[indxI](usL)                 # call attribute                          
-                    continue
-                usL.append(uS.strip())
+            if uS[0:2] == "||":                        # command
+                uL = uS[2:].split("|")
+                indxI = cmdL.index(uL[0].strip()) 
+                attrL[indxI](uL)                      # call attribute                          
                 continue
-            if uS[0:2] == "||":
-                usL = []
-                usL.append(uS[2:].split("|"))
-                indxI = cmdL.index(usL[0][0].strip()) 
-                if usL[0][indxI].strip() == "image":       # check image block
-                    blkflgB = True
-                    continue
-                attrL[indxI](usL)                     # call attribute                          
-                continue
-            if "]_" in uS:                              # process a tag
-                if "[#]_" in uS:
-                    uS = uS.replace("[#]_", "[" + 
-                        str(self.setsectD["ftqueL"][-1]) + "]" )
-                    print(uS); self.calcS += uS + "\n"
-                    incrI = self.setsectD["ftqueL"][-1] + 1
-                    self.setsectD["ftqueL"].append(incrI); continue
-                chk = any(tag in tagL for tag in uS)
-                if True in chk:
-                    self.calcS, self.setsectD = self._tags(uS, self.calcS, self.setsectD)
-                    continue 
-                else:
-                    utfS = uS.replace("]_","]")
-                    print(utfS); self.calcS += utfS + "\n"
-                    continue
+            if "]_" in uS:                             # call tag
+                uS, self.setsectD = self._tags(uS, tagL)     
+            if typeS == "values":
+                if "=" in uS:
+                    uL = uS[2:].split("|")
+                    if uL[1].strip == "s": uL.insert(0,"symbol")
+                    elif uL[1].strip == "r": uL.insert(0,"replace")
+                    elif uL[1].strip == "t": uL.insert(0,"table")
+                    else: 
+                        uvL.append(uL)
+                        continue
+                    self._vassign(uL); uvL = []
+            if len(uvL) > 0 : 
+                self._vassign(uL); uvL = []                   
             print(uS.rstrip()); self.calcS += uS.rstrip() + "\n"
 
     def r_utf(self) -> str:
@@ -220,8 +207,8 @@ class ParseUTF:
         """
         
         rcmdL = ["calc", "scope", "attach"]
-        rtagL = ["[links]_", "[literal]_"]
         rattrL = [self._rcalc, self._rscope, self._rattach]
+        rtagL = ["[links]_", "[literal]_", "[foot]_", "[cite]_", "[x]_"]
         
         self._parseutf("repo", rcmdL, rattrL, rtagL)
         
@@ -248,8 +235,8 @@ class ParseUTF:
         icmdL = ["text", "sym", "tex", "table", "image"]
         iattrL = [self._itext, self._isympy, self._ilatex, 
                             self._utable, self._uimage, ]
-        itagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-                    "[r]_", "[c]_", "[t]_", "[f]_" ] 
+        itagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[cite]_",
+            "[foot]_", "[#]_", "[r]_", "[c]_", "[e]_", "[t]_", "[f]_"] 
         
         self._parseutf("insert", icmdL, iattrL, itagL)
         
@@ -263,14 +250,14 @@ class ParseUTF:
 
         """
         try:
-            scaleI = int(iL[0][2].strip)
+            scaleI = int(iL[2].strip)
         except:
             scaleI = self.setcmdD["scale1"]
         self.setcmdD.update({"scale1":scaleI})
-        txS = iL[0][1].strip()
+        txS = iL[1].strip()
         #txs = txs.encode('unicode-escape').decode()
-        ltxS = parse_latex(txS)
-        utfS2 = sp.pretty(sp.sympify(ltxS, _clash2, evaluate=False))
+        ptxS = parse_latex(txS)
+        utfS2 = sp.pretty(sp.sympify(ptxS, _clash2, evaluate=False))
         print(utfS2+"\n"); self.calcS += utfS2 + "\n"   
 
     def _isympy(self,iL):
@@ -280,11 +267,11 @@ class ParseUTF:
             ipL (list): parameter list
         """
         try:
-            scaleI = int(iL[0][2].strip())
+            scaleI = int(iL[2].strip())
         except:
             scaleI = self.setcmdD["scale1"]
         self.setcmdD.update({"scale1":scaleI})
-        spS = iL[0][1].strip()
+        spS = iL[1].strip()
         spL = spS.split("=")
         spS = "Eq(" + spL[0] +",(" + spL[1] +"))" 
         #sps = sps.encode('unicode-escape').decode()
@@ -297,21 +284,27 @@ class ParseUTF:
         Args:
             iL (list): text command list
         """
-        try: 
-           widthI = int(iL[0][2].strip())
-        except:
+        wrapB = 1
+        if iL[2].strip() == "*":
+            wrapB = 0
+        elif isinstance(iL[2].strip(), int):
+            widthI = int(iL[2].strip())
+            self.setcmdD.update({"cwidth": widthI})
+        else:
             widthI = self.setcmdD["cwidth"]
-        self.setcmdD.update({"cwidth": widthI})
-        txtpath = Path(self.folderD["xpath"] /  iL[1].strip())
+        txtpath = Path(self.folderD["xpath"]/iL[1].strip())
         with open(txtpath, 'r') as txtf1:
-                utfL = txtf1.readlines()
-        txtS = "".join(utfL)
-        indI = int((80-widthI)/2)
-        indS = " "*indI
-        utfL = textwrap.wrap(txtS, width=widthI)
-        utfL = [s+"\n" for s in utfL]
-        utfS = indS + indS.join(utfL)
-        print(utfS); self.calcS += utfS + "\n"
+                uL = txtf1.readlines()
+        txtS = "".join(uL)
+        if wrapB:
+            inxI = int((80-widthI)/2)
+            inS = " "*inxI
+            uL = textwrap.wrap(txtS, width=widthI)
+            uL = [s+"\n" for s in uL]
+            uS = inS + inS.join(uL)
+        else:
+            uS = txtS
+        print(uS); self.calcS += uS + "\n"
 
     def v_utf(self)-> tuple:
         """parse value-string
@@ -326,26 +319,20 @@ class ParseUTF:
 
         locals().update(self.rivetD)
 
-        vcmdL = ["values", "vector", "func", "table", "image"]
-        attrL = [self._vvalues, self._vvector, self._vfunc, self._vformat, 
+        vcmdL = ["value", "vector", "func", "format", "table", "image"]
+        attrL = [self._vassign, self._vvector, self._vfunc, self._vformat,
                                 self._utable, self._uimage,]
         vtagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-                    "[r]_", "[c]_", "[t]_", "[f]_"] 
+                "[r]_", "[c]_", "[t]_", "[e]_", "[f]_", "[x]_"] 
 
-        self._parseutf("value", vcmdL, attrL, vtagL)
-
-        """  df = pd.DataFrame(vsL)                      # write value table
-        hdrL = ["variable", "value", "value" "description"]
-        old_stdout = sys.stdout
-        output = StringIO()
-        output.write(tabulate(df, tablefmt="grid", headers=hdrL, showindex=False))            
-        valueS = output.getvalue()
-        sys.stdout = old_stdout
-        sys.stdout.flush()
-        print(valueS + "\n"); self.calcS += valueS + "\n" """
+        self._parseutf("values", vcmdL, attrL, vtagL)
 
         self.rivetD.update(locals())
         return self.calcS, self.setsectD, self.setcmdD, self.rivetD, self.exportS
+        
+    def _vformat(self, vL: list):        
+        self.setcmdD["tres"] = vL[1].split(",")[0].strip()
+        self.setcmdD["ttrm"] = vL[1].split(",")[1].strip()
         
     def _vassign(self, vL: list):
         """assign values to variables
@@ -356,108 +343,63 @@ class ParseUTF:
         
         locals().update(self.rivetD)
 
-        pyS = """"""; valL =[]                              # values        
-        descripS = vL[1].strip()
-        varS = vL[0].split("=")[0].strip()
-        valS = vL[0].split("=")[1].strip()
-        arrayS = "array(" + valS + ")"
-        cmdS = str(varS + " = " + arrayS)
-        pyS = str.ljust(varS + " = " + arrayS, 40) + " # " + descripS + "\n"
-        exec(cmdS, globals(), locals())
-        tempS = cmdS.split("array")[1].strip()
-        tempS = eval(tempS.strip("())"))
-        if type(tempS) == list:
-            if len(eval(varS)) > 3:
-                trimL= tempS[:3]
-                trimL.append("...")
-                valS = str(trimL)
-            else:
-                valS = str(tempS)
-        valL.append([varS, valS, descripS])
-
-        self.rivetD.update(locals())
-        self.exportS += pyS
-        return(valL)        
-
-    def _vvalues(self, vL: list):
-        """read values from file
-        
-        Args:
-            vL (list): list of values
-        """
-        
-        locals().update(self.rivetD)
-
-        pyS = """"""; valL =[]                   # value list for table
-        tfileS = Path(self.folderD["spath"], vL[1].strip())
-        with open(tfileS,'r') as pyfile:
-            readL = pyfile.readlines()
-        for v in readL:
-            vS = v.split("#")
-            varS = vS[0].split("=")[0].strip()
-            valS = vS[0].split("=")[1].strip()
-            arrayS = "array(" + valS + ")"                
-            descripS = vS[1].strip()
+        pyS = """"""; valL = []                                    
+        if vL[0] in ["s","r","t"]:                              # equations
+            descripS = vL[1].strip()
+            varS = vL[0].split("=")[0].strip()
+            valS = vL[0].split("=")[1].strip()
+            arrayS = "array(" + valS + ")"
             cmdS = str(varS + " = " + arrayS)
-            pyS = str(varS + " = " + arrayS + "   # " + descripS + "\n")
+            pyS = str.ljust(varS + " = " + arrayS, 40) + " # " + descripS + "\n"
             exec(cmdS, globals(), locals())
             tempS = cmdS.split("array")[1].strip()
-            tempS = eval(tempS.strip("()"))
-            if len(tempS) > 3:
-                trimL= tempS[:3]
-                trimL.append("...")
-                valS = str(trimL)
-            else:
-                valS = str(tempS)
+            tempS = eval(tempS.strip("())"))
+            if type(tempS) == list:
+                if len(eval(varS)) > 3:
+                    trimL= tempS[:3]; trimL.append("...")
+                    valS = str(trimL)
+                else:
+                    valS = str(tempS)
             valL.append([varS, valS, descripS])
-        
-        self.exportS += pyS
-        self.rivetD.update(locals())                        # update rivetD
-        return(valL)        
+        elif vL[0].strip() == "value":                           # value file
+            tfileS = Path(self.folderD["spath"], vL[1].strip())
+            with open(tfileS,'r') as pyfile:
+                readL = pyfile.readlines()
+            for v in readL:
+                vS = v.split("#")
+                varS = vS[0].split("=")[0].strip()
+                valS = vS[0].split("=")[1].strip()
+                arrayS = "array(" + valS + ")"                
+                descripS = vS[1].strip()
+                cmdS = str(varS + " = " + arrayS)
+                exec(cmdS, globals(), locals())
+                tempS = cmdS.split("array")[1].strip()
+                tempS = eval(tempS.strip("()"))
+            if type(tempS) == list:
+                if len(eval(varS)) > 3:
+                    trimL= tempS[:3]
+                    trimL.append("...")
+                    valS = str(trimL)
+                else:
+                    valS = str(tempS)
+                valL.append([varS, valS, descripS])
+            try:
+                if len(vL[0[0]]) > 0:                       # value strings
+                    pass
+            except:
+                    pass
+        df = pd.DataFrame(valL)                            # write value table
+        hdrL = ["variable", "value", "value" "description"]
+        old_stdout = sys.stdout
+        output = StringIO()
+        output.write(tabulate(df, tablefmt="grid", headers=hdrL, showindex=False))            
+        valS = output.getvalue()
+        sys.stdout = old_stdout
+        sys.stdout.flush()
 
-    def _vvector(self, vL: list):
-        """read vector from file
-        
-        Args:
-            vL (list): list of values
-        """
-        
-        locals().update(self.rivetD)
-        pyS = """"""; valL =[]                            # value list for table
-        tfileS = Path(self.folderD["tpath"], vL[1].strip())
-        varS = vL[2].split(":")[0].strip()
-        vecS = vL[2].split(":")[1].strip()
-        if "r" in vecS:
-            veS = vecS.strip("r"); valL =[]
-            with open(tfileS,'r') as csvf:
-                reader = csv.reader(csvf)
-                for row in range(int(veS)):
-                    val = next(reader)
-            valL = valL + list(val)
-            arrayS = "array(" + str(valL) + ")"  
-        if "c" in vecS:
-            veS = vecS.strip("c"); valL =[]
-            with open(tfileS,'r') as csvf:
-                reader = csv.reader(csvf)
-                for row in reader:
-                    valL.append(row[int(veS)])
-            arrayS = "array(" + str(valL) + ")"  
-        cmdS = varS + "=" + arrayS
-        exec(cmdS, globals(), locals())
-        pyS = cmdS
-        tempS = cmdS.split("array")[1].strip()
-        tempS = eval(tempS.strip("()"))
-        if len(tempS) > 3:
-            trimL= tempS[:3]
-            trimL.append(["..."])
-            valS = str(trimL)
-        else:
-            valS = str(tempS)
-        
-        descripS = "vector from " + vL[1].strip()
         self.exportS += pyS
-        self.rivetD.update(locals())                        # update rivetD
-        return([[varS, valS, descripS]])        
+        self.rivetD.update(locals())                        
+        print(valS.rstrip()); self.calcS += valS.rstrip() + "\n"
     
     def _vsymbol(self, eL: list):
         """[summary]
@@ -542,14 +484,53 @@ class ParseUTF:
         except:
             pass   
 
-    def _vfunc(self):
+    def _vfunc(self, vL: list):
         pass
 
-    def _vformat(self, eL):        
-        eupL = eL[1].strip()
-        eD = dict(i.split(":") for i in eupL.split(","))
-        self.setcmdD.update(eD)
-
+    def _vvector(self, vL: list):
+        """read vector from file
+        
+        Args:
+            vL (list): list of values
+        """
+        
+        locals().update(self.rivetD)
+        pyS = """"""; valL =[]                            # value list for table
+        vfileS = Path(self.folderD["tpath"], vL[1].strip())
+        varS = vL[3].strip()
+        vecS = vL[2].strip()
+        if "r" in vecS:
+            veS = vecS.strip("r"); valL =[]
+            with open(vfileS,'r') as csvf:
+                reader = csv.reader(csvf)
+                for row in range(int(veS)):
+                    val = next(reader)
+            valL = valL + list(val)
+            arrayS = "array(" + str(valL) + ")"  
+        if "c" in vecS:
+            veS = vecS.strip("c"); valL =[]
+            with open(vfileS,'r') as csvf:
+                reader = csv.reader(csvf)
+                for row in reader:
+                    valL.append(row[int(veS)])
+            arrayS = "array(" + str(valL) + ")"  
+        cmdS = varS + "=" + arrayS
+        exec(cmdS, globals(), locals())
+        pyS = cmdS
+        tempS = cmdS.split("array")[1].strip()
+        tempS = eval(tempS.strip("()"))
+        if len(tempS) > 3:
+            trimL= tempS[:3]
+            trimL.append(["..."])
+            valS = str(trimL)
+        else:
+            valS = str(tempS)
+        
+        descripS = "vector from " + vL[1].strip()
+        self.exportS += pyS
+        self.rivetD.update(locals())                        # update rivetD
+        return([[varS, valS, descripS]])        
+    
     def t_utf(self) -> tuple:
         """parse table-strings
 
@@ -557,17 +538,16 @@ class ParseUTF:
             calcS (list): utf formatted calc strings
             setsectD (dict): section settings
             setcmdD (dict): command settings
-            rivetD (list): calculation values        
-            
+            rivetD (list): calculation values         
         """
         tcmdL = ["table", "image", ]
-        attribL = [self._utable, self._uimage]
-        ttagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-                        "[r]_", "[c]_", "[f]_","[t]" ] 
+        attrL = [self._utable, self._uimage]
+        ttagL =  ["[page]_", "[line]_", "[link]_", 
+                "[cite]_", "[foot]_", "[f]_","[t]" ] 
     
         self._parseutf("table", tcmdL, attrL, ttagL)
         
-        return (self.calcS, self.setsectD, self.rivetD)
+        return self.calcS, self.setsectD, self.setcmdD, self.rivetD
 
     def _utable(self, iL: list):
         """insert table from inline or csv, rst file 
@@ -582,10 +562,10 @@ class ParseUTF:
 
         self.setcmdD.update({"cwidth":widthI})
         tableS = ""; utfS = ""
-        fileS = iL[0][1].strip()
+        fileS = iL[1].strip()
         tfileS = Path(self.folderD["tpath"], fileS)
         xfileS = Path(self.folderD["xpath"], fileS)  
-        if ".csv" in iL[0][1]:                        # csv file       
+        if ".csv" in iL[1]:                        # csv file       
             format1 = []
             with open(tfileS,'r') as csvfile:
                 readL = list(csv.reader(csvfile))
@@ -604,13 +584,7 @@ class ParseUTF:
             sys.stdout = old_stdout
             try: titleS = iL[0][2].strip() + titleS
             except: pass        
-        elif ".rst" in iL[0][1]:                      # rst file
-            with open(xfileS,'r') as rst: 
-                utfS = rst.read()
-            titleS = "  \n"
-            try: titleS = iL[0][2].strip() + titleS
-            except: pass
-        else:                                         # inline reST table 
+        else:                                       
             utfS = ""
             titleS = "  "
             try: titleS = iL[0][2].strip() + titleS
