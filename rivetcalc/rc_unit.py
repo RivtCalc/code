@@ -8,7 +8,7 @@ import importlib.util
 from pathlib import Path, PurePath
 
 # load unum from rivet directory
-spec1 = importlib.util.find_spec("rivet")
+spec1 = importlib.util.find_spec("rivetcalc")
 rivpath = Path(spec1.origin).parent
 unum_path = Path(rivpath / 'unum' / '__init__.py')
 spec2 = importlib.util.spec_from_file_location("unum", unum_path)

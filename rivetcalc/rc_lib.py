@@ -113,7 +113,6 @@ T('''The table-string defines tables and plots
     write_report()     : write docs to pdf report file
     write_template()   : make template from project
 """
-import __main__
 import os
 import sys
 import textwrap
@@ -124,38 +123,40 @@ import numpy as np
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
-from rivetcalc.rc_unit import *
+#from rivetcalc.rc_unit import *
 import rivetcalc.rc_calc as _rc_calc
 #import rivet.rivet_doc as _rdoc
 #import rivet.rivet_reprt as _reprt
-#import rivet.rivet_chk as _rchk
+#import rivet.rivet_chk as _rchk                   
 
-__version__ = "0.9.5"
-__author__ = "rholland@structurelabs.com"
-if sys.version_info < (3, 7):
-    sys.exit("rivet requires Python version 3.7 or later")
-# calc variables - global 
-exportS  = """"""                                   # calc values export string
-rivetcalcD: dict ={}                                # calc values dictonary
-# start variables
-_utfcalcS = """"""                                   # utf calc string
-_cfull    = Path(__main__.__file__)                  # calc file path
-_cfile    = Path(__main__.__file__).name             # calc file name
+_calcfileS = sys.argv[1]
+if "ip=" in _calcfileS:
+    import __main__
+    _calcfileS = (__main__.__file__)
+else:
+    _calcfileS = sys.argv[1]
+_cwdS = os.getcwd()
+_cfull = Path(_calcfileS)
+_cfile    = Path(_cfull).name                        # calc file name
 _cname    = _cfile.split(".py")[0]                   # calc file basename
-_rivpath  = Path("rivet.rivet_lib.py").parent        # rivet program path
+_rivpath  = Path("rivetcalc.rivet_lib.py").parent    # rivet program path
 _cpath    =  Path(_cfull).parent                     # calc folder path
 _ppath    = Path(_cfull).parent.parent               # project folder path
 _dpath    = Path(_ppath / "docs")                    # doc folder path
 _rppath   = Path(_ppath / "reports")                 # report folder path
 _utffile  = Path(_cpath / ".".join((_cname, "txt"))) # utf calc output
-_expfile  = Path(_cpath / "scripts" / "".join(("v", _cfile))) # export file
+_expfile  = Path(_cpath / "scripts" / "".join(_cfile)) # export file
 # settings - global 
+utfcalcS = """"""                                   # utf calc string
+rstcalcS = """"""                                   # reST calc string
+exportS  = """"""                                   # calc values export string
+rivetcalcD: dict ={}                                # calc values dictonary
 _setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
-"sname": "", "snum": "", "swidth": 80,
-"enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
-"ftqueL": deque([1]), "ctqueL": deque([1])}
+                    "sname": "", "snum": "", "swidth": 80,
+                    "enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
+                    "ftqueL": deque([1]), "ctqueL": deque([1])}
 _setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,
-                            "tres": 2,"ttrm": 2,"sym":""}
+                    "tres": 2,"ttrm": 2,"sym":""}
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
@@ -194,17 +195,30 @@ _lshortP = Path(*Path(_logfile).parts[-4:])
 logging.info(f"""model: {_rshortP}""" )
 logging.info(f"""backup: {_bshortP}""")
 logging.info(f"""logging: {_lshortP}""")
-print(" ")
+print(" ")                       # todo: check folder structure here
+        
+def _callclass(rawS: str):
+    """updates sections and returns class instance for rivet string
 
-# todo: check folder structure here
+    Args:
+        rawstr (str): rivet string
 
-def _update(hdrS:str):
-    """format section heading and update section settings
+    Returns:
+        class instance: string type instance
+    """
+    sectS,strS = rawS.split("\n",1); _update(sectS)
+    strL = strS.split("\n")
+    ucalc = _rc_calc.ParseUTF(strL, _foldD, _setcmdD, _setsectD, 
+                                        rivetcalcD, exportS)
+    return ucalc 
+
+def _update(hdrS: str):
+    """format and update section headings and settings 
 
     Args:
         hdrS (str): section heading line
     """
-    global _utfcalcS, _setsectD
+    global utfcalcS, _setsectD
 
     _rgx = r'\[\d\d\]\_'
     if re.search(_rgx,hdrS):        
@@ -219,38 +233,10 @@ def _update(hdrS:str):
                 ("[" + snumS + "]")).rjust(widthI - len(nameS) - 2)
         bordrS = widthI * "="
         utfS = bordrS + "\n" + headS + "\n" + bordrS +"\n"
-        print(utfS); _utfcalcS += utfS
+        print(utfS); utfcalcS += utfS
 
-def _callclass(rawS: str):
-    """updates sections and returns class instance for rivet string
-
-    Args:
-        rawstr (str): rivet string
-
-    Returns:
-        class instance: string type instance
-    """
-    sectS,strS = rawS.split("\n",1);
-    _update(sectS)
-    strL = strS.split("\n")
-    ucalc = _rc_calc.ParseUTF(strL, _foldD, _setcmdD, _setsectD, 
-                                        rivetcalcD, exportS)
-    return ucalc
-
-def _rstcalc(_rstcalcS, _rstfile):
-    """write reST calc string to file
-    
-    Args:
-        pline ([type]): [description]
-        pp ([type]): [description]
-        indent ([type]): [description]
-    """
-
-    with open(_rstfile, "wb") as f1:
-        f1.write(_rstcalcS.encode("UTF-8"))
-
-def list_values():
-    """write table of values to terminal 
+def list_values(fileP):
+    """write value file to table in terminal 
     """
     rivetL = [[k,v] for k,v in rivetcalcD.items()]
     rivetT = []
@@ -273,25 +259,29 @@ def write_values():
         File path: scipts folder      
     """
     
-    str1 =  ("""header string""")
-    str1 = str1 + _exportS
-    with open(_expfile, 'w') as expF:
-        expF.write(str1)
+    str1 =  ("""header string\n""")
+    str1 = str1 + exportS
+    with open(_expfile, 'w') as expF: expF.write(str1)
 
-def write_utfcalc(utfcalc, _pyfile):
-    """write utf calc string to file
+def write_utf():
+    """write all utf and reST strings to files
     """
-    pyfile = " "
-    with open(pyfile, "wb") as f1:
-        f1.write(_utfcalcS.encode("UTF-8"))
+    global utfcalcS
+    with open(_utffile, 'wb') as f1:
+        f1.write(utfcalcS.encode("UTF-8"))
+    print("calc written to file")
+    utfcalcS = """"""
 
-def write_htmldoc():
+    #with open(_rstfile, "wb") as f1:
+    #    f1.write(rstcalcS.encode("UTF-8"))
+
+def write_html():
     """[summary]
     """
     with open(_txtfile, "wb") as f1:
         f1.write(utfcalc.encode("UTF-8"))
 
-def write_pdfdoc():
+def write_pdf():
     txtfile = " "
     with open(txtfile, "wb") as f1:
         f1.write(utfcalc.encode("UTF-8"))
@@ -305,61 +295,61 @@ def write_pdfdoc():
         "texmak2":  ".".join((_rbase, ".fls")),
         "texmak3":  ".".join((_rbase, ".fdb_latexmk"))}
 
-def write_pdfreport():
+def write_report():
     """[summary]
     """
     pass
 
 def R(rawS: str):
-    """transform repository-string to utf and reST-string
+    """repository-string to utf calc-string
     
     Args:
         rawstrS (str): repository-string
     """
-    global  _utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
+    global  utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
     
     rcalc = _callclass(rawS)
     rcalcS, _setsectD = rcalc.r_utf()
-    _utfcalcS += rcalcS
+    utfcalcS += rcalcS
 
 def I(rawS: str):
-    """transform insert-string to utf and reST-string
+    """insert-string to utf calc-string
     
     Args:
         rawstrS (str): insert-string
     """
-    global _utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
+    global utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
     
     icalc = _callclass(rawS)
     icalcS, _setsectD, _setcmdD = icalc.i_utf()
-    _utfcalcS += icalcS
+    utfcalcS += icalcS
 
 def V(rawS: str):
-    """transform value-string to utf and reST-string
+    """value-string to utf calc-string
     
     Args:
         rawstr (str): value-string
     """
-    global _utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
+    global utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
 
     vcalc = _callclass(rawS)
     vcalcS, _setsectD, _setcmdD, rivetcalcD, exportS = vcalc.v_utf()
-    _utfcalcS += vcalcS
+    utfcalcS += vcalcS
 
 def T(rawS: str):
-    """convert table-string to utf and reST-string
+    """table-string to utf calc-string
      
      Args:
         rawstr (str): table-string   
     """
-    global _utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
+    global utfcalcS,  _foldD, _setsectD, _setcmdD, rivetcalcD, exportS
 
     tcalc = _callclass(rawS)
     tcalcS, _setsectD, _setcmdD, rivetcalcD = tcalc.t_utf()
-    _utfcalcS += tcalcS
+    utfcalcS += tcalcS
 
 def X(rawS: str):
-    """exclude string
+    """exclude string from processing
      
      Args:
         rawstr (str): any string to exclude
