@@ -123,20 +123,24 @@ import numpy as np
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
-#from rivetcalc.rc_unit import *
+
+from rivetcalc.rc_unit import *
 import rivetcalc.rc_calc as _rc_calc
 #import rivet.rivet_doc as _rdoc
 #import rivet.rivet_reprt as _reprt
 #import rivet.rivet_chk as _rchk                   
 
 _calcfileS = sys.argv[1]
-if "ip=" in _calcfileS:
+if "\\" in _calcfileS:
+    _calcfileS = sys.argv[1]
+    print("cmd_calcfile: ", _calcfileS)
+else:
     import __main__
     _calcfileS = (__main__.__file__)
-else:
-    _calcfileS = sys.argv[1]
+    print("inter_calcfile: ", _calcfileS)
+ 
 _cwdS = os.getcwd()
-_cfull = Path(_calcfileS)
+_cfull = _calcfileS
 _cfile    = Path(_cfull).name                        # calc file name
 _cname    = _cfile.split(".py")[0]                   # calc file basename
 _rivpath  = Path("rivetcalc.rivet_lib.py").parent    # rivet program path
@@ -201,10 +205,10 @@ def _callclass(rawS: str):
     """updates sections and returns class instance for rivet string
 
     Args:
-        rawstr (str): rivet string
+        rawstr (str): rivet-string
 
     Returns:
-        class instance: string type instance
+        class instance: string-type instance
     """
     sectS,strS = rawS.split("\n",1); _update(sectS)
     strL = strS.split("\n")

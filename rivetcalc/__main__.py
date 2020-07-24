@@ -10,8 +10,9 @@ import numpy as np
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
-from rivetcalc.rc_unit import *
+
 import rivetcalc.rc_lib as rc
+import rivetcalc.rc_calc as _rc_calc
 
 __version__ = "0.9.5"
 __author__ = "rholland@structurelabs.com"
@@ -46,10 +47,11 @@ if __name__ == "__main__":
         _cfull = Path(_calcfileS)
         _cfile    = Path(_cfull).name                        # calc file name
         _cname    = _cfile.split(".py")[0]                   # calc file basename
-        print(_cname)
-        print(os.getcwd())
+        print("getcwd: ", os.getcwd())
+        print("cname: ", _cname)
         __import__(_cname)
     except Exception as _e:
+        _cmdlinehelp()
         print(_e)
         sys.exit()      
 else:

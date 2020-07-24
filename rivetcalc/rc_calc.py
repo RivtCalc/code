@@ -208,7 +208,7 @@ class ParseUTF:
         
         rcmdL = ["calc", "scope", "attach"]
         rattrL = [self._rcalc, self._rscope, self._rattach]
-        rtagL = ["[links]_", "[literal]_", "[foot]_", "[cite]_", "[x]_"]
+        rtagL = ["[links]_", "[literal]_", "[foot]_", "[cite]_", "[#]_"]
         
         self._parseutf("repo", rcmdL, rattrL, rtagL)
         
@@ -384,7 +384,7 @@ class ParseUTF:
                     valS = str(tempS)
                 valL.append([varS, valS, descripS])
             try:
-                if len(vL[0[0]]) > 0:                       # value strings
+                if len(vL[0]) > 0:                       # value strings
                     pass
             except:
                     pass
