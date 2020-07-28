@@ -60,17 +60,19 @@ V(''' The value-string defines values and equations
     
     May include arbitrary text that does not include an equal sign.
 
-    x = 10.1*IN      | description | unit, alt unit | {trailing, write to file}
+    x = 10.1*IN      | description | unit, alt unit | {trailing | save to file}
 
     || vector | x.csv | VECTORNAME r[n] {row in file to vector}
     || vector | x.csv | VECTORNAME c[n] {column in file to vector}    
-    || value | rccdd_values.py | [:] {import values from file}
+    || values | rccdd_values.py  {import values from py file}
+    || values | table.xls  {import values from excel file}
+    || values | sum | IN, FT | {sum block of values}
 
     ||format | 2,2 {truncate result, terms} | sym {symbolic} | 
 
     v1 = x + 4*M  | unit, alt unit
 
-    y1 = v1 / 4      | unit, alt unit | {if trailing |, write value to file}         
+    y1 = v1 / 4      | unit, alt unit | {trailing | save to file}         
 
     || func | func_file.py | func_call | var_name {import function from file}
     || table | x.csv | 60    
@@ -130,26 +132,25 @@ import rivetcalc.rc_calc as _rc_calc
 #import rivet.rivet_reprt as _reprt
 #import rivet.rivet_chk as _rchk                   
 
-_calcfileS = sys.argv[1]
-if "\\" in _calcfileS:
-    _calcfileS = sys.argv[1]
-    print("cmd_calcfile: ", _calcfileS)
+_modfileS = sys.argv[1]                             #  check source of file
+if "/" in _modfileS:
+    print("cmd_calcfile: ", _modfileS)
 else:
     import __main__
-    _calcfileS = (__main__.__file__)
-    print("inter_calcfile: ", _calcfileS)
+    _modfileS = (__main__.__file__)
+    print("ide_calcfile: ", _modfileS)
  
 _cwdS = os.getcwd()
-_cfull = _calcfileS
-_cfile    = Path(_cfull).name                        # calc file name
-_cname    = _cfile.split(".py")[0]                   # calc file basename
+_cfull = Path(_modfileS)                             # model file full path
+_cfileS   = _cfull.name                              # model file name
+_cname    = _cfileS.split(".py")[0]                  # model file basename
 _rivpath  = Path("rivetcalc.rivet_lib.py").parent    # rivet program path
-_cpath    =  Path(_cfull).parent                     # calc folder path
-_ppath    = Path(_cfull).parent.parent               # project folder path
+_cpath    = _cfull.parent                            # calc folder path
+_ppath    = _cfull.parent.parent                     # project folder path
 _dpath    = Path(_ppath / "docs")                    # doc folder path
 _rppath   = Path(_ppath / "reports")                 # report folder path
 _utffile  = Path(_cpath / ".".join((_cname, "txt"))) # utf calc output
-_expfile  = Path(_cpath / "scripts" / "".join(_cfile)) # export file
+_expfile  = Path(_cpath / "scripts" / "".join(_cfileS)) # export file
 # settings - global 
 utfcalcS = """"""                                   # utf calc string
 rstcalcS = """"""                                   # reST calc string
@@ -159,8 +160,8 @@ _setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
                     "sname": "", "snum": "", "swidth": 80,
                     "enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
                     "ftqueL": deque([1]), "ctqueL": deque([1])}
-_setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,
-                    "tres": 2,"ttrm": 2,"sym":""}
+_setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,"writeS": "table",
+                                    "saveB": False, "tresI": 2,"ttrmI": 2}
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,

@@ -136,11 +136,6 @@ class ParseUTF:
                     refS = self._refs(tnumI, "[ Table: ")
                     uS = (tagL[0].strip() + " " + refS + " ]").rjust(int(self.setsectD["swidth"]-1))
                     break
-                elif tag == "[#]_":
-                    uS = uS.replace("[#]_", "[" + str(self.setsectD["ftqueL"][-1]) + "]")
-                    incrI = self.setsectD["ftqueL"][-1] + 1
-                    self.setsectD["ftqueL"].append(incrI)
-                    break
                 elif tag == "[foot]_":
                     tagL = tagS.strip().split("]_")
                     uS = "[" + str(self.setsectD["ftqueL"].popleft()) + "] " + tagL[1].strip()
@@ -149,8 +144,17 @@ class ParseUTF:
                     tagL = tagS.strip().split("]_")
                     uS = "[" + str(self.setsectD["ctqueL"].popleft()) + "] " + tagL[1].strip()
                     break
+                elif tag == "[#]_":
+                    uS = uS.replace("[#]_", "[" + str(self.setsectD["ftqueL"][-1]) + "]")
+                    incrI = self.setsectD["ftqueL"][-1] + 1
+                    self.setsectD["ftqueL"].append(incrI)
+                    break
                 else:
-                    pass
+                    tg0indx = tagS.index("[")
+                    tg1indx = tagS.index("]_")
+                    citeS = tagS[tg0indx, tg1indx]
+                    self.setsectD["ctqueL"].append(citeS)
+                    break
             else:
                 uS = tagS
         return uS, self.setsectD
@@ -169,6 +173,7 @@ class ParseUTF:
         uvL = []           # value list 
 
         for uS in self.strL:
+            self.setcmdD["saveB"] = False                         
             if uS[0:2] == "##":  continue              # remove review comment
             uS = uS[4:]                                # remove indent
             try: 
@@ -179,23 +184,26 @@ class ParseUTF:
                 continue
             if uS[0:2] == "||":                        # command
                 uL = uS[2:].split("|")
-                indxI = cmdL.index(uL[0].strip()) 
+                indxI = cmdL.index(uL[0].strip())
+                print(typeS, indxI) 
                 attrL[indxI](uL)                      # call attribute                          
                 continue
-            if "]_" in uS:                             # call tag
+            if "]_" in uS:                             # check for tag
                 uS, self.setsectD = self._tags(uS, tagL)     
-            if typeS == "values":
+            if typeS == "value":
                 if "=" in uS:
-                    uL = uS[2:].split("|")
-                    if uL[1].strip == "s": uL.insert(0,"symbol")
-                    elif uL[1].strip == "r": uL.insert(0,"replace")
-                    elif uL[1].strip == "t": uL.insert(0,"table")
-                    else: 
-                        uvL.append(uL)
-                        continue
-                    self._vassign(uL); uvL = []
-            if len(uvL) > 0 : 
-                self._vassign(uL); uvL = []                   
+                    if "||" in uS:                      # end of line write tag
+                        uS = uS.replace("||"," ")
+                        self.setcmdD["saveB"] = True                      
+                    uL = uS.split('|')
+                    uvL = self._vassign(uL, uvL)
+                    continue
+                if uS.strip() == "":
+                    self._vtable(uvL)
+                    uvL = []
+                    print(uS.rstrip(" ")); self.calcS += " \n"
+                    continue
+
             print(uS.rstrip()); self.calcS += uS.rstrip() + "\n"
 
     def r_utf(self) -> str:
@@ -318,23 +326,78 @@ class ParseUTF:
          """
 
         locals().update(self.rivetD)
-
-        vcmdL = ["value", "vector", "func", "format", "table", "image"]
-        attrL = [self._vassign, self._vvector, self._vfunc, self._vformat,
-                                self._utable, self._uimage,]
+        vcmdL = ["values", "vector", "func",
+                            "table", "image"]
+        attrL = [self._vvalues, self._vvector, self._vfunc,
+                                 self._utable, self._uimage]
         vtagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
-                "[r]_", "[c]_", "[t]_", "[e]_", "[f]_", "[x]_"] 
+                      "[r]_", "[c]_", "[t]_", "[e]_", "[f]_", "[x]_"] 
 
-        self._parseutf("values", vcmdL, attrL, vtagL)
+        self._parseutf("value", vcmdL, attrL, vtagL)
 
         self.rivetD.update(locals())
         return self.calcS, self.setsectD, self.setcmdD, self.rivetD, self.exportS
         
-    def _vformat(self, vL: list):        
-        self.setcmdD["tres"] = vL[1].split(",")[0].strip()
-        self.setcmdD["ttrm"] = vL[1].split(",")[1].strip()
-        
-    def _vassign(self, vL: list):
+    def _vvalues(self, vL: list, valL: list):
+        """set values parameters
+
+        Args:
+            vL (list): value command arguments
+        """
+
+        locals().update(self.rivetD)
+        self.setcmdD["tresI"] = vL[1].split(",")[0].strip()
+        self.setcmdD["ttrmI"] = vL[1].split(",")[1].strip()
+        valL = []
+        try:
+            if ".py" in vL[2].strip() :                   # values in .py file
+                tfileS = Path(self.folderD["spath"], vL[0].strip())
+                with open(tfileS,'r') as pyfile:
+                    readL = pyfile.readlines()
+                for v in readL:
+                    vS = v.split("#")
+                    varS = vS[0].split("=")[0].strip()
+                    valS = vS[0].split("=")[1].strip()
+                    arrayS = "array(" + valS + ")"                
+                    descripS = vS[1].strip()
+                    cmdS = str(varS + " = " + arrayS)
+                    exec(cmdS, globals(), locals())
+                    tempS = cmdS.split("array")[1].strip()
+                    tempS = eval(tempS.strip("()"))
+                if type(tempS) == list:
+                    if len(eval(varS)) > 3:
+                        trimL= tempS[:3]
+                        trimL.append("...")
+                        valS = str(trimL)
+                    else:
+                        valS = str(tempS)
+                    valL.append([varS, valS, valS, descripS])
+        except:
+            pass
+        try:
+            if ".csv" in vL[2].strip():                   # values in .csv file
+                pass
+        except:
+            pass
+        try:
+            if vL[2] == "sub":
+                self.setcmdD["values"] = "sub"
+        except:
+            pass
+        try:
+            if vL[2] == "table":
+                self.setcmdD["values"] = "table"
+        except:
+            pass
+        try:
+            if vL[2].strip() == "sum": 
+                self.setcmdD["values"] = "sum"        
+        except:
+            pass
+
+        self.rivetD.update(locals()) 
+
+    def _vassign(self, vL: list, valL: list):
         """assign values to variables
         
         Args:
@@ -343,53 +406,44 @@ class ParseUTF:
         
         locals().update(self.rivetD)
 
-        pyS = """"""; valL = []                                    
-        if vL[0] in ["s","r","t"]:                              # equations
+        pyS = """"""                                                              
+        if len(vL) < 3:
+            self._vsymbol(vL)
+        elif len(vL) > 2:
             descripS = vL[1].strip()
+            unitL = vL[2].split(",")
             varS = vL[0].split("=")[0].strip()
-            valS = vL[0].split("=")[1].strip()
-            arrayS = "array(" + valS + ")"
+            val1S = vL[0].split("=")[1].strip()
+            val2S = vL[0].split("=")[1].strip()
+            arrayS = "array(" + val1S + ")"
             cmdS = str(varS + " = " + arrayS)
-            pyS = str.ljust(varS + " = " + arrayS, 40) + " # " + descripS + "\n"
             exec(cmdS, globals(), locals())
             tempS = cmdS.split("array")[1].strip()
             tempS = eval(tempS.strip("())"))
             if type(tempS) == list:
                 if len(eval(varS)) > 3:
                     trimL= tempS[:3]; trimL.append("...")
-                    valS = str(trimL)
+                    val1S = str(trimL)
                 else:
-                    valS = str(tempS)
-            valL.append([varS, valS, descripS])
-        elif vL[0].strip() == "value":                           # value file
-            tfileS = Path(self.folderD["spath"], vL[1].strip())
-            with open(tfileS,'r') as pyfile:
-                readL = pyfile.readlines()
-            for v in readL:
-                vS = v.split("#")
-                varS = vS[0].split("=")[0].strip()
-                valS = vS[0].split("=")[1].strip()
-                arrayS = "array(" + valS + ")"                
-                descripS = vS[1].strip()
-                cmdS = str(varS + " = " + arrayS)
-                exec(cmdS, globals(), locals())
-                tempS = cmdS.split("array")[1].strip()
-                tempS = eval(tempS.strip("()"))
-            if type(tempS) == list:
-                if len(eval(varS)) > 3:
-                    trimL= tempS[:3]
-                    trimL.append("...")
-                    valS = str(trimL)
-                else:
-                    valS = str(tempS)
-                valL.append([varS, valS, descripS])
-            try:
-                if len(vL[0]) > 0:                       # value strings
-                    pass
-            except:
-                    pass
-        df = pd.DataFrame(valL)                            # write value table
-        hdrL = ["variable", "value", "value" "description"]
+                    val1S = str(tempS)
+            valL.append([varS, val1S, val2S, descripS])          
+            pyS = str.ljust(varS + " = " + arrayS, 40) + " # " + descripS + "\n"
+            print(pyS)
+            if self.setcmdD["saveB"] == True:  self.exportS += pyS
+        
+        self.rivetD.update(locals())   
+        return valL
+
+    def _vtable(self, valL: list):
+        """write value table
+
+        Args:
+            valL (list): table values
+        """
+        locals().update(self.rivetD)
+    
+        df = pd.DataFrame(valL)                            
+        hdrL = ["variable", "value", "[value]", "description"]
         old_stdout = sys.stdout
         output = StringIO()
         output.write(tabulate(df, tablefmt="grid", headers=hdrL, showindex=False))            
@@ -397,20 +451,18 @@ class ParseUTF:
         sys.stdout = old_stdout
         sys.stdout.flush()
 
-        self.exportS += pyS
         self.rivetD.update(locals())                        
         print(valS.rstrip()); self.calcS += valS.rstrip() + "\n"
-    
+
     def _vsymbol(self, eL: list):
-        """[summary]
+        """write symbolic equation
     
         Args:
-            eL (list): list of equation plus parameters
-        
+            eL (list): equation and units
         """
+        
         locals().update(self.rivetD)
         
-        eS =""""""
         eqS = eL[0].strip()
         varS = eqS.split("=")[1].strip()
         resultS = eqS.split("=")[0].strip()
@@ -484,10 +536,8 @@ class ParseUTF:
         except:
             pass   
 
-    def _vfunc(self, vL: list):
-        pass
 
-    def _vvector(self, vL: list):
+    def _vvector(self, vL: list, valL: list):
         """read vector from file
         
         Args:
@@ -497,8 +547,9 @@ class ParseUTF:
         locals().update(self.rivetD)
         pyS = """"""; valL =[]                            # value list for table
         vfileS = Path(self.folderD["tpath"], vL[1].strip())
-        varS = vL[3].strip()
         vecS = vL[2].strip()
+        varS = vL[3].strip()
+        print("kkkkkkkkkkkkkkkkk")
         if "r" in vecS:
             veS = vecS.strip("r"); valL =[]
             with open(vfileS,'r') as csvf:
@@ -527,10 +578,14 @@ class ParseUTF:
             valS = str(tempS)
         
         descripS = "vector from " + vL[1].strip()
+        valL.append([varS, val1S, val2S, descripS])    
         self.exportS += pyS
         self.rivetD.update(locals())                        # update rivetD
-        return([[varS, valS, descripS]])        
-    
+       
+
+    def _vfunc(self, vL: list, valL: list):
+        pass
+
     def t_utf(self) -> tuple:
         """parse table-strings
 
