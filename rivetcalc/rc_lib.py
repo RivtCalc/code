@@ -161,7 +161,7 @@ _setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
                     "enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
                     "ftqueL": deque([1]), "ctqueL": deque([1])}
 _setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,"writeS": "table",
-                                    "saveB": False, "tresI": 2,"ttrmI": 2}
+                                    "saveB": False, "trmrI": 2,"trmt": 2}
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
@@ -174,7 +174,7 @@ _foldD: dict = {
 "xpath": Path(_cpath, "text"),
 "mpath": Path(_cpath, "tmp"),
 "hpath": Path(_dpath, "html"),
-"fpath": Path(_dpath, "html/figures"),
+"fpath": Path(_dpath, "html"),
 "apath": Path(_rppath, "attach")}
 # temp files
 _rbak = Path(_foldD["mpath"] / ".".join((_cname, "bak")))
@@ -225,17 +225,17 @@ def _update(hdrS: str):
     """
     global utfcalcS, _setsectD
 
-    _rgx = r'\[\d\d\]\_'
+    _rgx = r'\[\d\d\]'
     if re.search(_rgx,hdrS):        
         _setsectD["enum"] = 0 
         _setsectD["fnum"] = 0
         _setsectD["tnum"] = 0
-        nameS = _setsectD["sname"] = hdrS[hdrS.find("]_") + 2:].strip()
-        snumS = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]_")]
+        nameS = _setsectD["sname"] = hdrS[hdrS.find("]") + 2:].strip()
+        snumS = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]")]
         rnumS = str(_setsectD["rnum"])
         widthI = int(_setsectD["swidth"])
         headS = " " +  nameS + (rnumS + " - " +
-                ("[" + snumS + "]")).rjust(widthI - len(nameS) - 2)
+                ("[" + snumS + "]")).rjust(widthI - len(nameS) - 1)
         bordrS = widthI * "="
         utfS = bordrS + "\n" + headS + "\n" + bordrS +"\n"
         print(utfS); utfcalcS += utfS
