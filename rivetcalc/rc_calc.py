@@ -21,6 +21,8 @@ import pandas as pd
 import sympy as sp
 import matplotlib.pyplot as plt 
 import matplotlib.image as mpimg
+from IPython.display import display as _display
+from IPython.display import Image as _Image
 from numpy import *
 from rivetcalc.rc_unit import *
 from io import StringIO
@@ -65,7 +67,7 @@ class ParseUTF:
         self.valL = []
     
     def _refs(self, objnumI: int, typeS: str) -> str:
-        """reference labels for equations, tables and figures
+        """reference label for equations, tables and figures
 
         Args:
             objnumI (int): equation, table or figure numbers
@@ -97,14 +99,13 @@ class ParseUTF:
         """
 
         tagS = tagS.rstrip()
-        print("tagggggg", tagS)
         if "]__" in tagS:   
-            if "[#]__" in tagS:                      # auto incremented tag                     
+            if "[#]__" in tagS:                 # auto increment footnote mark                    
                 uS = tagS.replace("[#]__", "[" + 
                             str(self.setsectD["ftqueL"][-1]) + "]")
                 incrI = self.setsectD["ftqueL"][-1] + 1
                 self.setsectD["ftqueL"].append(incrI)
-            else:                                   # citation
+            else:                               # citation mark
                 indxstrtI = tagS.index("[")
                 indxendI = tagS.index("]__")
                 uS = tagS[indxstrtI:indxendI]
@@ -112,60 +113,52 @@ class ParseUTF:
         else:
             for tag in tagL:
                 if tag in tagS:
-                    print("tag****", tag)
-                    if tag == "[page]_":
+                    if tag == "[page]_":        # new page
                         uS = int(self.setsectD["swidth"]) * "." ; break
-                    elif tag == "[line]_":
+                    elif tag == "[line]_":      # horizontal line
                         uS = int(self.setsectD["swidth"]) * '-' ; break   
-                    elif tag == "[link]_":
+                    elif tag == "[link]_":      # url link
                         tgS = tagS.strip("[link]_").strip()
                         uS = "link: "+ tgS ; break
-                    elif tag == "[literal]_":
+                    elif tag == "[literal]_":   # literal text
                         uS = "" ; break
-                    elif tag == "[r]_":
+                    elif tag == "[r]_":         # right adjust text
                         tagL = tagS.strip().split("[r]_")
                         uS = (tagL[0].strip()).rjust(
-                                    int(self.setsectD["swidth"]-1))
-                        break
-                    elif tag ==  "[c]_":
+                                    int(self.setsectD["swidth"]-1)); break
+                    elif tag ==  "[c]_":        # center text  
                         tagL = tagS.strip().split("[c]_")
                         uS = (tagL[0].strip()).rjust(
-                                    int(self.setsectD["swidth"]-1))
-                        break
-                    elif tag == "[f]_":
+                                    int(self.setsectD["swidth"]-1)); break
+                    elif tag == "[f]_":         # figure label
                         tagL = tagS.strip().split("[e]_")
                         enumI = int(self.setsectD["enum"]) + 1
                         self.setsectD["enum"] = enumI
                         refS = self._refs(enumI, "[ Figure: ")
-                        uS = (tagL[0].strip() + " " + refS + " ]").rjust(
-                                    int(self.setsectD["swidth"]-1))
-                        break
-                    elif tag == "[e]_":
+                        uS = (tagL[0].strip("[f]_") + " " + refS + " ]").rjust(
+                                    int(self.setsectD["swidth"]-1)); break
+                    elif tag == "[e]_":         # equation label
                         tagL = tagS.strip().split("[e]_")
                         enumI = int(self.setsectD["enum"]) + 1
                         self.setsectD["enum"] = enumI
                         refS = self._refs(enumI, "[ Equ: ")
                         uS = (tagL[0].strip() + " " + refS + " ]").rjust(
-                                    int(self.setsectD["swidth"]-1))
-                        break
-                    elif tag == "[t]_":
+                                    int(self.setsectD["swidth"]-1)); break
+                    elif tag == "[t]_":         # table label
                         tagL = tagS.strip().split("[t]_")
                         tnumI = int(self.setsectD["tnum"]) + 1
                         self.setsectD["tnum"] = tnumI
                         refS = self._refs(tnumI, "[ Table: ")
                         uS = (tagL[0].strip() + " " + refS + " ]").rjust(
-                                    int(self.setsectD["swidth"]-1))
-                        break
-                    elif tag == "[foot]_":
+                                    int(self.setsectD["swidth"]-1)); break
+                    elif tag == "[foot]_":      # footnote label
                         tagL = tagS.strip().split("]_")
                         uS = "[" + str(self.setsectD["ftqueL"].popleft()
-                                                    ) +  "] " + tagL[1].strip()
-                        break
-                    elif tag == "[cite]_":    
+                                        ) +  "] " + tagL[1].strip(); break
+                    elif tag == "[cite]_":      # citation label   
                         tagL = tagS.strip().split("]_")
                         uS = "[" + str(self.setsectD["ctqueL"].popleft()
-                                                    ) + "] " + tagL[1].strip()
-                        break
+                                        ) + "] " + tagL[1].strip(); break
                 else:
                     uS = tagS
 
@@ -196,6 +189,7 @@ class ParseUTF:
                 continue
             if re.search(_rgx, uS):                 # check for tag
                 uS, self.setsectD = self._tags(uS, tagL)
+                print(uS.rstrip()); self.calcS += uS.rstrip() + "\n"
                 continue     
             if typeS == "value":
                 self.setcmdD["saveB"] = False  
@@ -232,7 +226,7 @@ class ParseUTF:
         
         rcmdL = ["info", "scope", "attach"]
         rmethL = [self._rinfo, self._rscope, self._rattach]
-        rtagL = ["[links]_", "[literal]_", "[foot]_", "[cite]_", "[#]_"]
+        rtagL = ["[links]_", "[literal]_", "[foot]_", "[cite]_", "[#]__"]
         
         self._parseutf("repo", rcmdL, rmethL, rtagL)
         
@@ -260,7 +254,7 @@ class ParseUTF:
         imethL = [self._itext, self._isympy, self._ilatex, 
                             self._itable, self._iimage, ]
         itagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[cite]_",
-            "[foot]_", "[#]_", "[r]_", "[c]_", "[e]_", "[t]_", "[f]_"] 
+            "[foot]_", "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]__"] 
         
         self._parseutf("insert", icmdL, imethL, itagL)
         
@@ -276,8 +270,8 @@ class ParseUTF:
         try:
             scaleI = int(iL[2].strip)
         except:
-            scaleI = self.setcmdD["scale1"]
-        self.setcmdD.update({"scale1":scaleI})
+            scaleI = self.setcmdD["scale1F"]
+        self.setcmdD.update({"scale1F":scaleI})
         txS = iL[1].strip()
         #txs = txs.encode('unicode-escape').decode()
         ptxS = parse_latex(txS)
@@ -293,8 +287,8 @@ class ParseUTF:
         try:
             scaleI = int(iL[2].strip())
         except:
-            scaleI = self.setcmdD["scale1"]
-        self.setcmdD.update({"scale1":scaleI})
+            scaleI = self.setcmdD["scale1F"]
+        self.setcmdD.update({"scale1F":scaleI})
         spS = iL[1].strip()
         spL = spS.split("=")
         spS = "Eq(" + spL[0] +",(" + spL[1] +"))" 
@@ -373,62 +367,46 @@ class ParseUTF:
         print(utfS); self.calcS += utfS + "\n"  
 
     def _iimage(self, iL: list):
-        """insert image from file
+        """insert one or two images from file
         
         Args:
-            ipl (list): parameter list
-        """
-        try:
-            scaleI = int(iL[3].strip)
-        except:
-            scaleI = self.setcmdD["scale1"]
-        self.setcmdD.update({"scale1":scaleI})
-        self.setsectD["fnum"] += 1
-        figI = self.setsectD["fnum"]
-        sectI = self.setsectD["snum"]
-        fileS = iL[0][1].strip()
-        try:
-            captionS = iL[0][2].strip()
-            imgpaths = str(Path(self.folderD["fpath"], fileS))
-            imgpathS = str(Path(*Path(imgpaths).parts[-5:]))
-            utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
-               + captionS + "\npath: " + imgpathS + "\n")
-        except:
-            imgpaths = str(Path(self.folderD["fpath"], fileS))
-            imgpathS = str(Path(*Path(imgpaths).parts[-5:]))
-            utfS = ("Figure: " + imgpathS + "\n")
-        print(utfS); self.calcS += utfS + "\n"
-
-        """       
-                try:                                 # update default scale
-                scaleL= iL[3].split(",")
-                scale1I = int(scaleL[0].strip())
-                scale1I = int(scaleL[0].strip())
-                self.setcmdD.update({"scale1":scale1I})
-                self.setcmdD.update({"scale2":scale2I})
-            except:
-                scale1I = self.setcmdD["scale1"]
-                scale2I = self.setcmdD["scale2"]
-            self.setsectD["fnum"] += 1                     # image 1
-            figI = self.setsectD["fnum"]
-            sectI = self.setsectD["snum"]
-            fileS = iL[1].strip()
-            captionS = iL[3].strip()
-            imgP = str(Path(self.folderD["fpath"], fileS))
-            utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
-                + captionS + "\npath: " + imgP)
-            print(utfS); self.calcS += utfS + "\n"
-
-            self.setsectD["fnum"] += 1                     # image 2
-            figI = self.setsectD["fnum"]
-            sectI = self.setsectD["snum"]
-            fileS = iL[2].strip()
-            captionS = iL[4].strip()
-            imgP = str(Path(self.folderD["fpath"], fileS))
-            utfS = ("Figure " + str(sectI) + '.' + str(figI) + "  "  
-                + captionS + "\npath: " + imgP)
-            print(utfS); self.calcS += utfS + "\n"
-        """
+            ipl (list): image parameters
+        """        
+        imgflgI = 0
+        if "," in iL[1]: imgflgI = 1                     # double image flag
+        if imgflgI:
+            scaleF = iL[2].split(",")
+            scale1F = float(scaleF[0])
+            scale2F = float(scaleF[1])
+            self.setcmdD.update({"scale1F":scale1F})
+            self.setcmdD.update({"scale2F":scale2F})
+            self.setsectD["fnum"] += 1
+            fig1I = self.setsectD["fnum"]                
+            self.setsectD["fnum"] += 1
+            fig2I = self.setsectD["fnum"]                
+            fileS = iL[1].split(",")
+            file1S = fileS[0].strip()
+            file2S = fileS[1].strip()
+            img1S = str(Path(self.folderD["fpath"] / file1S))
+            img2S = str(Path(self.folderD["fpath"] / file1S))                
+            pthshort1S = str(Path(*Path(img1S).parts[-4:]))
+            pthshort2S = str(Path(*Path(img2S).parts[-4:]))
+        else:
+            scale1F = float(iL[2])
+            self.setcmdD.update({"scale1F":scale1F})
+            self.setsectD["fnum"] += 1
+            fig1I = self.setsectD["fnum"]
+            file1S = iL[1].strip()
+            img1S = str(Path(self.folderD["fpath"] / file1S))
+            pthshort1S = str(Path(*Path(img1S).parts[-4:]))
+        
+        _display(_Image(img1S))
+        if imgflgI:  _display(_Image(img2S))
+        uS = ("Figure path: " + pthshort1S + "\n")
+        print(uS); self.calcS += uS + "\n"
+        if imgflgI:    
+            uS = ("Figure path: " + pthshort2S + "\n")
+            print(uS); self.calcS += uS + "\n"
 
     def v_utf(self)-> tuple:
         """parse value-string
@@ -443,12 +421,15 @@ class ParseUTF:
 
         locals().update(self.rivetD)
 
-        vcmdL = ["values", "func", "table", "image"]
-        methL = [self._vvalues, self._vfunc, self._itable, self._iimage]
+        vcmdL = ["values", "func",
+                "text", "sym", "tex", "table", "image"]
+        vmethL = [self._vvalues, self._vfunc, 
+                self._itext, self._isympy, self._ilatex, 
+                                    self._itable, self._iimage, ]
         vtagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                       "[r]_", "[c]_", "[t]_", "[e]_", "[f]_", "[x]_"] 
 
-        self._parseutf("value", vcmdL, methL, vtagL)
+        self._parseutf("value", vcmdL, vmethL, vtagL)
 
         self.rivetD.update(locals())
         return self.calcS, self.setsectD, self.setcmdD, self.rivetD, self.exportS

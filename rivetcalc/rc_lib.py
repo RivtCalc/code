@@ -160,7 +160,7 @@ _setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
                     "sname": "", "snum": "", "swidth": 80,
                     "enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
                     "ftqueL": deque([1]), "ctqueL": deque([1])}
-_setcmdD = {"cwidth": 50,"scale1": 1.,"scale2": 1.,"writeS": "table",
+_setcmdD = {"cwidth": 50,"scale1F": 1.,"scale2F": 1.,"writeS": "table",
                                     "saveB": False, "trmrI": 2,"trmt": 2}
 _foldD: dict = {
 "efile": _expfile,   
