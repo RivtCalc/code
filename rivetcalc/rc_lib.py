@@ -2,27 +2,27 @@
 """This module exposes the API for **RivetCalc**.  
 
     The API, summarized below, includes string input and write functions. 
-    The string functions take **rivet** markup strings as arguments. 
+    The string functions take rivet-markup strings as arguments. 
     The first line of a string is a descriptor (may include a 
-    section title). Markup options depend on the string type, and 
-    includes unicode text, commands, tags and Python code. Text may 
+    section title). Markup options include unicode text, commands, 
+    tags and Python code. Options depend on the string type. Strings may 
     also include reStructuredText markup. The write functions control 
     calculation output type e.g. UTF-8, PDF, HTML.
 
-    String input functions
-    ----------------------
 
     type     API  text     commands {comment}
     ======= ===== ===== ================================================
     repo     R()   yes    calc, scope, attach
     insert   I()   yes    tex, sym, text, table, image
-    value    V()   yes    =, values, vector, format, func, table, image 
-    table    T()   no     {Python simple statements}, table, image 
+    value    V()   yes    =, values, {all insert commands}
+    table    T()   no     {Python simple statements},{insert commands}  
     exclude  X()   --     {skip processing of rivet-string}
 
-    Command syntax  
-    ---------------
-R(''' The repo-string defines repository and report data
+
+    Commands for each string type are described below.  String text is
+    indented 4 spaces after the first descripton line. 
+
+R(''' repo-string defines repository and report data
     
     May include general text at the start of the string. No text is processed
     after reading a command. The toc argument generates a table of contents
@@ -42,7 +42,7 @@ R(''' The repo-string defines repository and report data
     || attach | back | appendix1.pdf 
     ''')
 
-I(''' The insert-string inserts predefined text, tables and images.  
+I(''' insert-string contains text, tables and images.  
     
     May include arbitrary text.
     
@@ -58,21 +58,22 @@ I(''' The insert-string inserts predefined text, tables and images.
 
 V(''' The value-string defines values and equations
     
-    May include arbitrary text that does not include an equal sign.
+    May include arbitrary text that does not include an equal sign and any
+    insert-string command.
 
-    x = 10.1*IN      | description | unit, alt unit | {trailing | save to file}
+    x1 = 10.1*IN      | description | unit, alt unit || {trailing || save to file}
+    y1 = 12.1*FT      | description | unit, alt unit 
 
-    || vector | x.csv | VECTORNAME r[n] {row in file to vector}
-    || vector | x.csv | VECTORNAME c[n] {column in file to vector}    
+    || values | 2,2 {truncate result, terms} | sym {symbolic} | 
+    || values | 2,2 {truncate result, terms} | sum {sum block of values} | 
+    || values | 2,2 | vector | x.csv | VECTORNAME r[n] {row in file to vector}
+    || values | 2,2 | vector | x.csv | VECTORNAME c[n] {column in file to vector}    
     || values | rccdd_values.py  {import values from py file}
     || values | table.xls  {import values from excel file}
-    || values | sum | IN, FT | {sum block of values}
-
-    ||format | 2,2 {truncate result, terms} | sym {symbolic} | 
 
     v1 = x + 4*M  | unit, alt unit
 
-    y1 = v1 / 4      | unit, alt unit | {trailing | save to file}         
+    y1 = v1 / 4      | unit, alt unit || {trailing | save value to file}         
 
     || func | func_file.py | func_call | var_name {import function from file}
     || table | x.csv | 60    
@@ -81,7 +82,7 @@ V(''' The value-string defines values and equations
 
 T('''The table-string defines tables and plots
     
-    {May include any simple Python statement (single line)}
+    {May include any simple Python statement (single line) or insert-string command}
 
     || table | x.csv | 60    
     || image | x.png, y.jpg | 0.5,0.5
@@ -113,7 +114,7 @@ T('''The table-string defines tables and plots
     write_pdf()        : write doc to pdf file
     write_html()       : write doc to html file
     write_report()     : write docs to pdf report file
-    write_template()   : make template from project
+    write_template()   : make template from project for uploading
 """
 import os
 import sys
@@ -161,7 +162,7 @@ _setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
                     "enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
                     "ftqueL": deque([1]), "ctqueL": deque([1])}
 _setcmdD = {"cwidth": 50,"scale1F": 1.,"scale2F": 1.,"writeS": "table",
-                                    "saveB": False, "trmrI": 2,"trmt": 2}
+                                    "saveB": False, "trmrI": 2,"trmtI": 2}
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
