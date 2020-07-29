@@ -421,7 +421,7 @@ class ParseUTF:
 
         locals().update(self.rivetD)
 
-        vcmdL = ["values", "func",
+        vcmdL = ["value", "func",
                 "text", "sym", "tex", "table", "image"]
         vmethL = [self._vvalues, self._vfunc, 
                 self._itext, self._isympy, self._ilatex, 
@@ -482,7 +482,7 @@ class ParseUTF:
             pass                           
         elif ".csv" in vL[2].strip():              # values from .csv file               
             pass
-        elif vL[2].strip() == "vector":            # vector from .csv file
+        elif vL[2].strip() == "list":            # vector from .csv file
             vfileS = Path(self.folderD["tpath"] / vL[3].strip())
             vecS = vL[4].strip()
             varS = vL[5].strip()

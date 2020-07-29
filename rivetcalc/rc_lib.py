@@ -14,7 +14,7 @@
     ======= ===== ===== ================================================
     repo     R()   yes    calc, scope, attach
     insert   I()   yes    tex, sym, text, table, image
-    value    V()   yes    =, values, {all insert commands}
+    value    V()   yes    =, value, {all insert commands}
     table    T()   no     {Python simple statements},{insert commands}  
     exclude  X()   --     {skip processing of rivet-string}
 
@@ -64,12 +64,12 @@ V(''' The value-string defines values and equations
     x1 = 10.1*IN      | description | unit, alt unit || {trailing || save to file}
     y1 = 12.1*FT      | description | unit, alt unit 
 
-    || values | 2,2 {truncate result, terms} | sym {symbolic} | 
-    || values | 2,2 {truncate result, terms} | sum {sum block of values} | 
-    || values | 2,2 | vector | x.csv | VECTORNAME r[n] {row in file to vector}
-    || values | 2,2 | vector | x.csv | VECTORNAME c[n] {column in file to vector}    
-    || values | rccdd_values.py  {import values from py file}
-    || values | table.xls  {import values from excel file}
+    || value | 2,2 {truncate result, terms} | sym {symbolic} | 
+    || value | 2,2 {truncate result, terms} | sum {sum block of values} | 
+    || value | 2,2 | list | x.csv | VECTORNAME r[n] {row in file to vector}
+    || value | 2,2 | list | x.csv | VECTORNAME c[n] {column in file to vector}    
+    || value | rccdd_values.py  {import values from py file}
+    || value | table.xls  {import values from excel file}
 
     v1 = x + 4*M  | unit, alt unit
 
