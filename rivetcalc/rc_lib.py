@@ -133,7 +133,10 @@ import rivetcalc.rc_calc as _rc_calc
 #import rivet.rivet_reprt as _reprt
 #import rivet.rivet_chk as _rchk                   
 
-_modfileS = sys.argv[1]                             #  check source of file
+try:
+    _modfileS = sys.argv[1]                             #  check source of file
+except:
+    _modfileS = sys.argv[0]
 if "/" in _modfileS:
     print("cmd_calcfile: ", _modfileS)
 else:
