@@ -48,12 +48,15 @@ I(''' insert-string contains static text, tables and images.
     
     || tex | \gamma = x + 3 # latex equation | 1. # image scale
     || sym | x = y/2 # sympy equation | 1.
+    
+    
     || table | x.txt | 60 # max paragraph width - characters 
     || table | x.csv | 60,[:] # max column width - characters, line range  
     || table | x.rst | [:] # line range
 
-                                                             figure caption [f]_
+                                                             
     || image | x.png {image file} | 1. {scale}
+    figure caption [f]_
     ''')
 
 V(''' The value-string defines active values and equations
@@ -82,12 +85,9 @@ V(''' The value-string defines active values and equations
 
 T('''The table-string defines tables and plots with simple Python statements
     
-    {May include any simple Python statement (single line) or insert-string command}
+    {May include any simple Python statement (single line) or
+     insert-string command}
 
-    || table | x.csv | 60    
-    || image | x.png, y.jpg | 0.5,0.5
-    figure1 caption
-    figure2 caption
     ''')
 
     Tags
