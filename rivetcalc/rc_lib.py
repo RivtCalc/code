@@ -137,7 +137,7 @@ try:
     _modfileS = sys.argv[1]                             #  check source of file
 except:
     _modfileS = sys.argv[0]
-if ".py" in _modfileS:
+if ".py " in _modfileS:
     print("cmd_calcfile: ", _modfileS)
 else:
     import __main__
