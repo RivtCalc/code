@@ -42,7 +42,7 @@ R(''' repo-string defines repository and report data
     || attach | back | appendix1.pdf 
     ''')
 
-I(''' insert-string contains text, tables and images.  
+I(''' insert-string contains static text, tables and images.  
     
     May include arbitrary text.
     
@@ -56,7 +56,7 @@ I(''' insert-string contains text, tables and images.
     || image | x.png {image file} | 1. {scale}
     ''')
 
-V(''' The value-string defines values and equations
+V(''' The value-string defines active values and equations
     
     May include arbitrary text that does not include an equal sign and any
     insert-string command.
@@ -80,7 +80,7 @@ V(''' The value-string defines values and equations
     || image | x.png | 1.
     ''') 
 
-T('''The table-string defines tables and plots
+T('''The table-string defines tables and plots with simple Python statements
     
     {May include any simple Python statement (single line) or insert-string command}
 
