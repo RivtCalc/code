@@ -1,4 +1,15 @@
-# command line help
+"""
+***RivetCalc may be run interactively, as a file, and from command line. If run
+interactively cell marks (#%%) are typically placed before sections but may be
+placed before any string.
+
+If run as s file from the command line the command is
+
+    python -m rivetcalc rddcc_modelfile.py 
+
+Calc and doc files are only generated when specified, and after the file is run.
+
+"""
 
 import os
 import sys
@@ -23,7 +34,7 @@ def _cmdlinehelp():
     """command line help """
     print()
     print("Run RivetCalc at the command line in the 'calc' folder with:")
-    print("     python  -m rivetcalc rddcc_ calcname.py")
+    print("     python  -m rivetcalc rddcc_modelfile.py")
     print("where rddcc_ calcname.py is the model file in the folder")
     print("and **ddcc** is the model number")
     print()
