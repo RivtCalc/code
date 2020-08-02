@@ -1,8 +1,0 @@
-AST Design Calculations 
-c | c0101_system.pdf | System Overview
-c | c0201_loads_1.pdf | Loads
-c | c0202_loads_2.pdf | Dynamic Loads
-c | c0301_track.pdf | Track Design
-c | c0401_components_1.pdf | A-frame Design
-c | c0402_components_2.pdf | Purlin and Gear Design
-a | AST_calc_append.pdf  | Test and Vendor Data 
