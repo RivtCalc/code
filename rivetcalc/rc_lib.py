@@ -32,9 +32,10 @@ R(''' repo-string defines repository and report data
     The first paragraph of the summary is included in the Github 
     README.rst file.
     
-    || calc | calc title | date: mm,dd,yy | toc | readme
+    || header | calc title | date: mm,dd,yy | toc | readme
 
-    || scope | discipline, object, condition, intent, assembly, component 
+    || scope | discipline, object, condition, intent, assembly, component
+    || codes | code1, code2 
     
     || attach | front | calccover.pdf         
     || attach | back | functions 
@@ -48,8 +49,8 @@ I(''' insert-string contains text, tables and images.
     
     || tex | \gamma = x + 3 # latex equation | 1. # image scale
     || sym | x = y/2 # sympy equation | 1.
-    || table | x.txt | 60 # max paragraph width - characters 
-    || table | x.csv | 60,[:] # max column width - characters, line range  
+    || table | x.txt | 60 # max character width 
+    || table | x.csv | 60,[:] # max character col width, [columns]
     || table | x.rst | [:] # line range
 
                                                              figure caption [f]_
@@ -134,7 +135,7 @@ import rivetcalc.rc_calc as _rc_calc
 #import rivet.rivet_chk as _rchk                   
 
 try:
-    _modfileS = sys.argv[1]                             #  check source of file
+    _modfileS = sys.argv[1]                           #  check source of file
 except:
     _modfileS = sys.argv[0]
 if "/" in _modfileS:
@@ -153,7 +154,8 @@ _cpath    = _cfull.parent                            # calc folder path
 _ppath    = _cfull.parent.parent                     # project folder path
 _dpath    = Path(_ppath / "docs")                    # doc folder path
 _rppath   = Path(_ppath / "reports")                 # report folder path
-_utffile  = Path(_cpath / ".".join((_cname, "txt"))) # utf calc output
+_rname    = "c"+_cname[1:]                           # calc file basename
+_utffile  = Path(_cpath / ".".join((_rname, "txt"))) # utf calc output
 _expfile  = Path(_cpath / "scripts" / "".join(_cfileS)) # export file
 # settings - global 
 utfcalcS = """"""                                   # utf calc string

@@ -224,16 +224,19 @@ class ParseUTF:
             setsectD (dict): section settings
         """
         
-        rcmdL = ["info", "scope", "attach"]
-        rmethL = [self._rinfo, self._rscope, self._rattach]
+        rcmdL = ["header", "codes", "scope", "attach"]
+        rmethL = [self._rheader, self._rcodes, self._rscope, self._rattach]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[cite]_", "[#]__"]
         
         self._parseutf("repo", rcmdL, rmethL, rtagL)
         
         return self.calcS, self.setsectD
 
-    def _rinfo(self, rsL):
+    def _rheader(self, rsL):
         c = 2
+    
+    def _rcodes(self, rsL):
+        d = 2
 
     def _rscope(self, rsL):
         a = 4
@@ -330,30 +333,40 @@ class ParseUTF:
         Args:
             ipl (list): parameter list
         """       
-        try:
-            widthI = int(iL[0][2].strip())
-        except:
-            widthI = int(self.setcmdD["cwidth"])
-
-        self.setcmdD.update({"cwidth":widthI})
         tableS = ""; utfS = ""
         fileS = iL[1].strip()
         tfileS = Path(self.folderD["tpath"], fileS)
         xfileS = Path(self.folderD["xpath"], fileS)  
         if ".csv" in iL[1]:                        # csv file       
-            format1 = []
             with open(tfileS,'r') as csvfile:
                 readL = list(csv.reader(csvfile))
+            lenI = len(readL[0])
+            try:
+                widthI = int(iL[2].strip())
+                incl_colL =  eval(iL[3].strip())
+            except:
+                widthI = int(self.setcmdD["cwidth"])
+                incl_colL = range(len(readL[0]))            
+            try: sumL = eval(iL[4].strip())
+            except: sumL = []
+            self.setcmdD.update({"cwidth":widthI})
+            contentL = []
             for row in readL:
-                wrow=[]
-                for i in row:
-                    templist = textwrap.wrap(i, widthI) 
-                    wrow.append("""\n""".join(templist))
-                format1.append(wrow)
+                contentL.append([row[i] for i in incl_colL])
+            if len(sumL) > 0:
+                sumF = 0.
+                totalL = [""]*lenI
+                totalL[0] = "Totals"
+                for colS in sumL:
+                    for row in readL:
+                        try: sumF += float(row[int(colS)])
+                        except: pass
+                    totalL[int(colS)] = sumF
+                contentL.append(totalL) 
             sys.stdout.flush()
             old_stdout = sys.stdout
             output = StringIO()
-            output.write(tabulate(format1, tablefmt="grid", headers="firstrow"))            
+            output.write(tabulate(contentL, tablefmt="grid", headers="firstrow"))            
             utfS = output.getvalue()
             titleS = "  \n"
             sys.stdout = old_stdout
