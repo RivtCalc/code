@@ -49,11 +49,10 @@ I(''' insert-string contains static text, tables and images.
     include arbitrary text.
 
                                                                   equations [e]_
-    || tex | \gamma = x + 3 # latex equation | 1. # image scale
-    || sym | x = y/2 # sympy equation | 1.
-    || table | x.txt | 60 # max character width 
-    || table | x.csv | 60,[:] # max character col width, [columns]
-    || table | x.rst | [:] # line range
+    || tex | \gamma = x + 3 # latex equation 
+    || sym | x = y/2 # sympy equation 
+    || text | x.txt | 60 {max char. width}  
+    || table | x.csv | 60 {max char. width} | [2,1,3] {cols} | [1,3] {sum cols}
 
     || image | x.png {image file} | 1. {scale}
                                                              figure caption [f]_
