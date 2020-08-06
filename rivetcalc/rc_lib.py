@@ -1,13 +1,12 @@
 #! python
-"""This module exposes the API for **RivetCalc**.  
+"""exposes **RivetCalc** API.  
 
-    The API, summarized below, includes string input and write functions. 
-    The string functions take rivet-markup strings as arguments. 
-    The first line of a string is a descriptor (may include a 
-    section title). Markup options include unicode text, commands, 
-    tags and Python code. Options depend on the string type. Strings may 
-    also include reStructuredText markup. The write functions control 
-    calculation output type e.g. UTF-8, PDF, HTML.
+    The API includes string input and write functions. The string functions
+    take rivet-markup strings as arguments. The first line of a string is a
+    descriptor (may include a section title). Markup options include unicode
+    text, commands, tags and Python code. Options depend on the string type.
+    Strings may also include reStructuredText markup. The write functions
+    control calculation output type e.g. UTF-8, PDF, HTML.
 
 
     type     API  text     commands {comment}
@@ -18,19 +17,20 @@
     table    T()   no     {Python simple statements},{insert commands}  
     exclude  X()   --     {skip processing of rivet-string}
 
-
-    Commands for each string type are described below.  String text is
-    indented 4 spaces after the first descripton line. 
+    Commands for each string type are described below.  String text must be
+    indented 4 spaces after the first descripton line (improves clarity) 
 
 R(''' repo-string defines repository and report data
     
-    May include general text at the start of the string. No text is processed
-    after reading a command. The toc argument generates a table of contents
-    from section tags. The date argument generates a date string before the
-    calc title.
+    May include general text at the start of the string. The first paragraph of
+    the summary is included in the Github README.rst file. 
     
-    The first paragraph of the summary is included in the Github 
-    README.rst file.
+    The || calc command specifies the calc title and date printed at the top of
+    each page. The toc argument generates a table of contents from section tags
+    at the beginning of the calc. The readme argument triggers a README.txt
+    output for Github. A generated index of search terms from the calc is
+    included in the README. The scope command provides high level descriptive 
+    labels for searching.
     
     || header | calc title | date: mm,dd,yy | toc | readme
 
@@ -43,27 +43,38 @@ R(''' repo-string defines repository and report data
     || attach | back | appendix1.pdf 
     ''')
 
-I(''' insert-string contains text, tables and images.  
+I(''' insert-string contains static text, tables and images.  
     
-    May include arbitrary text.
-    
+    The insert-string generates formatted text, equations and images. It may
+    include arbitrary text.
+
+                                                                  equations [e]_
     || tex | \gamma = x + 3 # latex equation | 1. # image scale
     || sym | x = y/2 # sympy equation | 1.
     || table | x.txt | 60 # max character width 
     || table | x.csv | 60,[:] # max character col width, [columns]
     || table | x.rst | [:] # line range
 
-                                                             figure caption [f]_
     || image | x.png {image file} | 1. {scale}
+                                                             figure caption [f]_
+    
+    Side by side images.
+    || image | x.png, y.jpg | 1.,0.5
+                                                       first figure caption [f]_
+                                                       second figure caption [f]_
+
     ''')
 
-V(''' The value-string defines values and equations
+V(''' value-string defines active values and equations
     
-    May include arbitrary text that does not include an equal sign and any
-    insert-string command.
+    The value-string includes arbitrary text that does not include an equal
+    sign.  Lines with equal signs define assignments and equations that 
+    are numerically evaluated.
 
-    x1 = 10.1*IN      | description | unit, alt unit || {trailing || save to file}
-    y1 = 12.1*FT      | description | unit, alt unit 
+
+
+    x1 = 10.1*IN    | description | unit, alt unit || {save if trailing ||}
+    y1 = 12.1*FT    | description | unit, alt unit 
 
     || value | 2,2 {truncate result, terms} | sym {symbolic} | 
     || value | 2,2 {truncate result, terms} | sum {sum block of values} | 
@@ -74,21 +85,23 @@ V(''' The value-string defines values and equations
 
     v1 = x + 4*M  | unit, alt unit
 
-    y1 = v1 / 4      | unit, alt unit || {trailing | save value to file}         
+                                                           another equation [e]_
+    y1 = v1 / 4   | unit, alt unit || {save if trailing ||}         
 
     || func | func_file.py | func_call | var_name {import function from file}
+
+                                                        another table title [t]_
     || table | x.csv | 60    
+    
     || image | x.png | 1.
+                                                             figure caption [f]_
     ''') 
 
-T('''The table-string defines tables and plots
+T('''table-string defines tables and plots with simple Python statements
     
-    {May include any simple Python statement (single line) or insert-string command}
+    {May include any simple Python statement (single line) or
+     insert-string command}
 
-    || table | x.csv | 60    
-    || image | x.png, y.jpg | 0.5,0.5
-    figure1 caption
-    figure2 caption
     ''')
 
     Tags
@@ -138,7 +151,7 @@ try:
     _modfileS = sys.argv[1]                           #  check source of file
 except:
     _modfileS = sys.argv[0]
-if "/" in _modfileS:
+if ".py" in _modfileS:
     print("cmd_calcfile: ", _modfileS)
 else:
     import __main__
