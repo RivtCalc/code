@@ -1,29 +1,44 @@
 #! python
 """exposes **RivetCalc** API.  
 
-    The API includes string input and write functions. The string functions
-    take rivet-markup strings as arguments. The first line of a string is a
-    descriptor (may include a section title). Markup options include unicode
-    text, commands, tags and Python code. Options depend on the string type.
-    Strings may also include reStructuredText markup. The write functions
-    control calculation output type e.g. UTF-8, PDF, HTML.
-
-
-    type     API  text     commands {comment}
-    ======= ===== ===== ================================================
-    repo     R()   yes    calc, scope, attach
-    insert   I()   yes    tex, sym, text, table, image
-    value    V()   yes    =, value, {all insert commands}
-    table    T()   no     {Python simple statements},{insert commands}  
-    exclude  X()   --     {skip processing of rivet-string}
-
-    Commands for each string type are described below.  String text must be
-    indented 4 spaces after the first descripton line (improves clarity) 
-
-R(''' repo-string defines repository and report data
+    The API includes string input and output functions. Input functions take
+    rivet-markup strings as arguments and output utf-formatted calcs to the
+    terminal. Ouput functions write formatted calculations to files in utf-8,
+    pdf and html formats.
     
-    May include general text at the start of the string. The first paragraph of
-    the summary is included in the Github README.rst file. 
+    Markup includes unicode text, commands, tags and Python code. Options
+    depend on the rivet-string type (R,I,V or T). Strings may also include
+    reStructuredText markup. 
+
+    Input functions ----------------------------------------------------
+    type     API  text   tags     commands {comment}
+    ======= ===== ===== ====== =========================================
+    repo     R()   yes    no    header, scope, codes, attach
+    insert   I()   yes    yes   tex, sym, text, table, image
+    value    V()   yes    yes   =, value, {and insert commands}
+    table    T()   no     yes   {Python simple statements and insert commands}  
+    exclude  X()   --      --   {skip processing of rivet-string}
+
+    Output functions -----------------------------------------------------
+        name                   description
+    =================  ===================================================
+    write_values()     write values to python file for import
+    write_calc()       write calc to utf8 text file
+    write_pdf()        write doc to pdf file
+    write_html()       write doc to html file
+    write_report()     write docs to pdf report file
+    write_template()   make template from project for uploading
+
+    Commands and tags for each string type are described below in the context
+    of the string function type. The first line of a rivet-string is a
+    descriptor (may include a section title). For clarity, string text must be
+    indented 4 spaces after the first descriptor line.
+
+R('''repo-string defines repository and report data
+    
+    Repo strings may include general text at the start of the string. The first
+    paragraph of the summary becomes part of the Github README.rst file for the
+    project.
     
     The || calc command specifies the calc title and date printed at the top of
     each page. The toc argument generates a table of contents from section tags
@@ -32,7 +47,7 @@ R(''' repo-string defines repository and report data
     included in the README. The scope command provides high level descriptive 
     labels for searching.
     
-    || header | calc title | date: mm,dd,yy | toc | readme
+    || header | calc title | mm,dd,yy {date} | toc | readme
 
     || scope | discipline, object, condition, intent, assembly, component
     || codes | code1, code2 
@@ -42,17 +57,18 @@ R(''' repo-string defines repository and report data
     || attach | back | docstrings
     || attach | back | appendix1.pdf 
     ''')
-
-I(''' insert-string contains static text, tables and images.  
+I('''insert-string contains static text, tables and images.  
     
-    The insert-string generates formatted text, equations and images. It may
-    include arbitrary text.
+    Insert-strings generate formatted static text, equations and images. They
+    may include arbitrary text.
 
                                                                   equations [e]_
     || tex | \gamma = x + 3 # latex equation 
     || sym | x = y/2 # sympy equation 
     || text | x.txt | 60 {max char. width}  
-    || table | x.csv | 60 {max char. width} | [2,1,3] {cols} | [1,3] {sum cols}
+    
+                                                                table title [t]_
+    || table | x.csv | 60 {max width} | [2,1,3,4] {cols} | [1,3] {totals} | [4]
 
     || image | x.png {image file} | 1. {scale}
                                                              figure caption [f]_
@@ -60,27 +76,22 @@ I(''' insert-string contains static text, tables and images.
     Side by side images.
     || image | x.png, y.jpg | 1.,0.5
                                                        first figure caption [f]_
-                                                       second figure caption [f]_
-
+                                                      second figure caption [f]_
     ''')
-
-V(''' value-string defines active values and equations
+V('''value-string defines active values and equations
     
-    The value-string includes arbitrary text that does not include an equal
-    sign.  Lines with equal signs define assignments and equations that 
+    Value-strings may include arbitrary text that does not include an equal
+    sign.  Lines with equal signs define equations and assignments that 
     are numerically evaluated.
-
-
 
     x1 = 10.1*IN    | description | unit, alt unit || {save if trailing ||}
     y1 = 12.1*FT    | description | unit, alt unit 
 
-    || value | 2,2 {truncate result, terms} | sym {symbolic} | 
-    || value | 2,2 {truncate result, terms} | sum {sum block of values} | 
-    || value | 2,2 | list | x.csv | VECTORNAME r[n] {row in file to vector}
-    || value | 2,2 | list | x.csv | VECTORNAME c[n] {column in file to vector}    
-    || value | rccdd_values.py  {import values from py file}
-    || value | table.xls  {import values from excel file}
+    || value | sub {or nosub} | 2,2 {truncate result, terms}  
+    || value | val  | file.csv 
+    || value | sum  | file.csv | unit, alt unit {units for column sum}
+    || value | list | file.csv | [1:4] {rows with var name in first column}
+    || value | xlsx  | table.xlsx {values from excel file}
 
     v1 = x + 4*M  | unit, alt unit
 
@@ -95,39 +106,30 @@ V(''' value-string defines active values and equations
     || image | x.png | 1.
                                                              figure caption [f]_
     ''') 
-
 T('''table-string defines tables and plots with simple Python statements
     
-    {May include any simple Python statement (single line) or
-     insert-string command}
+    {Table-strings may include any simple Python statement (single line),
+     insert-string command or tag}
 
     ''')
 
-    Tags
-    -------------------------------------------------------------------
-    [nn]_ abc def      : section title and number
-    [abc123]_          : citation        
-    abc def [cite]_    : citation description    
-    [#]_               : autonumbered footnote
-    abc def [foot]_    : footnote description
-    abc def [t]_       : right justify table title, autoincrement number   
-    abc def [e]_       : right justify equation label, autoincrement number
-    abc def [f]_       : right justify caption, autoincrement number   
-    abc def [r]_       : right justify line of text
-    abc def [c]_       : center line of text
-    [literal]_         : literal text block
-    [line]_            : draw horizontal line
-    [page]_            : new doc page
-    http://abc [link]_ : link
-
-    Output functions
-    -------------------------------------------------------------------
-    write_values()     : write values to python file for import
-    write_calc()       : write calc to utf8 text file
-    write_pdf()        : write doc to pdf file
-    write_html()       : write doc to html file
-    write_report()     : write docs to pdf report file
-    write_template()   : make template from project for uploading
+    Tags -----------------------------------------------------------------
+       tag               description
+    ===============  ======================================================
+    [nn]_ abc def       section title and number in first (descriptor) line
+    [abc123]_           citation        
+    abc def [cite]_     citation description    
+    [#]_                autonumbered footnote
+    abc def [foot]_     footnote description
+    abc def [t]_        right justify table title, autoincrement number   
+    abc def [e]_        right justify equation label, autoincrement number
+    abc def [f]_        right justify caption, autoincrement number   
+    abc def [r]_        right justify line of text
+    abc def [c]_        center line of text
+    [literal]_          literal text block
+    [line]_             draw horizontal line
+    [page]_             new doc page
+    http://abc [link]_  link
 """
 import os
 import sys

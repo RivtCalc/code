@@ -194,13 +194,13 @@ class ParseUTF:
             if typeS == "value":
                 self.setcmdD["saveB"] = False  
                 if "=" in uS:
-                    if uS.strip()[-2] == "||":      # save value
+                    if uS.strip()[-2] == "||":      # write value to file
                         uS = uS.replace("||"," ")
                         self.setcmdD["saveB"] = True                      
                     uL = uS.split('|')
                     self._vassign(uL)
                     continue
-                if len(uS.strip()) == 0:            # at blank line write table
+                if len(uS.strip()) == 0:            # blank line - write table
                     if len(self.valL) > 0: self._vtable()
                     self.valL = []
                     print(uS.rstrip(" ")); self.calcS += " \n"
@@ -223,7 +223,6 @@ class ParseUTF:
             calcS (list): utf formatted calc-string (appended)
             setsectD (dict): section settings
         """
-        
         rcmdL = ["header", "codes", "scope", "attach"]
         rmethL = [self._rheader, self._rcodes, self._rscope, self._rattach]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[cite]_", "[#]__"]
@@ -328,55 +327,56 @@ class ParseUTF:
         print(uS); self.calcS += uS + "\n"
 
     def _itable(self, iL: list):
-        """insert table from inline or csv, rst file 
+        """insert table from csv file 
         
         Args:
             ipl (list): parameter list
         """       
-        tableS = ""; utfS = ""
-        fileS = iL[1].strip()
-        tfileS = Path(self.folderD["tpath"], fileS)
-        xfileS = Path(self.folderD["xpath"], fileS)  
-        if ".csv" in iL[1]:                        # csv file       
+        if len(iL) < 6: iL += [''] * (6 - len(iL))      # pad parameters
+        utfS = ""; contentL = []; sumL = []
+        fileS = iL[1].strip(); tfileS = Path(self.folderD["tpath"], fileS)
+        if ".csv" in fileS:                             # read csv file       
             with open(tfileS,'r') as csvfile:
                 readL = list(csv.reader(csvfile))
             lenI = len(readL[0])
-            try:
+            if iL[2].strip():                           # max col width
                 widthI = int(iL[2].strip())
-                incl_colL =  eval(iL[3].strip())
-            except:
+                self.setcmdD.update({"cwidth":widthI})
+            else:
                 widthI = int(self.setcmdD["cwidth"])
-                incl_colL = range(len(readL[0]))            
-            try: sumL = eval(iL[4].strip())
-            except: sumL = []
-            self.setcmdD.update({"cwidth":widthI})
-            contentL = []
+            if iL[3].strip():                           # columns
+                incl_colL =  eval(iL[3].strip())
+                totalL = [""]*len(incl_colL)
+            else: incl_colL = range(len(readL[0]))            
+            if iL[4].strip():                           # column totals
+                sumL = eval(iL[4].strip())
+            if iL[5].strip():                           # total units
+                colL = eval(iL[5].strip()) 
+                unitL = [readL[1][i].strip() for i in colL]
+                zipL = list(zip(colL,unitL))
+                for i in zipL:
+                    colI = incl_colL.index(i[0])
+                    totalL[colI] = i[1]
+                    totalL[0] = "Totals"
             for row in readL:
                 contentL.append([row[i] for i in incl_colL])
-            if len(sumL) > 0:
+            if sumL:
                 sumF = 0.
-                totalL = [""]*lenI
-                totalL[0] = "Totals"
                 for colS in sumL:
                     for row in readL:
                         try: sumF += float(row[int(colS)])
                         except: pass
-                    totalL[int(colS)] = sumF
+                    colI = int(incl_colL.index(colS))
+                    totalL[colI] = sumF
                 contentL.append(totalL) 
             sys.stdout.flush()
             old_stdout = sys.stdout
             output = StringIO()
             output.write(tabulate(contentL, tablefmt="grid", headers="firstrow"))            
             utfS = output.getvalue()
-            titleS = "  \n"
             sys.stdout = old_stdout
-            try: titleS = iL[0][2].strip() + titleS
-            except: pass        
-        else:                                       
-            utfS = ""
-            titleS = "  "
-            try: titleS = iL[0][2].strip() + titleS
-            except: pass
+        else: pass
+        
         print(utfS); self.calcS += utfS + "\n"  
 
     def _iimage(self, iL: list):
@@ -434,11 +434,10 @@ class ParseUTF:
 
         locals().update(self.rivetD)
 
-        vcmdL = ["value", "func",
-                "text", "sym", "tex", "table", "image"]
-        vmethL = [self._vvalues, self._vfunc, 
-                self._itext, self._isympy, self._ilatex, 
-                                    self._itable, self._iimage, ]
+        vcmdL = ["value", "func", "text", 
+                    "sym", "tex", "table", "image"]
+        vmethL = [self._vvalues, self._vfunc, self._itext, 
+                    self._isympy, self._ilatex, self._itable, self._iimage, ]
         vtagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                       "[r]_", "[c]_", "[t]_", "[e]_", "[f]_", "[x]_"] 
 
@@ -446,90 +445,6 @@ class ParseUTF:
 
         self.rivetD.update(locals())
         return self.calcS, self.setsectD, self.setcmdD, self.rivetD, self.exportS
-        
-    def _vvalues(self, vL: list):
-        """import values and set parameters
-
-        Args:
-            vL (list): value command arguments
-        """
-
-        locals().update(self.rivetD)
-    
-        if len(vL) < 6:
-            vL += [''] * (6 - len(vL))
-
-        self.setcmdD["trmrI"] = vL[1].split(",")[0].strip()
-        self.setcmdD["trmtI"] = vL[1].split(",")[1].strip()
-        
-        if vL[2].strip() == "sub":              # substitute equation values      
-            self.setcmdD["values"] = "sub"
-        elif vL[2].strip() == "table":          # table of equation values
-            self.setcmdD["values"] = "table"
-        elif vL[2].strip() == "sum":            # sum block of values
-            self.setcmdD["values"] = "sum"
-        elif ".py" in vL[2].strip() :           # values from .py file       
-            vfileS = Path(self.folderD["spath"] / vL[2].strip())
-            with open(vfileS,'r') as pyfile:
-                readL = pyfile.readlines()
-            for v in readL:
-                vS = v.split("#")
-                varS = vS[0].split("=")[0].strip()
-                valS = vS[0].split("=")[1].strip()
-                arrayS = "array(" + valS + ")"                
-                descripS = vS[1].strip()
-                cmdS = str(varS + " = " + arrayS)
-                exec(cmdS, globals(), locals())
-                tempS = cmdS.split("array")[1].strip()
-                tempS = eval(tempS.strip("()"))
-            if type(tempS) == list:
-                if len(eval(varS)) > 3:
-                    trimL= tempS[:3]
-                    trimL.append("...")
-                    valS = str(trimL)
-                else:
-                    valS = str(tempS)
-                self.valL.append([varS, valS, valS, descripS])
-                return
-        elif ".xls" in vL[2].strip():              # values from .xls file   
-            pass                           
-        elif ".csv" in vL[2].strip():              # values from .csv file               
-            pass
-        elif vL[2].strip() == "list":            # vector from .csv file
-            vfileS = Path(self.folderD["tpath"] / vL[3].strip())
-            vecS = vL[4].strip()
-            varS = vL[5].strip()
-            if "r" in vecS:
-                rL = []
-                veS = vecS.strip("r"); valL =[]
-                with open(vfileS,'r') as csvf:
-                    reader = csv.reader(csvf)
-                    for row in range(int(veS)):
-                        val = next(reader)
-                rL = rL + list(val)
-                arrayS = "array(" + str(rL) + ")"  
-            if "c" in vecS:
-                cL =[]
-                veS = vecS.strip("c"); valL =[]
-                with open(vfileS,'r') as csvf:
-                    reader = csv.reader(csvf)
-                    for row in reader:
-                        cL.append(row[int(veS)])
-                arrayS = "array(" + str(cL) + ")"  
-            cmdS = varS + "=" + arrayS
-            exec(cmdS, globals(), locals())
-            tempS = cmdS.split("array")[1].strip()
-            tempS = eval(tempS.strip("()"))
-            if len(tempS) > 3:
-                trimL= tempS[:2]
-                trimL.append(["..."])
-                valS = str(trimL)
-            else:
-                valS = str(tempS)
-            
-            self.valL.append([varS, valS, valS, vL[3].strip()])    
-
-        self.rivetD.update(locals()) 
 
     def _vassign(self, vL: list):
         """assign values to variables
@@ -540,9 +455,9 @@ class ParseUTF:
         
         locals().update(self.rivetD)
                                                         
-        if len(vL) < 3:
+        if len(vL) < 3:                             # equation
             self._vsymbol(vL)
-        elif len(vL) > 2:
+        elif len(vL) > 2:                           # value
             descripS = vL[1].strip()
             unitL = vL[2].split(",")
             varS = vL[0].split("=")[0].strip()
@@ -565,6 +480,77 @@ class ParseUTF:
             if self.setcmdD["saveB"] == True:  self.exportS += pyS
         
         self.rivetD.update(locals())   
+
+    def _vvalues(self, vL: list):
+        """import values and set parameters
+
+        Args:
+            vL (list): value command arguments
+        """
+        locals().update(self.rivetD)
+    
+        if len(vL) < 5: vL += [''] * (5 - len(vL))                    # pad
+        if vL[1].strip() == "sub" or vL[1].strip() == "nosub":        # sub      
+            self.setcmdD["values"] = vL[1].strip() 
+            self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
+            self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
+        elif vL[1].strip() == "val" or vL[1].strip() == "sum" :       # values
+            vfileS = Path(self.folderD["spath"] / vL[2].strip())
+            with open(vfileS,'r') as csvfile:
+                readL = list(csv.reader(csvfile))
+            #print(f"{readL=}")
+            lenI = len(readL[0])
+            for vaL in readL:
+                if len(vaL) < 4: vaL += [''] * (4 - len(vL))          # pad 
+                varS = vaL[0].strip()
+                valS = vaL[1].strip()
+                descripS = vaL[2].strip()
+                unit1S = " "; unit2S = " "
+                if val[3]: 
+                    unit1S, unit2S = map(str.strip, val[3].split(":"))
+                arrayS = "array(" + valS + ")"                
+                cmdS = str(varS + " = " + arrayS)
+                exec(cmdS, globals(), locals())
+                tempS = cmdS.split("array")[1].strip()
+                tempS = eval(tempS.strip("()"))
+                if len(eval(varS)) > 3:
+                    trimL= tempS[:3]
+                    trimL.append("...")
+                    valS = str(trimL)
+                else:
+                    valS = str(tempS)
+            if vL[1].strip() == "sum" : 
+                pass
+            self.valL.append([varS, valS, valS, descripS])
+        elif vL[1].strip() == "list":                    # values from list 
+            vfileS = Path(self.folderD["tpath"] / vL[3].strip())
+            vecS = vL[4].strip()
+            varS = vL[5].strip()
+            rL = []
+            veS = vecS.strip("r"); valL =[]
+            with open(vfileS,'r') as csvF:
+                reader = csv.reader(csvF)
+                for row in range(int(veS)):
+                    val = next(reader)
+            rL = rL + list(val)
+            arrayS = "array(" + str(rL) + ")"  
+            cmdS = varS + "=" + arrayS
+            exec(cmdS, globals(), locals())
+            tempS = cmdS.split("array")[1].strip()
+            tempS = eval(tempS.strip("()"))
+            if len(tempS) > 3:
+                trimL= tempS[:2]
+                trimL.append(["..."])
+                valS = str(trimL)
+            else:
+                valS = str(tempS)
+            self.valL.append([varS, valS, valS, vL[3].strip()])    
+        elif vL[1].strip() == "xlsx":                    # values from excel
+            pass
+        else:
+            pass            
+
+        self.rivetD.update(locals()) 
 
     def _vtable(self):
         """write value table"""
@@ -601,7 +587,7 @@ class ParseUTF:
 
         self.rivetD.update(locals())   
 
-    def _vsub(self, epL: list, epS: str):
+    def _vsub(self, eqL: list, eqS: str):
         """substitute numbers for variables in printed output
         
         Args:
@@ -611,7 +597,7 @@ class ParseUTF:
 
         locals().update(self.rivetd)
 
-        utfS = epl[0].strip(); descripS = epl[3]; parD = dict(epL[1])
+        utfS = eql[0].strip(); descripS = eql[3]; parD = dict(eqL[1])
         varS = utfS.split("=")
         resultS = vars[0].strip() + " = " + str(eval(vars[1]))
         try: 
@@ -622,7 +608,7 @@ class ParseUTF:
         except:
             print(utfs); self.calcl.append(utfs)
         try:
-            symeq = sp.sympify(eps.strip())                                                 # substitute                            
+            symeq = sp.sympify(eqS.strip())                                                 # substitute                            
             symat = symeq.atoms(sp.Symbol)
             for _n2 in symat:
                 evlen = len((eval(_n2.__str__())).__str__())  # get var length

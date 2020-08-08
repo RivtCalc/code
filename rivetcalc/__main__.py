@@ -1,16 +1,14 @@
 """
-***RivetCalc may be run interactively, as a file, and from command line. If run
-interactively cell marks (#%%) are typically placed before sections but may be
-placed before any string.
-
-If run as s file from the command line the command is
+***RivetCalc** may be run interactively, one cell (#%%) or function at a time
+in an IDE, or from command line. If run as a command line file: 
 
     python -m rivetcalc rddcc_modelfile.py 
 
-Calc and doc files are only generated when specified, and after the file is run.
+Where ddcc are division and calc numbers used for document organization. Calc
+and doc output files are only generated when specified and after the file is
+run, but not when used interactively.
 
 """
-
 import os
 import sys
 import textwrap
