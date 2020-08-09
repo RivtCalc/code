@@ -23,13 +23,13 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from IPython.display import display as _display
 from IPython.display import Image as _Image
-from numpy import *
-from rivetcalc.rc_unit import *
 from io import StringIO
 from sympy.parsing.latex import parse_latex
 from sympy.abc import _clash2
 from tabulate import tabulate 
 from pathlib import Path
+from numpy import *
+from rivetcalc.rc_unit import *
 
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 
@@ -338,7 +338,6 @@ class ParseUTF:
         if ".csv" in fileS:                             # read csv file       
             with open(tfileS,'r') as csvfile:
                 readL = list(csv.reader(csvfile))
-            lenI = len(readL[0])
             if iL[2].strip():                           # max col width
                 widthI = int(iL[2].strip())
                 self.setcmdD.update({"cwidth":widthI})
@@ -368,11 +367,18 @@ class ParseUTF:
                         except: pass
                     colI = int(incl_colL.index(colS))
                     totalL[colI] = sumF
-                contentL.append(totalL) 
+                contentL.append(totalL)             
+            wcontentL = []
+            for rowL in contentL:
+                wrowL=[]
+                for iS in rowL:
+                    templist = textwrap.wrap(iS, int(widthI)) 
+                    wrowL.append("""\n""".join(templist))
+                wcontentL.append(wrowL)
             sys.stdout.flush()
             old_stdout = sys.stdout
             output = StringIO()
-            output.write(tabulate(contentL, tablefmt="grid", headers="firstrow"))            
+            output.write(tabulate(wcontentL, tablefmt="grid", headers="firstrow"))            
             utfS = output.getvalue()
             sys.stdout = old_stdout
         else: pass
@@ -490,48 +496,55 @@ class ParseUTF:
         locals().update(self.rivetD)
     
         if len(vL) < 5: vL += [''] * (5 - len(vL))                    # pad
+        self.valL = []                                                # values
         if vL[1].strip() == "sub" or vL[1].strip() == "nosub":        # sub      
             self.setcmdD["values"] = vL[1].strip() 
             self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
             self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
-        elif vL[1].strip() == "val" or vL[1].strip() == "sum" :       # values
-            vfileS = Path(self.folderD["spath"] / vL[2].strip())
+        elif vL[1].strip() == "file":                                 # file
+            vfileS = Path(self.folderD["tpath"] / vL[2].strip())
             with open(vfileS,'r') as csvfile:
                 readL = list(csv.reader(csvfile))
             #print(f"{readL=}")
-            lenI = len(readL[0])
-            for vaL in readL:
-                if len(vaL) < 4: vaL += [''] * (4 - len(vL))          # pad 
+            for vaL in readL[1:]:                         # skip first line
+                if len(vaL) < 5: vaL += [''] * (5 - len(vL))  # pad missing 
                 varS = vaL[0].strip()
                 valS = vaL[1].strip()
                 descripS = vaL[2].strip()
-                unit1S = " "; unit2S = " "
-                if val[3]: 
-                    unit1S, unit2S = map(str.strip, val[3].split(":"))
-                arrayS = "array(" + valS + ")"                
-                cmdS = str(varS + " = " + arrayS)
-                exec(cmdS, globals(), locals())
-                tempS = cmdS.split("array")[1].strip()
-                tempS = eval(tempS.strip("()"))
-                if len(eval(varS)) > 3:
-                    trimL= tempS[:3]
-                    trimL.append("...")
-                    valS = str(trimL)
+                unit1S = vaL[3].strip()
+                unit2S = vaL[4].strip()
+                try: valU = unum.Unum.coerceToUnum(float(valS))
+                except TypeError:
+                    try: valU = unum.Unum.coerceToUnum(list(valS))
+                    except:
+                        raise TypeError
+                if len(unit1S):
+                    if valU.strUnit(): valS1 = valU.asUnit(eval(unit1S))
+                    else: valU1 = valU*eval(unit1S)                                    
+                valU2 = unum.Unum.coerceToUnum(valS)
+                if len(unit2S): 
+                    valU2 = valU1.asUnit(eval(unit2S))
                 else:
-                    valS = str(tempS)
-            if vL[1].strip() == "sum" : 
-                pass
-            self.valL.append([varS, valS, valS, descripS])
-        elif vL[1].strip() == "list":                    # values from list 
+                    valU2 = valU1
+                if type(eval(valS)) == list:
+                    if len(eval(valS)) > 3:
+                        trimL= eval(valU1)[:3]
+                        trimL.append("... " + unit1S)
+                        valU1 = str(trimL)
+                        trimL= eval(valU2)[:3]
+                        trimL.append("... " + unit2S)
+                        valU2 = str(trimL)
+                    else: pass 
+                self.valL.append([varS, valU1, valU2, descripS])
+        elif vL[1].strip() == "list":                                  # list 
             vfileS = Path(self.folderD["tpath"] / vL[3].strip())
             vecS = vL[4].strip()
             varS = vL[5].strip()
             rL = []
-            veS = vecS.strip("r"); valL =[]
+            veS = vecS.strip("r")
             with open(vfileS,'r') as csvF:
                 reader = csv.reader(csvF)
-                for row in range(int(veS)):
-                    val = next(reader)
+                for row in range(int(veS)): val = next(reader)
             rL = rL + list(val)
             arrayS = "array(" + str(rL) + ")"  
             cmdS = varS + "=" + arrayS
@@ -542,13 +555,9 @@ class ParseUTF:
                 trimL= tempS[:2]
                 trimL.append(["..."])
                 valS = str(trimL)
-            else:
-                valS = str(tempS)
-            self.valL.append([varS, valS, valS, vL[3].strip()])    
-        elif vL[1].strip() == "xlsx":                    # values from excel
-            pass
-        else:
-            pass            
+            else: valS = str(tempS)
+            self.valL.append([varS, valS, valS, descripS])    
+        else: pass            
 
         self.rivetD.update(locals()) 
 

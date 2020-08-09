@@ -87,11 +87,25 @@ V('''value-string defines active values and equations
     x1 = 10.1*IN    | description | unit, alt unit || {save if trailing ||}
     y1 = 12.1*FT    | description | unit, alt unit 
 
+
+    Set value parameters where sub means to render equation with substition.
     || value | sub {or nosub} | 2,2 {truncate result, terms}  
-    || value | val  | file.csv 
-    || value | sum  | file.csv | unit, alt unit {units for column sum}
-    || value | list | file.csv | [1:4] {rows with var name in first column}
-    || value | xlsx  | table.xlsx {values from excel file}
+    
+    Import values from csv or xlxs file, starting with the second row.    
+    || value | file | file.csv or file.xlsx
+    
+    The csv file must have the structure:
+    [literal]_
+    variable name, value, description, primary unit, secondary unit
+
+    Import a list of values from a csv file 
+    || value | list | file.csv | [1:4] {rows to import}
+
+    The csv file must have the structure:
+    [literal]_
+    variable name, value1, value2, value3, ....
+    
+
 
     v1 = x + 4*M  | unit, alt unit
 
