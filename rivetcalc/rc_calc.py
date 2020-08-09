@@ -231,9 +231,13 @@ class ParseUTF:
         
         return self.calcS, self.setsectD
 
-    def _rheader(self, rsL):
-        c = 2
-    
+    def _rheader(self, rL):
+        if len(rL) < 5: rL += [''] * (5 - len(iL))      # pad parameters
+        if rL[1]: calctitleS = rL[1].strip()
+        if rL[2] == "toc": pass
+        if rL[3] == "readme": pass
+        if rL[4] : pass
+
     def _rcodes(self, rsL):
         d = 2
 
