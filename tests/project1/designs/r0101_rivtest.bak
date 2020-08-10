@@ -1,4 +1,4 @@
-from rivet.rivet_lib import *; setfiles(os.path.realpath(__file__))
+from rivt.rivt_lib import *; setfiles(os.path.realpath(__file__))
 print(dir())
 
 # region 1
@@ -123,4 +123,4 @@ e__(
 # endregion 3
 # region 4
 # %% section 4
-print(var_rivet_dict)
+print(var_rivt_dict)

@@ -88,7 +88,7 @@ Shared Project Template Tree
 ============================ 
 ::
 
-  RivetCalcTemplate_nnnn (nnnn is a unique three digit number)
+  rivtCalcTemplate_nnnn (nnnn is a unique three digit number)
       |- calcs
           |- sketches
           |- scripts
@@ -112,7 +112,7 @@ Minimum Setup and Execution
 
 The minimum working version of **RivtCalc** on a PC workstation includes a
 Python installation with about a dozen Python science libraries
-(https://github.com/rivetcalcs/rivet-code/requirements.txt) and a text editor.
+(https://github.com/rivtcalcs/rivt-code/requirements.txt) and a text editor.
 In this case the input model is run from the command line as::
 
   python -m rivtcalc ddss_modelname.py 
@@ -131,20 +131,14 @@ cells. Execution steps include::
                      |       R(), I(), V(), T()       |                    
                      \---------------||---------------/                    
                                      \/                                    
-  +--------------+|  +--------------------------------+  +-------------+
-  |    Process    |  |   Working in interactive IDE?  |  |  Process    |   
-  |    cell or    |  |     (VSCode, Spyder, Pyzo)     |  |  file       |   
-  |    file       <--+ YES                         NO +-->             |   
+  +---------------+  +--------------------------------+  +-------------+
+  |   Process     |  |   Working in interactive IDE?  |  |  Process    |   
+  |   cell to     |  |     (VSCode, Spyder, Pyzo)     |  |  file       |   
+  |   terminal    <--+ YES                         NO +-->             |   
   +------+--------+  +--------------------------------+  +------+------+   
          |           +================================+         |          
-         |           |    Write utf-8 calc to :       |         |          
-         +===========>    terminal  or  file          <=========+            
-                     |================================|                    
-                     +===============||===============+                    
-                                     \/
-                     +================================+                    
-                     |   Write reST calc file if      |
-                     |   complete file is processed.  |       
+         |           |    Write utf-8 and reST calc   |         |          
+         +===========>    to file on function call    <=========+            
                      |================================|                    
                      +===============||===============+                    
                                      \/
@@ -165,7 +159,7 @@ cells. Execution steps include::
                      +================================+    
                      
                      
-**RivetCalc** may be installed by:
+**rivtCalc** may be installed by:
 
 - Locally installing and configuring the individual open source components.
 - Locally downloading and unzipping a pre-configured installation (Windows only).
@@ -182,4 +176,12 @@ By far the most efficient way to write **rivt** models is to use a full
 featured code editor or IDE like Microsoft VSCode. Use of VSCode is extensibly
 documented in the **RivtCalc User Manual**. When working in VSCode the models
 can be written and evaluated step by step and graphics can be output inline.
+
+Learning Curve
+--------------
+
+The estimated time to set up **RivtCalc** and begin producing calculations is
+about one hour for people familiar with Python, and about four hours for those
+starting from scratch.
+
 

@@ -1,5 +1,5 @@
 #! python
-"""transform model-string to calc-string
+"""process model-strings to calc-strings
 
 The ParseUTF class converts model-strings to calc-string.
 Model-strings must be indented 4 spaces. Commands start with
@@ -29,7 +29,7 @@ from sympy.abc import _clash2
 from tabulate import tabulate 
 from pathlib import Path
 from numpy import *
-from rivetcalc.rc_unit import *
+from rivtcalc.rc_unit import *
 
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 
@@ -39,7 +39,7 @@ class ParseUTF:
     """
     
     def __init__(self, strL: list, folderD: dict, setcmdD: dict,
-         setsectD: dict, rivetD: dict, exportS: str):
+         setsectD: dict, rivtD: dict, exportS: str):
         
         """transform model-string to calc-string
 
@@ -54,7 +54,7 @@ class ParseUTF:
             folderD (dict): folderD
             setsectD (dict): setsectD
             setcmdD (dict): setcmdD
-            rivetD (dict): rivetD
+            rivtD (dict): rivtD
         """
     
         self.calcS = """"""
@@ -63,7 +63,7 @@ class ParseUTF:
         self.folderD = folderD
         self.setsectD = setsectD
         self.setcmdD = setcmdD
-        self.rivetD = rivetD
+        self.rivtD = rivtD
         self.valL = []
     
     def _refs(self, objnumI: int, typeS: str) -> str:
@@ -89,7 +89,7 @@ class ParseUTF:
         """parse tag
         
         Args:
-            tagS (str): rivet-string with tag
+            tagS (str): rivt-string with tag
             tagL (list): list of tags for string type
             setsectD (dict): section dictionary
             
@@ -165,10 +165,10 @@ class ParseUTF:
         return uS, self.setsectD
     
     def _parseutf(self, typeS: str, cmdL: list, methL: list, tagL: list ):
-        """parse rivet-string`
+        """parse rivt-string`
 
         Args:
-            typeS (str): rivet-string type
+            typeS (str): rivt-string type
             cmdL (list): command list
             methL (list): method list
             tagL (list): tag list
@@ -438,11 +438,11 @@ class ParseUTF:
             calcS (list): utf formatted calc-string (appended)
             setsectD (dict): section settings
             setcmdD (dict): command settings
-            rivetD (list): calculation results
+            rivtD (list): calculation results
             exportS (list): value strings for export
          """
 
-        locals().update(self.rivetD)
+        locals().update(self.rivtD)
 
         vcmdL = ["value", "func", "text", 
                     "sym", "tex", "table", "image"]
@@ -453,8 +453,8 @@ class ParseUTF:
 
         self._parseutf("value", vcmdL, vmethL, vtagL)
 
-        self.rivetD.update(locals())
-        return self.calcS, self.setsectD, self.setcmdD, self.rivetD, self.exportS
+        self.rivtD.update(locals())
+        return self.calcS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
 
     def _vassign(self, vL: list):
         """assign values to variables
@@ -463,7 +463,7 @@ class ParseUTF:
             vL (list): list of assignments
         """
         
-        locals().update(self.rivetD)
+        locals().update(self.rivtD)
                                                         
         if len(vL) < 3:                             # equation
             self._vsymbol(vL)
@@ -489,7 +489,7 @@ class ParseUTF:
             #print(pyS)
             if self.setcmdD["saveB"] == True:  self.exportS += pyS
         
-        self.rivetD.update(locals())   
+        self.rivtD.update(locals())   
 
     def _vvalues(self, vL: list):
         """import values and set parameters
@@ -497,7 +497,7 @@ class ParseUTF:
         Args:
             vL (list): value command arguments
         """
-        locals().update(self.rivetD)
+        locals().update(self.rivtD)
     
         if len(vL) < 5: vL += [''] * (5 - len(vL))                    # pad
         self.valL = []                                                # values
@@ -563,12 +563,12 @@ class ParseUTF:
             self.valL.append([varS, valS, valS, descripS])    
         else: pass            
 
-        self.rivetD.update(locals()) 
+        self.rivtD.update(locals()) 
 
     def _vtable(self):
         """write value table"""
 
-        locals().update(self.rivetD)
+        locals().update(self.rivtD)
     
         df = pd.DataFrame(self.valL)                            
         hdrL = ["variable", "value", "[value]", "description"]
@@ -577,7 +577,7 @@ class ParseUTF:
         valS = output.getvalue()
         sys.stdout = old_stdout; sys.stdout.flush()
 
-        self.rivetD.update(locals())                        
+        self.rivtD.update(locals())                        
         print(valS.rstrip()); self.calcS += valS.rstrip() + "\n"
 
     def _vsymbol(self, eL: list):
@@ -587,7 +587,7 @@ class ParseUTF:
             eL (list): equation and units
         """
         
-        locals().update(self.rivetD)
+        locals().update(self.rivtD)
         
         eqS = eL[0].strip()
         varS = eqS.split("=")[1].strip()
@@ -598,7 +598,7 @@ class ParseUTF:
         except: pass
         print(utfS); self.calcS += utfS + "\n"
 
-        self.rivetD.update(locals())   
+        self.rivtD.update(locals())   
 
     def _vsub(self, eqL: list, eqS: str):
         """substitute numbers for variables in printed output
@@ -608,7 +608,7 @@ class ParseUTF:
             epS (str): [description]
         """
 
-        locals().update(self.rivetd)
+        locals().update(self.rivtd)
 
         utfS = eql[0].strip(); descripS = eql[3]; parD = dict(eqL[1])
         varS = utfS.split("=")
@@ -673,7 +673,7 @@ class ParseUTF:
             calcS (list): utf formatted calc-string (appended)
             setsectD (dict): section settings
             setcmdD (dict): command settings
-            rivetD (list): calculation values         
+            rivtD (list): calculation values         
         """
         tcmdL = ["table", "image", ]
         methL = [self._itable, self._iimage]
@@ -682,4 +682,4 @@ class ParseUTF:
     
         self._parseutf("table", tcmdL, methL, ttagL)
         
-        return self.calcS, self.setsectD, self.setcmdD, self.rivetD
+        return self.calcS, self.setsectD, self.setcmdD, self.rivtD

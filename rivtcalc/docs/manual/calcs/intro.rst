@@ -9,13 +9,13 @@ From the command line:
 
 .. code:: python
 
-    python rivet ddcc_ rivetfilename.py  (or batch_of_files.txt)
+    python rivt ddcc_ rivtfilename.py  (or batch_of_files.txt)
 
 As a library:
 
 .. code:: python
 
-    from rivet_lib import *
+    from rivt_lib import *
 
 Like **on-c-e** its focus is on improving the resuse, review, reach and reliability of
 engineering calculation reports. Code and documentation are here: https://github.com/r-i-v-e-t .  
@@ -25,8 +25,8 @@ A **r-i-v-e-t** file is a Python text file containing engineering design and ana
 calculations written in ASCII or UTF-8. Any text processor (i.e. Notepad) can be used to create 
 and edit a design file but an IDE or code editor significantly improves efficiency, allows for interactive design development
 and is strongly recommended.  **r-i-v-e-t** documentation  is written around the code editor Microsoft VS Code. 
-The *rivet* program has a single primary function, *__r("rivet-string")*,  which takes a single string as argument. 
-The first  character of each string is one of **r, i, v, e, t**,  which controls the rivet syntax and 
+The *rivt* program has a single primary function, *__r("rivt-string")*,  which takes a single string as argument. 
+The first  character of each string is one of **r, i, v, e, t**,  which controls the rivt syntax and 
 operations within that context. The characters signify the following::
 
     r -> run Python code
@@ -35,8 +35,8 @@ operations within that context. The characters signify the following::
     e -> evaluate equations
     t -> generate and manipulate tables and plots
     
-**r-i-v-e-t** evaluates rivet files (designs) and outputs calculation files (calcs) in UTF-8, HTML 
-or PDF formats. Design files have names of the form *ddcc_rivetfilename.py* where dd and cc are 
+**r-i-v-e-t** evaluates rivt files (designs) and outputs calculation files (calcs) in UTF-8, HTML 
+or PDF formats. Design files have names of the form *ddcc_rivtfilename.py* where dd and cc are 
 two digit numbers identifying the division and calculation number respectively. Division 
 numbers apply to **r-i-v-e-t**  reports, which are organized compilations of calcs.
 Calc output files retain the design file name with a modified file-type suffix (txt, html, pdf), 
@@ -59,7 +59,7 @@ naming conventions::
         
 Design (input) files and utf8-calc (output) files are read from and written to the *calcs* folder. Supporting 
 design files are stored in the *calcs* sub-folders. All supporting files are  ASCII or UTF-8 text files, 
-as are the rivet design and utf8-calc files. A zip of the *calc* folder and sub-folders may be uploaded to a shared online 
+as are the rivt design and utf8-calc files. A zip of the *calc* folder and sub-folders may be uploaded to a shared online 
 database.
 
 **pdf-** calcs and reports are written to the *reports* folder. **html-** calcs and reports are 

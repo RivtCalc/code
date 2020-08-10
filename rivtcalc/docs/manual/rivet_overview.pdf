@@ -1,5 +1,5 @@
 %PDF-1.4
-%“Œ‹ž ReportLab Generated PDF document http://www.reportlab.com
+%ï¿½ï¿½ï¿½ï¿½ ReportLab Generated PDF document http://www.reportlab.com
 1 0 obj
 <<
 /F1 2 0 R /F2 3 0 R /F3 4 0 R /F4 5 0 R /F5 8 0 R
@@ -127,7 +127,7 @@ n 330 0 6 12 re f*
 n 336 0 18 12 re f*
 .960784 .960784 .862745 rg
 n 354 0 6 12 re f*
-BT 1 0 0 1 0 2 Tm 12 TL /F3 10 Tf 0 0 0 rg (python) Tj 0 0 0 rg ( ) Tj 0 0 0 rg (rivet) Tj 0 0 0 rg ( ) Tj 0 0 0 rg (ddcc_) Tj 0 0 0 rg ( ) Tj 0 0 0 rg (rivetfilename) Tj .4 .4 .4 rg (.) Tj 0 0 0 rg (py) Tj 0 0 0 rg (  ) Tj 0 0 0 rg (\() Tj /F4 10 Tf .666667 .133333 1 rg (or) Tj /F3 10 Tf 0 0 0 rg ( ) Tj 0 0 0 rg (batch_of_files) Tj .4 .4 .4 rg (.) Tj 0 0 0 rg (txt) Tj 0 0 0 rg (\)) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F3 10 Tf 0 0 0 rg (python) Tj 0 0 0 rg ( ) Tj 0 0 0 rg (rivt) Tj 0 0 0 rg ( ) Tj 0 0 0 rg (ddcc_) Tj 0 0 0 rg ( ) Tj 0 0 0 rg (rivtfilename) Tj .4 .4 .4 rg (.) Tj 0 0 0 rg (py) Tj 0 0 0 rg (  ) Tj 0 0 0 rg (\() Tj /F4 10 Tf .666667 .133333 1 rg (or) Tj /F3 10 Tf 0 0 0 rg ( ) Tj 0 0 0 rg (batch_of_files) Tj .4 .4 .4 rg (.) Tj 0 0 0 rg (txt) Tj 0 0 0 rg (\)) Tj T* ET
 Q
 Q
 Q
@@ -162,7 +162,7 @@ n 30 0 54 12 re f*
 n 90 0 36 12 re f*
 .960784 .960784 .862745 rg
 n 132 0 6 12 re f*
-BT 1 0 0 1 0 2 Tm 12 TL /F4 10 Tf 0 .501961 0 rg (from) Tj /F3 10 Tf 0 0 0 rg ( ) Tj /F4 10 Tf 0 0 1 rg (rivet_lib) Tj /F3 10 Tf 0 0 0 rg ( ) Tj /F4 10 Tf 0 .501961 0 rg (import) Tj /F3 10 Tf 0 0 0 rg ( ) Tj .4 .4 .4 rg (*) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F4 10 Tf 0 .501961 0 rg (from) Tj /F3 10 Tf 0 0 0 rg ( ) Tj /F4 10 Tf 0 0 1 rg (rivt_lib) Tj /F3 10 Tf 0 0 0 rg ( ) Tj /F4 10 Tf 0 .501961 0 rg (import) Tj /F3 10 Tf 0 0 0 rg ( ) Tj .4 .4 .4 rg (*) Tj T* ET
 Q
 Q
 Q
@@ -177,7 +177,7 @@ Q
 q
 1 0 0 1 62.69291 502.6236 cm
 q
-BT 1 0 0 1 0 74 Tm .18936 Tw 12 TL /F1 10 Tf 0 0 0 rg (A ) Tj /F2 10 Tf (r-i-v-e-t) Tj /F1 10 Tf ( file is a Python text file containing engineering design and analysis calculations written in ASCII) Tj T* 0 Tw -0.069059 Tw (or UTF-8. Any text processor \(i.e. Notepad\) can be used to create and edit a design file but an IDE or code) Tj T* 0 Tw 1.643615 Tw (editor significantly improves efficiency and is strongly recommended. ) Tj /F2 10 Tf (r-i-v-e-t) Tj /F1 10 Tf ( documentation is written) Tj T* 0 Tw 4.742126 Tw (around the code editor Microsoft VS Code. The ) Tj /F5 10 Tf (rivet) Tj /F1 10 Tf ( program has a single primary function,) Tj T* 0 Tw .392209 Tw /F5 10 Tf (__r\("rivet-string"\)) Tj /F1 10 Tf (, which takes a single string as argument. The first character of each string is one of ) Tj /F2 10 Tf (r, i,) Tj T* 0 Tw 2.098735 Tw (v, e, t) Tj /F1 10 Tf (, which controls the rivet syntax and operations within that context. The characters signify the) Tj T* 0 Tw (following:) Tj T* ET
+BT 1 0 0 1 0 74 Tm .18936 Tw 12 TL /F1 10 Tf 0 0 0 rg (A ) Tj /F2 10 Tf (r-i-v-e-t) Tj /F1 10 Tf ( file is a Python text file containing engineering design and analysis calculations written in ASCII) Tj T* 0 Tw -0.069059 Tw (or UTF-8. Any text processor \(i.e. Notepad\) can be used to create and edit a design file but an IDE or code) Tj T* 0 Tw 1.643615 Tw (editor significantly improves efficiency and is strongly recommended. ) Tj /F2 10 Tf (r-i-v-e-t) Tj /F1 10 Tf ( documentation is written) Tj T* 0 Tw 4.742126 Tw (around the code editor Microsoft VS Code. The ) Tj /F5 10 Tf (rivt) Tj /F1 10 Tf ( program has a single primary function,) Tj T* 0 Tw .392209 Tw /F5 10 Tf (__r\("rivt-string"\)) Tj /F1 10 Tf (, which takes a single string as argument. The first character of each string is one of ) Tj /F2 10 Tf (r, i,) Tj T* 0 Tw 2.098735 Tw (v, e, t) Tj /F1 10 Tf (, which controls the rivt syntax and operations within that context. The characters signify the) Tj T* 0 Tw (following:) Tj T* ET
 Q
 Q
 q
@@ -203,7 +203,7 @@ Q
 q
 1 0 0 1 62.69291 353.4236 cm
 q
-BT 1 0 0 1 0 50 Tm -0.126682 Tw 12 TL /F2 10 Tf 0 0 0 rg (r-i-v-e-t) Tj /F1 10 Tf ( evaluates rivet files \(designs\) and outputs calculation files \(calcs\) in UTF-8, HTML or PDF formats.) Tj T* 0 Tw 2.425318 Tw (Design files have names of the form ) Tj /F5 10 Tf (ddcc_rivetfilename.py) Tj /F1 10 Tf ( where dd and cc are two digit numbers) Tj T* 0 Tw 1.366647 Tw (identifying the division and calculation number respectively. Division numbers apply to ) Tj /F2 10 Tf (r-i-v-e-t) Tj /F1 10 Tf ( reports,) Tj T* 0 Tw 1.19686 Tw (which are organized compilations of calcs. Calc output files retain the design file name with a modified) Tj T* 0 Tw (file-type suffix \(txt, html, pdf\), depending on the output type selected.) Tj T* ET
+BT 1 0 0 1 0 50 Tm -0.126682 Tw 12 TL /F2 10 Tf 0 0 0 rg (r-i-v-e-t) Tj /F1 10 Tf ( evaluates rivt files \(designs\) and outputs calculation files \(calcs\) in UTF-8, HTML or PDF formats.) Tj T* 0 Tw 2.425318 Tw (Design files have names of the form ) Tj /F5 10 Tf (ddcc_rivtfilename.py) Tj /F1 10 Tf ( where dd and cc are two digit numbers) Tj T* 0 Tw 1.366647 Tw (identifying the division and calculation number respectively. Division numbers apply to ) Tj /F2 10 Tf (r-i-v-e-t) Tj /F1 10 Tf ( reports,) Tj T* 0 Tw 1.19686 Tw (which are organized compilations of calcs. Calc output files retain the design file name with a modified) Tj T* 0 Tw (file-type suffix \(txt, html, pdf\), depending on the output type selected.) Tj T* ET
 Q
 Q
 q
@@ -236,7 +236,7 @@ Q
 q
 1 0 0 1 62.69291 138.2236 cm
 q
-BT 1 0 0 1 0 26 Tm 1.191163 Tw 12 TL /F1 10 Tf 0 0 0 rg (Design \(input\) files and utf8 calc \(output\) files are read from and written to the ) Tj /F5 10 Tf (calcs) Tj /F1 10 Tf ( folder. Supporting) Tj T* 0 Tw -0.044223 Tw (design files are stored in the ) Tj /F5 10 Tf (calcs) Tj /F1 10 Tf ( sub-folders. All supporting files are ASCII or UTF-8 files, as are the rivet) Tj T* 0 Tw (design and utf8-calc files. A zip of the ) Tj /F5 10 Tf (calc) Tj /F1 10 Tf ( folder and sub-folders may be uploaded to a shared database.) Tj T* ET
+BT 1 0 0 1 0 26 Tm 1.191163 Tw 12 TL /F1 10 Tf 0 0 0 rg (Design \(input\) files and utf8 calc \(output\) files are read from and written to the ) Tj /F5 10 Tf (calcs) Tj /F1 10 Tf ( folder. Supporting) Tj T* 0 Tw -0.044223 Tw (design files are stored in the ) Tj /F5 10 Tf (calcs) Tj /F1 10 Tf ( sub-folders. All supporting files are ASCII or UTF-8 files, as are the rivt) Tj T* 0 Tw (design and utf8-calc files. A zip of the ) Tj /F5 10 Tf (calc) Tj /F1 10 Tf ( folder and sub-folders may be uploaded to a shared database.) Tj T* ET
 Q
 Q
 q

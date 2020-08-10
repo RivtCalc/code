@@ -7,8 +7,8 @@ __version__ = "0.9.0"
 __author__ = 'rholland'
 
 
-class CheckRivet:
-    """check rivet syntax and log
+class Checkrivt:
+    """check rivt syntax and log
     
     Arguments:
         logname {[type]} -- [description]
