@@ -11,14 +11,15 @@ subset of reStructuredText.
 
 A **RivtCalc** file is a Python file that imports *rivtcalc.rc_lib as rc* and
 calls functions on **rivt-strings**. A **rivt-string** contains text,
-commands and tags defining the calculation. A function call is of the form
-rc.I('''**rivt-string**''').
+commands and tags defining the calculation. A function call is of the form::
+
+  rc.V(''' several line rivt-string ''')
 
 Input file names (models) have the form *rddss_modelname.py*. Corresponding
 output files (calcs, docs and reports) have the names *rddss_calcname.txt*,
-*rddss_calcname.html*, or *rddcc_calcname.pdf*; where ddss is the calculation
-number made up of the division (dd) and sequence (ss) numbers which are used to
-organize PDF documents into collated reports.
+*rddss_calcname.html*, or *rddcc_calcname.pdf*; where *ddss* is the calculation
+number made up of the division (*dd*) and sequence (*ss*) numbers which are
+used to organize PDF documents into collated reports.
 
 Files
 =====
@@ -31,12 +32,11 @@ doc (.pdf or .html)   formatted HTML or PDF calc output, written to file
 report (.pdf)         formatted and collated PDF doc, written to a file
 ===================  =====================================================       
 
-The **RivtCalc** API consists of four functions that take as input
-a **rivt-string** and four functions that control output the output
-format.
+The **RivtCalc** API consists of four functions that take a **rivt-string** as
+input and four functions that control the output format.
 
-Functions
-=========
+API Functions
+=============
 ================ =======================================================
  API              Description
 ================ =======================================================
@@ -82,7 +82,7 @@ UTF-8 or ASCII files. Binary files, including image and PDF files, are stored
 in the *docs* and *reports* folders. A shared project or calc includes the full
 project tree containing only text (ASCII, UTF-8) files. The calcs folder is
 typically fully populated and the *docs* and *reports* folders contain only
-config files. A shared template on Github has the following form.
+config files. A shared template on Github has the following form:
 
 Shared Project Template Tree
 ============================ 
@@ -110,26 +110,24 @@ setup files.
 Minimum Setup and Execution
 ---------------------------
 
-The minimum working version of **RivtCalc** includes a Python installation with
-about a dozen Python science libraries
+The minimum working version of **RivtCalc** on a PC workstation includes a
+Python installation with about a dozen Python science libraries
 (https://github.com/rivetcalcs/rivet-code/requirements.txt) and a text editor.
 In this case the input model is run from the command line as::
 
-  python -m rivtcalc ddss_calcname.py 
+  python -m rivtcalc ddss_modelname.py 
 
-If a LaTeX distribution is installed, formatted PDF documents and 
-reports can be generated. If an IDE or full-featured code editor 
-is used the calculations can be executed interactively and in stages 
-by tagging the API functions as cells. The program documentation, 
-for example, focuses on the use case of **VSCode** and extensions, 
-which dramatically increases calculation efficiency. Execution steps 
-include::
+If a LaTeX distribution is installed, formatted PDF documents and reports can
+be generated. If an IDE or full-featured code editor is used the calculations
+can be executed interactively and in stages by tagging the API functions as
+cells. Execution steps include::
 
                      /--------------------------------\                    
-                     |   Edit and run RivetCalc       |
-                     |   model file or cells.         |                   
+                     |     Edit and run RivtCalc      |
+                     |     model file or              | 
+                     |     interactive cells.         |                   
                      |                                |
-                     |          cell types:           |                    
+                     |    cell or function types:     |                    
                      |       R(), I(), V(), T()       |                    
                      \---------------||---------------/                    
                                      \/                                    
@@ -169,11 +167,11 @@ include::
                      
 **RivetCalc** may be installed by:
 
-1. Locally installing and configuring the individual open source components.
-2. Locally downloading and unzipping a single pre-configured installation for Windows.
-3. Remotely running a cloud service in a container. 
+- Locally installing and configuring the individual open source components.
+- Locally downloading and unzipping a pre-configured installation (Windows only).
+- Remotely installing as a cloud service in a container. 
 
-Pre-installed cloud installations (**RvetCloud.net**) that run through the
+Pre-installed cloud installations (**RvetCloud.net**) that run through a
 broswer are available with paid support. Refer to the **RivtCalc User Manual**
 for details.
 
