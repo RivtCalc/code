@@ -25,10 +25,10 @@ Files
 ===================  =====================================================
 File type             File description                                      
 ===================  =====================================================
-model (.py)           text input model, written in **rivt**                      
+model (.py)           input model written in **rivt**                      
 calc (.txt)           formatted UTF-8 output, written to screen (and file) 
-doc (.pdf or .html)   formatted HTML or PDF output, written to file                  
-report (.pdf)         organized and formatted PDF docs, written to file
+doc (.pdf or .html)   formatted HTML or PDF calc output, written to file                  
+report (.pdf)         formatted and collated PDF doc, written to a file
 ===================  =====================================================       
 
 The **RivtCalc** API consists of four functions that take as input
@@ -50,15 +50,15 @@ write_htmldoc()  write html doc to file (includes images)
 write_report()   compile pdf docs into a report
 ================ =======================================================
 
-Calcuation files are stored in a structured project folder tree. UTF-8 models
-and calcs are stored in the *calcs* folder. Docs are written to their
-respective folders in PDF or HTML formts. PDF reports are written to the
-*reports* folder. Binary image files used in docs and reports are stored in the
-*html* folder. The user initially copies the complete folder tree from
-a prior project or template.
+All calculation and supporting files are stored in a structured project tree.
+UTF-8 model input and output are stored in the *calcs* folder. Docs are written
+to their respective folders in PDF or HTML formts. PDF reports are written to
+the *reports* folder. Binary image files used in docs and reports are stored in
+the *html* folder. The user initially starts a project by copying a complete
+folder tree from a prior project or template.
 
-Project File Tree
-================= 
+Project Folder Tree
+=================== 
 ::
 
   Project_Name (chosen by user)
@@ -82,7 +82,11 @@ UTF-8 or ASCII files. Binary files, including image and PDF files, are stored
 in the *docs* and *reports* folders. A shared project or calc includes the full
 project tree containing only text (ASCII, UTF-8) files. The calcs folder is
 typically fully populated and the *docs* and *reports* folders contain only
-config files. A shared template on Github has the form::
+config files. A shared template on Github has the following form.
+
+Shared Project Template Tree
+============================ 
+::
 
   RivetCalcTemplate_nnnn (nnnn is a unique three digit number)
       |- calcs
@@ -96,15 +100,15 @@ config files. A shared template on Github has the form::
       |- reports (config file only)
           |- attachments (config file only)
 
-**RivtCalcTemplate_nnnn** becomes the standard Github repository name where
-nnnn is a unique four digit number. This common name across Github accounts and
+**RivtCalcTemplate_nnnn** is the standard Github repository name where nnnn is
+a unique four digit number. This shared common name across Github accounts and
 repositories facilitates searches. Each account may contain many repositories
 (templates). **RivtCalc** templates may be cloned, downloaded as a zip file, or
 run directly on Digital Ocean, Gitpod or repl.it with the addition of a few
 setup files.
 
-Minimum Setup
--------------
+Minimum Setup and Execution
+---------------------------
 
 The minimum working version of **RivtCalc** includes a Python installation with
 about a dozen Python science libraries
@@ -165,12 +169,13 @@ include::
                      
 **RivetCalc** may be installed by:
 
-1. Locally installing and configuring individual open source components.
+1. Locally installing and configuring the individual open source components.
 2. Locally downloading and unzipping a single pre-configured installation for Windows.
 3. Remotely running a cloud service in a container. 
 
-Pre-installed cloud installations (**RvetCloud.net**) are available with paid support. 
-Refer to the **RivtCalc User Manual** for details.
+Pre-installed cloud installations (**RvetCloud.net**) that run through the
+broswer are available with paid support. Refer to the **RivtCalc User Manual**
+for details.
 
 Efficient IDE Development
 -------------------------
