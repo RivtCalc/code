@@ -1,10 +1,10 @@
 from distutils.core import setup
 
 setup(
-    name='rivetcalc',
+    name='rivtcalc',
     author='rhholland',
     version='0.8.2-beta.0',
-    packages=['rivetcalc','rivetcalc.unum','rivetcalc.unum.units','rivetcalc.unum.units.si'],
+    packages=['rivtcalc','rivtcalc.unum','rivtcalc.unum.units','rivtcalc.unum.units.si'],
     license='GPLv3',
     long_description=open('README.rst').read(),
     python_requires='>=3.7',
