@@ -120,8 +120,6 @@ class ParseUTF:
                     elif tag == "[link]_":      # url link
                         tgS = tagS.strip("[link]_").strip()
                         uS = "link: "+ tgS ; break
-                    elif tag == "[literal]_":   # literal text
-                        uS = "" ; break
                     elif tag == "[r]_":         # right adjust text
                         tagL = tagS.strip().split("[r]_")
                         uS = (tagL[0].strip()).rjust(
@@ -181,22 +179,21 @@ class ParseUTF:
             if uS[0:2] == "##":  continue           # remove review comment
             uS = uS[4:]                             # remove indent
             if len(uS) == 0 : uS = " "
+            continue
             try: 
-                if uS[0] == "#" : continue          # remove comment 
-                if uS[0:2] == "::" : continue       # remove preformat         
+                if uS[0] == "#" : continue          # remove comment      
             except:
                 print(" "); self.calcS += "\n"
                 continue
+            if uS.strip() == "[literal]_" : continue
             if re.search(_rgx, uS):                 # check for tag
                 uS, self.setsectD = self._tags(uS, tagL)
                 print(uS.rstrip()); self.calcS += uS.rstrip() + "\n"
                 continue     
             if typeS == "value":
                 self.setcmdD["saveB"] = False  
-                if "=" in uS:
-                    if uS.strip()[-2] == "||":      # write value to file
-                        uS = uS.replace("||"," ")
-                        self.setcmdD["saveB"] = True                      
+                if "=" in uS and uS.strip()[-2] == "||":  # check for save
+                        uS = uS.replace("||"," "); self.setcmdD["saveB"] = True                      
                     uL = uS.split('|')
                     self._vassign(uL)
                     continue

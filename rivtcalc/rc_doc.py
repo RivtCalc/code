@@ -1,4 +1,3 @@
-
 #!
 """process model-strings to reST-strings
 
@@ -28,8 +27,6 @@ from sympy import printing
 from sympy.core.alphabets import greeks
 import matplotlib.pyplot as plt 
 import matplotlib.image as mpimg
-from IPython.display import display as _display
-from IPython.display import Image as _Image
 from io import StringIO
 from sympy.parsing.latex import parse_latex
 from sympy.abc import _clash2
@@ -46,14 +43,14 @@ except:
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 
 class ParseReST:
-    """transform model-string to calc-string
+    """process model-string to reST-string
 
     """
     
     def __init__(self, strL: list, folderD: dict, setcmdD: dict,
          setsectD: dict, rivtD: dict, exportS: str):
         
-        """transform model-string to calc-string
+        """transform model-string to reST-string
 
         The ParseUTF class converts model-strings to calc-string.
         Model-strings must be indented 4 spaces. Commands start with
@@ -69,14 +66,12 @@ class ParseReST:
             rivtD (dict): rivtD
         """
     
-        self.calcS = """"""
-        self.exportS = exportS
+        self.restS = """"""
         self.strL = strL
         self.folderD = folderD
         self.setsectD = setsectD
         self.setcmdD = setcmdD
         self.rivtD = rivtD
-        self.valL = []
     
     def _refs(self, objnumI: int, typeS: str) -> str:
         """reference label for equations, tables and figures
@@ -89,7 +84,6 @@ class ParseReST:
         Returns:
             str: [description]
         """
-
         objfillS = str(objnumI).zfill(2)
         sfillS = str(self.setsectD["snum"]).strip().zfill(2)
         rnumS = str(self.setsectD["rnum"])
@@ -133,7 +127,7 @@ class ParseReST:
                         tgS = tagS.strip("[link]_").strip()
                         uS = "link: "+ tgS ; break
                     elif tag == "[literal]_":   # literal text
-                        uS = "" ; break
+                        uS = "::" ; break
                     elif tag == "[r]_":         # right adjust text
                         tagL = tagS.strip().split("[r]_")
                         uS = (tagL[0].strip()).rjust(
@@ -176,7 +170,7 @@ class ParseReST:
 
         return uS, self.setsectD
     
-    def _parseutf(self, typeS: str, cmdL: list, methL: list, tagL: list ):
+    def _parserest(self, typeS: str, cmdL: list, methL: list, tagL: list ):
         """parse rivt-string`
 
         Args:
@@ -194,8 +188,7 @@ class ParseReST:
             uS = uS[4:]                             # remove indent
             if len(uS) == 0 : uS = " "
             try: 
-                if uS[0] == "#" : continue          # remove comment 
-                if uS[0:2] == "::" : continue       # remove preformat         
+                if uS[0] == "#" : continue          # remove comment      
             except:
                 print(" "); self.calcS += "\n"
                 continue
@@ -204,12 +197,8 @@ class ParseReST:
                 print(uS.rstrip()); self.calcS += uS.rstrip() + "\n"
                 continue     
             if typeS == "value":
-                self.setcmdD["saveB"] = False  
-                if "=" in uS:
-                    if uS.strip()[-2] == "||":      # write value to file
-                        uS = uS.replace("||"," ")
-                        self.setcmdD["saveB"] = True                      
-                    uL = uS.split('|')
+                self.setcmdD["saveB"] = False       
+                if "=" in uS:   
                     self._vassign(uL)
                     continue
                 if len(uS.strip()) == 0:            # blank line - write table
@@ -228,7 +217,7 @@ class ParseReST:
 
             print(uS.rstrip()); self.calcS += uS.rstrip() + "\n"
 
-    def r_utf(self) -> str:
+    def r_rest(self) -> str:
         """ parse repository string
        
        Returns:
@@ -259,7 +248,7 @@ class ParseReST:
     def _rattach(self, rsL):
         b = 5
     
-    def i_utf(self) -> tuple:                
+    def i_rest(self) -> tuple:                
         """ parse insert-string
        
         Returns:
@@ -443,7 +432,7 @@ class ParseReST:
             uS = ("Figure path: " + pthshort2S + "\n")
             print(uS); self.calcS += uS + "\n"
 
-    def v_utf(self)-> tuple:
+    def v_rest(self)-> tuple:
         """parse value-string
 
         Return:
@@ -678,7 +667,7 @@ class ParseReST:
     def _vfunc(self, vL: list):
         pass
 
-    def t_utf(self) -> tuple:
+    def t_rest(self) -> tuple:
         """parse table-strings
 
         Return:
@@ -701,13 +690,16 @@ class ParseReST:
 
 
 
+#---------------------------------------------------------------------------
 
 
+#---------------------------------------------------------------------------
 
 
+#---------------------------------------------------------------------------
 
 
-
+#---------------------------------------------------------------------------
 
 
 class ExecRST(object):
