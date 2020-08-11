@@ -50,20 +50,14 @@ class ParseReST:
     def __init__(self, strL: list, folderD: dict, setcmdD: dict,
          setsectD: dict, rivtD: dict, exportS: str):
         
-        """transform model-string to reST-string
-
-        The ParseUTF class converts model-strings to calc-string.
-        Model-strings must be indented 4 spaces. Commands start with
-        a double bar (||) and are single line, except where noted. Tags
-        are included inline, with the associated text.
-        
+        """process model-string to reST-string
+       
         Args:
-            exportS (str): exportS
-            strL (list): strL
-            folderD (dict): folderD
-            setsectD (dict): setsectD
-            setcmdD (dict): setcmdD
-            rivtD (dict): rivtD
+            strL (list): string list
+            folderD (dict): folders
+            setsectD (dict): set section parameters
+            setcmdD (dict): set command parameters
+            rivtD (dict): rivt values
         """
     
         self.restS = """"""
@@ -127,7 +121,7 @@ class ParseReST:
                         tgS = tagS.strip("[link]_").strip()
                         uS = "link: "+ tgS ; break
                     elif tag == "[literal]_":   # literal text
-                        uS = "::" ; break
+                        uS = "::\\n" ; break
                     elif tag == "[r]_":         # right adjust text
                         tagL = tagS.strip().split("[r]_")
                         uS = (tagL[0].strip()).rjust(

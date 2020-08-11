@@ -22,7 +22,7 @@
     Output functions -----------------------------------------------------
         name                   description
     =================  ===================================================
-    write_values()     write values to python file for import
+    write_values()     write values for import
     write_utf()        write calc to utf8 text file
     write_pdf()        write calc to pdf file
     write_html()       write doc to html file
@@ -187,7 +187,7 @@ _dpath    = Path(_ppath / "docs")                    # doc folder path
 _rppath   = Path(_ppath / "reports")                 # report folder path
 _rname    = "c"+_cname[1:]                           # calc file basename
 _utffile  = Path(_cpath / ".".join((_rname, "txt"))) # utf calc output
-_expfile  = Path(_cpath / "scripts" / "".join(_cfileS)) # export file
+_expfile  = Path(_cpath / "data" / "".join(_cfileS)) # export file
 # settings - global 
 utfcalcS = """"""                                   # utf calc string
 rstcalcS = """"""                                   # reST calc string
@@ -292,7 +292,7 @@ def write_utf():
     #    f1.write(rstcalcS.encode("UTF-8"))
     print("reST calc written to file")
     utfcalcS = """"""
-    
+
 def write_pdf():
     txtfile = " "
     with open(txtfile, "wb") as f1:
@@ -319,10 +319,10 @@ def write_report():
     pass
 
 def write_values():
-    """ write value assignments to Python file
+    """ write value assignments to csv file
  
         File name: calc file name prepended with 'v'
-        File path: scipts folder      
+        File path: data folder      
     """
     
     str1 =  ("""header string\n""")
@@ -330,7 +330,7 @@ def write_values():
     with open(_expfile, 'w') as expF: expF.write(str1)
 
 def R(rawS: str):
-    """repository-string to utf calc-string
+    """repository-string to utf-string
     
     Args:
         rawstrS (str): repository-string
@@ -342,7 +342,7 @@ def R(rawS: str):
     utfcalcS += rcalcS
 
 def I(rawS: str):
-    """insert-string to utf calc-string
+    """insert-string to utf-string
     
     Args:
         rawstrS (str): insert-string
@@ -354,7 +354,7 @@ def I(rawS: str):
     utfcalcS += icalcS
 
 def V(rawS: str):
-    """value-string to utf calc-string
+    """value-string to utf-string
     
     Args:
         rawstr (str): value-string
@@ -366,7 +366,7 @@ def V(rawS: str):
     utfcalcS += vcalcS
 
 def T(rawS: str):
-    """table-string to utf calc-string
+    """table-string to utf-string
      
      Args:
         rawstr (str): table-string   
