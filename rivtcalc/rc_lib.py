@@ -72,13 +72,14 @@ I('''insert-string contains static text, tables and images.
                                                                 table title [t]_
     ||table | x.csv | 60 {max width} | [2,1,3,4] {cols} | [1,3] {totals} | [4]
 
-    ||image | x.png {image file} | 1. {scale}
                                                              figure caption [f]_
+    ||image | x.png {image file} | 1. {scale}
     
     Side by side images.
-    ||image | x.png, y.jpg | 1.,0.5
                                                        first figure caption [f]_
                                                       second figure caption [f]_
+    ||image | x.png, y.jpg | 1.,0.5
+      
     ''')
 V('''value-string defines active values and equations
     
@@ -119,8 +120,8 @@ V('''value-string defines active values and equations
                                                         another table title [t]_
     ||table | x.csv | 60    
     
-    ||image | x.png | 1.
                                                              figure caption [f]_
+    ||image | x.png | 1.
     ''') 
 T('''table-string defines tables and plots with simple Python statements
     
@@ -132,10 +133,10 @@ T('''table-string defines tables and plots with simple Python statements
     Tags -----------------------------------------------------------------
        tag               description
     ===============  ======================================================
-    [nn]_ abc def       section title and number in first (descriptor) line
-    [abc123]_           citation        
+    [nn]_ abc def       section title and number in descriptor line (first line)
+    [abc123]__          citation (double underscore)
+    [#]__               autonumbered footnote  (double underscore)       
     abc def [cite]_     citation description    
-    [#]_                autonumbered footnote
     abc def [foot]_     footnote description
     abc def [t]_        right justify table title, autoincrement number   
     abc def [e]_        right justify equation label, autoincrement number
@@ -194,9 +195,8 @@ rstcalcS = """"""                                   # reST calc string
 exportS  = """"""                                   # calc values export string
 rivtcalcD: dict ={}                                # calc values dictonary
 _setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
-                    "sname": "", "snum": "", "swidth": 80,
-                    "enum":  0, "fnum": 0, "tnum" : 0, "ftnum": 0, "cite": " ",
-                    "ftqueL": deque([1]), "ctqueL": deque([1])}
+            "sname": "", "snum": "", "swidth": 80, "enum":  0, "tnum" : 0,
+   "figqueL": deque([[0,"cap"]]), "ftqueL": deque([1]), "ctqueL": deque([1])}
 _setcmdD = {"cwidth": 50,"scale1F": 1.,"scale2F": 1.,"writeS": "table",
                                     "saveB": False, "trmrI": 2,"trmtI": 2}
 _foldD: dict = {
@@ -287,10 +287,10 @@ def write_utf():
     with open(_utffile, 'wb') as f1:
         f1.write(utfcalcS.encode("UTF-8"))
     print("utf calc written to file")
-    _write_reSt():
+    #_write_reSt()
     #with open(_rstfile, "wb") as f1:
     #    f1.write(rstcalcS.encode("UTF-8"))
-    print("reST calc written to file")
+    #print("reST calc written to file")
     utfcalcS = """"""
 
 def write_pdf():
