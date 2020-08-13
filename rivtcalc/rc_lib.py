@@ -94,17 +94,17 @@ V('''value-string defines active values and equations
     Set value parameters where sub means to render equation with substition.
     ||value | sub {or nosub} | 2,2 {truncate result, terms}  
     
-    Import values from csv or xlxs file, starting with the second row.    
+    Import values from a csv file, starting with the second row.    
     ||value | file | file.csv or file.xlsx
     
-    The csv file must have the structure:
+    Import a list of values from rows of a csv file 
+    ||value | filerows | file.csv | [1:4] {rows to import} 
+
+    For a value file the csv file must have the structure:
     [literal]_
     variable name, value, description, primary unit, secondary unit
-
-    Import a list of values from a csv file 
-    ||value | list | file.csv | [1:4] {rows to import}
-
-    The csv file must have the structure:
+    
+    For file rows the csv file must have the structure:
     [literal]_
     variable name, value1, value2, value3, ....
     
@@ -150,53 +150,49 @@ T('''table-string defines tables and plots with simple Python statements
 """
 import os
 import sys
+import time
 import textwrap
 import logging
 import warnings
 import re
+import runpy
 import numpy as np
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
-
 from rivtcalc.rc_unit import *
 import rivtcalc.rc_calc as _rc_calc
+from contextlib import suppress
 #import rivt.rivt_doc as _rdoc
 #import rivt.rivt_reprt as _reprt
 #import rivt.rivt_chk as _rchk                   
 
-try:
-    _modfileS = sys.argv[1]                           #  check source of file
-except:
-    _modfileS = sys.argv[0]
-if ".py" in _modfileS:
-    print("model file from command line: ", _modfileS)
-    write_utf()
-else:
-    import __main__
-    _modfileS = (__main__.__file__)
-    print("model file from IDE: ", _modfileS)
+try: _modfileS = sys.argv[1]                           #  check source of file
+except: _modfileS = sys.argv[0]
+if ".py" not in _modfileS:
+    import __main__; _modfileS = (__main__.__file__)
+    #print("model file from IDE: ", _modfileS)
  
 _cwdS = os.getcwd()
 _cfull = Path(_modfileS)                             # model file full path
 _cfileS   = _cfull.name                              # model file name
 _cname    = _cfileS.split(".py")[0]                  # model file basename
-_rivpath  = Path("rivtcalc.rivt_lib.py").parent    # rivt program path
+_rivpath  = Path("rivtcalc.rivt_lib.py").parent      # rivt program path
 _cpath    = _cfull.parent                            # calc folder path
 _ppath    = _cfull.parent.parent                     # project folder path
 _dpath    = Path(_ppath / "docs")                    # doc folder path
 _rppath   = Path(_ppath / "reports")                 # report folder path
 _rname    = "c"+_cname[1:]                           # calc file basename
-_utffile  = Path(_cpath / ".".join((_rname, "txt"))) # utf calc output
+_utffile  = Path(_cpath / ".".join((_rname, "txt"))) # utf output
 _expfile  = Path(_cpath / "data" / "".join(_cfileS)) # export file
-# settings - global 
-utfcalcS = """"""                                   # utf calc string
-rstcalcS = """"""                                   # reST calc string
-exportS  = """"""                                   # calc values export string
-rivtcalcD: dict ={}                                # calc values dictonary
-_setsectD: dict = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
-            "sname": "", "snum": "", "swidth": 80, "enum":  0, "tnum" : 0,
-   "figqueL": deque([[0,"cap"]]), "ftqueL": deque([1]), "ctqueL": deque([1])}
+                                            # global settings
+utfcalcS = """"""                                    # utf calc string
+rstcalcS = """"""                                    # reST calc string
+exportS  = """"""                                    # values export string
+rivtcalcD = {}                                       # values dictonary
+_setsectD = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
+            "sname": "", "snum": "", "swidth": 80, "enum":  0, "tnum": 0,
+    "figqueL": deque([[0,"cap"]]), "ftqueL": deque([1]), "ctqueL": deque([1])}
 _setcmdD = {"cwidth": 50,"scale1F": 1.,"scale2F": 1.,"writeS": "table",
                                     "saveB": False, "trmrI": 2,"trmtI": 2}
 _foldD: dict = {
@@ -238,7 +234,7 @@ logging.info(f"""model: {_rshortP}""" )
 logging.info(f"""backup: {_bshortP}""")
 logging.info(f"""logging: {_lshortP}""")
 print(" ")                       # todo: check folder structure here
-        
+
 def _initclass(rawS: str):
     """return class instance for rivt-string
 
@@ -273,24 +269,37 @@ def _update(hdrS: str):
         headS = " " +  nameS + (rnumS + " - " +
                 ("[" + snumS + "]")).rjust(widthI - len(nameS) - 1)
         bordrS = widthI * "="
-        utfS = bordrS + "\n" + headS + "\n" + bordrS +"\n"
+        utfS = "\n" + bordrS + "\n" + headS + "\n" + bordrS +"\n"
         print(utfS); utfcalcS += utfS
 
-def _write_reST():
-    pass
+def write_values():
+    """ write value assignments to csv file
+ 
+        File name: calc file name prepended with 'v'
+        File path: data folder      
+    """
+    
+    str1 =  ("""header string\n""")
+    str1 = str1 + exportS
+    with open(_expfile, 'w') as expF: expF.write(str1)
 
 def write_utf():
-    """write utf calc and reST-string files
+    """write utf-string and reST-string files
     """
     global utfcalcS
-    
-    with open(_utffile, 'wb') as f1:
-        f1.write(utfcalcS.encode("UTF-8"))
-    print("utf calc written to file")
-    #_write_reSt()
-    #with open(_rstfile, "wb") as f1:
-    #    f1.write(rstcalcS.encode("UTF-8"))
-    #print("reST calc written to file")
+
+    f1 = open(_cfull, "r"); utfcalcL = f1.readlines(); f1.close()
+    print("model file read: " + str(_cfull))
+    for iS in enumerate(utfcalcL):
+        if "write_utf" in iS[1]: 
+            indx = int(iS[0]); break
+    utfcalcL = utfcalcL[0:indx]+utfcalcL[indx+1:]
+    cmdS = ''.join(utfcalcL)
+    exec(cmdS, globals(), locals())
+    with open(_utffile, "wb") as f1: f1.write(utfcalcS.encode("UTF-8"))
+    print("utf calc written to file", flush=True)
+    with suppress(BaseException): raise SystemExit()
+    print("program complete")
     utfcalcS = """"""
 
 def write_pdf():
@@ -317,17 +326,6 @@ def write_report():
     """[summary]
     """
     pass
-
-def write_values():
-    """ write value assignments to csv file
- 
-        File name: calc file name prepended with 'v'
-        File path: data folder      
-    """
-    
-    str1 =  ("""header string\n""")
-    str1 = str1 + exportS
-    with open(_expfile, 'w') as expF: expF.write(str1)
 
 def R(rawS: str):
     """repository-string to utf-string

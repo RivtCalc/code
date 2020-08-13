@@ -15,6 +15,7 @@ import textwrap
 import logging
 import warnings
 import re
+import importlib
 import numpy as np
 from pathlib import Path
 from collections import deque
@@ -54,18 +55,14 @@ if __name__ == "__main__":
         _cfileS = Path(_cfull).name                   # calc file name
         _cname  = _cfileS.split(".py")[0]             # calc file basename
         print("current folder: ", os.getcwd())
-        print("model name: ", _cname)
-        __import__(_cname)
+        print("model name: ", _cfileS)
+        importlib.import_module(_cname)
     except ImportError as error:
-        # Output expected ImportErrors.
         print("error---------------------------------------------")
-        print(error.__class__.__name__ + ": " + error.message)
+        print(error)
     except Exception as exception:
         # Output unexpected Exceptions.
         print("exception-----------------------------------------")
-        print(exception, False)
-        print(exception.__class__.__name__ + ": " + exception.message)
-    #finally:
-    #    print("model file: ", _modfileS)
-    #    _cmdlinehelp()
+        print(exception)
+
 

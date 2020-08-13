@@ -31,6 +31,7 @@ from numpy import *
 from rivtcalc.rc_unit import *
 
 logging.getLogger("numexpr").setLevel(logging.WARNING)
+#tabulate.PRESERVE_WHITESPACE = True
 
 class ParseUTF:
     """converts model-strings to calc-strings
@@ -104,52 +105,49 @@ class ParseUTF:
             uS = tagS[indxstrtI:indxendI]
             self.setsectD["ctqueL"].append(uS)
         else:
+            tagL = [tag for tag in tagL if(tag in tagS)]
             for tag in tagL:
-                if tag in tagS:
-                    if tag == "[#]_":           # auto increment footnote mark                    
-                        ftnumI = self.setsectD["ftqueL"][-1] + 1
-                        self.setsectD["ftqueL"].append(ftnumI)      
-                        uS = tagS.replace("[x]_", "[" + str(ftnumI) + "]")
-                    if tag == "[page]_":        # new page
-                        uS = int(self.setsectD["swidth"]) * "." ; break
-                    elif tag == "[line]_":      # horizontal line
-                        uS = int(self.setsectD["swidth"]) * '-' ; break   
-                    elif tag == "[link]_":      # url link
-                        tgS = tagS.strip("[link]_").strip()
-                        uS = "link: "+ tgS ; break
-                    elif tag == "[r]_":         # right adjust text
-                        tagL = tagS.strip().split("[r]_")
-                        uS = (tagL[0].strip()).rjust(swidthI); break
-                    elif tag == "[c]_":        # center text  
-                        tagL = tagS.strip().split("[c]_")
-                        uS = (tagL[0].strip()).rjust(swidthI); break
-                    elif tag == "[f]_":        # figure caption                    
-                        fnumI = int(self.setsectD["figqueL"][-1][0])
-                        capS = tagS.strip("[f]_").strip()
-                        self.setsectD["figqueL"].append([fnumI+1, capS])
-                        uS = ""; break
-                    elif tag == "[e]_":         # equation label
-                        tagL = tagS.strip().split("[e]_")
-                        enumI = int(self.setsectD["enum"]) + 1
-                        self.setsectD["enum"] = enumI
-                        refS = self._refs(enumI, "[ Equ: ")
-                        uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI)
-                        uS = ""; break
-                    elif tag == "[t]_":         # table label
-                        tagL = tagS.strip().split("[t]_")
-                        tnumI = int(self.setsectD["tnum"]) + 1
-                        self.setsectD["tnum"] = tnumI
-                        refS = self._refs(tnumI, "[ Table: ")
-                        uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI) 
-                        uS = ""; break
-                    elif tag == "[foot]_":      # footnote label
-                        tagS = tagS.strip("[foot]_").strip()
-                        uS = self.setsectD["ftqueL"].popleft() + tagS; break
-                    elif tag == "[cite]_":      # citation label   
-                        tagS = tagS.strip("[cite]_").strip()
-                        uS = self.setsectD["ctqueL"].popleft() + tagS; break
-                else:
-                    uS = tagS
+                if tag == "[#]_":           # auto increment footnote mark                    
+                    ftnumI = self.setsectD["ftqueL"][-1] + 1
+                    self.setsectD["ftqueL"].append(ftnumI)      
+                    uS = tagS.replace("[x]_", "[" + str(ftnumI) + "]")
+                elif tag == "[page]_":        # new page
+                    uS = int(self.setsectD["swidth"]) * "." 
+                elif tag == "[line]_":      # horizontal line
+                    uS = int(self.setsectD["swidth"]) * '-'   
+                elif tag == "[link]_":      # url link
+                    tgS = tagS.strip("[link]_").strip()
+                    uS = "link: "+ tgS 
+                elif tag == "[r]_":         # right adjust text
+                    tagL = tagS.strip().split("[r]_")
+                    uS = (tagL[0].strip()).rjust(swidthI)
+                elif tag == "[c]_":        # center text  
+                    tagL = tagS.strip().split("[c]_")
+                    uS = (tagL[0].strip()).rjust(swidthI)
+                elif tag == "[f]_":        # figure caption                    
+                    fnumI = int(self.setsectD["figqueL"][-1][0])
+                    capS = tagS.strip("[f]_").strip()
+                    self.setsectD["figqueL"].append([fnumI+1, capS])
+                elif tag == "[e]_":         # equation label
+                    tagL = tagS.strip().split("[e]_")
+                    enumI = int(self.setsectD["enum"]) + 1
+                    self.setsectD["enum"] = enumI
+                    refS = self._refs(enumI, "[ Equ: ")
+                    uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI)
+                elif tag == "[t]_":         # table label
+                    tagL = tagS.strip().split("[t]_")
+                    tnumI = int(self.setsectD["tnum"]) + 1
+                    self.setsectD["tnum"] = tnumI
+                    refS = self._refs(tnumI, "[ Table: ")
+                    uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI) 
+                elif tag == "[foot]_":      # footnote label
+                    tagS = tagS.strip("[foot]_").strip()
+                    uS = self.setsectD["ftqueL"].popleft() + tagS
+                elif tag == "[cite]_":      # citation label   
+                    tagS = tagS.strip("[cite]_").strip()
+                    uS = self.setsectD["ctqueL"].popleft() + tagS
+            else:
+                uS = tagS
 
         return uS, self.setsectD
     
@@ -185,20 +183,17 @@ class ParseUTF:
                 self.setcmdD["saveB"] = False  
                 if "=" in uS and uS.strip()[-2] == "||":  # check for save
                     uS = uS.replace("||"," "); self.setcmdD["saveB"] = True                      
-                    uL = uS.split('|')
-                    self._vassign(uL)
+                    uL = uS.split('|'); self._vassign(uL)
                     continue
                 if len(uS.strip()) == 0:            # blank line - write table
                     if len(self.valL) > 0: self._vtable()
                     self.valL = []
-                    print(uS.rstrip(" ")); self.calcS += " \n"
-                    continue
-            if uS[0:2] == "||":                     # command
+                    print(uS.rstrip(" ")); self.calcS += " \n"; continue
+            if uS[0:2] == "||":
                 uL = uS[2:].split("|")
                 indxI = cmdL.index(uL[0].strip())
-                #print(typeS, indxI) 
-                methL[indxI](uL)                    # call attribute                          
-                continue
+                methL[indxI](uL); continue          # call method from list                         
+ 
 
             print(uS); self.calcS += uS.rstrip() + "\n"
 
@@ -489,70 +484,62 @@ class ParseUTF:
         """
         locals().update(self.rivtD)
     
-        if len(vL) < 5: vL += [''] * (5 - len(vL))                    # pad
-        self.valL = []                                                # values
-        if vL[1].strip() == "sub" or vL[1].strip() == "nosub":        # sub      
+        valL = []                                       # list of table values
+        if len(vL) < 5: vL += [''] * (5 - len(vL))               # pad command                                                        
+        if vL[1].strip() == "sub" or vL[1].strip() == "nosub":   # sub      
             self.setcmdD["values"] = vL[1].strip() 
             self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
             self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
-        elif vL[1].strip() == "file":                                 # file
+            return
+        elif vL[1].strip() == "file":                            # file
             vfileS = Path(self.folderD["tpath"] / vL[2].strip())
+            valL.append(["variable","value","[value]", "description"]) # header
             with open(vfileS,'r') as csvfile:
                 readL = list(csv.reader(csvfile))
-            #print(f"{readL=}")
-            for vaL in readL[1:]:                         # skip first line
-                if len(vaL) < 5: vaL += [''] * (5 - len(vL))  # pad missing 
-                varS = vaL[0].strip()
-                valS = vaL[1].strip()
+            for vaL in readL[1:]:                 
+                if len(vaL) < 5: vaL += [''] * (5 - len(vL))     # pad values
+                varS = vaL[0].strip(); valS = vaL[1].strip()
                 descripS = vaL[2].strip()
-                unit1S = vaL[3].strip()
-                unit2S = vaL[4].strip()
+                unit1S = vaL[3].strip(); unit2S = vaL[4].strip()
                 try: valU = unum.Unum.coerceToUnum(float(valS))
                 except TypeError:
                     try: valU = unum.Unum.coerceToUnum(list(valS))
-                    except:
-                        raise TypeError
+                    except: raise TypeError
                 if len(unit1S):
                     if valU.strUnit(): valS1 = valU.asUnit(eval(unit1S))
                     else: valU1 = valU*eval(unit1S)                                    
-                valU2 = unum.Unum.coerceToUnum(valS)
-                if len(unit2S): 
-                    valU2 = valU1.asUnit(eval(unit2S))
-                else:
-                    valU2 = valU1
+                if len(unit2S): valU2 = valU1.asUnit(eval(unit2S))
+                else: valU2 = valU1
                 if type(eval(valS)) == list:
                     if len(eval(valS)) > 3:
-                        trimL= eval(valU1)[:3]
-                        trimL.append("... " + unit1S)
+                        trimL= eval(valU1)[:3]; trimL.append("... " + unit1S)
                         valU1 = str(trimL)
-                        trimL= eval(valU2)[:3]
-                        trimL.append("... " + unit2S)
+                        trimL= eval(valU2)[:3]; trimL.append("... " + unit2S)
                         valU2 = str(trimL)
-                    else: pass 
-                self.valL.append([varS, valU1, valU2, descripS])
-        elif vL[1].strip() == "list":                                  # list 
+                    else: pass
+                valL.append([varS, valU1, valU2, descripS])
+        elif vL[1].strip() == "filerows":                          # list 
+            valL.append(["variable", "values"])                   
             vfileS = Path(self.folderD["tpath"] / vL[3].strip())
-            vecS = vL[4].strip()
-            varS = vL[5].strip()
-            rL = []
-            veS = vecS.strip("r")
+            vecL = eval(vL[3].strip())
             with open(vfileS,'r') as csvF:
                 reader = csv.reader(csvF)
-                for row in range(int(veS)): val = next(reader)
-            rL = rL + list(val)
-            arrayS = "array(" + str(rL) + ")"  
-            cmdS = varS + "=" + arrayS
-            exec(cmdS, globals(), locals())
-            tempS = cmdS.split("array")[1].strip()
-            tempS = eval(tempS.strip("()"))
-            if len(tempS) > 3:
-                trimL= tempS[:2]
-                trimL.append(["..."])
-                valS = str(trimL)
-            else: valS = str(tempS)
-            self.valL.append([varS, valS, valS, descripS])    
-        else: pass            
-
+            vL = list(reader)
+            for i in vL:
+                varS = i[0]; varL = array(i[1:])
+                cmdS = varS + "=" + str(varL)
+                exec(cmdS, globals(), locals())
+                if len(varL) > 4: varL= str((varL[:2]).append(["..."]))
+                valL.append([varS, varL])    
+        else: pass
+        sys.stdout.flush()                                       # write table
+        old_stdout = sys.stdout
+        output = StringIO()
+        output.write(tabulate(valL, headers="firstrow", tablefmt="rst", 
+                colalign=["right","right","right","left" ]))            
+        utfS = output.getvalue(); sys.stdout = old_stdout            
+        print(utfS); self.calcS += utfS + "\n"  
+        
         self.rivtD.update(locals()) 
 
     def _vtable(self):

@@ -1,5 +1,5 @@
 #!
-"""convertsß model-strings to reST-strings
+"""converts model-strings to reST-strings
 
 The ParseReST class converts model-strings to reST-strings.
 Model-strings must be indented 4 spaces. Commands start with
@@ -46,7 +46,6 @@ class ParseReST:
     """process model-string to reST-string
 
     """
-    
     def __init__(self, strL: list, folderD: dict, setcmdD: dict,
          setsectD: dict, rivtD: dict, exportS: str):
         
@@ -97,7 +96,6 @@ class ParseReST:
             rS (str): reST string 
             setsectD (dict): section dictinoary
         """
-
         tagS = tagS.rstrip(); rS = ''
         if "]__" in tagS:   
                 indxstrtI = tagS.index("[")
@@ -541,6 +539,7 @@ class ParseReST:
         self.rivtD.update(locals())   
 
     def _vvalues(self, vL: list):
+    def _vvalues(self, vL: list):
         """import values and set parameters
 
         Args:
@@ -548,70 +547,62 @@ class ParseReST:
         """
         locals().update(self.rivtD)
     
-        if len(vL) < 5: vL += [''] * (5 - len(vL))                    # pad
-        self.valL = []                                                # values
-        if vL[1].strip() == "sub" or vL[1].strip() == "nosub":        # sub      
+        valL = []                                       # list of table values
+        if len(vL) < 5: vL += [''] * (5 - len(vL))               # pad command                                                        
+        if vL[1].strip() == "sub" or vL[1].strip() == "nosub":   # sub      
             self.setcmdD["values"] = vL[1].strip() 
             self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
             self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
-        elif vL[1].strip() == "file":                                 # file
+            return
+        elif vL[1].strip() == "file":                            # file
             vfileS = Path(self.folderD["tpath"] / vL[2].strip())
+            valL.append(["variable","value","[value]", "description"]) # header
             with open(vfileS,'r') as csvfile:
                 readL = list(csv.reader(csvfile))
-            #print(f"{readL=}")
-            for vaL in readL[1:]:                         # skip first line
-                if len(vaL) < 5: vaL += [''] * (5 - len(vL))  # pad missing 
-                varS = vaL[0].strip()
-                valS = vaL[1].strip()
+            for vaL in readL[1:]:                 
+                if len(vaL) < 5: vaL += [''] * (5 - len(vL))     # pad values
+                varS = vaL[0].strip(); valS = vaL[1].strip()
                 descripS = vaL[2].strip()
-                unit1S = vaL[3].strip()
-                unit2S = vaL[4].strip()
+                unit1S = vaL[3].strip(); unit2S = vaL[4].strip()
                 try: valU = unum.Unum.coerceToUnum(float(valS))
                 except TypeError:
                     try: valU = unum.Unum.coerceToUnum(list(valS))
-                    except:
-                        raise TypeError
+                    except: raise TypeError
                 if len(unit1S):
                     if valU.strUnit(): valS1 = valU.asUnit(eval(unit1S))
                     else: valU1 = valU*eval(unit1S)                                    
-                valU2 = unum.Unum.coerceToUnum(valS)
-                if len(unit2S): 
-                    valU2 = valU1.asUnit(eval(unit2S))
-                else:
-                    valU2 = valU1
+                if len(unit2S): valU2 = valU1.asUnit(eval(unit2S))
+                else: valU2 = valU1
                 if type(eval(valS)) == list:
                     if len(eval(valS)) > 3:
-                        trimL= eval(valU1)[:3]
-                        trimL.append("... " + unit1S)
+                        trimL= eval(valU1)[:3]; trimL.append("... " + unit1S)
                         valU1 = str(trimL)
-                        trimL= eval(valU2)[:3]
-                        trimL.append("... " + unit2S)
+                        trimL= eval(valU2)[:3]; trimL.append("... " + unit2S)
                         valU2 = str(trimL)
-                    else: pass 
-                self.valL.append([varS, valU1, valU2, descripS])
-        elif vL[1].strip() == "list":                                  # list 
+                    else: pass
+                valL.append([varS, valU1, valU2, descripS])
+        elif vL[1].strip() == "filerows":                          # list 
+            valL.append(["variable", "values"])                   
             vfileS = Path(self.folderD["tpath"] / vL[3].strip())
-            vecS = vL[4].strip()
-            varS = vL[5].strip()
-            rL = []
-            veS = vecS.strip("r")
+            vecL = eval(vL[3].strip())
             with open(vfileS,'r') as csvF:
                 reader = csv.reader(csvF)
-                for row in range(int(veS)): val = next(reader)
-            rL = rL + list(val)
-            arrayS = "array(" + str(rL) + ")"  
-            cmdS = varS + "=" + arrayS
-            exec(cmdS, globals(), locals())
-            tempS = cmdS.split("array")[1].strip()
-            tempS = eval(tempS.strip("()"))
-            if len(tempS) > 3:
-                trimL= tempS[:2]
-                trimL.append(["..."])
-                valS = str(trimL)
-            else: valS = str(tempS)
-            self.valL.append([varS, valS, valS, descripS])    
-        else: pass            
-
+            vL = list(reader)
+            for i in vL:
+                varS = i[0]; varL = array(i[1:])
+                cmdS = varS + "=" + str(varL)
+                exec(cmdS, globals(), locals())
+                if len(varL) > 4: varL= str((varL[:2]).append(["..."]))
+                valL.append([varS, varL])    
+        else: pass
+        sys.stdout.flush()                                       # write table
+        old_stdout = sys.stdout
+        output = StringIO()
+        output.write(tabulate(valL, headers="firstrow", tablefmt="rst", 
+                colalign=["right","right","right","left" ]))            
+        rS = output.getvalue(); sys.stdout = old_stdout            
+        self.restS += rS + "\n"  
+        
         self.rivtD.update(locals()) 
 
     def _vtable(self):
