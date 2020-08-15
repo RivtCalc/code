@@ -67,18 +67,18 @@ I('''insert-string contains static text, tables and images.
                                                                   equations [e]_
     ||tex | \gamma = x + 3 # latex equation 
     ||sym | x = y/2 # sympy equation 
-    ||text | x.txt | 60 {max char. width}  
+    ||text | f.txt | 60 {max char. width}  
     
                                                                 table title [t]_
-    ||table | x.csv | 60 {max width} | [2,1,3,4] {cols} | [1,3] {totals} | [4]
+    ||table | f.csv | 60 {max width} | [2,1,3,4] {cols} | [1,3] {totals} | [4]
 
                                                              figure caption [f]_
-    ||image | x.png {image file} | 1. {scale}
+    ||image | f.png {image file} | 1. {scale}
     
     Side by side images.
                                                        first figure caption [f]_
                                                       second figure caption [f]_
-    ||image | x.png, y.jpg | 1.,0.5
+    ||image | f1.png, f2.jpg | 1.,0.5
       
     ''')
 V('''value-string defines active values and equations
@@ -95,10 +95,10 @@ V('''value-string defines active values and equations
     ||value | sub {or nosub} | 2,2 {truncate result, terms}  
     
     Import values from a csv file, starting with the second row.    
-    ||value | file | file.csv or file.xlsx
+    ||value | file | f.csv
     
     Import a list of values from rows of a csv file 
-    ||value | filerows | file.csv | [1:4] {rows to import} 
+    ||value | filerows | f.csv | [1:4] {rows to import} 
 
     For a value file the csv file must have the structure:
     [literal]_
