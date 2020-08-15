@@ -6,7 +6,7 @@
 import os
 import importlib.util
 from pathlib import Path, PurePath
-import unum
+
 
 # load unum from rivt directory
 spec1 = importlib.util.find_spec("rivtcalc")
