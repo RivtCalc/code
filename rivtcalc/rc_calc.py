@@ -319,55 +319,52 @@ class ParseUTF:
         """  
         if len(iL) < 6: iL += [''] * (6 - len(iL))      # pad parameters
         utfS = ""; contentL = []; sumL = []
-        fileS = iL[1].strip(); tfileS = Path(self.folderD["tpath"], fileS)
-        if ".csv" in fileS:                             # read csv file       
-            with open(tfileS,'r') as csvfile:
-                readL = list(csv.reader(csvfile))
-            if iL[2].strip():                           # max col width
-                widthI = int(iL[2].strip())
-                self.setcmdD.update({"cwidth":widthI})
-            else:
-                widthI = int(self.setcmdD["cwidth"])
-            if iL[3].strip():                           # columns
-                incl_colL =  eval(iL[3].strip())
-                totalL = [""]*len(incl_colL)
-            else: incl_colL = range(len(readL[0]))            
-            if iL[4].strip():                           # column totals
-                sumL = eval(iL[4].strip())
-            if iL[5].strip():                           # total units
-                colL = eval(iL[5].strip()) 
-                unitL = [readL[1][i].strip() for i in colL]
-                zipL = list(zip(colL,unitL))
-                for i in zipL:
-                    colI = incl_colL.index(i[0])
-                    totalL[colI] = i[1]
-                    totalL[0] = "Totals"
-            for row in readL:
-                contentL.append([row[i] for i in incl_colL])
-            if sumL:
-                sumF = 0.
-                for colS in sumL:
-                    for row in readL:
-                        try: sumF += float(row[int(colS)])
-                        except: pass
-                    colI = int(incl_colL.index(colS))
-                    totalL[colI] = sumF
-                contentL.append(totalL)             
-            wcontentL = []
-            for rowL in contentL:
-                wrowL=[]
-                for iS in rowL:
-                    templist = textwrap.wrap(str(iS), int(widthI)) 
-                    wrowL.append("""\n""".join(templist))
-                wcontentL.append(wrowL)
-            sys.stdout.flush()
-            old_stdout = sys.stdout
-            output = StringIO()
-            output.write(tabulate(wcontentL, tablefmt="grid", headers="firstrow"))            
-            utfS = output.getvalue()
-            sys.stdout = old_stdout
-        else: pass
-        
+        fileS = iL[1].strip(); tfileS = Path(self.folderD["tpath"], fileS)                           
+        with open(tfileS,'r') as csvfile:           # read csv file
+            readL = list(csv.reader(csvfile))
+        widthI = int(self.setcmdD["cwidth"])
+        if iL[2].strip():                           # max col width
+            widthI = int(iL[2].strip())
+            self.setcmdD.update({"cwidth":widthI})
+        incl_colL = list(range(len(readL[0])))         
+        if len(eval(iL[3].strip())):                           # columns
+            incl_colL =  eval(iL[3].strip())
+            totalL = [""]*len(incl_colL)
+        if len(eval(iL[4].strip())):                           # column totals
+            sumL = eval(iL[4].strip())
+        if len(eval(iL[5].strip())):                           # total units
+            colL = eval(iL[5].strip()) 
+            unitL = [readL[1][i].strip() for i in colL]
+            zipL = list(zip(colL,unitL))
+            for i in zipL:
+                colI = incl_colL.index(i[0])
+                totalL[colI] = i[1]
+                totalL[0] = "Totals"
+        for row in readL:
+            contentL.append([row[i] for i in incl_colL])
+        if sumL:
+            sumF = 0.
+            for colS in sumL:
+                for row in readL:
+                    try: sumF += float(row[int(colS)])
+                    except: pass
+                colI = int(incl_colL.index(colS))
+                totalL[colI] = sumF
+            contentL.append(totalL)             
+        wcontentL = []
+        for rowL in contentL:
+            wrowL=[]
+            for iS in rowL:
+                templist = textwrap.wrap(str(iS), int(widthI)) 
+                wrowL.append("""\n""".join(templist))
+            wcontentL.append(wrowL)
+        sys.stdout.flush()
+        old_stdout = sys.stdout
+        output = StringIO()
+        output.write(tabulate(wcontentL, tablefmt="grid", headers="firstrow"))            
+        utfS = output.getvalue()
+        sys.stdout = old_stdout
+
         print(utfS); self.calcS += utfS + "\n"  
 
     def _iimage(self, iL: list):
