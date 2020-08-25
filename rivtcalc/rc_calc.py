@@ -64,7 +64,7 @@ class ParseUTF:
         self.setsectD = setsectD
         self.setcmdD = setcmdD
         self.rivtD = rivtD
-        self.valL = []
+        self.valL = []                  # accumulated value list
     
     def _refs(self, objnumI: int, typeS: str) -> str:
         """reference label for equations, tables and figures
@@ -98,58 +98,59 @@ class ParseUTF:
             setsectD (dict): updated section dictionary
         """
 
-        tagS = tagS.rstrip(); uS = ''; swidthI =  self.setsectD["swidth"]-1
+        tagS = tagS.rstrip(); uS = ''
+        swidthI =  self.setsectD["swidth"]-1
+        tag = list(set(tagL).intersection(tagS.split()))[0]
+        #print("tag", tag)
         if "]__" in tagS:   
             indxstrtI = tagS.index("[")
             indxendI = tagS.index("]__")
             uS = tagS[indxstrtI:indxendI]
             self.setsectD["ctqueL"].append(uS)
+        elif "]_" in tagS:
+            if tag == "[#]_":           # auto increment footnote mark                    
+                ftnumI = self.setsectD["ftqueL"][-1] + 1
+                self.setsectD["ftqueL"].append(ftnumI)      
+                uS = tagS.replace("[x]_", "[" + str(ftnumI) + "]")
+            elif tag == "[page]_":        # new page
+                uS = int(self.setsectD["swidth"]) * "." 
+            elif tag == "[line]_":      # horizontal line
+                uS = int(self.setsectD["swidth"]) * '-'   
+            elif tag == "[link]_":      # url link
+                tgS = tagS.strip("[link]_").strip()
+                uS = "link: "+ tgS 
+            elif tag == "[r]_":         # right adjust text
+                tagL = tagS.strip().split("[r]_")
+                uS = (tagL[0].strip()).rjust(swidthI)
+            elif tag == "[c]_":        # center text  
+                tagL = tagS.strip().split("[c]_")
+                uS = (tagL[0].strip()).rjust(swidthI)
+            elif tag == "[f]_":        # figure caption                    
+                fnumI = int(self.setsectD["figqueL"][-1][0])
+                capS = tagS.strip("[f]_").strip()
+                self.setsectD["figqueL"].append([fnumI+1, capS])
+            elif tag == "[e]_":         # equation label
+                tagL = tagS.strip().split("[e]_")
+                enumI = int(self.setsectD["enum"]) + 1
+                self.setsectD["enum"] = enumI
+                refS = self._refs(enumI, "[ Equ: ")
+                uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI)
+            elif tag == "[t]_":         # table label
+                tagL = tagS.strip().split("[t]_")
+                tnumI = int(self.setsectD["tnum"]) + 1
+                self.setsectD["tnum"] = tnumI
+                refS = self._refs(tnumI, "[ Table: ")
+                uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI) 
+            elif tag == "[foot]_":      # footnote label
+                tagS = tagS.strip("[foot]_").strip()
+                uS = self.setsectD["ftqueL"].popleft() + tagS
+            elif tag == "[cite]_":      # citation label   
+                tagS = tagS.strip("[cite]_").strip()
+                uS = self.setsectD["ctqueL"].popleft() + tagS
         else:
-            tagL = [tag for tag in tagL if(tag in tagS)]
-            for tag in tagL:
-                if tag == "[#]_":           # auto increment footnote mark                    
-                    ftnumI = self.setsectD["ftqueL"][-1] + 1
-                    self.setsectD["ftqueL"].append(ftnumI)      
-                    uS = tagS.replace("[x]_", "[" + str(ftnumI) + "]")
-                elif tag == "[page]_":        # new page
-                    uS = int(self.setsectD["swidth"]) * "." 
-                elif tag == "[line]_":      # horizontal line
-                    uS = int(self.setsectD["swidth"]) * '-'   
-                elif tag == "[link]_":      # url link
-                    tgS = tagS.strip("[link]_").strip()
-                    uS = "link: "+ tgS 
-                elif tag == "[r]_":         # right adjust text
-                    tagL = tagS.strip().split("[r]_")
-                    uS = (tagL[0].strip()).rjust(swidthI)
-                elif tag == "[c]_":        # center text  
-                    tagL = tagS.strip().split("[c]_")
-                    uS = (tagL[0].strip()).rjust(swidthI)
-                elif tag == "[f]_":        # figure caption                    
-                    fnumI = int(self.setsectD["figqueL"][-1][0])
-                    capS = tagS.strip("[f]_").strip()
-                    self.setsectD["figqueL"].append([fnumI+1, capS])
-                elif tag == "[e]_":         # equation label
-                    tagL = tagS.strip().split("[e]_")
-                    enumI = int(self.setsectD["enum"]) + 1
-                    self.setsectD["enum"] = enumI
-                    refS = self._refs(enumI, "[ Equ: ")
-                    uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI)
-                elif tag == "[t]_":         # table label
-                    tagL = tagS.strip().split("[t]_")
-                    tnumI = int(self.setsectD["tnum"]) + 1
-                    self.setsectD["tnum"] = tnumI
-                    refS = self._refs(tnumI, "[ Table: ")
-                    uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI) 
-                elif tag == "[foot]_":      # footnote label
-                    tagS = tagS.strip("[foot]_").strip()
-                    uS = self.setsectD["ftqueL"].popleft() + tagS
-                elif tag == "[cite]_":      # citation label   
-                    tagS = tagS.strip("[cite]_").strip()
-                    uS = self.setsectD["ctqueL"].popleft() + tagS
-            else:
-                uS = tagS
+            uS = tagS
 
-        return uS, self.setsectD
+        return uS
     
     def _parseutf(self, typeS: str, cmdL: list, methL: list, tagL: list ):
         """parse rivt-string`
@@ -165,36 +166,35 @@ class ParseUTF:
         _rgx = r'\[([^\]]+)]_'      # tags
 
         for uS in self.strL:                     
-            if uS[0:2] == "##":  continue           # remove review comment
-            uS = uS[4:]                             # remove indent
+            if uS[0:2] == "##":  continue               # remove review comment
+            uS = uS[4:]                                 # remove indent
             if len(uS) == 0 : 
-                uS = " "; continue
+                if len(self.valL) > 0:
+                    self._vtable() ; self.valL = []       # write table, reset
+                    print(uS.rstrip(" ")); self.calcS += " \n" 
+                    continue
+                else: print(" "); self.calcS += "\n"; continue
             try: 
-                if uS[0] == "#" : continue          # remove comment      
+                if uS[0] == "#" : continue              # remove comment      
             except:
-                print(" "); self.calcS += "\n"
-                continue
+                print(" "); self.calcS += "\n"; continue
             if uS.strip() == "[literal]_" : continue
-            if re.search(_rgx, uS):                 # check for tag
-                uS, self.setsectD = self._tags(uS, tagL)
-                print(uS.rstrip()); self.calcS += uS.rstrip() + "\n"
+            if re.search(_rgx, uS):                     # check for tag
+                utgS = self._tags(uS, tagL)
+                print(utgS.rstrip()); self.calcS += utgS.rstrip() + "\n"
                 continue     
             if typeS == "value":
                 self.setcmdD["saveB"] = False  
-                if "=" in uS and uS.strip()[-2] == "||":  # check for save
+                if "=" in uS and uS.strip()[-2] == "||": # check for save
                     uS = uS.replace("||"," "); self.setcmdD["saveB"] = True                      
+                if "=" in uS:                            # check for value
                     uL = uS.split('|'); self._vassign(uL)
                     continue
-                if len(uS.strip()) == 0:            # blank line - write table
-                    if len(self.valL) > 0: self._vtable()
-                    self.valL = []
-                    print(uS.rstrip(" ")); self.calcS += " \n"; continue
-            if uS[0:2] == "||":
+            if uS[0:2] == "||":                           # check for command
                 uL = uS[2:].split("|")
                 indxI = cmdL.index(uL[0].strip())
-                methL[indxI](uL); continue          # call method from list                         
+                methL[indxI](uL); continue                # call method                         
  
-
             print(uS); self.calcS += uS.rstrip() + "\n"
 
     def r_utf(self) -> str:
@@ -327,12 +327,12 @@ class ParseUTF:
             widthI = int(iL[2].strip())
             self.setcmdD.update({"cwidth":widthI})
         incl_colL = list(range(len(readL[0])))         
-        if len(eval(iL[3].strip())):                           # columns
+        if iL[3].strip():                           # columns
             incl_colL =  eval(iL[3].strip())
             totalL = [""]*len(incl_colL)
-        if len(eval(iL[4].strip())):                           # column totals
+        if iL[4].strip():                           # column totals
             sumL = eval(iL[4].strip())
-        if len(eval(iL[5].strip())):                           # total units
+        if iL[5].strip():                           # total units
             colL = eval(iL[5].strip()) 
             unitL = [readL[1][i].strip() for i in colL]
             zipL = list(zip(colL,unitL))
@@ -426,9 +426,9 @@ class ParseUTF:
 
         locals().update(self.rivtD)
 
-        vcmdL = ["value", "func", "text", 
+        vcmdL = ["data", "func", "text", 
                     "sym", "tex", "table", "image"]
-        vmethL = [self._vvalues, self._vfunc, self._itext, 
+        vmethL = [self._vdata, self._vfunc, self._itext, 
                     self._isympy, self._ilatex, self._itable, self._iimage, ]
         vtagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                       "[r]_", "[c]_", "[t]_", "[e]_", "[f]_", "[x]_"] 
@@ -445,8 +445,7 @@ class ParseUTF:
             vL (list): list of assignments
         """
         
-        locals().update(self.rivtD)
-                                                        
+        locals().update(self.rivtD)                                                  
         if len(vL) < 3:                             # equation
             self._vsymbol(vL)
         elif len(vL) > 2:                           # value
@@ -473,14 +472,13 @@ class ParseUTF:
         
         self.rivtD.update(locals())   
 
-    def _vvalues(self, vL: list):
+    def _vdata(self, vL: list):
         """import values and set parameters
 
         Args:
             vL (list): value command arguments
         """
         locals().update(self.rivtD)
-    
         valL = []                                       # list of table values
         if len(vL) < 5: vL += [''] * (5 - len(vL))               # pad command                                                        
         if vL[1].strip() == "sub" or vL[1].strip() == "nosub":   # sub      

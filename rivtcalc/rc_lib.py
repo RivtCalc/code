@@ -85,7 +85,7 @@ V('''value-string defines active values and equations
     
     Value-strings may include arbitrary text that does not include an equal
     sign.  Lines with equal signs define equations and assignments that 
-    are numerically evaluated.
+    will be numerically evaluated.
 
     x1 = 10.1*IN    | description | unit, alt unit || {save if trailing ||}
     y1 = 12.1*FT    | description | unit, alt unit 
@@ -108,12 +108,10 @@ V('''value-string defines active values and equations
     [literal]_
     variable name, value1, value2, value3, ....
     
-
-
+                                                                an equation [e]_
     v1 = x + 4*M  | unit, alt unit
-
-                                                           another equation [e]_
-    y1 = v1 / 4   | unit, alt unit || {save if trailing ||}         
+                                                           save an equation [e]_
+    y1 = v1 / 4   | unit, alt unit ||         
 
     ||func | func_file.py | func_call | var_name {import function from file}
 
