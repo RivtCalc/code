@@ -161,6 +161,7 @@ class ParseUTF:
             methL (list): method list
             tagL (list): tag list
         """
+        locals().update(self.rivtD)        
         uL = []                     # command arguments
         indxI = -1                  # method index
         _rgx = r'\[([^\]]+)]_'      # tags
@@ -195,6 +196,7 @@ class ParseUTF:
                 indxI = cmdL.index(uL[0].strip())
                 methL[indxI](uL); continue                # call method                         
  
+            self.rivtD.update(locals())
             print(uS); self.calcS += uS.rstrip() + "\n"
 
     def r_utf(self) -> str:
@@ -448,6 +450,26 @@ class ParseUTF:
         locals().update(self.rivtD)                                                  
         if len(vL) < 3:                             # equation
             self._vsymbol(vL)
+            unitL = vL[1].split(",")
+            varS = vL[0].split("=")[0].strip()
+            val1S = vL[0].split("=")[1].strip()
+            val2S = vL[0].split("=")[1].strip()
+            arrayS = "array(" + val1S + ")"
+            cmdS = str(varS + " = " + arrayS)
+            exec(cmdS, globals(), locals())
+            tempS = cmdS.split("array(")[1].strip()
+            tempS = eval(tempS.strip(")"))
+            if type(tempS) == list:
+                if len(eval(varS)) > 3:
+                    trimL= tempS[:3]; trimL.append("...")
+                    val1S = str(trimL)
+                else:
+                    val1S = str(tempS)
+            self.valL.append([varS, val1S, val2S])          
+            pyS = str.ljust(varS + " = " + arrayS, 40) + " # equation" + "\n"
+            #print(pyS)
+            if self.setcmdD["saveB"] == True:  self.exportS += pyS
+            self._vtable(); self.valL=[]
         elif len(vL) > 2:                           # value
             descripS = vL[1].strip()
             unitL = vL[2].split(",")
