@@ -517,6 +517,8 @@ class ParseUTF:
                 varS = vaL[0].strip(); valS = vaL[1].strip()
                 unit1S, unit2S = vaL[2].strip(), vaL[3].strip()
                 descripS = vaL[4].strip()
+                if not len(varS):
+                    valL.append(['---------', ' ', ' ', ' ']); continue
                 val1U = val2U = array(eval(valS))
                 if unit1S != "-": 
                     if type(eval(valS)) == list: 
@@ -547,7 +549,7 @@ class ParseUTF:
         old_stdout = sys.stdout
         output = StringIO()
         output.write(tabulate(valL, headers="firstrow", tablefmt="rst", 
-                colalign=["right","right","right","left" ]))            
+                colalign=["left","right","right","left" ]))            
         utfS = output.getvalue(); sys.stdout = old_stdout            
         print(utfS); self.calcS += utfS + "\n"  
         self.rivtD.update(locals()) 
@@ -556,14 +558,12 @@ class ParseUTF:
         """write value table"""
 
         locals().update(self.rivtD)
-    
         df = pd.DataFrame(self.valL)                            
         hdrL = ["variable", "value", "[value]", "description"]
         old_stdout = sys.stdout; output = StringIO()
         output.write(tabulate(df, tablefmt="grid", headers=hdrL, showindex=False))            
         valS = output.getvalue()
         sys.stdout = old_stdout; sys.stdout.flush()
-
         self.rivtD.update(locals())                        
         print(valS.rstrip()); self.calcS += valS.rstrip() + "\n"
 
