@@ -185,11 +185,6 @@ class ParseUTF:
                 print(utgS.rstrip()); self.calcS += utgS.rstrip() + "\n"
                 continue     
             if typeS == "value":
-                if vL[1].strip() == "sub" or vL[1].strip() == "nosub":  # format
-                    self.setcmdD["values"] = vL[1].strip() 
-                    self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
-                    self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
-                    continue
                 self.setcmdD["saveB"] = False  
                 if "=" in uS and uS.strip()[-2] == "||":               # save
                     uS = uS.replace("||"," "); self.setcmdD["saveB"] = True                      
@@ -432,18 +427,26 @@ class ParseUTF:
          """
 
         locals().update(self.rivtD)
-
-        vcmdL = ["data", "func", "text", 
+        vcmdL = ["format","data", "func", "text", 
                     "sym", "tex", "table", "image"]
-        vmethL = [self._vdata, self._vfunc, self._itext, 
+        vmethL = [self._vformat, self._vdata, self._vfunc, self._itext, 
                     self._isympy, self._ilatex, self._itable, self._iimage, ]
         vtagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                       "[r]_", "[c]_", "[t]_", "[e]_", "[f]_", "[x]_"] 
-
         self._parseutf("value", vcmdL, vmethL, vtagL)
-
         self.rivtD.update(locals())
         return self.calcS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
+
+    def _vformat(self, vL: list):
+        """[summary]
+
+        Args:
+            vL (list): [description]
+        """
+
+        self.setcmdD["values"] = vL[1].strip() 
+        self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
+        self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
 
     def _vassign(self, vL: list):
         """assign values to variables
@@ -554,15 +557,13 @@ class ParseUTF:
         print(utfS); self.calcS += utfS + "\n"  
         self.rivtD.update(locals()) 
 
-    def _vtable(self):
+    def _vtable(self, tbl, hdr, tblfmt):
         """write value table"""
 
         locals().update(self.rivtD)
-        df = pd.DataFrame(self.valL)                            
         hdrL = ["variable", "value", "[value]", "description"]
         old_stdout = sys.stdout; output = StringIO()
-        output.write(tabulate(df, tablefmt="grid", headers=hdrL, showindex=False))            
-        valS = output.getvalue()
+        output.write(tabulate(tbl, tablefmt=tblfmt, headers=hdr, showindex=False))                    valS = output.getvalue()
         sys.stdout = old_stdout; sys.stdout.flush()
         self.rivtD.update(locals())                        
         print(valS.rstrip()); self.calcS += valS.rstrip() + "\n"
