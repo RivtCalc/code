@@ -171,7 +171,7 @@ class ParseUTF:
             uS = uS[4:]                                 # remove indent
             if len(uS) == 0 : 
                 if len(self.valL) > 0:
-                    self._vtable() ; self.valL = []       # write table, reset
+                    self._vtable() ; self.valL = []       # write vtable, reset
                     print(uS.rstrip(" ")); self.calcS += " \n" 
                     continue
                 else: print(" "); self.calcS += "\n"; continue
@@ -185,13 +185,18 @@ class ParseUTF:
                 print(utgS.rstrip()); self.calcS += utgS.rstrip() + "\n"
                 continue     
             if typeS == "value":
+                if vL[1].strip() == "sub" or vL[1].strip() == "nosub":  # format
+                    self.setcmdD["values"] = vL[1].strip() 
+                    self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
+                    self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
+                    continue
                 self.setcmdD["saveB"] = False  
-                if "=" in uS and uS.strip()[-2] == "||": # check for save
+                if "=" in uS and uS.strip()[-2] == "||":               # save
                     uS = uS.replace("||"," "); self.setcmdD["saveB"] = True                      
-                if "=" in uS:                            # check for value
+                if "=" in uS:                                          # assign
                     uL = uS.split('|'); self._vassign(uL)
                     continue
-            if uS[0:2] == "||":                           # check for command
+            if uS[0:2] == "||":                           # command
                 uL = uS[2:].split("|")
                 indxI = cmdL.index(uL[0].strip())
                 methL[indxI](uL); continue                # call method                         
@@ -465,35 +470,31 @@ class ParseUTF:
                     val1S = str(trimL)
                 else: val1S = str(tempS)
             self.valL.append([varS, val1S, val2S])          
-            pyS = varS + " = " + arrayS + " # equation" + "\n" ;#print(pyS)
-            if self.setcmdD["saveB"] == True:  self.exportS += pyS
-            self._vtable(); self.valL=[]
+            if self.setcmdD["saveB"] == True:  
+                pyS = varS + " = " + arrayS + " # equation" + "\n" ;#print(pyS)
+                self.exportS += pyS
         elif len(vL) >= 3:                                       # value
             descripS = vL[2].strip()
             unitL = vL[1].split(",")
+            unit1S, unit2S = unitL[0].strip(),unitL[1].strip()
             varS = vL[0].split("=")[0].strip()
             valS = vL[0].split("=")[1].strip()
-            array1S = "uarray(" + valS + ")*" + unitL[0].strip()
-            cmd1S = str(varS + " = " + array1S)
-            print(cmd1S)
-            exec(cmd1S, globals(), locals())
-            print(eval(varS))
-            print(type(eval(varS)))
-            cmd2S = "var2S = eval(varS).asUnit(" + unitL[0].strip() + ")"
-            exec(cmd2S, globals(), locals())
-            print(eval(var2S))            
-            tempS = cmdS.split("array(")[1].strip()
-            tempS = eval(tempS.strip(")"))
-            if type(tempS) == list:
-                if len(eval(varS)) > 3:
-                    trimL= tempS[:3]; trimL.append("...")
-                    val1S = str(trimL)
-                else: val1S = str(tempS)
-            self.valL.append([varS, val1S, val2S, descripS])          
-            pyS = str.ljust(varS + " = " + arrayS, 40) + " # " + descripS + "\n"
-            #print(pyS)
-            if self.setcmdD["saveB"] == True:  self.exportS += pyS
-        
+            val1U = val2U = array(eval(valS))
+            if unit1S != "-": 
+                if type(eval(valS)) == list: 
+                    val1U = array(eval(valS)) * eval(unit1S)
+                    val2U = [q.cast_unit(eval(unit2S)) for q in val1U]
+                else:
+                    cmdS = varS + "= " + valS + "*" + unit1S
+                    exec(cmdS, globals(), locals())
+                    valU = eval(varS)                
+                    val1U = str(valU.number()) + ' ' + str(valU.unit())
+                    val2U = valU.cast_unit(eval(unit2S))
+            self.valL.append([varS, val1U, val2U, descripS])
+            if self.setcmdD["saveB"] == True:  
+                pyS = str.ljust(varS + " = " + arrayS, 40) + " # " + descripS + "\n"
+                #print(pyS)
+                self.exportS += pyS
         self.rivtD.update(locals())   
 
     def _vdata(self, vL: list):
@@ -502,23 +503,19 @@ class ParseUTF:
         Args:
             vL (list): value command arguments
         """
+        
         locals().update(self.rivtD)
         valL = []                                       # list of table values
         if len(vL) < 5: vL += [''] * (5 - len(vL))               # pad command                                                        
-        if vL[1].strip() == "sub" or vL[1].strip() == "nosub":   # sub 
-            self.setcmdD["values"] = vL[1].strip() 
-            self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
-            self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
-            return
-        elif vL[1].strip() == "file":                            # file
+        if vL[1].strip() == "file":                            # value in file
             vfileS = Path(self.folderD["tpath"] / vL[2].strip())
-            valL.append(["variable","value","[value]", "description"]) # header
+            valL.append(["variable","value","[value]", "description"])
             with open(vfileS,'r') as csvfile:
                 readL = list(csv.reader(csvfile))
             for vaL in readL[1:]:                 
                 if len(vaL) < 5: vaL += [''] * (5 - len(vL))     # pad values
                 varS = vaL[0].strip(); valS = vaL[1].strip()
-                unit1S = vaL[2].strip(); unit2S = vaL[3].strip()
+                unit1S, unit2S = vaL[2].strip(), vaL[3].strip()
                 descripS = vaL[4].strip()
                 val1U = val2U = array(eval(valS))
                 if unit1S != "-": 
@@ -532,10 +529,9 @@ class ParseUTF:
                         val1U = str(valU.number()) + ' ' + str(valU.unit())
                         val2U = valU.cast_unit(eval(unit2S))
                 valL.append([varS, val1U, val2U, descripS])
-                exec(cmdS, globals(), locals())
-        elif vL[1].strip() == "filerows":                        # list 
+        elif vL[1].strip() == "filerows":                        # list in file
             valL.append(["variable", "values"])                   
-            vfileS = Path(self.folderD["tpath"] / vL[3].strip())
+            vfileS = Path(self.folderD["tpath"] / vL[2].strip())
             vecL = eval(vL[3].strip())
             with open(vfileS,'r') as csvF:
                 reader = csv.reader(csvF)
@@ -554,7 +550,6 @@ class ParseUTF:
                 colalign=["right","right","right","left" ]))            
         utfS = output.getvalue(); sys.stdout = old_stdout            
         print(utfS); self.calcS += utfS + "\n"  
-        
         self.rivtD.update(locals()) 
 
     def _vtable(self):
