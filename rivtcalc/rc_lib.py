@@ -87,8 +87,8 @@ V('''value-string defines active values and equations
     sign.  Lines with equal signs define equations and assignments that 
     will be numerically evaluated.
 
-    x1 = 10.1*IN    | description | unit, alt unit || {save if trailing ||}
-    y1 = 12.1*FT    | description | unit, alt unit 
+    x1 = 10.1    | unit, alt unit | description || {save if trailing ||}
+    y1 = 12.1    | unit, alt unit | description  
 
 
     Set value parameters where sub means to render equation with substition.
@@ -102,7 +102,7 @@ V('''value-string defines active values and equations
 
     For a value file the csv file must have the structure:
     [literal]_
-    variable name, value, description, primary unit, secondary unit
+    variable name, value, primary unit, secondary unit, description 
     
     For file rows the csv file must have the structure:
     [literal]_

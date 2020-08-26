@@ -6,7 +6,7 @@ the terminal. Model-strings must be indented 4 spaces. Commands are single line
 and typically start with a double bar (||). Tags are in line with the
 associated text. """
 
-import os
+import os 
 import sys
 import csv
 import textwrap
@@ -448,7 +448,7 @@ class ParseUTF:
         """
         
         locals().update(self.rivtD)                                                  
-        if len(vL) < 3:                             # equation
+        if len(vL) <= 2:                                         # equation
             self._vsymbol(vL)
             unitL = vL[1].split(",")
             varS = vL[0].split("=")[0].strip()
@@ -463,30 +463,32 @@ class ParseUTF:
                 if len(eval(varS)) > 3:
                     trimL= tempS[:3]; trimL.append("...")
                     val1S = str(trimL)
-                else:
-                    val1S = str(tempS)
+                else: val1S = str(tempS)
             self.valL.append([varS, val1S, val2S])          
-            pyS = str.ljust(varS + " = " + arrayS, 40) + " # equation" + "\n"
-            #print(pyS)
+            pyS = varS + " = " + arrayS + " # equation" + "\n" ;#print(pyS)
             if self.setcmdD["saveB"] == True:  self.exportS += pyS
             self._vtable(); self.valL=[]
-        elif len(vL) > 2:                           # value
-            descripS = vL[1].strip()
-            unitL = vL[2].split(",")
+        elif len(vL) >= 3:                                       # value
+            descripS = vL[2].strip()
+            unitL = vL[1].split(",")
             varS = vL[0].split("=")[0].strip()
-            val1S = vL[0].split("=")[1].strip()
-            val2S = vL[0].split("=")[1].strip()
-            arrayS = "array(" + val1S + ")"
-            cmdS = str(varS + " = " + arrayS)
-            exec(cmdS, globals(), locals())
+            valS = vL[0].split("=")[1].strip()
+            array1S = "uarray(" + valS + ")*" + unitL[0].strip()
+            cmd1S = str(varS + " = " + array1S)
+            print(cmd1S)
+            exec(cmd1S, globals(), locals())
+            print(eval(varS))
+            print(type(eval(varS)))
+            cmd2S = "var2S = eval(varS).asUnit(" + unitL[0].strip() + ")"
+            exec(cmd2S, globals(), locals())
+            print(eval(var2S))            
             tempS = cmdS.split("array(")[1].strip()
             tempS = eval(tempS.strip(")"))
             if type(tempS) == list:
                 if len(eval(varS)) > 3:
                     trimL= tempS[:3]; trimL.append("...")
                     val1S = str(trimL)
-                else:
-                    val1S = str(tempS)
+                else: val1S = str(tempS)
             self.valL.append([varS, val1S, val2S, descripS])          
             pyS = str.ljust(varS + " = " + arrayS, 40) + " # " + descripS + "\n"
             #print(pyS)
@@ -503,7 +505,7 @@ class ParseUTF:
         locals().update(self.rivtD)
         valL = []                                       # list of table values
         if len(vL) < 5: vL += [''] * (5 - len(vL))               # pad command                                                        
-        if vL[1].strip() == "sub" or vL[1].strip() == "nosub":   # sub      
+        if vL[1].strip() == "sub" or vL[1].strip() == "nosub":   # sub 
             self.setcmdD["values"] = vL[1].strip() 
             self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
             self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
@@ -516,26 +518,22 @@ class ParseUTF:
             for vaL in readL[1:]:                 
                 if len(vaL) < 5: vaL += [''] * (5 - len(vL))     # pad values
                 varS = vaL[0].strip(); valS = vaL[1].strip()
-                descripS = vaL[2].strip()
-                unit1S = vaL[3].strip(); unit2S = vaL[4].strip()
-                try: valU = unum.Unum.coerceToUnum(float(valS))
-                except TypeError:
-                    try: valU = unum.Unum.coerceToUnum(list(valS))
-                    except: raise TypeError
-                if len(unit1S):
-                    if valU.strUnit(): valS1 = valU.asUnit(eval(unit1S))
-                    else: valU1 = valU*eval(unit1S)                                    
-                if len(unit2S): valU2 = valU1.asUnit(eval(unit2S))
-                else: valU2 = valU1
-                if type(eval(valS)) == list:
-                    if len(eval(valS)) > 3:
-                        trimL= eval(valU1)[:3]; trimL.append("... " + unit1S)
-                        valU1 = str(trimL)
-                        trimL= eval(valU2)[:3]; trimL.append("... " + unit2S)
-                        valU2 = str(trimL)
-                    else: pass
-                valL.append([varS, valU1, valU2, descripS])
-        elif vL[1].strip() == "filerows":                          # list 
+                unit1S = vaL[2].strip(); unit2S = vaL[3].strip()
+                descripS = vaL[4].strip()
+                val1U = val2U = array(eval(valS))
+                if unit1S != "-": 
+                    if type(eval(valS)) == list: 
+                        val1U = array(eval(valS)) * eval(unit1S)
+                        val2U = [q.cast_unit(eval(unit2S)) for q in val1U]
+                    else:
+                        cmdS = varS + "= " + valS + "*" + unit1S
+                        exec(cmdS, globals(), locals())
+                        valU = eval(varS)                
+                        val1U = str(valU.number()) + ' ' + str(valU.unit())
+                        val2U = valU.cast_unit(eval(unit2S))
+                valL.append([varS, val1U, val2U, descripS])
+                exec(cmdS, globals(), locals())
+        elif vL[1].strip() == "filerows":                        # list 
             valL.append(["variable", "values"])                   
             vfileS = Path(self.folderD["tpath"] / vL[3].strip())
             vecL = eval(vL[3].strip())
