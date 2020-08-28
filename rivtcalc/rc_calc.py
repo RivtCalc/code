@@ -140,7 +140,7 @@ class ParseUTF:
                 tnumI = int(self.setsectD["tnum"]) + 1
                 self.setsectD["tnum"] = tnumI
                 refS = self._refs(tnumI, "[ Table: ")
-                uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI) 
+                uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI)
             elif tag == "[foot]_":      # footnote label
                 tagS = tagS.strip("[foot]_").strip()
                 uS = self.setsectD["ftqueL"].popleft() + tagS
@@ -478,7 +478,7 @@ class ParseUTF:
             utfS = vL[0]; spS = "Eq(" + varS + ",(" + valS + "))"  # pretty prnt   
             try: utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
             except: pass
-            print(utfS + "\n"); self.calcS += utfS + "\n"
+            print("\n" + utfS + "\n"); self.calcS += "\n"+ utfS + "\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
             if self.setcmdD["subst"]: self._vsub()
