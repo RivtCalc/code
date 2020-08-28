@@ -481,7 +481,7 @@ class ParseUTF:
             print("\n" + utfS + "\n"); self.calcS += "\n"+ utfS + "\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
-            if self.setcmdD["subst"]: self._vsub()
+            if self.setcmdD["subst"]: self._vsub(vL)
             else:
                 hdrL=[] ; valL=[]
                 hdrL.append(varS); hdrL.append("[" + varS + "]")
