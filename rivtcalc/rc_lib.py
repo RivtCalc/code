@@ -13,9 +13,9 @@
     Input functions ----------------------------------------------------
     type     API  text   tags     commands {comment}
     ======= ===== ===== ====== =========================================
-    repo     R()   yes    no    header, scope, codes, attach
+    repo     R()   yes    no    heading, tag, pdf
     insert   I()   yes    yes   tex, sym, text, table, image
-    value    V()   yes    yes   =, value, {and insert commands}
+    value    V()   yes    yes   =, config, value, data, func, +insert commands
     table    T()   no     yes   {Python simple statements and insert commands}  
     exclude  X()   --      --   {skip processing of rivt-string}
 
