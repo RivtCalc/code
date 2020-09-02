@@ -1,11 +1,10 @@
 #!
 """converts model-strings to reST-strings
 
-The ParseReST class converts model-strings to reST-strings.
-Model-strings must be indented 4 spaces. Commands start with
-a double bar (||) and are single line, except where noted. Tags
-are included inline, with the associated text.
-"""
+The ParseReST class converts model-strings to intermediate reST-strings which
+are then converted to pdf or html docs.Model-strings must be indented 4 spaces.
+Commands start with a double bar (||) and are single line, except where noted.
+Tags are included inline, with the associated text. """
 
 import os
 import sys
