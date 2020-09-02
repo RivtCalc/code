@@ -35,13 +35,13 @@ logging.getLogger("numexpr").setLevel(logging.WARNING)
 
 class ParseUTF:
     """converts model-strings to calc-strings
-
+  
     """
     
     def __init__(self, strL: list, folderD: dict, setcmdD: dict,
          setsectD: dict, rivtD: dict, exportS: str):
         
-        """transform model-string to calc-string
+        """transform model-string to calc-string xvv
 
         The ParseUTF class converts model-strings to calc-string.
         Model-strings must be indented 4 spaces. Commands start with
@@ -233,7 +233,7 @@ class ParseUTF:
     def _rattach(self, rsL):
         b = 5
     
-    def i_utf(self) -> tuple:                
+    def i_utf(self) -> tuple:                 
         """ parse insert-string
        
         Returns:
@@ -419,7 +419,7 @@ class ParseUTF:
             print(uS); self.calcS += uS + "\n"
 
     def v_utf(self)-> tuple:
-        """parse value-string
+        """parse value-string and set method
 
         Return:
             calcS (list): utf formatted calc-string (appended)
@@ -430,9 +430,9 @@ class ParseUTF:
          """
 
         locals().update(self.rivtD)
-        vcmdL = ["format","data", "func", 
+        vcmdL = ["format", "values", "data", "func", 
                     "text", "sym", "tex", "table", "image"]
-        vmethL = [self._vformat, self._vdata, self._vfunc, 
+        vmethL = [self._vformat, self.vvalues, self._vdata, self._vfunc, 
            self._itext, self._isympy, self._ilatex, self._itable, self._iimage]
         vtagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                       "[r]_", "[c]_", "[t]_", "[e]_", "[f]_", "[x]_"] 
@@ -519,6 +519,85 @@ class ParseUTF:
                 self.exportS += pyS
         self.rivtD.update(locals())   
 
+    def _vvalues(self, vL: list):
+        """import values from files
+
+        Args:
+            vL (list): value command arguments
+        """
+        
+        locals().update(self.rivtD)
+        valL = [] 
+        if len(vL) < 5: vL += [''] * (5 - len(vL))            # pad command                                                        
+        vfileS = Path(self.folderD["tpath"] / vL[2].strip())
+        with open(vfileS,'r') as csvfile:
+            readL = list(csv.reader(csvfile))
+        for vaL in readL[1:]:                 
+            if len(vaL) < 5: vaL += [''] * (5 - len(vL))     # pad values
+            varS = vaL[0].strip(); valS = vaL[1].strip()
+            unit1S, unit2S = vaL[2].strip(), vaL[3].strip()
+            descripS = vaL[4].strip()
+            if not len(varS):
+                valL.append(['---------', ' ', ' ', ' '])    # totals
+                continue
+            val1U = val2U = array(eval(valS))
+            if unit1S != "-": 
+                if type(eval(valS)) == list: 
+                    val1U = array(eval(valS)) * eval(unit1S)
+                    val2U = [q.cast_unit(eval(unit2S)) for q in val1U]
+                else:
+                    cmdS = varS + "= " + valS + "*" + unit1S
+                    exec(cmdS, globals(), locals())
+                    valU = eval(varS)                
+                    val1U = str(valU.number()) + ' ' + str(valU.unit())
+                    val2U = valU.cast_unit(eval(unit2S))
+            valL.append([varS, val1U, val2U, descripS])
+        hdrL = ["variable", "value", "[value]", "description"]
+        alignL = ['left','right','right','left' ]            
+        self._vtable(valL, hdrL, "rst", alignL)
+        self.rivtD.update(locals()) 
+ 
+    def _vdata(self, vL: list):
+        """import data from files
+
+        Args:
+            vL (list): data command arguments
+        """
+        
+        locals().update(self.rivtD)
+        valL = [] 
+        if len(vL) < 5: vL += [''] * (5 - len(vL))            # pad command                                                        
+        valL.append(["variable", "values"])                   
+        vfileS = Path(self.folderD["tpath"] / vL[2].strip())
+        vecL = eval(vL[3].strip())
+        with open(vfileS,'r') as csvF:
+            reader = csv.reader(csvF)
+        vL = list(reader)
+        for i in vL:
+            varS = i[0]; varL = array(i[1:])
+            cmdS = varS + "=" + str(varL)
+            exec(cmdS, globals(), locals())
+            if len(varL) > 4: varL= str((varL[:2]).append(["..."]))
+            valL.append([varS, varL])    
+        hdrL = ["variable", "values"]
+        alignL = ['left','right']            
+        self._vtable(valL, hdrL, "rst", alignL)
+        self.rivtD.update(locals()) 
+
+    def _vtable(self, tbl, hdrL, tblfmt, alignL):
+        """write value table"""
+
+        locals().update(self.rivtD)
+        sys.stdout.flush()                                      
+        old_stdout = sys.stdout; output = StringIO()
+        output.write(tabulate(tbl, tablefmt=tblfmt, headers=hdrL, 
+                    showindex=False, colalign=alignL))                    
+        valS = output.getvalue()
+        sys.stdout = old_stdout; sys.stdout.flush()
+        utfS = output.getvalue(); sys.stdout = old_stdout            
+        print(utfS); self.calcS += utfS + "\n"  
+        self.rivtD.update(locals())                        
+
     def _vsub(self, eqL: list, eqS: str):
         """substitute numbers for variables in printed output
         
@@ -581,76 +660,6 @@ class ParseUTF:
             self._write_utf(" ", 0, 0)
         except:
             pass   
-       
-    def _vdata(self, vL: list):
-        """import values from files
-
-        Args:
-            vL (list): value command arguments
-        """
-        
-        locals().update(self.rivtD)
-        valL = [] 
-        if len(vL) < 5: vL += [''] * (5 - len(vL))            # pad command                                                        
-        if vL[1].strip() == "file":                           # values from file
-            vfileS = Path(self.folderD["tpath"] / vL[2].strip())
-            with open(vfileS,'r') as csvfile:
-                readL = list(csv.reader(csvfile))
-            for vaL in readL[1:]:                 
-                if len(vaL) < 5: vaL += [''] * (5 - len(vL))     # pad values
-                varS = vaL[0].strip(); valS = vaL[1].strip()
-                unit1S, unit2S = vaL[2].strip(), vaL[3].strip()
-                descripS = vaL[4].strip()
-                if not len(varS):
-                    valL.append(['---------', ' ', ' ', ' '])    # totals
-                    continue
-                val1U = val2U = array(eval(valS))
-                if unit1S != "-": 
-                    if type(eval(valS)) == list: 
-                        val1U = array(eval(valS)) * eval(unit1S)
-                        val2U = [q.cast_unit(eval(unit2S)) for q in val1U]
-                    else:
-                        cmdS = varS + "= " + valS + "*" + unit1S
-                        exec(cmdS, globals(), locals())
-                        valU = eval(varS)                
-                        val1U = str(valU.number()) + ' ' + str(valU.unit())
-                        val2U = valU.cast_unit(eval(unit2S))
-                valL.append([varS, val1U, val2U, descripS])
-            hdrL = ["variable", "value", "[value]", "description"]
-            alignL = ['left','right','right','left' ]            
-            self._vtable(valL, hdrL, "rst", alignL)
-        elif vL[1].strip() == "filerows":                       # list from file
-            valL.append(["variable", "values"])                   
-            vfileS = Path(self.folderD["tpath"] / vL[2].strip())
-            vecL = eval(vL[3].strip())
-            with open(vfileS,'r') as csvF:
-                reader = csv.reader(csvF)
-            vL = list(reader)
-            for i in vL:
-                varS = i[0]; varL = array(i[1:])
-                cmdS = varS + "=" + str(varL)
-                exec(cmdS, globals(), locals())
-                if len(varL) > 4: varL= str((varL[:2]).append(["..."]))
-                valL.append([varS, varL])    
-            hdrL = ["variable", "values"]
-            alignL = ['left','right']            
-            self._vtable(valL, hdrL, "rst", alignL)
-        else: pass
-        self.rivtD.update(locals()) 
-
-    def _vtable(self, tbl, hdrL, tblfmt, alignL):
-        """write value table"""
-
-        locals().update(self.rivtD)
-        sys.stdout.flush()                                      
-        old_stdout = sys.stdout; output = StringIO()
-        output.write(tabulate(tbl, tablefmt=tblfmt, headers=hdrL, 
-                    showindex=False, colalign=alignL))                    
-        valS = output.getvalue()
-        sys.stdout = old_stdout; sys.stdout.flush()
-        utfS = output.getvalue(); sys.stdout = old_stdout            
-        print(utfS); self.calcS += utfS + "\n"  
-        self.rivtD.update(locals())                        
 
     def _vfunc(self, vL: list):
         pass
