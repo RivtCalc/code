@@ -86,30 +86,30 @@ rc.V('''value-string defines active values and equations
     Value-strings may include arbitrary text that does not include an equal
     sign.  Lines with equal signs define equations and assignments that 
     will be numerically evaluated.
-
+    
+    Set value parameters where sub means to render equation with substition.
+    ||config | sub {or nosub} | 2,2 {truncate result, terms}  
+    
     x1 = 10.1    | unit, alt unit | description || {save if trailing ||}
     y1 = 12.1    | unit, alt unit | description  
 
-    Set value parameters where sub means to render equation with substition.
-    ||value | sub {or nosub} | 2,2 {truncate result, terms}  
-    
     Import values from a csv file, starting with the second row.    
     ||value | file | f.csv
     
     Import a list of values from rows of a csv file 
-    ||value | filerows | f.csv | [1:4] {rows to import} 
+    ||data | f.csv | [1:4] {rows to import} 
 
     For a value file the csv file must have the structure:
     [literal]_
     variable name, value, primary unit, secondary unit, description 
     
-    For file rows the csv file must have the structure:
+    For a data file the csv file must have the structure:
     [literal]_
     variable name, value1, value2, value3, ....
     
     an equation [e]_
     v1 = x + 4*M  | unit, alt unit
-    save equation results to filev[e]_
+    save an equation result to file [e]_
     y1 = v1 / 4   | unit, alt unit ||         
 
     ||func | func_file.py | func_call | var_name {import function from file}
