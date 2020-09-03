@@ -10,32 +10,32 @@
     depend on the rivt-string type (R,I,V or T). Strings may also include
     reStructuredText markup. 
 
-    Input functions ----------------------------------------------------
-    type     API  text   tags     commands {comment}
-    ======= ===== ===== ====== =========================================
-    repo     R()   yes    no    heading, tag, pdf
-    insert   I()   yes    yes   tex, sym, text, table, image
-    value    V()   yes    yes   =, config, value, data, func, +insert commands
-    table    T()   no     yes   {Python simple statements and insert commands}  
-    exclude  X()   --      --   {skip processing of rivt-string}
+    Input functions ------------------------------------------------------------
+    type     API  text  tags     commands {comment}
+    ======= ===== ===== =====  =================================================
+    report   R()   yes   no    heading, tag, pdf
+    insert   I()   yes   yes   tex, sym, text, table, image
+    values   V()   yes   yes   =, config, value, data, func, +insert commands
+    table    T()   no    yes   Python (pandas) simple statements+insert commands  
+    skip     S()   --     --   skip processing rivt-string processing
 
-    Output functions -----------------------------------------------------
+    Output functions -----------------------------------------------------------
         name                   description
-    =================  =======================================================
+    =================  =========================================================
     1.write_utf()        write calc to utf8 doc file
     2.write_pdf()        write calc to pdf doc file
     3.write_html()       write calc to html doc file
     4.write_report()     combine pdf docs into pdf report file
-    =================  =======================================================
+    =================  =========================================================
 
     Commands and tags for each string type are described below. The first line
     of each rivt-string is a descriptor which may include a section designator
     and title. String text must be indented 4 spaces after the first descriptor
     line.
 
-Input Syntax and commands ======================================================
+Input Syntax and commands ------------------------------------------------------
 
-import rc_lib as rc
+from rivtcalc import rc_lib as rc
 rc.R('''report-string defines respository and document formats
     
     Report-strings may include general text at the start of the string. The
@@ -46,21 +46,23 @@ rc.R('''report-string defines respository and document formats
     parameter writes a README.rst file for Github or other online repositories.
     The first paragraph of the report-string becomes part of the README.rst
     file for the project. 
-    
+
+    ||heading | [calc title] | toc; notoc | read; noread | [date]
+
     The ||tag command lists terms describing the scope of the calc with up to
     five terms per command. Tags and a generated index of search terms from the
     calc are also included in the README.
     
-    The ||attach command 
-
-    ||heading | [calc title] | toc; notoc | read; noread | [date]
-
     ||tag | [discipline], [object], [purpose], [assembly], [component]
     ||tag | [code1], [code2], [code3], .... 
+
+    The ||pdf command attaches, in order, existing pdf documents to the front
+    or back of the calc doc. PDF files to attach files are stored in the
+    docs/attach/ folder.
     
-    ||attach | front | [calccoverfile.pdf]         
-    ||attach | back | functions; docstrings
-    ||attach | back | [appendixfile.pdf] 
+    ||pdf | front | [calccoverfile.pdf]         
+    ||pdf | back | functions; docstrings
+    ||pdf | back | [appendixfile.pdf] 
     ''')
 rc.I('''insert-string contains static text, tables and images.  
     
@@ -126,9 +128,9 @@ rc.T('''table-string defines tables and plots with simple Python statements
      insert-commands or tags.
     ''')
 
-    Tags 
+    Tags -----------------------------------------------------------------------
        tag               description
-    ===============  ======================================================
+    ===============  ===========================================================
     [nn]_ abc def       section title and number in descriptor line (first line)
     [abc123]__          citation (double underscore)
     [#]__               autonumbered footnote  (double underscore)       

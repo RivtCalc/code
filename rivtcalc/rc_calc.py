@@ -49,22 +49,22 @@ class ParseUTF:
         are included inline, with the associated text.
         
         Args:
-            exportS (str): exportS
-            strL (list): strL
-            folderD (dict): folderD
-            setsectD (dict): setsectD
-            setcmdD (dict): setcmdD
-            rivtD (dict): rivtD
+            exportS (str): stores values that are written to file
+            strL (list): calc lines
+            folderD (dict): folder paths
+            setcmdD (dict): command settings
+            setsectD (dict): section settings
+            rivtD (dict): global rivt dictionary
         """
     
-        self.calcS = """"""
+        self.calcS = """"""             # calc string
         self.exportS = exportS
-        self.strL = strL
+        self.strL = strL 
         self.folderD = folderD
         self.setsectD = setsectD
         self.setcmdD = setcmdD
         self.rivtD = rivtD
-        self.valL = []                  # accumulated value list
+        self.valL = []                  # value list
     
     def _refs(self, objnumI: int, typeS: str) -> str:
         """reference label for equations, tables and figures
@@ -164,13 +164,13 @@ class ParseUTF:
         locals().update(self.rivtD)        
         uL = []                     # command arguments
         indxI = -1                  # method index
-        _rgx = r'\[([^\]]+)]_'      # tags
+        _rgx = r'\[([^\]]+)]_'      # find tags
 
         for uS in self.strL:                     
-            if uS[0:2] == "##":  continue               # remove review comment
-            uS = uS[4:]                                 # remove indent
+            if uS[0:2] == "##":  continue                   # remove comment
+            uS = uS[4:]                                     # remove indent
             if len(uS) == 0 : 
-                if len(self.valL) > 0:                  # write values, reset
+                if len(self.valL) > 0:                      # prnt value table
                     hdrL = ["variable", "value", "[value]", "description"]
                     alignL = ['left','right','right','left' ]            
                     self._vtable(self.valL, hdrL, "rst", alignL)
@@ -179,28 +179,36 @@ class ParseUTF:
                     continue
                 else: print(" "); self.calcS += "\n"; continue
             try: 
-                if uS[0] == "#" : continue              # remove comment      
+                if uS[0] == "#" : continue                   # remove comment      
             except:
                 print(" "); self.calcS += "\n"; continue
             if uS.strip() == "[literal]_" : continue
-            if re.search(_rgx, uS):                     # check for tag
+            if re.search(_rgx, uS):                          # check for tag
                 utgS = self._tags(uS, tagL)
                 print(utgS.rstrip()); self.calcS += utgS.rstrip() + "\n"
                 continue     
-            if typeS == "value":
+            if typeS == "values":                            # chk for values
                 self.setcmdD["saveB"] = False  
-                if "=" in uS and uS.strip()[-2] == "||":               # save
+                if "=" in uS and uS.strip()[-2] == "||":     # value to file
                     uS = uS.replace("||"," "); self.setcmdD["saveB"] = True                      
-                if "=" in uS:                                          # assign
+                if "=" in uS:                                # assign value
                     uL = uS.split('|'); self._vassign(uL)
                     continue
-            if uS[0:2] == "||":                           # command
+            if typeS == "table":                              # check for table
+                if uS[0:2] == "||":           
+                    uL = uS[2:].split("|")
+                    indxI = cmdL.index(uL[0].strip())
+                    methL[indxI](uL); continue 
+                else:
+                    exec(uS); continue                        # exec table code 
+            if uS[0:2] == "||":                               # check any cmd
                 uL = uS[2:].split("|")
                 indxI = cmdL.index(uL[0].strip())
-                methL[indxI](uL); continue                # call method                         
- 
+                methL[indxI](uL); continue                    # call any cmd
+                
             self.rivtD.update(locals())
-            print(uS); self.calcS += uS.rstrip() + "\n"
+            if typeS != "table":                              # skip table prnt
+                print(uS); self.calcS += uS.rstrip() + "\n"
 
     def r_utf(self) -> str:
         """ parse repository string
@@ -209,28 +217,25 @@ class ParseUTF:
             calcS (list): utf formatted calc-string (appended)
             setsectD (dict): section settings
         """
-        rcmdL = ["header", "codes", "scope", "attach"]
-        rmethL = [self._rheader, self._rcodes, self._rscope, self._rattach]
+        rcmdL = ["heading", "tag", "scope", "pdf"]
+        rmethL = [self._rheading, self._rtag, self._rpdf]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[cite]_", "[#]__"]
         
-        self._parseutf("repo", rcmdL, rmethL, rtagL)
+        self._parseutf("report", rcmdL, rmethL, rtagL)
         
         return self.calcS, self.setsectD
 
-    def _rheader(self, rL):
-        if len(rL) < 5: rL += [''] * (5 - len(iL))      # pad parameters
+    def _rheading(self, rL):
+        if len(rL) < 5: rL += [''] * (5 - len(rL))      # pad parameters
         if rL[1]: calctitleS = rL[1].strip()
         if rL[2] == "toc": pass
         if rL[3] == "readme": pass
         if rL[4] : pass
 
-    def _rcodes(self, rsL):
-        d = 2
-
-    def _rscope(self, rsL):
+    def _rtag(self, rsL):
         a = 4
     
-    def _rattach(self, rsL):
+    def _rpdf(self, rsL):
         b = 5
     
     def i_utf(self) -> tuple:                 
@@ -430,17 +435,17 @@ class ParseUTF:
          """
 
         locals().update(self.rivtD)
-        vcmdL = ["format", "values", "data", "func", 
+        vcmdL = ["config", "value", "data", "func", 
                     "text", "sym", "tex", "table", "image"]
-        vmethL = [self._vformat, self.vvalues, self._vdata, self._vfunc, 
+        vmethL = [self._vconfig, self._vvalue, self._vdata, self._vfunc, 
            self._itext, self._isympy, self._ilatex, self._itable, self._iimage]
         vtagL =  ["[page]_", "[line]_", "[link]_", "[cite]_", "[foot]_",   
                       "[r]_", "[c]_", "[t]_", "[e]_", "[f]_", "[x]_"] 
-        self._parseutf("value", vcmdL, vmethL, vtagL)
+        self._parseutf("values", vcmdL, vmethL, vtagL)
         self.rivtD.update(locals())
         return self.calcS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
 
-    def _vformat(self, vL: list):
+    def _vconfig(self, vL: list):
         """update dictionary format values
 
         Args:
@@ -519,7 +524,7 @@ class ParseUTF:
                 self.exportS += pyS
         self.rivtD.update(locals())   
 
-    def _vvalues(self, vL: list):
+    def _vvalue(self, vL: list):
         """import values from files
 
         Args:
@@ -529,7 +534,7 @@ class ParseUTF:
         locals().update(self.rivtD)
         valL = [] 
         if len(vL) < 5: vL += [''] * (5 - len(vL))            # pad command                                                        
-        vfileS = Path(self.folderD["tpath"] / vL[2].strip())
+        vfileS = Path(self.folderD["tpath"] / vL[1].strip())
         with open(vfileS,'r') as csvfile:
             readL = list(csv.reader(csvfile))
         for vaL in readL[1:]:                 
@@ -608,13 +613,14 @@ class ParseUTF:
 
         locals().update(self.rivtd)
 
-        utfS = eql[0].strip(); descripS = eql[3]; parD = dict(eqL[1])
+        eformat =""
+        utfS = eqL[0].strip(); descripS = eqL[3]; parD = dict(eqL[1])
         varS = utfS.split("=")
         resultS = vars[0].strip() + " = " + str(eval(vars[1]))
         try: 
-            epS = "Eq(" + epL[0] +",(" + epL[1] +"))" 
+            eqS = "Eq(" + eqL[0] +",(" + eqL[1] +"))" 
             #sps = sps.encode('unicode-escape').decode()
-            utfs = sp.pretty(sp.sympify(eps, _clash2, evaluate=False))
+            utfs = sp.pretty(sp.sympify(eqS, _clash2, evaluate=False))
             print(utfs); self.calcl.append(utfs)
         except:
             print(utfs); self.calcl.append(utfs)
@@ -673,11 +679,13 @@ class ParseUTF:
             setcmdD (dict): command settings
             rivtD (list): calculation values         
         """
-        tcmdL = ["table", "image", ]
-        methL = [self._itable, self._iimage]
-        ttagL =  ["[page]_", "[line]_", "[link]_", 
-                "[cite]_", "[foot]_", "[f]_","[t]_" ] 
-    
-        self._parseutf("table", tcmdL, methL, ttagL)
+        
+        tcmdL = ["text", "sym", "tex", "table", "image"]
+        tmethL = [self._itext, self._isympy, self._ilatex, 
+                            self._itable, self._iimage, ]
+        ttagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[cite]_",
+            "[foot]_", "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]__"] 
+        
+        self._parseutf("table", tcmdL, tmethL, ttagL)
         
         return self.calcS, self.setsectD, self.setcmdD, self.rivtD
