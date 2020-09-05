@@ -132,9 +132,7 @@ rc.T('''table-string defines tables and plots with simple Python statements
        tag               description
     ===============  ===========================================================
     [nn]_ abc def       section title and number in descriptor line (first line)
-    [abc123]__          citation (double underscore)
-    [#]__               autonumbered footnote  (double underscore)       
-    abc def [cite]_     citation description    
+    [#]_                autonumbered footnote      
     abc def [foot]_     footnote description
     abc def [t]_        right justify table title, autoincrement number   
     abc def [e]_        right justify equation label, autoincrement number
@@ -190,9 +188,9 @@ exportS  = """"""                                    # values export string
 rivtcalcD = {}                                       # values dictonary
 _setsectD = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
             "sname": "", "snum": "", "swidth": 80, "enum":  0, "tnum": 0,
-    "figqueL": deque([[0,"cap"]]), "ftqueL": deque([1]), "ctqueL": deque([1])}
+    "figqueL": deque([[0,"cap"]]), "eqqueL": deque([1]), "ftqueL": deque([1])}
 _setcmdD = {"cwidth": 50,"scale1F": 1.,"scale2F": 1.,"writeS": "table",
-                              "subst": False, "saveB": False, "trmrI": 2,"trmtI": 2}
+                     "subst": False, "saveB": False, "trmrI": 2,"trmtI": 2}
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
