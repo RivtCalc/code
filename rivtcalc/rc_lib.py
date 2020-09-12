@@ -74,7 +74,7 @@ rc.I('''insert-string contains static text, tables and images.
     ||text | f.txt | 60 {max char. width}  
     
     table title [t]_
-    ||table | f.csv | 60 {max width} | [2,1,3,4] {cols} | [1,3] {totals} | [4]
+    ||table | f.csv | 60 {max width} | title {first line} | [2,1,3,4] {cols} 
 
     figure caption [f]_
     ||image | f.png {image file} | 1. {scale}

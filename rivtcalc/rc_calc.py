@@ -192,20 +192,20 @@ class ParseUTF:
                 if "=" in uS:                                # assign value
                     uL = uS.split('|'); self._vassign(uL)
                     continue
-            if typeS == "table":                              # check for table
+            if typeS == "table":                             # check for table
                 if uS[0:2] == "||":           
                     uL = uS[2:].split("|")
                     indxI = cmdL.index(uL[0].strip())
                     methL[indxI](uL); continue 
                 else:
-                    exec(uS); continue                        # exec table code 
-            if uS[0:2] == "||":                               # check any cmd
+                    exec(uS); continue                       # exec table code 
+            if uS[0:2] == "||":                              # check for cmd
                 uL = uS[2:].split("|")
                 indxI = cmdL.index(uL[0].strip())
-                methL[indxI](uL); continue                    # call any cmd
+                methL[indxI](uL); continue                   # call any cmd
                 
             self.rivtD.update(locals())
-            if typeS != "table":                              # skip table prnt
+            if typeS != "table":                             # skip table prnt
                 print(uS); self.calcS += uS.rstrip() + "\n"
 
     def r_utf(self) -> str:
@@ -325,7 +325,9 @@ class ParseUTF:
         Args:
             ipl (list): parameter list
         """  
-        if len(iL) < 6: iL += [''] * (6 - len(iL))      # pad parameters
+        itagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
+                        "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
+        if len(iL) < 5: iL += [''] * (5 - len(iL))      # pad parameters
         utfS = ""; contentL = []; sumL = []
         fileS = iL[1].strip(); tfileS = Path(self.folderD["tpath"], fileS)                           
         with open(tfileS,'r') as csvfile:           # read csv file
@@ -335,30 +337,22 @@ class ParseUTF:
             widthI = int(iL[2].strip())
             self.setcmdD.update({"cwidth":widthI})
         incl_colL = list(range(len(readL[0])))         
-        if iL[3].strip():                           # columns
-            incl_colL =  eval(iL[3].strip())
+        ttitleS = ""
+        if iL[3].strip():                           # title
+            ttitleS =  iL[3].strip()
+        if iL[4].strip():                           # columns
+            if iL[4].strip() == "[:]" :
+                totalL = [""]*len(incl_colL)
+        else:
+            incl_colL =  eval(iL[4].strip())
             totalL = [""]*len(incl_colL)
-        if iL[4].strip():                           # column totals
-            sumL = eval(iL[4].strip())
-        if iL[5].strip():                           # total units
-            colL = eval(iL[5].strip()) 
-            unitL = [readL[1][i].strip() for i in colL]
-            zipL = list(zip(colL,unitL))
-            for i in zipL:
-                colI = incl_colL.index(i[0])
-                totalL[colI] = i[1]
-                totalL[0] = "Totals"
         for row in readL:
+            if ttitleS:                             # first row title
+                ttitleS = row[0].strip() + " [t]_"
+                utgS = self._tags(ttitleS, itagL)
+                print(utgS.rstrip()); self.calcS += utgS.rstrip() + "\n"
+                ttitleS = ""; continue
             contentL.append([row[i] for i in incl_colL])
-        if sumL:
-            sumF = 0.
-            for colS in sumL:
-                for row in readL:
-                    try: sumF += float(row[int(colS)])
-                    except: pass
-                colI = int(incl_colL.index(colS))
-                totalL[colI] = sumF
-            contentL.append(totalL)             
         wcontentL = []
         for rowL in contentL:
             wrowL=[]
@@ -369,7 +363,7 @@ class ParseUTF:
         sys.stdout.flush()
         old_stdout = sys.stdout
         output = StringIO()
-        output.write(tabulate(wcontentL, tablefmt="grid", headers="firstrow"))            
+        output.write(tabulate(wcontentL, tablefmt="rst", headers="firstrow"))            
         utfS = output.getvalue()
         sys.stdout = old_stdout
 
