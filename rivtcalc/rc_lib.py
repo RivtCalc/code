@@ -71,10 +71,10 @@ rc.I('''insert-string contains static text, tables and images.
                                                                equations [e]_
     ||tex | \gamma = x + 3 # latex equation 
     ||sym | x = y/2 # sympy equation 
-    ||text | f.txt | 60 {max char. width}  
+    ||text | f.txt | 60 \ literal {max char. width or literal}  
     
     table title [t]_
-    ||table | f.csv | 60 {max width} | title {first line} | [2,1,3,4] {cols} 
+    ||table | f.csv | 60,c {width, align} | title {in csv} | [2,1,4] {cols} 
 
     figure caption [f]_
     ||image | f.png {image file} | 1. {scale}
@@ -186,10 +186,11 @@ utfcalcS = """"""                                    # utf calc string
 rstcalcS = """"""                                    # reST calc string
 exportS  = """"""                                    # values export string
 rivtcalcD = {}                                       # values dictonary
-_setsectD = {"rnum": _cname[1:5],"dnum": _cname[1:3],"cnum": _cname[3:5],
-            "sname": "", "snum": "", "swidth": 80, "enum":  0, "tnum": 0,
-    "figqueL": deque([[0,"cap"]]), "eqqueL": deque([1]), "ftqueL": deque([1])}
-_setcmdD = {"cwidth": 50,"scale1F": 1.,"scale2F": 1.,"writeS": "table",
+_setsectD = {"rnum": _cname[1:5], "dnum": _cname[1:3], "cnum": _cname[3:5],
+            "sname": "", "snum": "", "swidth":80, "enum":0, "tnum":0,
+    "figqueL":deque([[0,"cap"]]), "eqqueL":deque([1]), "ftqueL":deque([1])}
+_setcmdD = {"cwidthI":30, "calignS":"s", "titleS":"notitle", 
+                     "scale1F": 1.,"scale2F": 1.,"writeS":"table",
                      "subst": False, "saveB": False, "trmrI": 2,"trmtI": 2}
 _foldD: dict = {
 "efile": _expfile,   
@@ -240,12 +241,12 @@ def _initclass(rawS: str):
     Returns:
         class instance: string-type instance
     """
-    sectS,strS = rawS.split("\n",1); _update(sectS)
+    sectS,strS = rawS.split("\n",1); _section(sectS)
     strL = strS.split("\n")
     ucalc = _rc_calc.ParseUTF(strL,_foldD,_setcmdD,_setsectD, rivtcalcD, exportS)
     return ucalc 
 
-def _update(hdrS: str):
+def _section(hdrS: str):
     """format section headings and settings 
 
     Args:
@@ -264,8 +265,8 @@ def _update(hdrS: str):
         widthI = int(_setsectD["swidth"])
         headS = " " +  nameS + (rnumS + " - " +
                 ("[" + snumS + "]")).rjust(widthI - len(nameS) - 1)
-        bordrS = widthI * "="
-        utfS = "\n" + bordrS + "\n" + headS + "\n" + bordrS +"\n"
+        bordrS = widthI * "_"
+        utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS +"\n"
         print(utfS); utfcalcS += utfS
 
 def write_values():

@@ -298,8 +298,7 @@ class ParseUTF:
             iL (list): text command list
         """
         wrapB = 1
-        if iL[2].strip() == "*":
-            wrapB = 0
+        if iL[2].strip() == "literal": wrapB = 0
         elif isinstance(iL[2].strip(), int):
             widthI = int(iL[2].strip())
             self.setcmdD.update({"cwidth": widthI})
@@ -309,12 +308,13 @@ class ParseUTF:
         with open(txtpath, 'r') as txtf1:
                 uL = txtf1.readlines()
         txtS = "".join(uL)
+        if iL[2].strip() == "literal": wrapB = 0
         if wrapB:
             inxI = int((80-widthI)/2)
             inS = " "*inxI
             uL = textwrap.wrap(txtS, width=widthI)
-            uL = [s+"\n" for s in uL]
-            uS = inS + inS.join(uL)
+            uL = [inS+s+"\n" for s in uL]
+            uS = "".join(uL)
         else:
             uS = txtS
         print(uS); self.calcS += uS + "\n"
@@ -324,33 +324,44 @@ class ParseUTF:
         
         Args:
             ipl (list): parameter list
-        """  
+        """
+        alignD = {"s":"", "d":"decimal", "c":"center", "r":"right", "l":"left"}  
         itagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
                         "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
-        if len(iL) < 5: iL += [''] * (5 - len(iL))      # pad parameters
+        if len(iL) < 5: iL += [''] * (5 - len(iL))          # pad parameters
         utfS = ""; contentL = []; sumL = []
         fileS = iL[1].strip(); tfileS = Path(self.folderD["tpath"], fileS)                           
-        with open(tfileS,'r') as csvfile:           # read csv file
+        with open(tfileS,'r') as csvfile:                   # read csv file
             readL = list(csv.reader(csvfile))
-        widthI = int(self.setcmdD["cwidth"])
-        if iL[2].strip():                           # max col width
-            widthI = int(iL[2].strip())
-            self.setcmdD.update({"cwidth":widthI})
-        incl_colL = list(range(len(readL[0])))         
+        incl_colL = list(range(len(readL[0])))
+        widthI = self.setcmdD["cwidthI"]
+        alignS = self.setcmdD["calignS"]
+        if iL[2].strip():
+            widthL = iL[2].split(",")                       # new max col width
+            widthI = int(widthL[0].strip())
+            self.setcmdD.update({"cwidthI":widthI})
+            saS = alignD[widthL[1].strip()]                 # new alilgnment
+            self.setcmdD.update({"calignS":saS})
+        naS = saS
+        if saS == "decimal":
+            saS = ""; naS="decimal"      
         ttitleS = ""
-        if iL[3].strip():                           # title
+        ttitleS = self.setcmdD["titleS"]
+        if iL[3].strip():                                   # title
             ttitleS =  iL[3].strip()
-        if iL[4].strip():                           # columns
-            if iL[4].strip() == "[:]" :
+            self.setcmdD.update({"titleS":ttitleS})
+        totalL = [""]*len(incl_colL)
+        if iL[4].strip():                                   # columns
+            if iL[4].strip() == "[:]":
                 totalL = [""]*len(incl_colL)
         else:
             incl_colL =  eval(iL[4].strip())
             totalL = [""]*len(incl_colL)
         for row in readL:
-            if ttitleS:                             # first row title
+            if ttitleS == "title":                          # first row title
                 ttitleS = row[0].strip() + " [t]_"
                 utgS = self._tags(ttitleS, itagL)
-                print(utgS.rstrip()); self.calcS += utgS.rstrip() + "\n"
+                print(utgS.rstrip()+"\n"); self.calcS += utgS.rstrip() + "\n\n"
                 ttitleS = ""; continue
             contentL.append([row[i] for i in incl_colL])
         wcontentL = []
@@ -358,12 +369,14 @@ class ParseUTF:
             wrowL=[]
             for iS in rowL:
                 templist = textwrap.wrap(str(iS), int(widthI)) 
+                templist = [i.replace("""\\n""","""\n""") for i in templist]
                 wrowL.append("""\n""".join(templist))
             wcontentL.append(wrowL)
         sys.stdout.flush()
         old_stdout = sys.stdout
         output = StringIO()
-        output.write(tabulate(wcontentL, tablefmt="rst", headers="firstrow"))            
+        output.write(tabulate(wcontentL, tablefmt="rst", headers="firstrow", 
+                    numalign=naS, stralign=saS))            
         utfS = output.getvalue()
         sys.stdout = old_stdout
 
