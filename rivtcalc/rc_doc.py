@@ -78,8 +78,8 @@ class ParseReST:
         """
         objfillS = str(objnumI).zfill(2)
         sfillS = str(self.setsectD["snum"]).strip().zfill(2)
-        rnumS = str(self.setsectD["rnum"])
-        refS = typeS + rnumS + "." + sfillS + "." + objfillS 
+        cnumS = str(self.setsectD["cnum"])
+        refS = typeS + cnumS + "." + sfillS + "." + objfillS 
 
         return refS
 

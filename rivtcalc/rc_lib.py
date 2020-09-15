@@ -186,7 +186,7 @@ utfcalcS = """"""                                    # utf calc string
 rstcalcS = """"""                                    # reST calc string
 exportS  = """"""                                    # values export string
 rivtcalcD = {}                                       # values dictonary
-_setsectD = {"rnum": _cname[1:5], "dnum": _cname[1:3], "cnum": _cname[3:5],
+_setsectD = {"cnum": _cname[1:5], "dnum": _cname[1:3], "sdnum": _cname[3:5],
             "sname": "", "snum": "", "swidth":80, "enum":0, "tnum":0,
     "figqueL":deque([[0,"cap"]]), "eqqueL":deque([1]), "ftqueL":deque([1])}
 _setcmdD = {"cwidthI":30, "calignS":"s", "titleS":"notitle", 
@@ -261,9 +261,9 @@ def _section(hdrS: str):
         _setsectD["tnum"] = 0               # table number
         nameS = _setsectD["sname"] = hdrS[hdrS.find("]") + 2:].strip()
         snumS = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]")]
-        rnumS = str(_setsectD["rnum"])
+        cnumS = str(_setsectD["cnum"])
         widthI = int(_setsectD["swidth"])
-        headS = " " +  nameS + (rnumS + " - " +
+        headS = " " +  nameS + (cnumS + " - " +
                 ("[" + snumS + "]")).rjust(widthI - len(nameS) - 1)
         bordrS = widthI * "_"
         utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS +"\n"

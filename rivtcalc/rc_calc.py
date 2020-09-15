@@ -80,8 +80,8 @@ class ParseUTF:
 
         objfillS = str(objnumI).zfill(2)
         sfillS = str(self.setsectD["snum"]).strip().zfill(2)
-        rnumS = str(self.setsectD["rnum"])
-        refS = typeS + rnumS + "." + sfillS + "." + objfillS 
+        cnumS = str(self.setsectD["cnum"])
+        refS = typeS + cnumS + "." + sfillS + "." + objfillS 
 
         return refS
 
@@ -304,7 +304,8 @@ class ParseUTF:
             self.setcmdD.update({"cwidth": widthI})
         else:
             widthI = self.setcmdD["cwidth"]
-        txtpath = Path(self.folderD["xpath"]/iL[1].strip())
+        calP = "r"+self.setsectD["cnum"]
+        txtpath = Path(self.folderD["xpath"]/calP/iL[1].strip())
         with open(txtpath, 'r') as txtf1:
                 uL = txtf1.readlines()
         txtS = "".join(uL)
@@ -330,7 +331,9 @@ class ParseUTF:
                         "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
         if len(iL) < 5: iL += [''] * (5 - len(iL))          # pad parameters
         utfS = ""; contentL = []; sumL = []
-        fileS = iL[1].strip(); tfileS = Path(self.folderD["tpath"], fileS)                           
+        fileS = iL[1].strip()
+        calpS = "r"+self.setsectD["cnum"]
+        tfileS = Path(self.folderD["tpath"]/calpS/fileS)                           
         with open(tfileS,'r') as csvfile:                   # read csv file
             readL = list(csv.reader(csvfile))
         incl_colL = list(range(len(readL[0])))
@@ -397,8 +400,9 @@ class ParseUTF:
             self.setcmdD.update({"scale2F":scale2F})
             fileS = iL[1].split(",")
             file1S = fileS[0].strip(); file2S = fileS[1].strip()
-            img1S = str(Path(self.folderD["fpath"] / file1S))
-            img2S = str(Path(self.folderD["fpath"] / file2S))                
+            calpS = "r"+self.setsectD["cnum"]
+            img1S = str(Path(self.folderD["fpath"]/calpS/file1S))
+            img2S = str(Path(self.folderD["fpath"]/calpS/file2S))                
             pthshort1S = str(Path(*Path(img1S).parts[-4:]))
             pthshort2S = str(Path(*Path(img2S).parts[-4:]))
             uS += ("Figure path: " + pthshort1S + "\n")
