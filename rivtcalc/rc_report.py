@@ -84,7 +84,7 @@ class CalcPDF(object):
         texf = texf.replace("""inputenc""", """ """)
         texf = texf.replace("aaxbb ", """\\hfill""")
         texf = texf.replace("""\\begin{document}""",
-                            """\\renewcommand{\contentsname}{"""+
+                            """\\renewcommand{\contentsnameS}{"""+
                             self.calctitle + "}\n"+
                             """\\begin{document}"""+"\n"+
                             """\\makeatletter"""+

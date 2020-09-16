@@ -2056,7 +2056,7 @@ $contents{"\\LITERALnoLENGTH"}="literal_no_length";
 
 for ("text","operatorname","operatornamewithlimits","relax","-",
      "notag","!","/","protect","mathcal","Bbb","bf","it","em","boldsymbol",
-     "cal","Cal","goth","ref","maketitle","expandafter","csname","endcsname",
+     "cal","Cal","goth","ref","maketitle","expandafter","csnameS","endcsnameS",
      "makeatletter","makeatother","topmatter","endtopmatter","rm", "tt",
      "NoBlackBoxes","document","TagsOnRight","bold","dsize","roster",
      "endroster","endkey","endRefs","enddocument","displaystyle",
@@ -2257,7 +2257,7 @@ for ("title", "author", "affil", "address", "email", "date", # "thanks",
   $contents{"\\$_"}="par_puts_unindent;\U$_: ";
 }
 
-for ("document","split","enumerate"
+for ("document","split","enumIerate"
      ) {$environment_none{"$_"}++;} 
 
 $environment{"Sb"}="subscript:matrix,endmatrix;1;l";

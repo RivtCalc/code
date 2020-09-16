@@ -79,9 +79,9 @@ class ParseUTF:
         """
 
         objfillS = str(objnumI).zfill(2)
-        sfillS = str(self.setsectD["snum"]).strip().zfill(2)
-        cnumS = str(self.setsectD["cnum"])
-        refS = typeS + cnumS + "." + sfillS + "." + objfillS 
+        sfillS = str(self.setsectD["snumS"]).strip().zfill(2)
+        cnumSS = str(self.setsectD["cnumS"])
+        refS = typeS + cnumSS + "." + sfillS + "." + objfillS 
 
         return refS
 
@@ -99,7 +99,7 @@ class ParseUTF:
         """
 
         tagS = tagS.rstrip(); uS = ''
-        swidthI =  self.setsectD["swidth"]-1
+        swidthII =  self.setsectD["swidthI"]-1
         try: 
             tag = list(set(tagL).intersection(tagS.split()))[0]
         except:
@@ -107,38 +107,39 @@ class ParseUTF:
             return uS   
     
         if tag == "[#]_":           # auto increment footnote mark                    
-            ftnumI = self.setsectD["ftqueL"][-1] + 1
-            self.setsectD["ftqueL"].append(ftnumI)      
-            uS = tagS.replace("[x]_", "[" + str(ftnumI) + "]")
+            ftnumII = self.setsectD["ftqueL"][-1] + 1
+            self.setsectD["ftqueL"].append(ftnumII)      
+            uS = tagS.replace("[x]_", "[" + str(ftnumII) + "]")
         elif tag == "[page]_":        # new page
-            uS = int(self.setsectD["swidth"]) * "." 
+            uS = int(self.setsectD["swidthI"]) * "." 
         elif tag == "[line]_":      # horizontal line
-            uS = int(self.setsectD["swidth"]) * '-'   
+            uS = int(self.setsectD["swidthI"]) * '-'   
         elif tag == "[link]_":      # url link
             tgS = tagS.strip("[link]_").strip()
             uS = "link: "+ tgS 
         elif tag == "[r]_":         # right adjust text
             tagL = tagS.strip().split("[r]_")
-            uS = (tagL[0].strip()).rjust(swidthI)
+            uS = (tagL[0].strip()).rjust(swidthII)
         elif tag == "[c]_":        # center text  
             tagL = tagS.strip().split("[c]_")
-            uS = (tagL[0].strip()).rjust(swidthI)
+            uS = (tagL[0].strip()).rjust(swidthII)
         elif tag == "[f]_":        # figure caption                    
             fnumI = int(self.setsectD["figqueL"][-1][0])
             capS = tagS.strip("[f]_").strip()
             self.setsectD["figqueL"].append([fnumI+1, capS])
         elif tag == "[e]_":         # equation label
             tagL = tagS.strip().split("[e]_")
-            enumI = int(self.setsectD["enum"]) + 1
-            self.setsectD["enum"] = enumI
-            refS = self._refs(enumI, "[ Equ: ")
-            uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI)
+            enumII = int(self.setsectD["enumI"]) + 1
+            self.setsectD["enumI"] = enumII
+            refS = self._refs(enumII, "[ Equ: ")
+            uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthII)
         elif tag == "[t]_":         # table label
             tagL = tagS.strip().split("[t]_")
-            tnumI = int(self.setsectD["tnum"]) + 1
-            self.setsectD["tnum"] = tnumI
-            refS = self._refs(tnumI, "[ Table: ")
-            uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthI)
+            tnumII = int(self.setsectD["tnumI"]) + 1
+            self.setsectD["tnumI"] = tnumII
+            refS = self._refs(tnumII, "[Table: ") + "]"
+            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
+            uS = tagL[0].strip() + " " * spcI + refS
         elif tag == "[foot]_":      # footnote label
             tagS = tagS.strip("[foot]_").strip()
             uS = self.setsectD["ftqueL"].popleft() + tagS
@@ -304,7 +305,7 @@ class ParseUTF:
             self.setcmdD.update({"cwidth": widthI})
         else:
             widthI = self.setcmdD["cwidth"]
-        calP = "r"+self.setsectD["cnum"]
+        calP = "r"+self.setsectD["cnumS"]
         txtpath = Path(self.folderD["xpath"]/calP/iL[1].strip())
         with open(txtpath, 'r') as txtf1:
                 uL = txtf1.readlines()
@@ -332,7 +333,7 @@ class ParseUTF:
         if len(iL) < 5: iL += [''] * (5 - len(iL))          # pad parameters
         utfS = ""; contentL = []; sumL = []
         fileS = iL[1].strip()
-        calpS = "r"+self.setsectD["cnum"]
+        calpS = "r"+self.setsectD["cnumS"]
         tfileS = Path(self.folderD["tpath"]/calpS/fileS)                           
         with open(tfileS,'r') as csvfile:                   # read csv file
             readL = list(csv.reader(csvfile))
@@ -400,9 +401,9 @@ class ParseUTF:
             self.setcmdD.update({"scale2F":scale2F})
             fileS = iL[1].split(",")
             file1S = fileS[0].strip(); file2S = fileS[1].strip()
-            calpS = "r"+self.setsectD["cnum"]
-            img1S = str(Path(self.folderD["fpath"]/calpS/file1S))
-            img2S = str(Path(self.folderD["fpath"]/calpS/file2S))                
+            calpS = "r"+self.setsectD["cnumS"]
+            img1S = str(Path(self.folderD["hpath"]/calpS/file1S))
+            img2S = str(Path(self.folderD["hpath"]/calpS/file2S))                
             pthshort1S = str(Path(*Path(img1S).parts[-4:]))
             pthshort2S = str(Path(*Path(img2S).parts[-4:]))
             uS += ("Figure path: " + pthshort1S + "\n")
@@ -421,8 +422,9 @@ class ParseUTF:
             print(uS); self.calcS += uS + "\n"
         else:
             scale1F = float(iL[2]); self.setcmdD.update({"scale1F":scale1F})
-            file1S = iL[1].strip()
-            img1S = str(Path(self.folderD["fpath"] / file1S))
+            fileS = iL[1].split(","); file1S = fileS[0].strip() 
+            calpS = "r"+self.setsectD["cnumS"]
+            img1S = str(Path(self.folderD["hpath"]/calpS/file1S))
             pthshort1S = str(Path(*Path(img1S).parts[-4:]))        
             uS += ("Figure path: " + pthshort1S + "\n")
             if len(self.setsectD["figqueL"]) > 1:

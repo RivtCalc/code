@@ -163,49 +163,53 @@ from contextlib import suppress
 #import rivt.rivt_reprt as _reprt
 #import rivt.rivt_chk as _rchk                   
 
-try: _modfileS = sys.argv[1]                           #  check source of file
-except: _modfileS = sys.argv[0]
-if ".py" not in _modfileS:
-    import __main__; _modfileS = (__main__.__file__)
+try: _calcfileS = sys.argv[1]                           #  check source of file
+except: _calcfileS = sys.argv[0]
+if ".py" not in _calcfileS:
+    import __main__; _calcfileS = (__main__.__file__)
     #print("model file from IDE: ", _modfileS)
  
 _cwdS = os.getcwd()
-_cfull = Path(_modfileS)                             # model file full path
-_cfileS   = _cfull.name                              # model file name
-_cname    = _cfileS.split(".py")[0]                  # model file basename
+_cfull = Path(_calcfileS)                            # calc file full path
+_cfileS   = _cfull.name                              # calc file name
+_cname    = _cfileS.split(".py")[0]                  # calc file basename
 _rivpath  = Path("rivtcalc.rivt_lib.py").parent      # rivt program path
 _cpath    = _cfull.parent                            # calc folder path
 _ppath    = _cfull.parent.parent                     # project folder path
 _dpath    = Path(_ppath / "docs")                    # doc folder path
-_rppath   = Path(_ppath / "reports")                 # report folder path
+_rppath   = Path(_dpath / "report")                  # report folder path
 _rname    = "c"+_cname[1:]                           # calc file basename
 _utffile  = Path(_cpath / ".".join((_rname, "txt"))) # utf output
 _expfile  = Path(_cpath / "data" / "".join(_cfileS)) # export file
-                                            # global settings
+
+# global settings
 utfcalcS = """"""                                    # utf calc string
 rstcalcS = """"""                                    # reST calc string
 exportS  = """"""                                    # values export string
 rivtcalcD = {}                                       # values dictonary
-_setsectD = {"cnum": _cname[1:5], "dnum": _cname[1:3], "sdnum": _cname[3:5],
-            "sname": "", "snum": "", "swidth":80, "enum":0, "tnum":0,
-    "figqueL":deque([[0,"cap"]]), "eqqueL":deque([1]), "ftqueL":deque([1])}
-_setcmdD = {"cwidthI":30, "calignS":"s", "titleS":"notitle", 
-                     "scale1F": 1.,"scale2F": 1.,"writeS":"table",
-                     "subst": False, "saveB": False, "trmrI": 2,"trmtI": 2}
+# folder paths
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
 "dpath": _dpath,
 "rpath": _rppath,
 "cpath": Path(_cfull).parent,
+"mpath": Path(_ppath, "tmp"),
 "spath": Path(_cpath, "scripts"),
 "kpath": Path(_cpath, "sketches"),
 "tpath": Path(_cpath, "data"),
 "xpath": Path(_cpath, "text"),
-"mpath": Path(_cpath, "tmp"),
 "hpath": Path(_dpath, "html"),
-"fpath": Path(_dpath, "html"),
 "apath": Path(_rppath, "attach")}
+# section settings
+_setsectD = {"cnumS": _cname[1:5], "dnumS": _cname[1:3], "sdnumS": _cname[3:5],
+            "snameS": "", "snumS": "", "swidthI":80, "enumI":0, "tnumI":0,
+    "figqueL":deque([[0,"cap"]]), "eqqueL":deque([1]), "ftqueL":deque([1])}
+# command settings
+_setcmdD = {"cwidthI":30, "calignS":"s", "titleS":"notitle", 
+                     "scale1F": 1.,"scale2F": 1.,"writeS":"table",
+                     "subst": False, "saveB": False, "trmrI": 2,"trmtI": 2}
+
 # temp files
 _rbak = Path(_foldD["mpath"] / ".".join((_cname, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_cname, "log")))
@@ -256,15 +260,15 @@ def _section(hdrS: str):
 
     _rgx = r'\[\d\d\]'
     if re.search(_rgx,hdrS):        
-        _setsectD["enum"] = 0               # equation number
+        _setsectD["enumI"] = 0               # equation number
         _setsectD["fnum"] = 0               # figure number
-        _setsectD["tnum"] = 0               # table number
-        nameS = _setsectD["sname"] = hdrS[hdrS.find("]") + 2:].strip()
-        snumS = _setsectD["snum"] = hdrS[hdrS.find("[")+1:hdrS.find("]")]
-        cnumS = str(_setsectD["cnum"])
-        widthI = int(_setsectD["swidth"])
-        headS = " " +  nameS + (cnumS + " - " +
-                ("[" + snumS + "]")).rjust(widthI - len(nameS) - 1)
+        _setsectD["tnumI"] = 0               # table number
+        nameS = _setsectD["snameS"] = hdrS[hdrS.find("]") + 2:].strip()
+        snumSS = _setsectD["snumS"] = hdrS[hdrS.find("[")+1:hdrS.find("]")]
+        cnumSS = str(_setsectD["cnumS"])
+        widthI = int(_setsectD["swidthI"])
+        headS = " " +  nameS + (cnumSS + " - " +
+                ("[" + snumSS + "]")).rjust(widthI - len(nameS) - 1)
         bordrS = widthI * "_"
         utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS +"\n"
         print(utfS); utfcalcS += utfS
@@ -287,7 +291,7 @@ def write_utf():
 
     f1 = open(_cfull, "r"); utfcalcL = f1.readlines(); f1.close()
     print("model file read: " + str(_cfull))
-    for iS in enumerate(utfcalcL):
+    for iS in enumIerate(utfcalcL):
         if "write_utf" in iS[1]: 
             indx = int(iS[0]); break
     utfcalcL = utfcalcL[0:indx]+utfcalcL[indx+1:]

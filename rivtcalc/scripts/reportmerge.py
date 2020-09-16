@@ -24,7 +24,7 @@ preamble = r"""\\documentclass[12pt,notitle]{report}
 \\usepackage{float} % float configuration
 \\floatplacement{figure}{H} % place figures here definitely
 \\usepackage{graphicx}
-\\setcounter{secnumdepth}{0}
+\\setcounter{secnumSdepth}{0}
 
 %%% User specified packages and stylesheets
 \\usepackage{tabto}

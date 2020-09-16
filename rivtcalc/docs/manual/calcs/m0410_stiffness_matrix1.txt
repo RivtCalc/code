@@ -10,9 +10,9 @@
     units: kN, mm
 
     **Element Properties**
-    [t] elastic modulus (kN/mm**2)  | e_1 = 200000*MPA.asUnit(KN/MM**2).asNumber()
-    [t] cross section 1 (mm**2)     | a_1 = 10000*(MM**2).asNumber()
-    [t] cross section 2 (mm**2)     | a_2 = 15000*(MM**2).asNumber()
+    [t] elastic modulus (kN/mm**2)  | e_1 = 200000*MPA.asUnit(KN/MM**2).asnumSber()
+    [t] cross section 1 (mm**2)     | a_1 = 10000*(MM**2).asnumSber()
+    [t] cross section 2 (mm**2)     | a_2 = 15000*(MM**2).asnumSber()
 
     **Node coordinates** [node number, x, y]
     [t] node 0      | n_0  = [0,   0.,      0.]

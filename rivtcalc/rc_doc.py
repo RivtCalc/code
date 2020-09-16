@@ -77,9 +77,9 @@ class ParseReST:
             str: [description]
         """
         objfillS = str(objnumI).zfill(2)
-        sfillS = str(self.setsectD["snum"]).strip().zfill(2)
-        cnumS = str(self.setsectD["cnum"])
-        refS = typeS + cnumS + "." + sfillS + "." + objfillS 
+        sfillS = str(self.setsectD["snumS"]).strip().zfill(2)
+        cnumSS = str(self.setsectD["cnumS"])
+        refS = typeS + cnumSS + "." + sfillS + "." + objfillS 
 
         return refS
 
@@ -145,9 +145,9 @@ class ParseReST:
                         self.setsectD["figqueL"].append([fnumI+1, capS])
                     elif tag == "[e]_":         # equation label
                         tagL = tagS.strip().split("[e]_")
-                        enumI = int(self.setsectD["enum"]) + 1
-                        self.setsectD["enum"] = enumI
-                        refS = self._refs(enumI, "[ Equ: ")
+                        enumII = int(self.setsectD["enumI"]) + 1
+                        self.setsectD["enumI"] = enumII
+                        refS = self._refs(enumII, "[ Equ: ")
                         rS += "\n.. raw:: latex\n"
                         rS += "  \\begin{flushright}\n"
                         rS+= tagL[0].strip() + " " + refS + " ]"
@@ -155,9 +155,9 @@ class ParseReST:
                         rs += "   " ; break
                     elif tag == "[t]_":         # table label
                         tagL = tagS.strip().split("[t]_")
-                        tnumI = int(self.setsectD["tnum"]) + 1
-                        self.setsectD["tnum"] = tnumI
-                        refS = self._refs(tnumI, "[ Table: ")
+                        tnumII = int(self.setsectD["tnumI"]) + 1
+                        self.setsectD["tnumI"] = tnumII
+                        refS = self._refs(tnumII, "[ Table: ")
                         rS += "\n.. raw:: latex\n"
                         rS += "  \\begin{flushright}\n"
                         rS+= tagL[0].strip() + " " + refS + " ]"

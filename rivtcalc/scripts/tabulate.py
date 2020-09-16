@@ -437,17 +437,17 @@ def _isconvertible(conv, string):
         return False
 
 
-def _isnumber(string):
+def _isnumSber(string):
     """
-    >>> _isnumber("123.45")
+    >>> _isnumSber("123.45")
     True
-    >>> _isnumber("123")
+    >>> _isnumSber("123")
     True
-    >>> _isnumber("spam")
+    >>> _isnumSber("spam")
     False
-    >>> _isnumber("123e45678")
+    >>> _isnumSber("123e45678")
     False
-    >>> _isnumber("inf")
+    >>> _isnumSber("inf")
     True
     """
     if not _isconvertible(float, string):
@@ -516,7 +516,7 @@ def _type(string, has_invisible=True, numparse=True):
         return int
     elif _isint(string, _long_type) and numparse:
         return int
-    elif _isnumber(string) and numparse:
+    elif _isnumSber(string) and numparse:
         return float
     elif isinstance(string, _binary_type):
         return _binary_type
@@ -537,7 +537,7 @@ def _afterpoint(string):
     2
 
     """
-    if _isnumber(string):
+    if _isnumSber(string):
         if _isint(string):
             return -1
         else:
@@ -605,7 +605,7 @@ def _visible_width(s):
     """
     # optional wide-character support
     if wcwidth is not None and WIDE_CHARS_MODE:
-        len_fn = wcwidth.wcswidth
+        len_fn = wcwidth.wcswidthI
     else:
         len_fn = len
     if isinstance(s, _text_type) or isinstance(s, _binary_type):
@@ -631,7 +631,7 @@ def _choose_width_fn(has_invisible, enable_widechars, is_multiline):
     if has_invisible:
         line_width_fn = _visible_width
     elif enable_widechars: # optional wide-character support if available
-        line_width_fn = wcwidth.wcswidth
+        line_width_fn = wcwidth.wcswidthI
     else:
         line_width_fn = len
     if is_multiline:
@@ -686,7 +686,7 @@ def _align_column(strings, alignment, minwidth=0,
             # enable wide-character width corrections
             s_lens = [max((len(s) for s in re.split("[\r\n]", ms))) for ms in strings]
             visible_widths = [maxwidth - (w - l) for w, l in zip(s_widths, s_lens)]
-            # wcswidth and _visible_width don't count invisible characters;
+            # wcswidthI and _visible_width don't count invisible characters;
             # padfn doesn't need to apply another correction
             padded_strings = ["\n".join([padfn(w, s) for s in (ms.splitlines() or ms)])
                               for ms, w in zip(strings, visible_widths)]
@@ -697,7 +697,7 @@ def _align_column(strings, alignment, minwidth=0,
             # enable wide-character width corrections
             s_lens = list(map(len, strings))
             visible_widths = [maxwidth - (w - l) for w, l in zip(s_widths, s_lens)]
-            # wcswidth and _visible_width don't count invisible characters;
+            # wcswidthI and _visible_width don't count invisible characters;
             # padfn doesn't need to apply another correction
             padded_strings = [padfn(w, s) for s, w in zip(strings, visible_widths)]
     return padded_strings
@@ -1304,7 +1304,7 @@ def tabulate(tabular_data, headers=(), tablefmt="simple",
     aligns = [numalign if ct in [int,float] else stralign for ct in coltypes]
     if colalign is not None:
         assert isinstance(colalign, Iterable)
-        for idx, align in enumerate(colalign):
+        for idx, align in enumIerate(colalign):
             aligns[idx] = align
     minwidths = [width_fn(h) + MIN_PADDING for h in headers] if headers else [0]*len(cols)
     cols = [_align_column(c, a, minw, has_invisible, enable_widechars, is_multiline)

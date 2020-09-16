@@ -23,7 +23,7 @@ def uarray(array_like, *args, **kwargs):
 def unitless(*values):
     unit = Unum(1, values[0]._unit)
 
-    return (value.asNumber(unit) for value in values)
+    return (value.asnumSber(unit) for value in values)
 
 
 def is_unit(value):
