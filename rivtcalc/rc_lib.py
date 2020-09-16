@@ -1,14 +1,13 @@
 #! python
-"""exposes RivtCalc API.  
+"""rivtcalc API  
 
     The API includes string input and output functions. Input functions take
-    rivt-markup strings as arguments and output utf-formatted calcs to the
-    terminal. Ouput functions write formatted calculations to files in utf-8,
-    pdf and html formats.
+    rivt-markup strings (calcs) as arguments and write formatted utf
+    calculations to the terminal (calcs). Ouput functions write formatted
+    calculations (docs) to files in utf-8, pdf and html formats.
     
-    Markup includes unicode text, commands, tags and Python code. Options
-    depend on the rivt-string type (R,I,V or T). Strings may also include
-    reStructuredText markup. 
+    rivt-markup includes unicode and reStructuredText, commands, tags and
+    Python code. Options depend on the rivt-string type (R,I,V or T). 
 
     Input functions ------------------------------------------------------------
     type     API  text  tags     commands {comment}
@@ -17,46 +16,49 @@
     insert   I()   yes   yes   tex, sym, text, table, image
     values   V()   yes   yes   =, config, value, data, func, +insert commands
     table    T()   no    yes   Python (pandas) simple statements+insert commands  
-    skip     S()   --     --   skip processing rivt-string processing
+    skip     S()   --     --   skip rivt-string; do not evaluate
 
     Output functions -----------------------------------------------------------
         name                   description
     =================  =========================================================
-    1.write_utf()        write calc to utf8 doc file
-    2.write_pdf()        write calc to pdf doc file
-    3.write_html()       write calc to html doc file
-    4.write_report()     combine pdf docs into pdf report file
+    write_utf()         write calc to utf8 doc file
+    write_pdf()         write calc to pdf doc file
+    write_html()        write calc to html doc file
+    write_report()      combine pdf docs into pdf report file
     =================  =========================================================
 
     Commands and tags for each string type are described below. The first line
-    of each rivt-string is a descriptor which may include a section designator
-    and title. String text must be indented 4 spaces after the first descriptor
-    line.
+    of each rivt-string is a descriptor which may be a section designator and
+    title. String input must be indented 4 spaces after the first
+    descriptor line to improve legibility.
 
 Input Syntax and commands ------------------------------------------------------
 
 from rivtcalc import rc_lib as rc
 rc.R('''report-string defines respository and document formats
     
-    Report-strings may include general text at the start of the string. The
-    ||heading command specifies an optional calc title and date printed at the
-    top of each page. Arguments in brackets are user provided. Parameters not
-    in brackets are input as shown. Options are separated by semicolon. The toc
-    parameter generates a table of contents from section tags. The read
-    parameter writes a README.rst file for Github or other online repositories.
-    The first paragraph of the report-string becomes part of the README.rst
-    file for the project. 
+    Report-strings may include text. The readme parameter (see below) writes a
+    README.rst file for Github or other online repositories. The first
+    paragraph of the report-string in the specified calc becomes part of the
+    README.rst file for the project.
+    
+    The ||heading command specifies an optional calc title and date printed at
+    the top of each page, and table of contents printed before the printing the
+    text of this string. Arguments in brackets are user provided. Parameters
+    not in brackets are input as shown. Options are separated by semicolon. The
+    toc parameter generates a table of contents from section tags.
 
-    ||heading | [calc title] | toc; notoc | read; noread | [date]
+    ||heading | [calc title] | toc; notoc | [date] | [readme calc number] 
 
     The ||tag command lists terms describing the scope of the calc with up to
     five terms per command. Tags and a generated index of search terms from the
     calc are also included in the README.
     
-    ||tag | [discipline], [object], [purpose], [assembly], [component]
-    ||tag | [code1], [code2], [code3], .... 
+    ||tags | [discipline], [object], [purpose], [assembly], [component]
+    ||code | [year] | [title]
+    ||code | [year] | [title]
 
-    The ||pdf command attaches, in order, existing pdf documents to the front
+    The ||pdf command attaches existing pdf documents to the front
     or back of the calc doc. PDF files to attach files are stored in the
     docs/attach/ folder.
     
@@ -66,8 +68,8 @@ rc.R('''report-string defines respository and document formats
     ''')
 rc.I('''insert-string contains static text, tables and images.  
     
-    Insert-strings generate formatted static text, equations and images. They
-    may include arbitrary text.
+    Insert-strings include text, static equations and images. 
+
                                                                equations [e]_
     ||tex | \gamma = x + 3 # latex equation 
     ||sym | x = y/2 # sympy equation 
@@ -85,17 +87,18 @@ rc.I('''insert-string contains static text, tables and images.
     ''')
 rc.V('''value-string defines active values and equations
     
-    Value-strings may include arbitrary text that does not include an equal
-    sign.  Lines with equal signs define equations and assignments that 
-    will be numerically evaluated.
+    Value-strings include text, excluding equal signs. Lines with equal signs
+    define equations and assignments that are numerically evaluated.
     
-    Set value parameters where sub means to render equation with substition.
-    ||config | sub {or nosub} | 2,2 {truncate result, terms}  
+    Set value parameters where sub means to render equations with substited
+    values and the number pair specifies decimals in the result and terms.
+    ||config | sub; nosub | 2,2
     
     x1 = 10.1    | unit, alt unit | description || {save if trailing ||}
     y1 = 12.1    | unit, alt unit | description  
 
-    Import values from a csv file, starting with the second row.    
+    Import values from a csv file, starting with the second row.  The first row
+    is a descriptive heading.   
     ||value | file | f.csv
     
     Import a list of values from rows of a csv file 
@@ -376,8 +379,8 @@ def T(rawS: str):
     tcalcS, _setsectD, _setcmdD, rivtcalcD = tcalc.t_utf()
     utfcalcS += tcalcS
 
-def X(rawS: str):
-    """exclude string from processing
+def S(rawS: str):
+    """skip string
      
      Args:
         rawstr (str): any string to exclude

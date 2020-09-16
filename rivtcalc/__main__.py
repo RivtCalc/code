@@ -1,14 +1,15 @@
 """
-***rivtCalc** may be run interactively, one cell (#%%) or function at a time
-in an IDE, or from command line. If run as a command line file: 
+***rivtcalc** may be run interactively from and editor or IDE, one cell (#%%),
+or from command line. If run as a command line file the command is:
 
-    python -m rivtcalc rddcc_modelfile.py 
+    python -m rivtcalc rddss_calcfile.py 
 
-Where ddcc are division and calc numbers used for document organization. Calc
-and doc output files are only generated when specified and after the file is
-run, but not when used interactively.
+where ddss is the calc number made up of a two digit division plus subdivision
+number. The calc number is used for document and report organization. UTF calcs
+are always printed to to the terminal when the calc or interactive cell is run.
+If a file output type (utf, pdf and html) is specified within the calc the
+entire calc is processed and the calc file(s) are written to disk."""
 
-"""
 import os
 import sys
 import textwrap
