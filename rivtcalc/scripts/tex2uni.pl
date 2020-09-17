@@ -2257,7 +2257,7 @@ for ("title", "author", "affil", "address", "email", "date", # "thanks",
   $contents{"\\$_"}="par_puts_unindent;\U$_: ";
 }
 
-for ("document","split","enumIerate"
+for ("document","split","enumerate"
      ) {$environment_none{"$_"}++;} 
 
 $environment{"Sb"}="subscript:matrix,endmatrix;1;l";

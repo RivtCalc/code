@@ -1304,7 +1304,7 @@ def tabulate(tabular_data, headers=(), tablefmt="simple",
     aligns = [numalign if ct in [int,float] else stralign for ct in coltypes]
     if colalign is not None:
         assert isinstance(colalign, Iterable)
-        for idx, align in enumIerate(colalign):
+        for idx, align in enumerate(colalign):
             aligns[idx] = align
     minwidths = [width_fn(h) + MIN_PADDING for h in headers] if headers else [0]*len(cols)
     cols = [_align_column(c, a, minw, has_invisible, enable_widechars, is_multiline)

@@ -87,7 +87,7 @@ rc.I('''insert-string contains static text, tables and images.
     ''')
 rc.V('''value-string defines active values and equations
     
-    Value-strings include text, excluding equal signs. Lines with equal signs
+    Value-strings include text (excluding equal signs). Lines with equal signs
     define equations and assignments that are numerically evaluated.
     
     Set value parameters where sub means to render equations with substited
@@ -234,7 +234,7 @@ logging.getLogger('').addHandler(console)
 _rshortP = Path(*Path(_cfull).parts[-3:])
 _bshortP = Path(*Path(_rbak).parts[-4:])
 _lshortP = Path(*Path(_logfile).parts[-4:])
-logging.info(f"""model: {_rshortP}""" )
+logging.info(f"""calc: {_rshortP}""" )
 logging.info(f"""backup: {_bshortP}""")
 logging.info(f"""logging: {_lshortP}""")
 print(" ")                       # todo: check folder structure here
@@ -292,19 +292,20 @@ def write_utf():
     """
     global utfcalcS
 
+    utfcalcS = """"""
     f1 = open(_cfull, "r"); utfcalcL = f1.readlines(); f1.close()
     print("model file read: " + str(_cfull))
-    for iS in enumIerate(utfcalcL):
+    for iS in enumerate(utfcalcL):                      # filter function
         if "write_utf" in iS[1]: 
             indx = int(iS[0]); break
     utfcalcL = utfcalcL[0:indx]+utfcalcL[indx+1:]
     cmdS = ''.join(utfcalcL)
     exec(cmdS, globals(), locals())
     with open(_utffile, "wb") as f1: f1.write(utfcalcS.encode("UTF-8"))
-    print("utf calc written to file", flush=True)
-    with suppress(BaseException): raise SystemExit()
-    print("program complete")
-    utfcalcS = """"""
+    print("INFO  utf calc written to file", flush=True)
+    print("INFO  program complete")
+    os._exit(1)
+    #with suppress(BaseException): raise SystemExit()
 
 def write_pdf():
     txtfile = " "

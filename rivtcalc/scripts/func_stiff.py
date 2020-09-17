@@ -155,8 +155,8 @@ def displace(k, dof_list, node):
     reactx = {}
     reacty = {}
 
-    re = enumIerate(preact)
-    en = enumIerate(defxy)
+    re = enumerate(preact)
+    en = enumerate(defxy)
     for i in range(2*len(node)):
         if i in kreduce:
             if i%2 == 0:
