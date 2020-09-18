@@ -41,29 +41,38 @@ except:
 
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 
-class ParseReST:
-    """process model-string to reST-string
+class WriteRST:
+    """write calc output to reST file
 
+    Write reST 
     """
     def __init__(self, strL: list, folderD: dict, setcmdD: dict,
          setsectD: dict, rivtD: dict, exportS: str):
         
-        """process model-string to reST-string
-       
+        """transform model-string to calc-string xvv
+
+        The WriteUTF class converts model-strings to calc-string.
+        Model-strings must be indented 4 spaces. Commands start with
+        a double bar (||) and are single line, except where noted. Tags
+        are included inline, with the associated text.
+        
         Args:
-            strL (list): string list
-            folderD (dict): folders
-            setsectD (dict): set section parameters
-            setcmdD (dict): set command parameters
-            rivtD (dict): rivt values
+            exportS (str): stores values that are written to file
+            strL (list): calc lines
+            folderD (dict): folder paths
+            setcmdD (dict): command settings
+            setsectD (dict): section settings
+            rivtD (dict): global rivt dictionary
         """
     
-        self.restS = """"""
-        self.strL = strL
+        self.calcS = """"""             # calc string
+        self.exportS = exportS
+        self.strL = strL 
         self.folderD = folderD
         self.setsectD = setsectD
         self.setcmdD = setcmdD
         self.rivtD = rivtD
+        self.valL = []                  # value list
     
     def _refs(self, objnumI: int, typeS: str) -> str:
         """reference label for equations, tables and figures
@@ -150,7 +159,7 @@ class ParseReST:
 
         return uS
     
-    def _parserest(self, typeS: str, cmdL: list, methL: list, tagL: list ):
+    def _WriteUTF(self, typeS: str, cmdL: list, methL: list, tagL: list ):
         """parse rivt-string`
 
         Args:
@@ -208,35 +217,38 @@ class ParseReST:
             if typeS != "table":                             # skip table prnt
                 print(uS); self.calcS += uS.rstrip() + "\n"
 
-    def r_rest(self) -> str:
+    def r_utf(self) -> str:
         """ parse repository string
        
        Returns:
             calcS (list): utf formatted calc-string (appended)
             setsectD (dict): section settings
         """
-        rcmdL = ["heading", "tag", "scope", "pdf"]
-        rmethL = [self._rheading, self._rtag, self._rpdf]
+        rcmdL = ["head", "tags", "code", "pdf"]
+        rmethL = [self._rhead, self._rtags, self._rcode, self._rpdf]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
-        self._parseutf("report", rcmdL, rmethL, rtagL)
+        self._WriteUTF("report", rcmdL, rmethL, rtagL)
         
         return self.calcS, self.setsectD
 
-    def _rheading(self, rL):
+    def _rhead(self, rL):
         if len(rL) < 5: rL += [''] * (5 - len(rL))      # pad parameters
         if rL[1]: calctitleS = rL[1].strip()
         if rL[2] == "toc": pass
         if rL[3] == "readme": pass
         if rL[4] : pass
 
-    def _rtag(self, rsL):
+    def _rtags(self, rsL):
         a = 4
     
     def _rpdf(self, rsL):
         b = 5
-    
-    def i_rest(self) -> tuple:                 
+
+    def _rcode(self, rsL):
+        b = 5
+
+    def i_utf(self) -> tuple:                 
         """ parse insert-string
        
         Returns:
@@ -251,7 +263,7 @@ class ParseReST:
         itagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
                         "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
         
-        self._parseutf("insert", icmdL, imethL, itagL)
+        self._WriteUTF("insert", icmdL, imethL, itagL)
         
         return self.calcS, self.setsectD, self.setcmdD
 
@@ -433,7 +445,7 @@ class ParseReST:
             _display(_Image(img1S))
             print(uS); self.calcS += uS + "\n"
 
-    def v_rest(self)-> tuple:
+    def v_utf(self)-> tuple:
         """parse value-string and set method
 
         Return:
@@ -453,7 +465,7 @@ class ParseReST:
         vtagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
                         "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
 
-        self._parseutf("values", vcmdL, vmethL, vtagL)
+        self._WriteUTF("values", vcmdL, vmethL, vtagL)
         self.rivtD.update(locals())
         return self.calcS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
 
@@ -546,7 +558,8 @@ class ParseReST:
         locals().update(self.rivtD)
         valL = [] 
         if len(vL) < 5: vL += [''] * (5 - len(vL))            # pad command                                                        
-        vfileS = Path(self.folderD["tpath"] / vL[1].strip())
+        calpS = "r"+self.setsectD["cnumS"]
+        vfileS = Path(self.folderD["tpath"]/calpS/vL[1].strip())
         with open(vfileS,'r') as csvfile:
             readL = list(csv.reader(csvfile))
         for vaL in readL[1:]:                 
@@ -682,7 +695,7 @@ class ParseReST:
     def _vfunc(self, vL: list):
         pass
 
-    def t_rest(self) -> tuple:
+    def t_utf(self) -> tuple:
         """parse table-strings
 
         Return:
@@ -698,6 +711,6 @@ class ParseReST:
         ttagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
                         "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
         
-        self._parseutf("table", tcmdL, tmethL, ttagL)
+        self._WriteUTF("table", tcmdL, tmethL, ttagL)
         
-        return self.calcS, self.setsectD, self.setcmdD, self.rivtD
+        return self.calcS, self.setsectD, self.setcmdD, self.rivtD 

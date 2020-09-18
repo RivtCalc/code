@@ -175,27 +175,31 @@ if ".py" not in _calcfileS:
 _cwdS = os.getcwd()
 _cfull = Path(_calcfileS)                            # calc file full path
 _cfileS   = _cfull.name                              # calc file name
-_cname    = _cfileS.split(".py")[0]                  # calc file basename
+_cnameS    = _cfileS.split(".py")[0]                  # calc file basename
 _rivpath  = Path("rivtcalc.rivt_lib.py").parent      # rivt program path
-_cpath    = _cfull.parent                            # calc folder path
 _ppath    = _cfull.parent.parent                     # project folder path
-_dpath    = Path(_ppath / "docs")                    # doc folder path
-_rppath   = Path(_dpath / "report")                  # report folder path
-_rname    = "c"+_cname[1:]                           # calc file basename
-_utffile  = Path(_cpath / ".".join((_rname, "txt"))) # utf output
-_expfile  = Path(_cpath / "data" / "".join(_cfileS)) # export file
+_cpath    = _cfull.parent                            # calc folder path
+_tpath    = Path(_ppath/"tmp")                       # tmp folder path
+_dpath    = Path(_ppath/"docs")                      # doc folder path
+_rpath    = Path(_dpath/"report")                    # report folder path
+_rname    = "c"+_cnameS[1:]                           # calc file basename
+_utffile  = Path(_cpath/".".join((_rname, "txt")))   # utf output
+_rstfile  = Path(_ppath/".".join((_rname, "rst")))   # rst output
+_expfile  = Path(_cpath /"data"/"".join(_cfileS))    # export file
 
 # global settings
 utfcalcS = """"""                                    # utf calc string
 rstcalcS = """"""                                    # reST calc string
 exportS  = """"""                                    # values export string
+rstcalcS = """"""                                    # reST calc string
+rstflagB = False                                     # flag for reST generation
 rivtcalcD = {}                                       # values dictonary
 # folder paths
 _foldD: dict = {
 "efile": _expfile,   
 "ppath": _ppath,
 "dpath": _dpath,
-"rpath": _rppath,
+"rpath": _rpath,
 "cpath": Path(_cfull).parent,
 "mpath": Path(_ppath, "tmp"),
 "spath": Path(_cpath, "scripts"),
@@ -203,9 +207,9 @@ _foldD: dict = {
 "tpath": Path(_cpath, "data"),
 "xpath": Path(_cpath, "text"),
 "hpath": Path(_dpath, "html"),
-"apath": Path(_rppath, "attach")}
+"apath": Path(_rpath, "attach")}
 # section settings
-_setsectD = {"cnumS": _cname[1:5], "dnumS": _cname[1:3], "sdnumS": _cname[3:5],
+_setsectD = {"cnumS": _cnameS[1:5], "dnumS": _cnameS[1:3], "sdnumS": _cnameS[3:5],
             "snameS": "", "snumS": "", "swidthI":80, "enumI":0, "tnumI":0,
     "figqueL":deque([[0,"cap"]]), "eqqueL":deque([1]), "ftqueL":deque([1])}
 # command settings
@@ -214,9 +218,9 @@ _setcmdD = {"cwidthI":30, "calignS":"s", "titleS":"notitle",
                      "subst": False, "saveB": False, "trmrI": 2,"trmtI": 2}
 
 # temp files
-_rbak = Path(_foldD["mpath"] / ".".join((_cname, "bak")))
-_logfile = Path(_foldD["mpath"] / ".".join((_cname, "log")))
-_rstfile = Path(_foldD["mpath"] / ".".join((_cname, "rst"))) 
+_rbak = Path(_foldD["mpath"] / ".".join((_cnameS, "bak")))
+_logfile = Path(_foldD["mpath"] / ".".join((_cnameS, "log")))
+_rstfile = Path(_foldD["mpath"] / ".".join((_cnameS, "rst"))) 
 #logs and checks
 with open(_cfull, "r") as f2: calcbak = f2.read() 
 with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
@@ -239,8 +243,8 @@ logging.info(f"""backup: {_bshortP}""")
 logging.info(f"""logging: {_lshortP}""")
 print(" ")                       # todo: check folder structure here
 
-def _initclass(rawS: str):
-    """return class instance for rivt-string
+def _initutf(rawS: str):
+    """return utf class instance for rivt-string
 
     Args:
         rawstr (str): rivt-string
@@ -250,8 +254,22 @@ def _initclass(rawS: str):
     """
     sectS,strS = rawS.split("\n",1); _section(sectS)
     strL = strS.split("\n")
-    ucalc = _rc_calc.ParseUTF(strL,_foldD,_setcmdD,_setsectD, rivtcalcD, exportS)
+    ucalc = _rc_calc.WriteUTF(strL,_foldD,_setcmdD,_setsectD, rivtcalcD, exportS)
     return ucalc 
+
+def _initrst(rawS: str):
+    """return reST class instance for rivt-string
+
+    Args:
+        rawstr (str): rivt-string
+
+    Returns:
+        class instance: string-type instance
+    """
+    sectS,strS = rawS.split("\n",1); _section(sectS)
+    strL = strS.split("\n")
+    rstcalc = _rc_calc.WriteRST(strL,_foldD,_setcmdD,_setsectD, rivtcalcD, exportS)
+    return rstcalc 
 
 def _section(hdrS: str):
     """format section headings and settings 
@@ -288,38 +306,137 @@ def write_values():
     with open(_expfile, 'w') as expF: expF.write(str1)
 
 def write_utf():
-    """write utf-string and reST-string files
+    """write utf-calc output to file
+    
+    file is written to calcs folder
     """
-    global utfcalcS
+    global utfcalcS, rstflagB
 
+    rstflagB = False
     utfcalcS = """"""
     f1 = open(_cfull, "r"); utfcalcL = f1.readlines(); f1.close()
     print("model file read: " + str(_cfull))
-    for iS in enumerate(utfcalcL):                      # filter function
+    indx = 0
+    for iS in enumerate(utfcalcL):                      # filter write function
         if "write_utf" in iS[1]: 
             indx = int(iS[0]); break
     utfcalcL = utfcalcL[0:indx]+utfcalcL[indx+1:]
     cmdS = ''.join(utfcalcL)
     exec(cmdS, globals(), locals())
     with open(_utffile, "wb") as f1: f1.write(utfcalcS.encode("UTF-8"))
-    print("INFO  utf calc written to file", flush=True)
+    print("INFO  utf calc written to calc folder", flush=True)
     print("INFO  program complete")
     os._exit(1)
-    #with suppress(BaseException): raise SystemExit()
 
 def write_pdf():
-    txtfile = " "
-    with open(txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-    pdf_files = {
-        "cpdf":  ".".join((_rbase, "pdf")),
-        "chtml":  ".".join((_rbase, "html")),
-        "trst":  ".".join((_rbase, "rst")),    
-        "ttex1":  ".".join((_rbase, "tex")),
-        "auxfile": ".".join((_rbase, ".aux")),
-        "outfile":  ".".join((_rbase, ".out")),
-        "texmak2":  ".".join((_rbase, ".fls")),
-        "texmak3":  ".".join((_rbase, ".fdb_latexmk"))}
+    """write calc output to rst file
+    
+    file is written to docs folder
+    """
+    global rstcalcS, rstflagB
+
+    rstflagB = True
+    rstcalcS = """"""
+    f1 = open(_cfull, "r"); rstcalcL = f1.readlines(); f1.close()
+    print("model file read: " + str(_cfull))
+    indx = 0
+    for iS in enumerate(rstcalcL):                      # filter write function
+        if "write_pdf" in iS[1]: 
+            indx = int(iS[0]); break
+    rstcalcL = rstcalcL[0:indx]+rstcalcL[indx+1:]
+    cmdS = ''.join(rstcalcL)
+    exec(cmdS, globals(), locals())
+    with open(_rstfile, "wb") as f1: f1.write(rstcalcS.encode("UTF-8"))
+    print("INFO  reST calc written to tmp folder", flush=True)
+    write_pdffile()
+    
+def write_pdffile():
+    pdffiles = {
+        "cpdf":  Path(_tpath/".".join(_cnameS, "pdf")),
+        "chtml":  Path(_tpath/".".join(_cnameS, "html")),
+        "trst":  Path(_tpath/".".join(_cnameS, "rst")),    
+        "ttex1":  Path(_tpath/".".join(_cnameS, "tex")),
+        "auxfile": Path(_tpath/".".join(_cnameS, ".aux")),
+        "outfile":  Path(_tpath/".".join(_cnameS, ".out")),
+        "texmak2":  Path(_tpath/".".join(_cnameS, ".fls")),
+        "texmak3":  Path(_tpath/".".join(_cnameS, ".fdb_latexmk"))
+        }
+        #print("gen_tex1")
+        fixstylepath = self.stylepathpdf.replace('\\', '/')
+        try:
+            pypath = os.path.dirname(sys.executable)
+            rstexec = os.path.join(pypath,"Scripts","rst2latex.py")
+            with open(rstexec) as f1:
+                f1.close()
+            pythoncall = 'python '
+            #print("< rst2latex path 1> " + rstexec)
+        except:
+            try:
+                pypath = os.path.dirname(sys.executable)
+                rstexec = os.path.join(pypath,"rst2latex.py")
+                with open(rstexec) as f1:
+                    f1.close()
+                pythoncall = 'python '
+                #print("< rst2latex path 2> " + rstexec)
+            except:
+                rstexec = "/usr/local/bin/rst2latex.py"
+                pythoncall = 'python '
+                #print("< rst2latex path 3> " + rstexec)
+        tex1 = "".join([pythoncall, rstexec
+                        ,
+                        " --documentclass=report ",
+                        " --documentoptions=12pt,notitle,letterpaper",
+                        " --stylesheet=",
+                        fixstylepath + " ", self.rfile + " ", self.texfile2])
+        self.el.logwrite("tex call:\n" + tex1, self.vbos)
+        try:
+            os.system(tex1)
+            self.el.logwrite("< TeX file written >", self.vbos)
+        except:
+            print()
+            self.el.logwrite("< error in docutils call >", self.vbos)
+        self.mod_tex(self.texfile2)
+        with open(tfile, 'r') as texin:
+            texf = texin.read()
+        texf = texf.replace("""inputenc""", """ """)
+        texf = texf.replace("aaxbb ", """\\hfill""")
+        texf = texf.replace("""\\begin{document}""",
+                            """\\renewcommand{\contentsname}{"""+
+                            self.calctitle + "}\n"+
+                            """\\begin{document}"""+"\n"+
+                            """\\makeatletter"""+
+                            """\\renewcommand\@dotsep{10000}"""+
+                            """\\makeatother"""+
+                            """\\tableofcontents"""+
+                            """\\listoftables"""+
+                            """\\listoffigures""")    
+        with open (tfile, 'w') as texout:
+            print(texf, file=texout)
+        os.chdir(self.xpath)
+        if os.path.isfile(os.path.join(self.ppath,self.pdffile)):
+            os.remove(os.path.join(self.ppath,self.pdffile))
+        pdf1 ='latexmk -xelatex -quiet -f '+os.path.join(self.xpath,self.texfile)
+        #print("pdf call:  ", pdf1)
+        self.el.logwrite("< PDF calc written >", self.vbos)    
+        os.system(pdf1)
+        pdfname = self.pdffile
+        pdfname = list(pdfname)
+        pdfname[0]='m'
+        pdfname2 = "".join(pdfname)
+        pdfftemp = os.path.join(self.xpath, pdfname2)
+        pdffnew = os.path.join(self.cpath, self.pdffile)
+        try: os.remove(pdffnew)
+        except: pass
+        try: os.rename(pdfftemp, pdffnew)
+        except: self.el.logwrite("< PDF calc not moved from temp >", 1)
+        tocname2 = pdfname2.replace('.pdf','.toc')
+        toctemp = os.path.join(self.xpath, tocname2)
+        tocnew = os.path.join(self.rpath, tocname2)
+        try: shutil.copyfile(toctemp, tocnew)
+        except: self.el.logwrite("< TOC not moved from temp >", 1)
+    print("INFO  pdf doc written to docs folder", flush=True)    
+    print("INFO  program complete")
+    os._exit(1)
 
 def write_html():
     """[summary]
@@ -340,9 +457,14 @@ def R(rawS: str):
     """
     global  utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
     
-    rcalc = _initclass(rawS)
-    rcalcS, _setsectD = rcalc.r_utf()
-    utfcalcS += rcalcS
+    if rstflagB:
+        rcalc = _initrst(rawS)
+        rcalcS, _setsectD = rcalc.r_rst()
+        rstcalcS += rcalcS
+    else:
+        rcalc = _initutf(rawS)
+        rcalcS, _setsectD = rcalc.r_utf()
+        utfcalcS += rcalcS
 
 def I(rawS: str):
     """insert-string to utf-string
@@ -352,7 +474,7 @@ def I(rawS: str):
     """
     global utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
     
-    icalc = _initclass(rawS)
+    icalc = _initutf(rawS)
     icalcS, _setsectD, _setcmdD = icalc.i_utf()
     utfcalcS += icalcS
 
@@ -364,7 +486,7 @@ def V(rawS: str):
     """
     global utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
 
-    vcalc = _initclass(rawS)
+    vcalc = _initutf(rawS)
     vcalcS, _setsectD, _setcmdD, rivtcalcD, exportS = vcalc.v_utf()
     utfcalcS += vcalcS
 
@@ -376,7 +498,7 @@ def T(rawS: str):
     """
     global utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
 
-    tcalc = _initclass(rawS)
+    tcalc = _initutf(rawS)
     tcalcS, _setsectD, _setcmdD, rivtcalcD = tcalc.t_utf()
     utfcalcS += tcalcS
 

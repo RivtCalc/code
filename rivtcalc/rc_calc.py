@@ -1,7 +1,7 @@
 #! python
 """converts model-strings to calc-strings
 
-The ParseUTF class converts model-strings to calc-strings and prints results to
+The WriteUTF class converts model-strings to calc-strings and prints results to
 the terminal. Model-strings must be indented 4 spaces. Commands are single line
 and typically start with a double bar (||). Tags are in line with the
 associated text. """
@@ -33,8 +33,8 @@ from rivtcalc.rc_unit import *
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 #tabulate.PRESERVE_WHITESPACE = True
 
-class ParseUTF:
-    """converts model-strings to calc-strings
+class WriteUTF:
+    """write calc output to terminal
   
     """
     
@@ -43,7 +43,7 @@ class ParseUTF:
         
         """transform model-string to calc-string xvv
 
-        The ParseUTF class converts model-strings to calc-string.
+        The WriteUTF class converts model-strings to calc-string.
         Model-strings must be indented 4 spaces. Commands start with
         a double bar (||) and are single line, except where noted. Tags
         are included inline, with the associated text.
@@ -151,7 +151,7 @@ class ParseUTF:
 
         return uS
     
-    def _parseutf(self, typeS: str, cmdL: list, methL: list, tagL: list ):
+    def _WriteUTF(self, typeS: str, cmdL: list, methL: list, tagL: list ):
         """parse rivt-string`
 
         Args:
@@ -220,7 +220,7 @@ class ParseUTF:
         rmethL = [self._rhead, self._rtags, self._rcode, self._rpdf]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
-        self._parseutf("report", rcmdL, rmethL, rtagL)
+        self._WriteUTF("report", rcmdL, rmethL, rtagL)
         
         return self.calcS, self.setsectD
 
@@ -255,7 +255,7 @@ class ParseUTF:
         itagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
                         "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
         
-        self._parseutf("insert", icmdL, imethL, itagL)
+        self._WriteUTF("insert", icmdL, imethL, itagL)
         
         return self.calcS, self.setsectD, self.setcmdD
 
@@ -457,7 +457,7 @@ class ParseUTF:
         vtagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
                         "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
 
-        self._parseutf("values", vcmdL, vmethL, vtagL)
+        self._WriteUTF("values", vcmdL, vmethL, vtagL)
         self.rivtD.update(locals())
         return self.calcS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
 
@@ -703,6 +703,6 @@ class ParseUTF:
         ttagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
                         "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
         
-        self._parseutf("table", tcmdL, tmethL, ttagL)
+        self._WriteUTF("table", tcmdL, tmethL, ttagL)
         
         return self.calcS, self.setsectD, self.setcmdD, self.rivtD
