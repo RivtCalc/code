@@ -251,7 +251,7 @@ logging.info(f"""backup: {_bshortP}""")
 logging.info(f"""logging: {_lshortP}""")
 print(" ")                       # todo: check folder structure here
 
-def _initutf(rawS: str):
+def _init_utf(rawS: str):
     """return rivt-string utf class instance
 
     Args:
@@ -265,7 +265,7 @@ def _initutf(rawS: str):
     ucalc = _rc_calc.WriteUTF(strL,_foldD,_setcmdD,_setsectD, rivtcalcD, exportS)
     return ucalc 
 
-def _initrst(rawS: str):
+def _init_rst(rawS: str):
     """return rivt-string reST class
 
     Args:
@@ -339,7 +339,7 @@ def write_utf():
 def write_pdf():
     """write calc output to rst file
     
-    file is written to docs folder
+    write .rst file to tmp folder
     """
     global rstcalcS, rstflagB
 
@@ -466,11 +466,11 @@ def R(rawS: str):
     global  utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
     
     if rstflagB:
-        rcalc = _initrst(rawS)
+        rcalc = _init_rst(rawS)
         rcalcS, _setsectD = rcalc.r_rst()
         rstcalcS += rcalcS
     else:
-        rcalc = _initutf(rawS)
+        rcalc = _init_utf(rawS)
         rcalcS, _setsectD = rcalc.r_utf()
         utfcalcS += rcalcS
 
@@ -482,7 +482,7 @@ def I(rawS: str):
     """
     global utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
     
-    icalc = _initutf(rawS)
+    icalc = _init_utf(rawS)
     icalcS, _setsectD, _setcmdD = icalc.i_utf()
     utfcalcS += icalcS
 
@@ -494,7 +494,7 @@ def V(rawS: str):
     """
     global utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
 
-    vcalc = _initutf(rawS)
+    vcalc = _init_utf(rawS)
     vcalcS, _setsectD, _setcmdD, rivtcalcD, exportS = vcalc.v_utf()
     utfcalcS += vcalcS
 
@@ -506,7 +506,7 @@ def T(rawS: str):
     """
     global utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
 
-    tcalc = _initutf(rawS)
+    tcalc = _init_utf(rawS)
     tcalcS, _setsectD, _setcmdD, rivtcalcD = tcalc.t_utf()
     utfcalcS += tcalcS
 
