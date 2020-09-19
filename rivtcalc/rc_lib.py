@@ -6,17 +6,19 @@
     calculations to the terminal (calcs). Ouput functions write formatted
     calculations (docs) to files in utf-8, pdf and html formats.
     
-    rivt-markup includes unicode and reStructuredText, commands, tags and
-    Python code. Options depend on the rivt-string type (R,I,V or T). 
+    Rivt-markup includes unicode and reStructuredText, commands, tags and
+    Python code. The options depend on the rivt-string type (R,I,V or T).
+    Commands generally operate on files and include processing parameters. Tags
+    generally format single lines of text and do not have parameters.
 
     Input functions ------------------------------------------------------------
     type     API  text  tags     commands {comment}
     ======= ===== ===== =====  =================================================
-    report   R()   yes   no    heading, tag, pdf
-    insert   I()   yes   yes   tex, sym, text, table, image
-    values   V()   yes   yes   =, config, value, data, func, +insert commands
-    table    T()   no    yes   Python (pandas) simple statements+insert commands  
-    skip     S()   --     --   skip rivt-string; do not evaluate
+    Report   R()   yes   no    head, code, keys, pdf
+    Insert   I()   yes   yes   text, table, image
+    Values   V()   yes   yes   =, config, value, data, func, +insert commands
+    Table    T()   no    yes   Python (pandas) simple statements+icommands  
+    Skip     S()   --     --   skip rivt-string; do not evaluate
 
     Output functions -----------------------------------------------------------
         name                   description
@@ -35,26 +37,27 @@
 Input Syntax and commands ------------------------------------------------------
 
 from rivtcalc import rc_lib as rc
-rc.R('''report-string defines respository and document formats
+rc.R('''[01] The report-string defines report, document and repository content
     
-    Report-strings may include text. The readme parameter (see below) writes a
+    Report-strings may include text. The index list (see below) writes a
     README.rst file for Github or other online repositories. The first
-    paragraph of the report-string in the specified calc becomes part of the
-    README.rst file for the project.
+    paragraph of the report-string specified in each calc specified in the list
+    becomes part of the README.rst file for the project. The specified keywords
+    and automatically scanned terms are also added to the README.
     
-    The ||heading command specifies an optional calc title and date printed at
-    the top of each page, and table of contents printed before the printing the
-    text of this string. Arguments in brackets are user provided. Parameters
-    not in brackets are input as shown. Options are separated by semicolon. The
-    toc parameter generates a table of contents from section tags.
+    The ||head command specifies an optional calc title and date printed at the
+    top of each page, and table of contents printed before the string text.
+    Arguments in brackets are user provided. Parameters not in brackets are
+    literal inputs. Options are separated by semicolon. The toc parameter
+    generates a table of contents from the section tags.
 
-    ||heading | [calc title] | toc; notoc | [date] | [readme calc number] 
+    ||head | [calc title] | toc; notoc | [date] | [index list] 
 
-    The ||tag command lists terms describing the scope of the calc with up to
-    five terms per command. Tags and a generated index of search terms from the
-    calc are also included in the README.
+    The ||keys command lists keywords describing the scope of the calc with up
+    to five terms per command. Keys plus an automatically generated index of
+    search terms from the calc are included in the README.
     
-    ||tags | [discipline], [object], [purpose], [assembly], [component]
+    ||keys | [discipline], [object], [purpose], [assembly], [component]
     ||code | [year] | [title]
     ||code | [year] | [title]
 
@@ -66,13 +69,17 @@ rc.R('''report-string defines respository and document formats
     ||pdf | back | functions; docstrings
     ||pdf | back | [appendixfile.pdf] 
     ''')
-rc.I('''insert-string contains static text, tables and images.  
+rc.I('''The insert-string contains static text, tables and images.  
     
-    Insert-strings include text, static equations and images. 
+    Insert-strings include text, static equations and images. The equation tag
+    auto increments and inserts the equation number. The x and s tags 
 
-                                                               equations [e]_
-    ||tex | \gamma = x + 3 # latex equation 
-    ||sym | x = y/2 # sympy equation 
+    latex equation [e]_
+    \gamma = \frac{5}{x+y} + 3  [x]_         
+    
+    sympy equation [e]_
+    x = 32 + (y/2) [s]_            
+    
     ||text | f.txt | 60 \ literal {max char. width or literal}  
     
     table title [t]_
@@ -85,7 +92,7 @@ rc.I('''insert-string contains static text, tables and images.
     second figure caption [f]_
     ||image | f1.png, f2.jpg | 1.,0.5
     ''')
-rc.V('''value-string defines active values and equations
+rc.V('''[02] The value-string defines active values and equations
     
     Value-strings include text (excluding equal signs). Lines with equal signs
     define equations and assignments that are numerically evaluated.
@@ -106,15 +113,15 @@ rc.V('''value-string defines active values and equations
 
     For a value file the csv file must have the structure:
     [literal]_
-    variable name, value, primary unit, secondary unit, description 
+        variable name, value, primary unit, secondary unit, description 
     
     For a data file the csv file must have the structure:
     [literal]_
-    variable name, value1, value2, value3, ....
+        variable name, value1, value2, value3, ....
     
     an equation [e]_
     v1 = x + 4*M  | unit, alt unit
-    save an equation result to file [e]_
+    save an equation result to the values file [e]_
     y1 = v1 / 4   | unit, alt unit ||         
 
     ||func | func_file.py | func_call | var_name {import function from file}
@@ -125,7 +132,7 @@ rc.V('''value-string defines active values and equations
     figure caption [f]_
     ||image | x.png | 1.
     ''') 
-rc.T('''table-string defines tables and plots with simple Python statements
+rc.T('''The table-string defines tables and plots with simple Python statements
     
      Table-strings may include any simple Python statement (single line),
      insert-commands or tags.
@@ -134,18 +141,20 @@ rc.T('''table-string defines tables and plots with simple Python statements
     Tags -----------------------------------------------------------------------
        tag               description
     ===============  ===========================================================
-    [nn]_ abc def       section title and number in descriptor line (first line)
+    [nn]_ abc def       descriptor line section number and title (first line)
     [#]_                autonumbered footnote      
     abc def [foot]_     footnote description
-    abc def [t]_        right justify table title, autoincrement number   
-    abc def [e]_        right justify equation label, autoincrement number
-    abc def [f]_        right justify caption, autoincrement number   
-    abc def [r]_        right justify line of text
-    abc def [c]_        center line of text
+    s = b\2 [s]_        format sympy equation
+    \a = c*2 [x]_       format LaTeX equation
+    description [e]_    autoincrement and insert equation number and description
+    title [t]_          autoincrement and insert table number and title   
+    caption [f]_        autoincrement and insert figure number and caption   
+    abc def [r]_        right justify text line
+    abc def [c]_        center text line
     [literal]_          literal text block
     [line]_             draw horizontal line
     [page]_             new doc page
-    http://abc [link]_  link
+    http://abc [link]_  url link
 """
 import os
 import sys
@@ -187,7 +196,7 @@ _utffile  = Path(_cpath/".".join((_rname, "txt")))   # utf output
 _rstfile  = Path(_ppath/".".join((_rname, "rst")))   # rst output
 _expfile  = Path(_cpath /"data"/"".join(_cfileS))    # export file
 
-# global settings
+# global variables; folders, sections, commmands
 utfcalcS = """"""                                    # utf calc string
 rstcalcS = """"""                                    # reST calc string
 exportS  = """"""                                    # values export string
@@ -214,9 +223,8 @@ _setsectD = {"cnumS": _cnameS[1:5], "dnumS": _cnameS[1:3], "sdnumS": _cnameS[3:5
     "figqueL":deque([[0,"cap"]]), "eqqueL":deque([1]), "ftqueL":deque([1])}
 # command settings
 _setcmdD = {"cwidthI":30, "calignS":"s", "titleS":"notitle", 
-                     "scale1F": 1.,"scale2F": 1.,"writeS":"table",
-                     "subst": False, "saveB": False, "trmrI": 2,"trmtI": 2}
-
+                     "scale1F": 1., "scale2F": 1., "trmrI": 2, "trmtI": 2,
+                     "substB": False, "saveB": False,"writeS":"table"}
 # temp files
 _rbak = Path(_foldD["mpath"] / ".".join((_cnameS, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_cnameS, "log")))
@@ -244,13 +252,13 @@ logging.info(f"""logging: {_lshortP}""")
 print(" ")                       # todo: check folder structure here
 
 def _initutf(rawS: str):
-    """return utf class instance for rivt-string
+    """return rivt-string utf class instance
 
     Args:
         rawstr (str): rivt-string
 
     Returns:
-        class instance: string-type instance
+        class instance: utf string-type instance
     """
     sectS,strS = rawS.split("\n",1); _section(sectS)
     strL = strS.split("\n")
@@ -258,13 +266,13 @@ def _initutf(rawS: str):
     return ucalc 
 
 def _initrst(rawS: str):
-    """return reST class instance for rivt-string
+    """return rivt-string reST class
 
     Args:
         rawstr (str): rivt-string
 
     Returns:
-        class instance: string-type instance
+        class instance: reST string-type instance
     """
     sectS,strS = rawS.split("\n",1); _section(sectS)
     strL = strS.split("\n")

@@ -1,5 +1,5 @@
 #! python
-"""converts model-strings to calc-strings
+"""converts calc-strings to utf-strings
 
 The WriteUTF class converts model-strings to calc-strings and prints results to
 the terminal. Model-strings must be indented 4 spaces. Commands are single line
@@ -34,19 +34,19 @@ logging.getLogger("numexpr").setLevel(logging.WARNING)
 #tabulate.PRESERVE_WHITESPACE = True
 
 class WriteUTF:
-    """write calc output to terminal
+    """write UTF8 calc output to terminal
   
     """
     
     def __init__(self, strL: list, folderD: dict, setcmdD: dict,
          setsectD: dict, rivtD: dict, exportS: str):
         
-        """transform model-string to calc-string xvv
+        """process rivt-string to UTF8 calc-string
 
-        The WriteUTF class converts model-strings to calc-string.
-        Model-strings must be indented 4 spaces. Commands start with
+        The WriteUTF class converts rivt-strings to calc-strings.
+        Rivt-strings must be indented 4 spaces. Commands start with
         a double bar (||) and are single line, except where noted. Tags
-        are included inline, with the associated text.
+        are inserted inline with the associated text.
         
         Args:
             exportS (str): stores values that are written to file
@@ -127,6 +127,19 @@ class WriteUTF:
             fnumI = int(self.setsectD["figqueL"][-1][0])
             capS = tagS.strip("[f]_").strip()
             self.setsectD["figqueL"].append([fnumI+1, capS])
+        elif tag == "[x]_":         # format tex
+            tagL = tagS.strip().split("[x]_")
+            txS = tagL[0].strip()
+            #txS = txs.encode('unicode-escape').decode()
+            ptxS = parse_latex(txS)
+            uS = sp.pretty(sp.sympify(ptxS, _clash2, evaluate=False))        
+        elif tag == "[s]_":         # format sympy
+            tagL = tagS.strip().split("[s]_")
+            spS = tagL[0].strip()
+            spL = spS.split("=")
+            spS = "Eq(" + spL[0] +",(" + spL[1] +"))" 
+            #sps = sps.encode('unicode-escape').decode()
+            uS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
         elif tag == "[e]_":         # equation label
             tagL = tagS.strip().split("[e]_")
             enumII = int(self.setsectD["enumI"]) + 1
@@ -151,8 +164,8 @@ class WriteUTF:
 
         return uS
     
-    def _WriteUTF(self, typeS: str, cmdL: list, methL: list, tagL: list ):
-        """parse rivt-string`
+    def _parseUTF(self, typeS: str, cmdL: list, methL: list, tagL: list ):
+        """parse rivt-string to UTF
 
         Args:
             typeS (str): rivt-string type
@@ -216,11 +229,11 @@ class WriteUTF:
             calcS (list): utf formatted calc-string (appended)
             setsectD (dict): section settings
         """
-        rcmdL = ["head", "tags", "code", "pdf"]
-        rmethL = [self._rhead, self._rtags, self._rcode, self._rpdf]
+        rcmdL = ["head", "keys", "code", "pdf"]
+        rmethL = [self._rhead, self._rkeys, self._rcode, self._rpdf]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
-        self._WriteUTF("report", rcmdL, rmethL, rtagL)
+        self._parseUTF("report", rcmdL, rmethL, rtagL)
         
         return self.calcS, self.setsectD
 
@@ -231,13 +244,13 @@ class WriteUTF:
         if rL[3] == "readme": pass
         if rL[4] : pass
 
-    def _rtags(self, rsL):
+    def _rkeys(self, rsL):
         a = 4
-    
-    def _rpdf(self, rsL):
-        b = 5
 
     def _rcode(self, rsL):
+        b = 5
+
+    def _rpdf(self, rsL):
         b = 5
 
     def i_utf(self) -> tuple:                 
@@ -249,52 +262,15 @@ class WriteUTF:
             setcmdD (dict): command settings
         """
 
-        icmdL = ["text", "sym", "tex", "table", "image"]
-        imethL = [self._itext, self._isympy, self._ilatex, 
-                            self._itable, self._iimage, ]
+        icmdL = ["text", "table", "image"]
+        imethL = [self._itext, self._itable, self._iimage, ]
         itagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
-                        "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
+                  "[s]_","[x]_","[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
         
-        self._WriteUTF("insert", icmdL, imethL, itagL)
+        self._parseUTF("insert", icmdL, imethL, itagL)
         
         return self.calcS, self.setsectD, self.setcmdD
 
-    def _ilatex(self,iL: list):
-        """insert formated equation from LaTeX string
-        
-        Args:
-            ipL (list): parameter list
-
-        """
-        try:
-            scaleI = int(iL[2].strip)
-        except:
-            scaleI = self.setcmdD["scale1F"]
-        self.setcmdD.update({"scale1F":scaleI})
-        txS = iL[1].strip()
-        #txS = txs.encode('unicode-escape').decode()
-        ptxS = parse_latex(txS)
-        utfS2 = sp.pretty(sp.sympify(ptxS, _clash2, evaluate=False))
-        print(utfS2+"\n"); self.calcS += utfS2 + "\n"   
-
-    def _isympy(self,iL):
-        """insert formated equation from sympy string 
-        
-        Args:
-            ipL (list): parameter list
-        """
-        try:
-            scaleI = int(iL[2].strip())
-        except:
-            scaleI = self.setcmdD["scale1F"]
-        self.setcmdD.update({"scale1F":scaleI})
-        spS = iL[1].strip()
-        spL = spS.split("=")
-        spS = "Eq(" + spL[0] +",(" + spL[1] +"))" 
-        #sps = sps.encode('unicode-escape').decode()
-        utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
-        print(utfS); self.calcS += utfS + "\n"   
-            
     def _itext(self, iL: list):
         """insert text from file
         
@@ -313,7 +289,6 @@ class WriteUTF:
         with open(txtpath, 'r') as txtf1:
                 uL = txtf1.readlines()
         txtS = "".join(uL)
-        if iL[2].strip() == "literal": wrapB = 0
         if wrapB:
             inxI = int((80-widthI)/2)
             inS = " "*inxI
@@ -449,15 +424,13 @@ class WriteUTF:
          """
 
         locals().update(self.rivtD)
-        vcmdL = ["config", "value", "data", "func", 
-                    "text", "sym", "tex", "table", "image"]
+        vcmdL = ["config", "value", "data", "func", "text", "table", "image"]
         vmethL = [self._vconfig, self._vvalue, self._vdata, self._vfunc, 
-           self._itext, self._isympy, self._ilatex, self._itable, self._iimage]
-
+                        self._itext, self._itable, self._iimage]
         vtagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
-                        "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
+                "[s]_","[x]_","[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
 
-        self._WriteUTF("values", vcmdL, vmethL, vtagL)
+        self._parseUTF("values", vcmdL, vmethL, vtagL)
         self.rivtD.update(locals())
         return self.calcS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
 
@@ -540,6 +513,20 @@ class WriteUTF:
                 self.exportS += pyS
         self.rivtD.update(locals())   
 
+    def _vtable(self, tbl, hdrL, tblfmt, alignL):
+        """write value table"""
+
+        locals().update(self.rivtD)
+        sys.stdout.flush()                                      
+        old_stdout = sys.stdout; output = StringIO()
+        output.write(tabulate(tbl, tablefmt=tblfmt, headers=hdrL, 
+                    showindex=False, colalign=alignL))                    
+        valS = output.getvalue()
+        sys.stdout = old_stdout; sys.stdout.flush()
+        utfS = output.getvalue(); sys.stdout = old_stdout            
+        print(utfS); self.calcS += utfS + "\n"  
+        self.rivtD.update(locals())            
+
     def _vvalue(self, vL: list):
         """import values from files
 
@@ -605,20 +592,6 @@ class WriteUTF:
         alignL = ['left','right']            
         self._vtable(valL, hdrL, "rst", alignL)
         self.rivtD.update(locals()) 
-
-    def _vtable(self, tbl, hdrL, tblfmt, alignL):
-        """write value table"""
-
-        locals().update(self.rivtD)
-        sys.stdout.flush()                                      
-        old_stdout = sys.stdout; output = StringIO()
-        output.write(tabulate(tbl, tablefmt=tblfmt, headers=hdrL, 
-                    showindex=False, colalign=alignL))                    
-        valS = output.getvalue()
-        sys.stdout = old_stdout; sys.stdout.flush()
-        utfS = output.getvalue(); sys.stdout = old_stdout            
-        print(utfS); self.calcS += utfS + "\n"  
-        self.rivtD.update(locals())                        
 
     def _vsub(self, eqL: list, eqS: str):
         """substitute numbers for variables in printed output
@@ -697,12 +670,11 @@ class WriteUTF:
             rivtD (list): calculation values         
         """
         
-        tcmdL = ["text", "sym", "tex", "table", "image"]
-        tmethL = [self._itext, self._isympy, self._ilatex, 
-                            self._itable, self._iimage, ]
+        tcmdL = ["text", "table", "image"]
+        tmethL = [self._itext, self._itable, self._iimage]
         ttagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
-                        "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
+                "[s]", "[x]", "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
         
-        self._WriteUTF("table", tcmdL, tmethL, ttagL)
+        self._parseUTF("table", tcmdL, tmethL, ttagL)
         
         return self.calcS, self.setsectD, self.setcmdD, self.rivtD
