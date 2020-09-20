@@ -8,8 +8,6 @@
     
     Rivt-markup includes unicode and reStructuredText, commands, tags and
     Python code. The options depend on the rivt-string type (R,I,V or T).
-    Commands generally operate on files and include processing parameters. Tags
-    generally format single lines of text and do not have parameters.
 
     Input functions ------------------------------------------------------------
     type     API  text  tags     commands {comment}
@@ -29,68 +27,80 @@
     write_report()      combine pdf docs into pdf report file
     =================  =========================================================
 
-    Commands and tags for each string type are described below. The first line
-    of each rivt-string is a descriptor which may be a section designator and
-    title. String input must be indented 4 spaces after the first
-    descriptor line to improve legibility.
+    Commands and tags for each string type are described below. Commands
+    generally operate on files and include processing parameters. Tags
+    generally format single lines of text and do not have parameters. The first
+    line of each rivt-string is a descriptor which may also be tagged as a
+    section designator . By design, string input must be indented 4 spaces
+    after the first descriptor line to improve legibility.
 
 Input Syntax and commands ------------------------------------------------------
 
 from rivtcalc import rc_lib as rc
-rc.R('''[01] The report-string defines report, document and repository content
+rc.R('''[01] The report-string defines report and repository content
     
-    Report-strings may include text. The index list (see below) writes a
-    README.rst file for Github or other online repositories. The first
-    paragraph of the report-string specified in each calc specified in the list
-    becomes part of the README.rst file for the project. The specified keywords
-    and automatically scanned terms are also added to the README.
-    
-    The ||head command specifies an optional calc title and date printed at the
-    top of each page, and table of contents printed before the string text.
-    Arguments in brackets are user provided. Parameters not in brackets are
-    literal inputs. Options are separated by semicolon. The toc parameter
+    Report-strings may include text. The first paragraph of the report-string
+    in each calc specified in the ||search command (see below) becomes part of
+    the README.rst file for the project. The ||head command specifies an
+    optional calc title and date printed at the top of each page, and table of
+    contents printed before the string text. Arguments not in parenthesis are
+    literal. Parameter options are separated by semicolons. The toc argument
     generates a table of contents from the section tags.
 
-    ||head | [calc title] | toc; notoc | [date] | [index list] 
+    ||head | (calc title) | (date) | toc; notoc  
 
-    The ||keys command lists keywords describing the scope of the calc with up
-    to five terms per command. Keys plus an automatically generated index of
-    search terms from the calc are included in the README.
+    The ||search command specifies a list of calc numbers that are searched
+    against a master category list for terms to be included in the README. The
+    calc number list is also used for the ||keys and ||code commands. Because
+    the search command is execcuted at the project level it is usually included
+    in the first calc in a project. The command overwrites existing README
+    files.
+
+    ||search | (calc num), (calc num), (calc num)
+
+    The ||keys command is a list of keywords included in the README that
+    describe the scope of the calc, with up to five terms per command.
     
-    ||keys | [discipline], [object], [purpose], [assembly], [component]
-    ||code | [year] | [title]
-    ||code | [year] | [title]
+    ||keys | (discipline), (object), (purpose), (assembly), (component)
+
+    The ||code command identifies codes used in the calculation that are listed
+    in the README and calc.
+
+    ||code | (year) | (title)
+    ||code | (year) | (title)
 
     The ||pdf command attaches existing pdf documents to the front
     or back of the calc doc. PDF files to attach files are stored in the
     docs/attach/ folder.
     
-    ||pdf | front | [calccoverfile.pdf]         
+    ||pdf | front | (calccoverfile.pdf)         
     ||pdf | back | functions; docstrings
-    ||pdf | back | [appendixfile.pdf] 
+    ||pdf | back | (appendixfile.pdf) 
     ''')
 rc.I('''The insert-string contains static text, tables and images.  
     
     Insert-strings include text, static equations and images. The equation tag
     auto increments and inserts the equation number. The x and s tags 
 
-    latex equation [e]_
+    latex equation  [e]_
     \gamma = \frac{5}{x+y} + 3  [x]_         
     
-    sympy equation [e]_
-    x = 32 + (y/2) [s]_            
+    sympy equation  [e]_
+    x = 32 + (y/2)  [s]_            
     
-    ||text | f.txt | 60 \ literal {max char. width or literal}  
+    ||text | file.txt | literal; indent {}  
     
-    table title [t]_
-    ||table | f.csv | 60,c {width, align} | title {in csv} | [2,1,4] {cols} 
+    table title  [t]_
+    ||table | f.csv | 60,c {width, align} | title {line 1} | 2,1,4 {include cols} 
 
-    figure caption [f]_
     ||image | f.png {image file} | 1. {scale}
-    
-    first figure caption (side by side) [f]_
-    second figure caption [f]_
+    figure caption [f]_
+
     ||image | f1.png, f2.jpg | 1.,0.5
+    first figure caption (side by side)  [f]_
+    second figure caption  [f]_
+
+    Python | http://wwww.python.org [link]_ 
     ''')
 rc.V('''[02] The value-string defines active values and equations
     
@@ -141,20 +151,20 @@ rc.T('''The table-string defines tables and plots with simple Python statements
     Tags -----------------------------------------------------------------------
        tag               description
     ===============  ===========================================================
-    [nn]_ abc def       descriptor line section number and title (first line)
-    [#]_                autonumbered footnote      
-    abc def [foot]_     footnote description
-    s = b\2 [s]_        format sympy equation
-    \a = c*2 [x]_       format LaTeX equation
+    [nn]_ abc def       first line - descriptor section number and title
     description [e]_    autoincrement and insert equation number and description
     title [t]_          autoincrement and insert table number and title   
     caption [f]_        autoincrement and insert figure number and caption   
-    abc def [r]_        right justify text line
-    abc def [c]_        center text line
-    [literal]_          literal text block
-    [line]_             draw horizontal line
-    [page]_             new doc page
-    http://abc [link]_  url link
+    [#]_                            autonumbered footnote      
+    abc def [foot]_                 footnote description
+    s = b\2 [s]_                    format sympy equation
+    \a = c*2 [x]_                   format LaTeX equation
+    abc def [r]_                    right justify text line
+    abc def [c]_                    center text line
+    [literal]_                      literal text block
+    [line]_                         draw horizontal line
+    [page]_                         new doc page
+    label | http://abc  [link]_     url link
 """
 import os
 import sys
@@ -184,27 +194,26 @@ if ".py" not in _calcfileS:
 _cwdS = os.getcwd()
 _cfull = Path(_calcfileS)                            # calc file full path
 _cfileS   = _cfull.name                              # calc file name
-_cnameS    = _cfileS.split(".py")[0]                  # calc file basename
+_cnameS    = _cfileS.split(".py")[0]                 # calc file basename
 _rivpath  = Path("rivtcalc.rivt_lib.py").parent      # rivt program path
 _ppath    = _cfull.parent.parent                     # project folder path
 _cpath    = _cfull.parent                            # calc folder path
 _tpath    = Path(_ppath/"tmp")                       # tmp folder path
 _dpath    = Path(_ppath/"docs")                      # doc folder path
 _rpath    = Path(_dpath/"report")                    # report folder path
-_rname    = "c"+_cnameS[1:]                           # calc file basename
-_utffile  = Path(_cpath/".".join((_rname, "txt")))   # utf output
-_rstfile  = Path(_ppath/".".join((_rname, "rst")))   # rst output
+_dname    = "d"+_cnameS[1:]                          # doc file basename
+_utffile  = Path(_cpath/".".join((_dname, "txt")))   # utf output
+_rstfile  = Path(_ppath/".".join((_dname, "rst")))   # rst output
 _expfile  = Path(_cpath /"data"/"".join(_cfileS))    # export file
 
 # global variables; folders, sections, commmands
 utfcalcS = """"""                                    # utf calc string
 rstcalcS = """"""                                    # reST calc string
 exportS  = """"""                                    # values export string
-rstcalcS = """"""                                    # reST calc string
-rstflagB = False                                     # flag for reST generation
 rivtcalcD = {}                                       # values dictonary
+_rstflagB = False                                    # flag for reST generation
 # folder paths
-_foldD: dict = {
+_foldD = {
 "efile": _expfile,   
 "ppath": _ppath,
 "dpath": _dpath,
@@ -218,13 +227,13 @@ _foldD: dict = {
 "hpath": Path(_dpath, "html"),
 "apath": Path(_rpath, "attach")}
 # section settings
-_setsectD = {"cnumS": _cnameS[1:5], "dnumS": _cnameS[1:3], "sdnumS": _cnameS[3:5],
-            "snameS": "", "snumS": "", "swidthI":80, "enumI":0, "tnumI":0,
-    "figqueL":deque([[0,"cap"]]), "eqqueL":deque([1]), "ftqueL":deque([1])}
+_setsectD = {"cnumS":_cnameS[1:5],"dnumS":_cnameS[1:3],"sdnumS":_cnameS[3:5],
+            "snameS":"","snumS":"","swidthI":80,
+            "enumI":0,"tnumI":0, "fnumI":0, "ftqueL":deque([1])}
 # command settings
-_setcmdD = {"cwidthI":30, "calignS":"s", "titleS":"notitle", 
-                     "scale1F": 1., "scale2F": 1., "trmrI": 2, "trmtI": 2,
-                     "substB": False, "saveB": False,"writeS":"table"}
+_setcmdD = {"cwidthI":30, "calignS":"s", "titleS":"notitle", "writeS":"table",
+            "scale1F": 1., "scale2F": 1., "trmrI": 2, "trmtI": 2,
+            "subB": False, "saveB": False}
 # temp files
 _rbak = Path(_foldD["mpath"] / ".".join((_cnameS, "bak")))
 _logfile = Path(_foldD["mpath"] / ".".join((_cnameS, "log")))
@@ -302,6 +311,82 @@ def _section(hdrS: str):
         utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS +"\n"
         print(utfS); utfcalcS += utfS
 
+def R(rawS: str):
+    """repository-string to utf-string
+    
+    Args:
+        rawstrS (str): repository-string
+    """
+    global  utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
+    
+    if _rstflagB:
+        rcalc = _init_rst(rawS)
+        rcalcS, _setsectD = rcalc.r_rst()
+        rstcalcS += rcalcS
+    else:
+        rcalc = _init_utf(rawS)
+        rcalcS, _setsectD = rcalc.r_utf()
+        utfcalcS += rcalcS
+
+def I(rawS: str):
+    """insert-string to utf-string
+    
+    Args:
+        rawstrS (str): insert-string
+    """
+    global utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
+    
+    if _rstflagB:
+        rcalc = _init_rst(rawS)
+        rcalcS, _setsectD = rcalc.r_rst()
+        rstcalcS += rcalcS
+    else:
+        icalc = _init_utf(rawS)
+        icalcS, _setsectD, _setcmdD = icalc.i_utf()
+        utfcalcS += icalcS
+
+def V(rawS: str):
+    """value-string to utf-string
+    
+    Args:
+        rawstr (str): value-string
+    """
+    global utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
+
+    if _rstflagB:
+        rcalc = _init_rst(rawS)
+        rcalcS, _setsectD = rcalc.r_rst()
+        rstcalcS += rcalcS
+    else:
+        vcalc = _init_utf(rawS)
+        vcalcS, _setsectD, _setcmdD, rivtcalcD, exportS = vcalc.v_utf()
+        utfcalcS += vcalcS
+
+def T(rawS: str):
+    """table-string to utf-string
+     
+     Args:
+        rawstr (str): table-string   
+    """
+    global utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
+
+    if _rstflagB:
+        rcalc = _init_rst(rawS)
+        rcalcS, _setsectD = rcalc.r_rst()
+        rstcalcS += rcalcS
+    else:
+        tcalc = _init_utf(rawS)
+        tcalcS, _setsectD, _setcmdD, rivtcalcD = tcalc.t_utf()
+        utfcalcS += tcalcS
+
+def S(rawS: str):
+    """skip string
+     
+     Args:
+        rawstr (str): any string to exclude
+    """
+    pass
+
 def write_values():
     """ write value assignments to csv file
  
@@ -318,64 +403,47 @@ def write_utf():
     
     file is written to calcs folder
     """
-    global utfcalcS, rstflagB
+    global utfcalcS, _rstflagB
 
-    rstflagB = False
     utfcalcS = """"""
     f1 = open(_cfull, "r"); utfcalcL = f1.readlines(); f1.close()
-    print("model file read: " + str(_cfull))
+    print("calc file read: " + str(_cfull))
     indx = 0
-    for iS in enumerate(utfcalcL):                      # filter write function
+    for iS in enumerate(utfcalcL):                      
         if "write_utf" in iS[1]: 
             indx = int(iS[0]); break
-    utfcalcL = utfcalcL[0:indx]+utfcalcL[indx+1:]
-    cmdS = ''.join(utfcalcL)
-    exec(cmdS, globals(), locals())
+    utfcalcL = utfcalcL[0:indx]+utfcalcL[indx+1:]     # filter write function
+    cmdS = ''.join(utfcalcL); exec(cmdS, globals(), locals())
     with open(_utffile, "wb") as f1: f1.write(utfcalcS.encode("UTF-8"))
     print("INFO  utf calc written to calc folder", flush=True)
     print("INFO  program complete")
     os._exit(1)
 
-def write_pdf():
-    """write calc output to rst file
-    
-    write .rst file to tmp folder
-    """
-    global rstcalcS, rstflagB
-
-    rstflagB = True
-    rstcalcS = """"""
-    f1 = open(_cfull, "r"); rstcalcL = f1.readlines(); f1.close()
-    print("model file read: " + str(_cfull))
-    indx = 0
-    for iS in enumerate(rstcalcL):                      # filter write function
-        if "write_pdf" in iS[1]: 
-            indx = int(iS[0]); break
-    rstcalcL = rstcalcL[0:indx]+rstcalcL[indx+1:]
-    cmdS = ''.join(rstcalcL)
-    exec(cmdS, globals(), locals())
-    with open(_rstfile, "wb") as f1: f1.write(rstcalcS.encode("UTF-8"))
-    print("INFO  reST calc written to tmp folder", flush=True)
-    write_pdffile()
-    
 def write_pdffile():
+    """read .rst file from tmp folder and write .pdf to docs folder 
+
+    .rst file is converted to tex file as an intermediate step
+    """
+    f1 = open(_rstfile, "r"); rstcalcL = f1.readlines(); f1.close()
+    print("INFO  rst file read: " + str(_rstfile))
+    mpath = _foldD{mpath}
     pdffiles = {
-        "cpdf":  Path(_tpath/".".join(_cnameS, "pdf")),
-        "chtml":  Path(_tpath/".".join(_cnameS, "html")),
-        "trst":  Path(_tpath/".".join(_cnameS, "rst")),    
-        "ttex1":  Path(_tpath/".".join(_cnameS, "tex")),
-        "auxfile": Path(_tpath/".".join(_cnameS, ".aux")),
-        "outfile":  Path(_tpath/".".join(_cnameS, ".out")),
-        "texmak2":  Path(_tpath/".".join(_cnameS, ".fls")),
-        "texmak3":  Path(_tpath/".".join(_cnameS, ".fdb_latexmk"))
+        "cpdf":  Path(mpath/".".join(_cnameS, "pdf")),
+        "chtml":  Path(mpath/".".join(_cnameS, "html")),
+        "trst":  Path(tpath/".".join(_cnameS, "rst")),    
+        "ttex1":  Path(tpath/".".join(_cnameS, "tex")),
+        "auxfile": Path(tpath/".".join(_cnameS, ".aux")),
+        "outfile":  Path(tpath/".".join(_cnameS, ".out")),
+        "texmak2":  Path(tpath/".".join(_cnameS, ".fls")),
+        "texmak3":  Path(tpath/".".join(_cnameS, ".fdb_latexmk"))
         }
-        #print("gen_tex1")
+        
+        # use search to find path to standard style or use local
         fixstylepath = self.stylepathpdf.replace('\\', '/')
         try:
             pypath = os.path.dirname(sys.executable)
             rstexec = os.path.join(pypath,"Scripts","rst2latex.py")
-            with open(rstexec) as f1:
-                f1.close()
+            with open(rstexec) as f1: f1.close()
             pythoncall = 'python '
             #print("< rst2latex path 1> " + rstexec)
         except:
@@ -390,6 +458,8 @@ def write_pdffile():
                 rstexec = "/usr/local/bin/rst2latex.py"
                 pythoncall = 'python '
                 #print("< rst2latex path 3> " + rstexec)
+        
+        
         tex1 = "".join([pythoncall, rstexec
                         ,
                         " --documentclass=report ",
@@ -446,6 +516,26 @@ def write_pdffile():
     print("INFO  program complete")
     os._exit(1)
 
+def write_pdf(stylefileS):
+    """write calc output to .rst file in tmp folder
+
+    """
+    global rstcalcS, _rstflagB
+
+    _rstflagB = True
+    rstcalcS = """"""
+    f1 = open(_cfull, "r"); rstcalcL = f1.readlines(); f1.close()
+    print("calc file read: " + str(_cfull))
+    indx = 0
+    for iS in enumerate(rstcalcL):                      
+        if "write_pdf" in iS[1]: 
+            indx = int(iS[0]); break
+    rstcalcL = rstcalcL[0:indx]+rstcalcL[indx+1:]     # filter write function
+    cmdS = ''.join(rstcalcL); exec(cmdS, globals(), locals())
+    with open(_rstfile, "wb") as f1: f1.write(rstcalcS.encode("UTF-8"))
+    print("INFO  rst calc written to tmp folder", flush=True)
+    write_pdffile(stylefileS)
+
 def write_html():
     """[summary]
     """
@@ -454,66 +544,5 @@ def write_html():
 
 def write_report():
     """[summary]
-    """
-    pass
-
-def R(rawS: str):
-    """repository-string to utf-string
-    
-    Args:
-        rawstrS (str): repository-string
-    """
-    global  utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
-    
-    if rstflagB:
-        rcalc = _init_rst(rawS)
-        rcalcS, _setsectD = rcalc.r_rst()
-        rstcalcS += rcalcS
-    else:
-        rcalc = _init_utf(rawS)
-        rcalcS, _setsectD = rcalc.r_utf()
-        utfcalcS += rcalcS
-
-def I(rawS: str):
-    """insert-string to utf-string
-    
-    Args:
-        rawstrS (str): insert-string
-    """
-    global utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
-    
-    icalc = _init_utf(rawS)
-    icalcS, _setsectD, _setcmdD = icalc.i_utf()
-    utfcalcS += icalcS
-
-def V(rawS: str):
-    """value-string to utf-string
-    
-    Args:
-        rawstr (str): value-string
-    """
-    global utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
-
-    vcalc = _init_utf(rawS)
-    vcalcS, _setsectD, _setcmdD, rivtcalcD, exportS = vcalc.v_utf()
-    utfcalcS += vcalcS
-
-def T(rawS: str):
-    """table-string to utf-string
-     
-     Args:
-        rawstr (str): table-string   
-    """
-    global utfcalcS,  _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
-
-    tcalc = _init_utf(rawS)
-    tcalcS, _setsectD, _setcmdD, rivtcalcD = tcalc.t_utf()
-    utfcalcS += tcalcS
-
-def S(rawS: str):
-    """skip string
-     
-     Args:
-        rawstr (str): any string to exclude
     """
     pass

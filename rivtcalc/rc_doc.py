@@ -100,71 +100,64 @@ class WriteRST:
             setsectD (dict): section dictionary
             
         Return:
-            uS (str): utf string 
+            rstS (str): restrutured text string 
             setsectD (dict): updated section dictionary
         """
 
         tagS = tagS.rstrip(); uS = ''
-        swidthII =  self.setsectD["swidthI"]-1
+        swidthI =  self.setsectD["swidthI"]-1
         try: 
             tag = list(set(tagL).intersection(tagS.split()))[0]
         except:
             uS = tagS
             return uS   
     
-        if tag == "[#]_":           # auto increment footnote mark                    
-            ftnumII = self.setsectD["ftqueL"][-1] + 1
-            self.setsectD["ftqueL"].append(ftnumII)      
-            uS = tagS.replace("[x]_", "[" + str(ftnumII) + "]")
+        if tag == "[#]_":           # auto increment footnote mark                      
+            uS = tagS + "\n"
         elif tag == "[page]_":        # new page
-            uS = int(self.setsectD["swidthI"]) * "." 
+            uS = ".. raw:: latex \n\n \\newpage"
         elif tag == "[line]_":      # horizontal line
             uS = int(self.setsectD["swidthI"]) * '-'   
         elif tag == "[link]_":      # url link
             tgS = tagS.strip("[link]_").strip()
-            uS = "link: "+ tgS 
+            tgL = tgS.split("|")
+            uS = ".. _" + tgL[0].strip() + ": " + tgL[1].strip()  
         elif tag == "[r]_":         # right adjust text
             tagL = tagS.strip().split("[r]_")
-            uS = (tagL[0].strip()).rjust(swidthII)
+            uS = "\\hfill" + tagL[0].strip() 
         elif tag == "[c]_":        # center text  
             tagL = tagS.strip().split("[c]_")
-            uS = (tagL[0].strip()).rjust(swidthII)
-        elif tag == "[f]_":        # figure caption                    
-            fnumI = int(self.setsectD["figqueL"][-1][0])
-            capS = tagS.strip("[f]_").strip()
-            self.setsectD["figqueL"].append([fnumI+1, capS])
+            uS = "\\begin{center} " + tagL[0].strip() + " \\end{center}"
         elif tag == "[x]_":         # format tex
             tagL = tagS.strip().split("[x]_")
             txS = tagL[0].strip()
-            #txS = txs.encode('unicode-escape').decode()
-            ptxS = parse_latex(txS)
-            uS = sp.pretty(sp.sympify(ptxS, _clash2, evaluate=False))        
+            uS = ".. raw:: math\n\n   " + txS + "\n"
         elif tag == "[s]_":         # format sympy
             tagL = tagS.strip().split("[s]_")
             spS = tagL[0].strip()
-            spL = spS.split("=")
-            spS = "Eq(" + spL[0] +",(" + spL[1] +"))" 
-            #sps = sps.encode('unicode-escape').decode()
-            uS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
+            txS = latex(S(spS))
+            uS = ".. raw:: math\n\n   " + txS + "\n"
+        elif tag == "[f]_":        # figure caption                    
+            tagL = tagS.strip().split("[f]_")
+            fnumI = int(self.setsectD["fnumI"]) + 1
+            self.setsectD["fnumI"] = fnumI
+            refS = self._refs(fnumI, "[ Fig: ") + " ]"
+            uS = tagL[0].strip() + " \\hfill " + refS        
         elif tag == "[e]_":         # equation label
             tagL = tagS.strip().split("[e]_")
-            enumII = int(self.setsectD["enumI"]) + 1
-            self.setsectD["enumI"] = enumII
-            refS = self._refs(enumII, "[ Equ: ")
-            uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthII)
+            enumI = int(self.setsectD["enumI"]) + 1
+            self.setsectD["enumI"] = enumI
+            refS = self._refs(enumI, "[ Equ: ")
+            uS = tagL[0].strip() + " \\hfill " + refS                
         elif tag == "[t]_":         # table label
             tagL = tagS.strip().split("[t]_")
-            tnumII = int(self.setsectD["tnumI"]) + 1
-            self.setsectD["tnumI"] = tnumII
-            refS = self._refs(tnumII, "[Table: ") + "]"
-            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
-            uS = tagL[0].strip() + " " * spcI + refS
+            tnumI = int(self.setsectD["tnumI"]) + 1
+            self.setsectD["tnumI"] = tnumI
+            refS = self._refs(tnumI, "[Table: ") + "]"
+            uS = tagL[0].strip() + " \\hfill " + refS
         elif tag == "[foot]_":      # footnote label
             tagS = tagS.strip("[foot]_").strip()
-            uS = self.setsectD["ftqueL"].popleft() + tagS
-        elif tag == "[cite]_":      # citation label   
-            tagS = tagS.strip("[cite]_").strip()
-            uS = self.setsectD["ctqueL"].popleft() + tagS
+            uS = ".. [*] " + tagS
         else:
             uS = tagS
 
@@ -184,6 +177,7 @@ class WriteRST:
         indxI = -1                  # method index
         _rgx = r'\[([^\]]+)]_'      # find tags
 
+        self.calcS+= ".. target-notes::\n\n"
         for uS in self.strL:                     
             if uS[0:2] == "##":  continue                   # remove comment
             uS = uS[4:]                                     # remove indent
@@ -195,15 +189,15 @@ class WriteRST:
                     self.valL = []; print(uS.rstrip(" ")); self.calcS += " \n" 
                     self.rivtD.update(locals()) 
                     continue
-                else: print(" "); self.calcS += "\n"; continue
+                else: self.calcS += "\n"; continue
             try: 
                 if uS[0] == "#" : continue                   # remove comment      
             except:
-                print(" "); self.calcS += "\n"; continue
+                self.calcS += "\n"; continue
             if uS.strip() == "[literal]_" : continue
             if re.search(_rgx, uS):                          # check for tag
                 utgS = self._tags(uS, tagL)
-                print(utgS.rstrip()); self.calcS += utgS.rstrip() + "\n"
+                self.calcS += utgS.rstrip() + "\n"
                 continue     
             if typeS == "values":                            # chk for values
                 self.setcmdD["saveB"] = False  
@@ -235,8 +229,8 @@ class WriteRST:
             calcS (list): utf formatted calc-string (appended)
             setsectD (dict): section settings
         """
-        rcmdL = ["head", "keys", "code", "pdf"]
-        rmethL = [self._rhead, self._rkeys, self._rcode, self._rpdf]
+        rcmdL = ["head", "serach", "keys", "code", "pdf"]
+        rmethL = [self._rhead,self._rsearch,self._rkeys,self._rcode,self._rpdf]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
         self._parseUTF("report", rcmdL, rmethL, rtagL)
@@ -249,6 +243,9 @@ class WriteRST:
         if rL[2] == "toc": pass
         if rL[3] == "readme": pass
         if rL[4] : pass
+
+    def _rsearch(self, rsL):
+        a = 4
 
     def _rkeys(self, rsL):
         a = 4
@@ -287,14 +284,19 @@ class WriteRST:
         txtpath = Path(self.folderD["xpath"]/calP/iL[1].strip())
         with open(txtpath, 'r') as txtf1:
             uL = txtf1.readlines()
-        txtS = "".join(uL)
-        widthI = self.setcmdD["cwidth"]
         if iL[2].strip() == "indent":
-            pass
+            txtS = "".join(uL)
+            widthI = self.setcmdD["cwidth"]
+            inS = " "*4
+            uL = textwrap.wrap(txtS, width=widthI)
+            uL = [inS+S1+"\n" for S1 in uL]
+            uS = "".join(uL)
         elif iL[2].strip() == "literal":
-            pass
+            txtS = "  ".join(uL)
+            uS = "::\n\n" + txtS + "\n"
         else:
-            uS = txtS
+            txtS = "".join(uL)
+            uS = "\n" + txtS
 
         self.calcS += uS + "\n"
 
@@ -367,11 +369,10 @@ class WriteRST:
         """insert one or two images from file
         
         Args:
-            ipl (list): image parameters
+            il (list): image parameters
         """        
-        imgflgI = 0; uS = ''
-        if "," in iL[1]: imgflgI = 1                     # double image flag
-        if imgflgI:
+        rstS = ""
+        if "," in iL[1]:                                        # two images
             scaleF = iL[2].split(",")
             scale1F = float(scaleF[0]); scale2F = float(scaleF[1])
             self.setcmdD.update({"scale1F":scale1F})
@@ -381,35 +382,21 @@ class WriteRST:
             calpS = "r"+self.setsectD["cnumS"]
             img1S = str(Path(self.folderD["hpath"]/calpS/file1S))
             img2S = str(Path(self.folderD["hpath"]/calpS/file2S))                
-            pthshort1S = str(Path(*Path(img1S).parts[-4:]))
-            pthshort2S = str(Path(*Path(img2S).parts[-4:]))
-            uS += ("Figure path: " + pthshort1S + "\n")
-            if len(self.setsectD["figqueL"]) > 1:
-                fnumL = self.setsectD["figqueL"].popleft()
-                refS = self._refs(fnumL[0], "[ Figure ")
-                uS += refS + " ] " + fnumL[1] 
-            _display(_Image(img1S))
-            print(uS); self.calcS += uS + "\n"
-            uS += ("Figure path: " + pthshort2S + "\n")
-            if len(self.setsectD["figqueL"]) > 1:
-                fnumL = self.setsectD["figqueL"].popleft()
-                refS = self._refs(fnumL[0], "[ Figure ")
-                uS += refS + " ] " + fnumL[1] 
-            _display(_Image(img1S))
-            print(uS); self.calcS += uS + "\n"
-        else:
+            rstS += (".. image:: " + img1S + "\n" +
+                    "   :width: " + scale1F + "\n" +
+                    ".. :image:: " + img2S + "\n" +
+                    "   :width: " + scale2F + "\n" +
+                    )
+        else:                                                   # one image
             scale1F = float(iL[2]); self.setcmdD.update({"scale1F":scale1F})
             fileS = iL[1].split(","); file1S = fileS[0].strip() 
             calpS = "r"+self.setsectD["cnumS"]
-            img1S = str(Path(self.folderD["hpath"]/calpS/file1S))
-            pthshort1S = str(Path(*Path(img1S).parts[-4:]))        
-            uS += ("Figure path: " + pthshort1S + "\n")
-            if len(self.setsectD["figqueL"]) > 1:
-                fnumL = self.setsectD["figqueL"].popleft()
-                refS = self._refs(fnumL[0], "[ Figure ")
-                uS += refS + " ] " + fnumL[1] 
-            _display(_Image(img1S))
-            print(uS); self.calcS += uS + "\n"
+            img1S = str(Path(self.folderD["hpath"]/calpS/file1S))  
+            rstS += (".. image:: " + img1S + "\n" +
+                    "   :width: " + scale1F + "\n" +
+                    "   :align: center \n"
+                    )
+            self.calcS += rstS + "\n"
 
     def v_rst(self)-> tuple:
         """parse value-string and set method
@@ -439,10 +426,10 @@ class WriteRST:
         """update dictionary format values
 
         Args:
-            vL (list): format parameters
+            vL (list): configuration parameters
         """
-
-        self.setcmdD["values"] = vL[1].strip() 
+        
+        if vL[1].strip() == "sub": self.setcmdD["subB"] = True
         self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
         self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
 

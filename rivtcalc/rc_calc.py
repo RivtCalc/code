@@ -110,23 +110,44 @@ class WriteUTF:
             ftnumII = self.setsectD["ftqueL"][-1] + 1
             self.setsectD["ftqueL"].append(ftnumII)      
             uS = tagS.replace("[x]_", "[" + str(ftnumII) + "]")
-        elif tag == "[page]_":        # new page
+        elif tag == "[foot]_":      # footnote label
+            tagS = tagS.strip("[foot]_").strip()
+            uS = self.setsectD["ftqueL"].popleft() + tagS
+        elif tag == "[page]_":      # new page
             uS = int(self.setsectD["swidthI"]) * "." 
         elif tag == "[line]_":      # horizontal line
             uS = int(self.setsectD["swidthI"]) * '-'   
         elif tag == "[link]_":      # url link
             tgS = tagS.strip("[link]_").strip()
-            uS = "link: "+ tgS 
+            tgL = tgS.split("|")
+            uS = tgL[0].strip() + " : " + tgL[1].strip()  
         elif tag == "[r]_":         # right adjust text
             tagL = tagS.strip().split("[r]_")
             uS = (tagL[0].strip()).rjust(swidthII)
-        elif tag == "[c]_":        # center text  
+        elif tag == "[c]_":         # center text  
             tagL = tagS.strip().split("[c]_")
             uS = (tagL[0].strip()).rjust(swidthII)
-        elif tag == "[f]_":        # figure caption                    
-            fnumI = int(self.setsectD["figqueL"][-1][0])
-            capS = tagS.strip("[f]_").strip()
-            self.setsectD["figqueL"].append([fnumI+1, capS])
+        elif tag == "[f]_":         # figure caption                    
+            tagL = tagS.strip().split("[f]_")
+            fnumI = int(self.setsectD["fnumI"]) + 1
+            self.setsectD["fnumI"] = fnumI
+            refS = self._refs(fnumI, "[ Fig: ") + " ]"
+            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
+            uS = tagL[0].strip() + " " * spcI + refS
+        elif tag == "[e]_":         # equation label
+            tagL = tagS.strip().split("[e]_")
+            enumI = int(self.setsectD["enumI"]) + 1
+            self.setsectD["enumI"] = enumI
+            refS = self._refs(enumI, "[ Equ: ") + " ]"
+            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
+            uS = tagL[0].strip() + " " * spcI + refS
+        elif tag == "[t]_":         # table label
+            tagL = tagS.strip().split("[t]_")
+            tnumI = int(self.setsectD["tnumI"]) + 1
+            self.setsectD["tnumI"] = tnumI
+            refS = self._refs(tnumI, "[Table: ") + " ]"
+            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
+            uS = tagL[0].strip() + " " * spcI + refS 
         elif tag == "[x]_":         # format tex
             tagL = tagS.strip().split("[x]_")
             txS = tagL[0].strip()
@@ -140,25 +161,6 @@ class WriteUTF:
             spS = "Eq(" + spL[0] +",(" + spL[1] +"))" 
             #sps = sps.encode('unicode-escape').decode()
             uS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
-        elif tag == "[e]_":         # equation label
-            tagL = tagS.strip().split("[e]_")
-            enumII = int(self.setsectD["enumI"]) + 1
-            self.setsectD["enumI"] = enumII
-            refS = self._refs(enumII, "[ Equ: ")
-            uS = (tagL[0].strip() + " " + refS + " ]").rjust(swidthII)
-        elif tag == "[t]_":         # table label
-            tagL = tagS.strip().split("[t]_")
-            tnumII = int(self.setsectD["tnumI"]) + 1
-            self.setsectD["tnumI"] = tnumII
-            refS = self._refs(tnumII, "[Table: ") + "]"
-            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
-            uS = tagL[0].strip() + " " * spcI + refS
-        elif tag == "[foot]_":      # footnote label
-            tagS = tagS.strip("[foot]_").strip()
-            uS = self.setsectD["ftqueL"].popleft() + tagS
-        elif tag == "[cite]_":      # citation label   
-            tagS = tagS.strip("[cite]_").strip()
-            uS = self.setsectD["ctqueL"].popleft() + tagS
         else:
             uS = tagS
 
@@ -229,8 +231,8 @@ class WriteUTF:
             calcS (list): utf formatted calc-string (appended)
             setsectD (dict): section settings
         """
-        rcmdL = ["head", "keys", "code", "pdf"]
-        rmethL = [self._rhead, self._rkeys, self._rcode, self._rpdf]
+        rcmdL = ["head", "search", "keys", "code", "pdf"]
+        rmethL = [self._rhead,self._rsearch,self._rkeys,self._rcode,self._rpdf]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
         self._parseUTF("report", rcmdL, rmethL, rtagL)
@@ -245,6 +247,9 @@ class WriteUTF:
         if rL[4] : pass
 
     def _rkeys(self, rsL):
+        a = 4
+
+    def _rsearch(self, rsL):
         a = 4
 
     def _rcode(self, rsL):
@@ -277,26 +282,27 @@ class WriteUTF:
         Args:
             iL (list): text command list
         """
-        wrapB = 1
-        if iL[2].strip() == "literal": wrapB = 0
-        elif isinstance(iL[2].strip(), int):
-            widthI = int(iL[2].strip())
-            self.setcmdD.update({"cwidth": widthI})
-        else:
-            widthI = self.setcmdD["cwidth"]
+
         calP = "r"+self.setsectD["cnumS"]
         txtpath = Path(self.folderD["xpath"]/calP/iL[1].strip())
         with open(txtpath, 'r') as txtf1:
-                uL = txtf1.readlines()
-        txtS = "".join(uL)
-        if wrapB:
-            inxI = int((80-widthI)/2)
-            inS = " "*inxI
+            uL = txtf1.readlines()
+        if iL[2].strip() == "indent":
+            txtS = "".join(uL)
+            widthI = self.setcmdD["cwidth"]
+            inS = " "*4
             uL = textwrap.wrap(txtS, width=widthI)
-            uL = [inS+s+"\n" for s in uL]
+            uL = [inS+S1+"\n" for S1 in uL]
             uS = "".join(uL)
+        elif iL[2].strip() == "literal":
+            txtS = "  ".join(uL)
+            uS = "\n" + txtS
         else:
-            uS = txtS
+            txtS = "".join(uL)
+            uS = "\n" + txtS
+
+        self.calcS += uS + "\n"
+
         print(uS); self.calcS += uS + "\n"
 
     def _itable(self, iL: list):
@@ -368,11 +374,10 @@ class WriteUTF:
         """insert one or two images from file
         
         Args:
-            ipl (list): image parameters
+            iL (list): image parameters
         """        
-        imgflgI = 0; uS = ''
-        if "," in iL[1]: imgflgI = 1                     # double image flag
-        if imgflgI:
+        utfS = ""
+        if "," in iL[1]:                                        # two images
             scaleF = iL[2].split(",")
             scale1F = float(scaleF[0]); scale2F = float(scaleF[1])
             self.setcmdD.update({"scale1F":scale1F})
@@ -382,35 +387,23 @@ class WriteUTF:
             calpS = "r"+self.setsectD["cnumS"]
             img1S = str(Path(self.folderD["hpath"]/calpS/file1S))
             img2S = str(Path(self.folderD["hpath"]/calpS/file2S))                
-            pthshort1S = str(Path(*Path(img1S).parts[-4:]))
-            pthshort2S = str(Path(*Path(img2S).parts[-4:]))
-            uS += ("Figure path: " + pthshort1S + "\n")
-            if len(self.setsectD["figqueL"]) > 1:
-                fnumL = self.setsectD["figqueL"].popleft()
-                refS = self._refs(fnumL[0], "[ Figure ")
-                uS += refS + " ] " + fnumL[1] 
-            _display(_Image(img1S))
-            print(uS); self.calcS += uS + "\n"
-            uS += ("Figure path: " + pthshort2S + "\n")
-            if len(self.setsectD["figqueL"]) > 1:
-                fnumL = self.setsectD["figqueL"].popleft()
-                refS = self._refs(fnumL[0], "[ Figure ")
-                uS += refS + " ] " + fnumL[1] 
-            _display(_Image(img1S))
-            print(uS); self.calcS += uS + "\n"
-        else:
+            pshrt1S = str(Path(*Path(img1S).parts[-4:]))
+            pshrt2S = str(Path(*Path(img2S).parts[-4:]))
+            for fS in [[pshrt1S,img1S], [pshrt2S,img2S]]:
+                utfS += ("Figure path: " + fS[0] + "\n")
+                try: _display(_Image(fS[1]))
+                except: pass
+                print(utfS); self.calcS += utfS + "\n"
+        else:                                                   # one image
             scale1F = float(iL[2]); self.setcmdD.update({"scale1F":scale1F})
             fileS = iL[1].split(","); file1S = fileS[0].strip() 
             calpS = "r"+self.setsectD["cnumS"]
             img1S = str(Path(self.folderD["hpath"]/calpS/file1S))
             pthshort1S = str(Path(*Path(img1S).parts[-4:]))        
-            uS += ("Figure path: " + pthshort1S + "\n")
-            if len(self.setsectD["figqueL"]) > 1:
-                fnumL = self.setsectD["figqueL"].popleft()
-                refS = self._refs(fnumL[0], "[ Figure ")
-                uS += refS + " ] " + fnumL[1] 
-            _display(_Image(img1S))
-            print(uS); self.calcS += uS + "\n"
+            utfS += ("Figure path: " + pthshort1S + "\n")
+            try: _display(_Image(img1S))
+            except: pass
+            print(utfS); self.calcS += utfS + "\n"
 
     def v_utf(self)-> tuple:
         """parse value-string and set method
@@ -438,10 +431,9 @@ class WriteUTF:
         """update dictionary format values
 
         Args:
-            vL (list): format parameters
+            vL (list): configuration parameters
         """
-
-        self.setcmdD["values"] = vL[1].strip() 
+        if vL[1].strip() == "sub": self.setcmdD["subB"] = True
         self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
         self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
 
