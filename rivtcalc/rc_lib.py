@@ -1,50 +1,74 @@
 #! python
 """rivtcalc API  
 
-    The API includes string input and output functions. Input functions take
+    The API includes eight input and output functions. Input functions take
     rivt-markup strings (calcs) as arguments and write formatted utf
     calculations to the terminal (calcs). Ouput functions write formatted
     calculations (docs) to files in utf-8, pdf and html formats.
+
+    Example calcs are here:
+
     
-    Rivt-markup includes unicode and reStructuredText, commands, tags and
+    and here:
+
+
+    Rivt-markup may include unicode, reStructuredText, commands, tags and
     Python code. The options depend on the rivt-string type (R,I,V or T).
+    Commands and tags for each string type are described and illustrated below.
+    Commands include processing parameters that start in the first column with
+    ||. Tags are encapsulated with []_ and operate on a line of text. Block tags are
+    encapsulated with []__ and operate on indented blocks.
 
-    Input functions ----------------------------------------------------------
+    Rivt function - Input -----------------------------------------------------
     type     API  any text       commands 
-    ======= ===== =========  =================================================
+    ======= ===== ========= ===================================================
     Report   R()    yes       head, search, info, keys, pdf, text, table
-    Insert   I()    yes       text, table, image
-    Values   V()    no        =, config, value, data, func, insert commands
-    Table    T()    no        Python simple statements, insert commands  
-    Skip     S()    --        skip rivt-string, do not evaluate
+    Insert   I()    yes       text, table, image, latex
+    Values   V()    no        =, config, value, data, func, + insert commands
+    Table    T()    no        Python simple statements, + insert commands  
+    Skip     S()    --        Skip rivt-string evaluation
 
-    Output functions ----------------------------------------------------------
-        name                   description
-    =================  ========================================================
-    write_utf()         write calc to utf8 doc file
-    write_pdf()         write calc to pdf doc file
-    write_html()        write calc to html doc file
-    write_report()      combine pdf docs into pdf report file
-    =================  ========================================================
 
-    Commands and tags for each string type are described below. Commands
-    generally operate on files and include processing parameters. Tags
-    generally format single lines of text and do not have parameters. The tag 
-    reserved symbols are list at the end of the command summary. 
+    Tags ----------------------------------------------------------------------
+       tag               description
+    ===============  ==========================================================
+    [nn]_ (abc def)       string descriptor section number and title
+    (description) [e]_    autoincrement and insert equation number and description
+    (title) [t]_          autoincrement and insert table number and title   
+    (caption) [f]_        autoincrement and insert figure number and caption   
+    [#]_                  autonumbered footnote      
+    (abc def) [foot]_     footnote description
+    (s = (b+2)/3) [s]_    format sympy equation
+    (\a = c*2^2) [x]_     format LaTeX equation
+    (abc def) [r]_        right justify text line
+    (abc def) [c]_        center text line
+    [line]_               draw horizontal line
+    [page]_               new doc page
+    (label)|(http://abc.xyz) [link]_    label_ is a clickable link in docs
+    [literal]__           literal text block
+    [latex]__             LaTeX text block
+
+
+    Rivt function - Output ----------------------------------------------------
+        name                          description
+    ============================ ==============================================
+    write_utf()                    write calc to utf8 doc file
+    write_doc(type, style)         write calc to pdf or html doc file
+    write_report()                 combine pdf docs into pdf report file
+    ============================ ==============================================
     
-    The first line of each rivt-string is a descriptor which may also be tagged
-    as a section designator. By design string input must be indented 4 spaces
-    after the first descriptor line provide code structure and improve
-    legibility. 
+    The first line of each rivt-string includes the string function name and
+    optional description which may be tagged as a section. String input, by
+    design, must be indented 4 spaces after the function call to provide code
+    structure and improve legibility.
     
-    In the suumary below, arguments in parenthesis are provided by
-    the user. Either/or options are separated by semi-colons. Comments are in
-    braces below the arguments.
+    Arguments in parenthesis are provided by the user. Either/or argumens are
+    separated by semi-colons. Comments are in braces below the arguments.
 
 Input Syntax and commands -----------------------------------------------------
 
 from rivtcalc import rc_lib as rc
-rc.R('''[01] The report-string defines report and repository content
+rc.R('''[01]_ The report-string defines report and repository content
     
     Report-strings may include arbitrary text. The first paragraph of the calcs
     specified in the ||search command (see below) becomes part of the
@@ -124,10 +148,9 @@ rc.I('''The insert-string contains static text, tables and images.
     [a] first figure caption  [f]_
     [b] second figure caption  [f]_
 
-
     (label) | http://wwww.someurl.suffix [link]_ 
     ''')
-rc.V('''[02] The value-string defines active values and equations
+rc.V('''[02]_ The value-string defines active values and equations
     
     Value-strings include text (excluding equal signs). Lines with equal signs
     define equations and assignments that are numerically evaluated.
@@ -178,25 +201,6 @@ rc.T('''The table-string defines tables and plots using simple Python statements
      Table-strings may include any simple Python statement (single line),
      commands or tags except value assignments with an = sign.
     ''')
-
-    Tags -----------------------------------------------------------------------
-       tag               description
-    ===============  ===========================================================
-    [nn]_ (abc def)       string descriptor section number and title
-    (description) [e]_    autoincrement and insert equation number and description
-    (title) [t]_          autoincrement and insert table number and title   
-    (caption) [f]_        autoincrement and insert figure number and caption   
-    [#]_                  autonumbered footnote      
-    (abc def) [foot]_     footnote description
-    (s = (b+2)/3) [s]_    format sympy equation
-    (\a = c*2^2) [x]_     format LaTeX equation
-    (abc def) [r]_        right justify text line
-    (abc def) [c]_        center text line
-    [literal]_            literal text block, indent 8 or more spaces
-    [latex]_              LaTeX text block, indent 8 or more spaces
-    [line]_               draw horizontal line
-    [page]_               new doc page
-    (label)|(http://abc.xyz) [link]_    label_ becomes a clickable link in docs
 """
 import os
 import sys
@@ -453,10 +457,18 @@ def write_utf():
     print("INFO  program complete")
     os._exit(1)
 
-def write_pdffile(stylefileS: str):
+def _write_html():
     """read .rst file from tmp folder and write .pdf to docs folder 
 
-    .rst file converted to .tex file in tmp folder as intermediate step
+    .rst file converted to .tex file in tmp folder in intermediate step
+    """
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+        
+def _write_pdf(stylefileS: str):
+    """read .rst file from tmp folder and write .pdf to docs folder 
+
+    .rst file converted to .tex file in tmp folder in intermediate step
     """
     f1 = open(_rstfile, "r"); rstcalcL = f1.readlines(); f1.close()
     print("INFO  rst file read: " + str(_rstfile))
@@ -466,6 +478,9 @@ def write_pdffile(stylefileS: str):
     elif sys.platform == 'darwin': pythoncallS = "python3 "
     else: pythoncallS == "python "
     
+    mpath = _foldD{mpath}; pdfS = ".".join(_cnameS, "pdf")
+    path1 = importlib.util.find_spec("rivtcalc")
+    rivpath = Path(path1.origin).parent
     pdfD = {
             "cpdfP":  Path(mpath/".".join(_cnameS, "pdf")),
             "chtml":  Path(mpath/".".join(_cnameS, "html")),
@@ -476,17 +491,15 @@ def write_pdffile(stylefileS: str):
             "texmak2":  Path(mpath/".".join(_cnameS, ".fls")),
             "texmak3":  Path(mpath/".".join(_cnameS, ".fdb_latexmk"))
             }
-    mpath = _foldD{mpath}; pdfS = ".".join(_cnameS, "pdf")
-    if stylefilesS != "default":
+
+    if stylefileS != "default":
         style_path = Path(_dpath/"style"/stylefileS)
     else:
-        path1 = importlib.util.find_spec("rivtcalc")
-        rivpath = Path(path1.origin).parent
         style_path = Path(rivpath/"scripts"/"pdfdoc.sty")
         
     # generate tex file
     rst2xeP = Path(rivpath/"scripts"/"rst2xetex.py")
-    texfileP = pdfD(ttex1)
+    texfileP = pdfD("ttex1")
     tex1S = "".join([pythoncallS, str(rst2xeP),
                     " --documentclass=report ",
                     " --documentoptions=12pt,notitle,letterpaper ",
@@ -520,12 +533,13 @@ def write_pdffile(stylefileS: str):
     os.chdir(mpath)
     os.system("latexmk -C")        
     print("\nINFO  temporary Tex files deleted \n")   
+    
     pdfmkS ="latexmk -pdf -xelatex -quiet -f "+ texfile
     #print("pdf call:  ", pdfmkS)        
     os.system(pdfmkS)
     print("\nINFO  pdf file written:\n")   
-    shutil.move(cpdfP, _dpath)
     
+    shutil.move(cpdfP, _dpath)
     os.chdir(_dpath); pdfnameL = list(pdfS)
     pdfnameL[0]='d'; pdfrenameS = "".join(pdfname)
     os.rename(pdfS, pdfrenameS)
@@ -533,7 +547,7 @@ def write_pdffile(stylefileS: str):
     print("INFO  program complete")
     os._exit(1)
 
-def write_pdf(stylefileS):
+def write_doc(doctypeS: str, stylefileS: str):
     """write calc output to .rst file in tmp folder
 
     """
@@ -542,22 +556,19 @@ def write_pdf(stylefileS):
     _rstflagB = True
     rstcalcS = """"""
     f1 = open(_cfull, "r"); rstcalcL = f1.readlines(); f1.close()
-    print("calc file read: " + str(_cfull))
+    print("INFO calc file read: " + str(_cfull))
+    
     indx = 0
     for iS in enumerate(rstcalcL):                      
-        if "write_pdf" in iS[1]: 
+        if "write_doc" in iS[1]: 
             indx = int(iS[0]); break
     rstcalcL = rstcalcL[0:indx]+rstcalcL[indx+1:]     # filter write function
     cmdS = ''.join(rstcalcL); exec(cmdS, globals(), locals())
     with open(_rstfile, "wb") as f1: f1.write(rstcalcS.encode("UTF-8"))
     print("INFO  rst calc written to tmp folder", flush=True)
-    write_pdffile(stylefileS)
-
-def write_html():
-    """[summary]
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
+    
+    if docstypeS.strip() == "pdf": _write_pdf(stylefileS)
+    if docstypeS.strip() == "html": _write_html(stylefileS)
 
 def write_report():
     """[summary]

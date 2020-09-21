@@ -120,7 +120,11 @@ class WriteUTF:
         elif tag == "[link]_":      # url link
             tgS = tagS.strip("[link]_").strip()
             tgL = tgS.split("|")
-            uS = tgL[0].strip() + " : " + tgL[1].strip()  
+            uS = tgL[0].strip() + " : " + tgL[1].strip()
+        elif tag == "[literal]_":   # literal text 
+            uS = "\n"
+        elif tag == "[latex]_":   # literal text 
+            uS = "\n"
         elif tag == "[r]_":         # right adjust text
             tagL = tagS.strip().split("[r]_")
             uS = (tagL[0].strip()).rjust(swidthII)
@@ -196,7 +200,6 @@ class WriteUTF:
                 if uS[0] == "#" : continue                   # remove comment      
             except:
                 print(" "); self.calcS += "\n"; continue
-            if uS.strip() == "[literal]_" : continue
             if re.search(_rgx, uS):                          # check for tag
                 utgS = self._tags(uS, tagL)
                 print(utgS.rstrip()); self.calcS += utgS.rstrip() + "\n"
@@ -407,7 +410,7 @@ class WriteUTF:
             print(utfS); self.calcS += utfS + "\n"
 
     def _ilatex(self, iL: list):
-        """insert text from file
+        """insert latex text from file
         
         Args:
             iL (list): text command list
