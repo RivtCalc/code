@@ -9,69 +9,88 @@
     Rivt-markup includes unicode and reStructuredText, commands, tags and
     Python code. The options depend on the rivt-string type (R,I,V or T).
 
-    Input functions ------------------------------------------------------------
-    type     API  text  tags     commands {comment}
-    ======= ===== ===== =====  =================================================
-    Report   R()   yes   no    head, code, keys, pdf
-    Insert   I()   yes   yes   text, table, image
-    Values   V()   yes   yes   =, config, value, data, func, +insert commands
-    Table    T()   no    yes   Python (pandas) simple statements+icommands  
-    Skip     S()   --     --   skip rivt-string; do not evaluate
+    Input functions ----------------------------------------------------------
+    type     API  any text       commands 
+    ======= ===== =========  =================================================
+    Report   R()    yes       head, search, info, keys, pdf, text, table
+    Insert   I()    yes       text, table, image
+    Values   V()    no        =, config, value, data, func, insert commands
+    Table    T()    no        Python simple statements, insert commands  
+    Skip     S()    --        skip rivt-string, do not evaluate
 
-    Output functions -----------------------------------------------------------
+    Output functions ----------------------------------------------------------
         name                   description
-    =================  =========================================================
+    =================  ========================================================
     write_utf()         write calc to utf8 doc file
     write_pdf()         write calc to pdf doc file
     write_html()        write calc to html doc file
     write_report()      combine pdf docs into pdf report file
-    =================  =========================================================
+    =================  ========================================================
 
     Commands and tags for each string type are described below. Commands
     generally operate on files and include processing parameters. Tags
-    generally format single lines of text and do not have parameters. The first
-    line of each rivt-string is a descriptor which may also be tagged as a
-    section designator . By design, string input must be indented 4 spaces
-    after the first descriptor line to improve legibility.
+    generally format single lines of text and do not have parameters. The tag 
+    reserved symbols are list at the end of the command summary. 
+    
+    The first line of each rivt-string is a descriptor which may also be tagged
+    as a section designator. By design string input must be indented 4 spaces
+    after the first descriptor line provide code structure and improve
+    legibility. 
+    
+    In the suumary below, arguments in parenthesis are provided by
+    the user. Either/or options are separated by semi-colons. Comments are in
+    braces below the arguments.
 
-Input Syntax and commands ------------------------------------------------------
+Input Syntax and commands -----------------------------------------------------
 
 from rivtcalc import rc_lib as rc
 rc.R('''[01] The report-string defines report and repository content
     
-    Report-strings may include text. The first paragraph of the report-string
-    in each calc specified in the ||search command (see below) becomes part of
-    the README.rst file for the project. The ||head command specifies an
-    optional calc title and date printed at the top of each page, and table of
-    contents printed before the string text. Arguments not in parenthesis are
-    literal. Parameter options are separated by semicolons. The toc argument
-    generates a table of contents from the section tags.
-
-    ||head | (calc title) | (date) | toc; notoc  
-
-    The ||search command specifies a list of calc numbers that are searched
-    against a master category list for terms to be included in the README. The
-    calc number list is also used for the ||keys and ||code commands. Because
-    the search command is execcuted at the project level it is usually included
-    in the first calc in a project. The command overwrites existing README
-    files.
-
+    Report-strings may include arbitrary text. The first paragraph of the calcs
+    specified in the ||search command (see below) becomes part of the
+    README.rst file for the project. The README is used in various (i.e.
+    Github) repository search functions.
+    
     ||search | (calc num), (calc num), (calc num)
+
+    The ||search command generates a README and specifies a list of calc
+    numbers that are searched against a master category list for terms to be
+    included. The calc number list is also used for the ||keys command. Because
+    the search command is execcuted at the project level across multipel calcs,
+    it is usually included in the first calc in a project. The command
+    overwrites existing README files.
 
     The ||keys command is a list of keywords included in the README that
     describe the scope of the calc, with up to five terms per command.
     
     ||keys | (discipline), (object), (purpose), (assembly), (component)
 
-    The ||code command identifies codes used in the calculation that are listed
-    in the README and calc.
+    The ||head command specifies an optional calc title and date printed at the
+    top of each page, and table of contents printed before the string text.
+    Arguments not in parenthesis are literal. Parameter options are separated
+    by semicolons. The toc argument generates a table of contents from the
+    section tags.
 
-    ||code | (year) | (title)
-    ||code | (year) | (title)
+    ||head | (calc title) | (date) | toc; notoc  
 
-    The ||pdf command attaches existing pdf documents to the front
-    or back of the calc doc. PDF files to attach files are stored in the
-    docs/attach/ folder.
+    The ||info command is similar to the the ||text command with a difference
+    in file location and use. ||info files are used for project specific
+    information (clients, addresses, etc) and are read from the docs/info
+    folder which is not shared, rather than the text folder. Also, the info is
+    only written to docs and not to the utf-calcs. This keeps project
+    information separated from the shareable calc information contained in the
+    calc folder. The *literal* argument keeps the text file formatting. The
+    *indent* argument indents and wraps the imported text. Leave the argument
+    blank for wrapping with no indent.
+
+    ||info | (project.txt) | literal; indent
+    ||table | (codes.txt) | 60,l | title; notitle | (2,1,4; :) 
+                {max width, align}  {read title from file} {cols or all}  
+
+    The ||pdf command attaches existing pdf documents, stored in the
+    docs/attach folder, to the front or back of the calc doc. The *functions*
+    or *docstrings* determine whether the complete function code or just the
+    docstrings are appended to the calc.
     
     ||pdf | front | (calccoverfile.pdf)         
     ||pdf | back | functions; docstrings
@@ -80,7 +99,8 @@ rc.R('''[01] The report-string defines report and repository content
 rc.I('''The insert-string contains static text, tables and images.  
     
     Insert-strings include text, static equations and images. The equation tag
-    auto increments and inserts the equation number. The x and s tags 
+    [e]_ auto-increments the equation labels. The [s]_ and [x]_  tags format 
+    LaTeX and sympy equations respectively.
 
     latex equation  [e]_
     \gamma = \frac{5}{x+y} + 3  [x]_         
@@ -88,19 +108,24 @@ rc.I('''The insert-string contains static text, tables and images.
     sympy equation  [e]_
     x = 32 + (y/2)  [s]_            
     
-    ||text | file.txt | literal; indent {}  
+    ||text | (file.txt) | literal; indent 
+
+    ||latex | (file.txt) 
     
     table title  [t]_
-    ||table | f.csv | 60,c {width, align} | title {line 1} | 2,1,4 {include cols} 
+    ||table | (file.csv or .xlst) | (60,c) | title; notitle | (2,1,4; :) 
+    
+    ||image | (file.png) | (50) 
+                        {scale as percent of page wdith}
+    figure caption [f]_ 
+    
+    Insert two images side by side using the following:
+    ||image | f1.png, f2.jpg | (45,45) 
+    [a] first figure caption  [f]_
+    [b] second figure caption  [f]_
 
-    ||image | f.png {image file} | 1. {scale}
-    figure caption [f]_
 
-    ||image | f1.png, f2.jpg | 1.,0.5
-    first figure caption (side by side)  [f]_
-    second figure caption  [f]_
-
-    Python | http://wwww.python.org [link]_ 
+    (label) | http://wwww.someurl.suffix [link]_ 
     ''')
 rc.V('''[02] The value-string defines active values and equations
     
@@ -111,60 +136,67 @@ rc.V('''[02] The value-string defines active values and equations
     values and the number pair specifies decimals in the result and terms.
     ||config | sub; nosub | 2,2
     
-    x1 = 10.1    | unit, alt unit | description || {save if trailing ||}
-    y1 = 12.1    | unit, alt unit | description  
+    Assign values to variables.  A blank line ends the value block and a table
+    is output.
 
-    Import values from a csv file, starting with the second row.  The first row
-    is a descriptive heading.   
-    ||value | file | f.csv
+    (x1 = 10.1)    | (unit, alt unit | description 
+    (y1 = 12.1)    | (unit, alt unit | description ||
+                            {save to value file if trailing ||} 
+
+    Import values from a csv or xlxs file, starting with the second row. The
+    first row is a descriptive heading. For a value file the csv or xlsx file
+    must have the structure:
     
-    Import a list of values from rows of a csv file 
-    ||data | f.csv | [1:4] {rows to import} 
-
-    For a value file the csv file must have the structure:
     [literal]_
-        variable name, value, primary unit, secondary unit, description 
+        variable name, value, primary unit, secondary unit, description
     
-    For a data file the csv file must have the structure:
+    ||values | (file.csv or .xlxs)
+    
+    Import a list of values from rows of a csv or xlsx file. For a data file
+    the csv file must have the structure:
     [literal]_
         variable name, value1, value2, value3, ....
+
+    ||data | f.csv | [1:4] {rows to import} 
     
     an equation [e]_
     v1 = x + 4*M  | unit, alt unit
-    save an equation result to the values file [e]_
+    save an equation result by appending double bars [e]_
     y1 = v1 / 4   | unit, alt unit ||         
 
-    ||func | func_file.py | func_call | var_name {import function from file}
+    Functions may be defined in a table-string or imported from a file.
+    ||func | (function_file.py) | (function_name) | 
 
-    a table title [t]_
+    A table title [t]_
     ||table | x.csv | 60    
     
-    figure caption [f]_
-    ||image | x.png | 1.
+    ||image | x.png | 50
+    A figure caption [f]_
     ''') 
-rc.T('''The table-string defines tables and plots with simple Python statements
+rc.T('''The table-string defines tables and plots using simple Python statements
     
      Table-strings may include any simple Python statement (single line),
-     insert-commands or tags.
+     commands or tags except value assignments with an = sign.
     ''')
 
     Tags -----------------------------------------------------------------------
        tag               description
     ===============  ===========================================================
-    [nn]_ abc def       first line - descriptor section number and title
-    description [e]_    autoincrement and insert equation number and description
-    title [t]_          autoincrement and insert table number and title   
-    caption [f]_        autoincrement and insert figure number and caption   
-    [#]_                            autonumbered footnote      
-    abc def [foot]_                 footnote description
-    s = b\2 [s]_                    format sympy equation
-    \a = c*2 [x]_                   format LaTeX equation
-    abc def [r]_                    right justify text line
-    abc def [c]_                    center text line
-    [literal]_                      literal text block
-    [line]_                         draw horizontal line
-    [page]_                         new doc page
-    label | http://abc  [link]_     url link
+    [nn]_ (abc def)       string descriptor section number and title
+    (description) [e]_    autoincrement and insert equation number and description
+    (title) [t]_          autoincrement and insert table number and title   
+    (caption) [f]_        autoincrement and insert figure number and caption   
+    [#]_                  autonumbered footnote      
+    (abc def) [foot]_     footnote description
+    (s = (b+2)/3) [s]_    format sympy equation
+    (\a = c*2^2) [x]_     format LaTeX equation
+    (abc def) [r]_        right justify text line
+    (abc def) [c]_        center text line
+    [literal]_            literal text block, indent 8 or more spaces
+    [latex]_              LaTeX text block, indent 8 or more spaces
+    [line]_               draw horizontal line
+    [page]_               new doc page
+    (label)|(http://abc.xyz) [link]_    label_ becomes a clickable link in docs
 """
 import os
 import sys
@@ -174,6 +206,8 @@ import logging
 import warnings
 import re
 import runpy
+import importlib.util
+import shutil
 import numpy as np
 from pathlib import Path
 from collections import deque
@@ -419,100 +453,83 @@ def write_utf():
     print("INFO  program complete")
     os._exit(1)
 
-def write_pdffile():
+def write_pdffile(stylefileS: str):
     """read .rst file from tmp folder and write .pdf to docs folder 
 
-    .rst file is converted to tex file as an intermediate step
+    .rst file converted to .tex file in tmp folder as intermediate step
     """
     f1 = open(_rstfile, "r"); rstcalcL = f1.readlines(); f1.close()
     print("INFO  rst file read: " + str(_rstfile))
-    mpath = _foldD{mpath}
-    pdffiles = {
-        "cpdf":  Path(mpath/".".join(_cnameS, "pdf")),
-        "chtml":  Path(mpath/".".join(_cnameS, "html")),
-        "trst":  Path(tpath/".".join(_cnameS, "rst")),    
-        "ttex1":  Path(tpath/".".join(_cnameS, "tex")),
-        "auxfile": Path(tpath/".".join(_cnameS, ".aux")),
-        "outfile":  Path(tpath/".".join(_cnameS, ".out")),
-        "texmak2":  Path(tpath/".".join(_cnameS, ".fls")),
-        "texmak3":  Path(tpath/".".join(_cnameS, ".fdb_latexmk"))
-        }
+    
+    if sys.platform == 'win32': pythoncallS = "python "
+    elif sys.platform == 'linux': pythoncallS = "python3 "
+    elif sys.platform == 'darwin': pythoncallS = "python3 "
+    else: pythoncallS == "python "
+    
+    pdfD = {
+            "cpdfP":  Path(mpath/".".join(_cnameS, "pdf")),
+            "chtml":  Path(mpath/".".join(_cnameS, "html")),
+            "trst":  Path(mpath/".".join(_cnameS, "rst")),    
+            "ttex1":  Path(mpath/".".join(_cnameS, "tex")),
+            "auxfile": Path(mpath/".".join(_cnameS, ".aux")),
+            "outfile":  Path(mpath/".".join(_cnameS, ".out")),
+            "texmak2":  Path(mpath/".".join(_cnameS, ".fls")),
+            "texmak3":  Path(mpath/".".join(_cnameS, ".fdb_latexmk"))
+            }
+    mpath = _foldD{mpath}; pdfS = ".".join(_cnameS, "pdf")
+    if stylefilesS != "default":
+        style_path = Path(_dpath/"style"/stylefileS)
+    else:
+        path1 = importlib.util.find_spec("rivtcalc")
+        rivpath = Path(path1.origin).parent
+        style_path = Path(rivpath/"scripts"/"pdfdoc.sty")
         
-        # use search to find path to standard style or use local
-        fixstylepath = self.stylepathpdf.replace('\\', '/')
-        try:
-            pypath = os.path.dirname(sys.executable)
-            rstexec = os.path.join(pypath,"Scripts","rst2latex.py")
-            with open(rstexec) as f1: f1.close()
-            pythoncall = 'python '
-            #print("< rst2latex path 1> " + rstexec)
-        except:
-            try:
-                pypath = os.path.dirname(sys.executable)
-                rstexec = os.path.join(pypath,"rst2latex.py")
-                with open(rstexec) as f1:
-                    f1.close()
-                pythoncall = 'python '
-                #print("< rst2latex path 2> " + rstexec)
-            except:
-                rstexec = "/usr/local/bin/rst2latex.py"
-                pythoncall = 'python '
-                #print("< rst2latex path 3> " + rstexec)
-        
-        
-        tex1 = "".join([pythoncall, rstexec
-                        ,
-                        " --documentclass=report ",
-                        " --documentoptions=12pt,notitle,letterpaper",
-                        " --stylesheet=",
-                        fixstylepath + " ", self.rfile + " ", self.texfile2])
-        self.el.logwrite("tex call:\n" + tex1, self.vbos)
-        try:
-            os.system(tex1)
-            self.el.logwrite("< TeX file written >", self.vbos)
-        except:
-            print()
-            self.el.logwrite("< error in docutils call >", self.vbos)
-        self.mod_tex(self.texfile2)
-        with open(tfile, 'r') as texin:
-            texf = texin.read()
-        texf = texf.replace("""inputenc""", """ """)
-        texf = texf.replace("aaxbb ", """\\hfill""")
-        texf = texf.replace("""\\begin{document}""",
-                            """\\renewcommand{\contentsname}{"""+
-                            self.calctitle + "}\n"+
-                            """\\begin{document}"""+"\n"+
-                            """\\makeatletter"""+
-                            """\\renewcommand\@dotsep{10000}"""+
-                            """\\makeatother"""+
-                            """\\tableofcontents"""+
-                            """\\listoftables"""+
-                            """\\listoffigures""")    
-        with open (tfile, 'w') as texout:
-            print(texf, file=texout)
-        os.chdir(self.xpath)
-        if os.path.isfile(os.path.join(self.ppath,self.pdffile)):
-            os.remove(os.path.join(self.ppath,self.pdffile))
-        pdf1 ='latexmk -xelatex -quiet -f '+os.path.join(self.xpath,self.texfile)
-        #print("pdf call:  ", pdf1)
-        self.el.logwrite("< PDF calc written >", self.vbos)    
-        os.system(pdf1)
-        pdfname = self.pdffile
-        pdfname = list(pdfname)
-        pdfname[0]='m'
-        pdfname2 = "".join(pdfname)
-        pdfftemp = os.path.join(self.xpath, pdfname2)
-        pdffnew = os.path.join(self.cpath, self.pdffile)
-        try: os.remove(pdffnew)
-        except: pass
-        try: os.rename(pdfftemp, pdffnew)
-        except: self.el.logwrite("< PDF calc not moved from temp >", 1)
-        tocname2 = pdfname2.replace('.pdf','.toc')
-        toctemp = os.path.join(self.xpath, tocname2)
-        tocnew = os.path.join(self.rpath, tocname2)
-        try: shutil.copyfile(toctemp, tocnew)
-        except: self.el.logwrite("< TOC not moved from temp >", 1)
-    print("INFO  pdf doc written to docs folder", flush=True)    
+    # generate tex file
+    rst2xeP = Path(rivpath/"scripts"/"rst2xetex.py")
+    texfileP = pdfD(ttex1)
+    tex1S = "".join([pythoncallS, str(rst2xeP),
+                    " --documentclass=report ",
+                    " --documentoptions=12pt,notitle,letterpaper ",
+                    " --stylesheet=",
+                    style_path + " ", _rstfile + " ", str(texfileP])
+    os.chdir(mpath)
+    try: os.system(tex1)
+    except: print("\nINFO  error in docutils call\n" + tex1 +"\n")
+
+
+    # self.mod_tex(self.texfile2)
+    # with open(tfile, 'r') as texin:
+    #     texf = texin.read()
+    # texf = texf.replace("""inputenc""", """ """)
+    # texf = texf.replace("aaxbb ", """\\hfill""")
+    # texf = texf.replace("""\\begin{document}""",
+    #                     """\\renewcommand{\contentsname}{"""+
+    #                     self.calctitle + "}\n"+
+    #                     """\\begin{document}"""+"\n"+
+    #                     """\\makeatletter"""+
+    #                     """\\renewcommand\@dotsep{10000}"""+
+    #                     """\\makeatother"""+
+    #                     """\\tableofcontents"""+
+    #                     """\\listoftables"""+
+    #                     """\\listoffigures""")    
+    # with open (tfile, 'w') as texout:
+    #     print(texf, file=texout)
+
+
+    # generate pdf file
+    os.chdir(mpath)
+    os.system("latexmk -C")        
+    print("\nINFO  temporary Tex files deleted \n")   
+    pdfmkS ="latexmk -pdf -xelatex -quiet -f "+ texfile
+    #print("pdf call:  ", pdfmkS)        
+    os.system(pdfmkS)
+    print("\nINFO  pdf file written:\n")   
+    shutil.move(cpdfP, _dpath)
+    
+    os.chdir(_dpath); pdfnameL = list(pdfS)
+    pdfnameL[0]='d'; pdfrenameS = "".join(pdfname)
+    os.rename(pdfS, pdfrenameS)
+    print("INFO  pdf file moved to docs folder", flush=True)    
     print("INFO  program complete")
     os._exit(1)
 

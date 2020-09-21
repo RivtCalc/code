@@ -1,0 +1,1594 @@
+{
+    "extension": "linecounter",
+    "version": "0.2.7",
+    "workspace": "/Users/rodneyholland/git/rivtcalc-code",
+    "linecount": [
+        {
+            "version": "0.2.7",
+            "counttime": "2020-09-20 22:57:34",
+            "filesum": 228,
+            "codesum": 17809,
+            "commentsum": 8858,
+            "blanksum": 3501,
+            "statistics": {
+                ".py": {
+                    "code": 3013,
+                    "comment": 374,
+                    "blank": 823
+                },
+                ".bak": {
+                    "code": 39,
+                    "comment": 0,
+                    "blank": 9
+                },
+                ".txt": {
+                    "code": 4304,
+                    "comment": 109,
+                    "blank": 1351
+                },
+                ".sty": {
+                    "code": 115,
+                    "comment": 0,
+                    "blank": 3
+                },
+                ".code-workspace": {
+                    "code": 18,
+                    "comment": 0,
+                    "blank": 0
+                },
+                "": {
+                    "code": 11,
+                    "comment": 0,
+                    "blank": 1
+                },
+                ".css": {
+                    "code": 0,
+                    "comment": 0,
+                    "blank": 1
+                },
+                ".rst": {
+                    "code": 209,
+                    "comment": 3,
+                    "blank": 45
+                },
+                ".pdf": {
+                    "code": 5781,
+                    "comment": 6266,
+                    "blank": 138
+                },
+                ".xml": {
+                    "code": 40,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".gliffy": {
+                    "code": 1,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".cmd": {
+                    "code": 4,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".md": {
+                    "code": 3559,
+                    "comment": 2102,
+                    "blank": 1128
+                },
+                ".svg": {
+                    "code": 715,
+                    "comment": 4,
+                    "blank": 2
+                }
+            },
+            "filelist": [
+                {
+                    "blank": 1,
+                    "code": 11,
+                    "comment": 0,
+                    "filename": ".gitignore"
+                },
+                {
+                    "blank": 28,
+                    "code": 84,
+                    "comment": 1,
+                    "filename": "LICENSE.txt"
+                },
+                {
+                    "blank": 30,
+                    "code": 157,
+                    "comment": 1,
+                    "filename": "README.rst"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 2,
+                    "filename": "rivtcalc/__init__.py"
+                },
+                {
+                    "blank": 9,
+                    "code": 49,
+                    "comment": 5,
+                    "filename": "rivtcalc/__main__.py"
+                },
+                {
+                    "filename": "rivtcalc/__pycache__/__init__.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/__pycache__/test2.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 15,
+                    "code": 52,
+                    "comment": 2,
+                    "filename": "rivtcalc/docs/manual/calcs/intro.rst"
+                },
+                {
+                    "blank": 69,
+                    "code": 262,
+                    "comment": 4,
+                    "filename": "rivtcalc/docs/manual/calcs/m0101_intro.txt"
+                },
+                {
+                    "blank": 86,
+                    "code": 264,
+                    "comment": 19,
+                    "filename": "rivtcalc/docs/manual/calcs/m0102_install.txt"
+                },
+                {
+                    "blank": 101,
+                    "code": 300,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0201_tags.txt"
+                },
+                {
+                    "blank": 17,
+                    "code": 67,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/calcs/m0202_ide.txt"
+                },
+                {
+                    "blank": 28,
+                    "code": 96,
+                    "comment": 5,
+                    "filename": "rivtcalc/docs/manual/calcs/m0203_interactive.txt"
+                },
+                {
+                    "blank": 11,
+                    "code": 48,
+                    "comment": 4,
+                    "filename": "rivtcalc/docs/manual/calcs/m0301_license.txt"
+                },
+                {
+                    "blank": 27,
+                    "code": 76,
+                    "comment": 2,
+                    "filename": "rivtcalc/docs/manual/calcs/m0401_examples.txt"
+                },
+                {
+                    "blank": 20,
+                    "code": 59,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0402_isobearing.txt"
+                },
+                {
+                    "blank": 20,
+                    "code": 59,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0403_isobearing.txt"
+                },
+                {
+                    "blank": 19,
+                    "code": 53,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0404_deflection.txt"
+                },
+                {
+                    "blank": 52,
+                    "code": 148,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0405.seismic.txt"
+                },
+                {
+                    "blank": 11,
+                    "code": 48,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0406.frame.txt"
+                },
+                {
+                    "blank": 22,
+                    "code": 70,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0407_brace.txt"
+                },
+                {
+                    "blank": 18,
+                    "code": 42,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0408_dynamics.txt"
+                },
+                {
+                    "blank": 20,
+                    "code": 67,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0409_opensees_truss.txt"
+                },
+                {
+                    "blank": 21,
+                    "code": 59,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0410_stiffness_matrix1.txt"
+                },
+                {
+                    "blank": 33,
+                    "code": 83,
+                    "comment": 1,
+                    "filename": "rivtcalc/docs/manual/calcs/m0411_stiffness_matrix2.txt"
+                },
+                {
+                    "blank": 528,
+                    "code": 972,
+                    "comment": 40,
+                    "filename": "rivtcalc/docs/manual/calcs/once-manual-083.txt"
+                },
+                {
+                    "blank": 183,
+                    "code": 482,
+                    "comment": 23,
+                    "filename": "rivtcalc/docs/manual/calcs/once-manual-083_x.txt"
+                },
+                {
+                    "blank": 0,
+                    "code": 8,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/calcs/reportmerge.txt"
+                },
+                {
+                    "blank": 9,
+                    "code": 25,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/calcs/scripts/eigen.py"
+                },
+                {
+                    "blank": 79,
+                    "code": 232,
+                    "comment": 36,
+                    "filename": "rivtcalc/docs/manual/calcs/scripts/func_stiff.py"
+                },
+                {
+                    "blank": 79,
+                    "code": 232,
+                    "comment": 36,
+                    "filename": "rivtcalc/docs/manual/calcs/scripts/func_stiff2.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/calcs/scripts/opensees_run1.cmd"
+                },
+                {
+                    "blank": 0,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/calcs/scripts/opensees_run2.cmd"
+                },
+                {
+                    "blank": 21,
+                    "code": 73,
+                    "comment": 9,
+                    "filename": "rivtcalc/docs/manual/calcs/scripts/plot_osgeom.py"
+                },
+                {
+                    "blank": 1,
+                    "code": 368,
+                    "comment": 2,
+                    "filename": "rivtcalc/docs/manual/calcs/sketches/cover.svg"
+                },
+                {
+                    "blank": 1,
+                    "code": 347,
+                    "comment": 2,
+                    "filename": "rivtcalc/docs/manual/calcs/sketches/manual_cover.svg"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/calcs/tables/new_chart.xlsx",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Appendix_H_2_01.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Appendix_H_2_02.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Appendix_H_2_03.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/atom_workspace_004.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/beam.skp",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/bearing.skp",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/business_model.mvmm",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/colorschememapping.xml"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/cover.docx",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/database1.gliffy"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/database1.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/database2.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/ex_image002.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/ex_image003.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/example_screen.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/beam.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/bearing1.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/bearing_geo.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/bldg.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/brace.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/floorplan.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/frame.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/geom1.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/geom1a.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/geom2.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/geom2a.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/geom3.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/geom3a.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/mode_shapes.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/truss1.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/truss2.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/truss_1.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/trusscopy1fig.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/trusscopy2fig.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/examples/tube.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig1_overview.mvmm",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig1_structure.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig1A_structure.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig1b_structure.wmf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig2_flow.mvmm",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 13,
+                    "code": 358,
+                    "comment": 503,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3_structure.md"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3_structure.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3_structure.wmf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3a.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 13,
+                    "code": 358,
+                    "comment": 558,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3a_structure.md"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3a_structure.wmf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3ax_structure.wmf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3b.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3b_flow.mvmm",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 13,
+                    "code": 358,
+                    "comment": 494,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3b_structure.md"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3b_structure.wmf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3bc_structure.wmf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig3c_structure.wmf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/fig_table2_Project Folder2a.mvmm",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/figure3.doc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/figure3.mvmm",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/file_struct.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 35,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/filelist.xml"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/IDE (Komodo 8).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image001.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image001.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image002.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image003.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image004.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image005.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image005.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image006.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image007.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image007.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image008.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image008.wmz",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image009.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image009.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image010.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image010.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image011.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image011.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image012.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image013.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image014.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image014.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image015.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image016.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image017.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image018.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image019.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image020.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image020.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image021.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image022.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image022.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image023.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image023.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image024.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image025.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image026.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image027.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image029.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image030.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image031.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image032.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image033.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image034.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image035.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image036.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/image037.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/ipy.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/ipy_screen.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/ipy_screen002.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/item0001.xml"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Komodo Edit or Wakari Interface.doc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/on-c-e.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/once-db.doc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/once-db2.doc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 13,
+                    "code": 357,
+                    "comment": 261,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/once-logo.md"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/once-manual-082_x.docx",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/once-manual-083_x.docx",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 1063,
+                    "code": 1770,
+                    "comment": 45,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/onx3.md"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/organization.mvmm",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/preview.wmf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Project  Folder.doc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Project Folder.mvmm",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Project1.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/props002.xml"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/ScreenClip.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Screenshot_2014-07-23-00-43-38.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Screenshot_2015-01-31-23-56-10.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Screenshot_2015-01-31-23-58-22.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Screenshot_2015-01-31-23-58-39.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Screenshot_2015-01-31-23-59-28.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Screenshot_2015-02-02-00-54-31.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Screenshot_2015-02-02-02-22-23.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/Screenshot_2015-02-02-02-33-05.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 13,
+                    "code": 358,
+                    "comment": 241,
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/structure.md"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/structure.wmf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/structure2.wmf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/table2.doc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/table4t.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/themedata.thmx",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/toolbar003.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/toolbar043.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/toolbar1.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/toolbar2.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/docs/html/figures/tube.skp",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 92,
+                    "code": 4004,
+                    "comment": 3006,
+                    "filename": "rivtcalc/docs/manual/reports/append/Appendix_I_examples.pdf"
+                },
+                {
+                    "filename": "rivtcalc/docs/manual/reports/append/cover.pdf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 21,
+                    "code": 485,
+                    "comment": 1206,
+                    "filename": "rivtcalc/docs/manual/reports/append/coverx.pdf"
+                },
+                {
+                    "blank": 0,
+                    "code": 208,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/manual/reports/append/insert-cal0403.seismic.pdf"
+                },
+                {
+                    "blank": 1,
+                    "code": 380,
+                    "comment": 849,
+                    "filename": "rivtcalc/docs/manual/reports/append/once-manual-083_x.pdf"
+                },
+                {
+                    "blank": 21,
+                    "code": 416,
+                    "comment": 1200,
+                    "filename": "rivtcalc/docs/manual/reports/append/once_cover09.pdf"
+                },
+                {
+                    "blank": 3,
+                    "code": 288,
+                    "comment": 5,
+                    "filename": "rivtcalc/docs/manual/rivet_overview.pdf"
+                },
+                {
+                    "blank": 1,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/rivet_html.css"
+                },
+                {
+                    "blank": 0,
+                    "code": 57,
+                    "comment": 0,
+                    "filename": "rivtcalc/docs/rivet_pdf.sty"
+                },
+                {
+                    "blank": 79,
+                    "code": 504,
+                    "comment": 65,
+                    "filename": "rivtcalc/rc_calc.py"
+                },
+                {
+                    "blank": 32,
+                    "code": 35,
+                    "comment": 2,
+                    "filename": "rivtcalc/rc_chk.py"
+                },
+                {
+                    "blank": 75,
+                    "code": 483,
+                    "comment": 62,
+                    "filename": "rivtcalc/rc_doc.py"
+                },
+                {
+                    "blank": 43,
+                    "code": 235,
+                    "comment": 55,
+                    "filename": "rivtcalc/rc_lib.py"
+                },
+                {
+                    "blank": 3,
+                    "code": 27,
+                    "comment": 0,
+                    "filename": "rivtcalc/rc_report.py"
+                },
+                {
+                    "blank": 6,
+                    "code": 89,
+                    "comment": 18,
+                    "filename": "rivtcalc/rc_unit.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 18,
+                    "comment": 0,
+                    "filename": "rivtcalc/rivtcalc_code.code-workspace"
+                },
+                {
+                    "blank": 3,
+                    "code": 58,
+                    "comment": 0,
+                    "filename": "rivtcalc/scripts/pdfdoc.sty"
+                },
+                {
+                    "blank": 24,
+                    "code": 108,
+                    "comment": 3,
+                    "filename": "rivtcalc/scripts/reportmerge.py"
+                },
+                {
+                    "blank": 37,
+                    "code": 957,
+                    "comment": 0,
+                    "filename": "rivtcalc/scripts/rivet_labels.txt"
+                },
+                {
+                    "blank": 8,
+                    "code": 9,
+                    "comment": 4,
+                    "filename": "rivtcalc/scripts/rst2html.py"
+                },
+                {
+                    "blank": 8,
+                    "code": 9,
+                    "comment": 4,
+                    "filename": "rivtcalc/scripts/rst2html4.py"
+                },
+                {
+                    "blank": 6,
+                    "code": 10,
+                    "comment": 15,
+                    "filename": "rivtcalc/scripts/rst2html5.py"
+                },
+                {
+                    "blank": 11,
+                    "code": 9,
+                    "comment": 4,
+                    "filename": "rivtcalc/scripts/rst2latex.py"
+                },
+                {
+                    "blank": 7,
+                    "code": 9,
+                    "comment": 4,
+                    "filename": "rivtcalc/scripts/rst2man.py"
+                },
+                {
+                    "blank": 10,
+                    "code": 14,
+                    "comment": 4,
+                    "filename": "rivtcalc/scripts/rst2odt.py"
+                },
+                {
+                    "blank": 18,
+                    "code": 41,
+                    "comment": 5,
+                    "filename": "rivtcalc/scripts/rst2odt_prepstyles.py"
+                },
+                {
+                    "blank": 8,
+                    "code": 9,
+                    "comment": 4,
+                    "filename": "rivtcalc/scripts/rst2pseudoxml.py"
+                },
+                {
+                    "blank": 8,
+                    "code": 9,
+                    "comment": 4,
+                    "filename": "rivtcalc/scripts/rst2s5.py"
+                },
+                {
+                    "blank": 12,
+                    "code": 9,
+                    "comment": 4,
+                    "filename": "rivtcalc/scripts/rst2xetex.py"
+                },
+                {
+                    "blank": 8,
+                    "code": 9,
+                    "comment": 4,
+                    "filename": "rivtcalc/scripts/rst2xml.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 3,
+                    "comment": 1,
+                    "filename": "rivtcalc/unum/__init__.py"
+                },
+                {
+                    "blank": 151,
+                    "code": 354,
+                    "comment": 6,
+                    "filename": "rivtcalc/unum/core.py"
+                },
+                {
+                    "blank": 22,
+                    "code": 19,
+                    "comment": 0,
+                    "filename": "rivtcalc/unum/exceptions.py"
+                },
+                {
+                    "blank": 3,
+                    "code": 5,
+                    "comment": 0,
+                    "filename": "rivtcalc/unum/units/__init__.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "rivtcalc/unum/units/custom/__init__.py"
+                },
+                {
+                    "blank": 7,
+                    "code": 18,
+                    "comment": 0,
+                    "filename": "rivtcalc/unum/units/custom/mechanical.py"
+                },
+                {
+                    "blank": 5,
+                    "code": 53,
+                    "comment": 2,
+                    "filename": "rivtcalc/unum/units/others/__init__.py"
+                },
+                {
+                    "blank": 2,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": "rivtcalc/unum/units/si/__init__.py"
+                },
+                {
+                    "blank": 15,
+                    "code": 163,
+                    "comment": 2,
+                    "filename": "rivtcalc/unum/units/si/base.py"
+                },
+                {
+                    "blank": 5,
+                    "code": 48,
+                    "comment": 1,
+                    "filename": "rivtcalc/unum/units/si/derived.py"
+                },
+                {
+                    "blank": 27,
+                    "code": 46,
+                    "comment": 0,
+                    "filename": "rivtcalc/unum/utils.py"
+                },
+                {
+                    "blank": 2,
+                    "code": 24,
+                    "comment": 0,
+                    "filename": "setup.py"
+                },
+                {
+                    "blank": 9,
+                    "code": 39,
+                    "comment": 0,
+                    "filename": "tests/project1/designs/r0101_rivtest.bak"
+                },
+                {
+                    "blank": 10,
+                    "code": 27,
+                    "comment": 11,
+                    "filename": "tests/project1/designs/r0101_rivtest.py"
+                },
+                {
+                    "blank": 11,
+                    "code": 18,
+                    "comment": 1,
+                    "filename": "tests/project1/designs/test1.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 3,
+                    "comment": 0,
+                    "filename": "tests/project1/designs/test2.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 1,
+                    "filename": "tests/project1/designs/test_one.py"
+                }
+            ]
+        }
+    ]
+}

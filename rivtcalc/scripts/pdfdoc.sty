@@ -1,0 +1,61 @@
+%%
+%% default LaTex report class style for rivtcalc 
+%%
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[no-math]{fontspec}
+\usepackage{libertine}
+\usepackage[libertine]{newtxmath}
+\usepackage{currfile}
+\usepackage{bm}
+\usepackage{gensymb}
+\usepackage[normalem]{ulem}
+\usepackage{etoolbox}
+%% math font
+\setmonofont{DejaVu Sans Mono}[Scale=0.8]
+\DeclareMathSizes{12}{13}{11}{11}
+%% margins
+\usepackage{geometry}
+\geometry{hmargin={1.0in,0.75in},vmargin={0.9in,1.0in}}
+\setlength{\parindent}{0in}
+
+%% pagestyle plain - table of contents
+\fancypagestyle{plain} {%
+\fancyhf{}
+\filename@parse{\currfilename}
+\fancyfoot[C]{model: \filename@base .txt \hfill \today\ }
+\renewcommand\headrulewidth{0pt}
+\renewcommand\footrulewidth{1pt}
+}
+
+%% pagestyle fancy - calculation
+%% header
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\normalsize Page \thepage\ of \pageref*{LastPage} \phantom{aaaaaaaaaa}}
+\renewcommand\chaptermark[1]{\markboth{#1}{}} 
+\renewcommand\sectionmark[1]{\markright{\thesection.\ #1}}
+%% footer
+\filename@parse{\currfilename}
+\fancyfoot[C]{model: \filename@base .txt \hfill \today\ }
+\renewcommand\headrulewidth{1pt}
+\renewcommand\footrulewidth{1pt}
+%% modify section headings - chapters
+\titleformat{\chapter}
+ [display]
+ {\normalfont\large\bfseries}
+ {}{0pt}
+ {\large}
+ [\vspace{2mm}\titlerule]
+\titlespacing*{\chapter}{0pt}{-40pt}{12pt}
+%% modify section headings - sections
+\titleformat{\section}
+ [display]
+ {\normalfont\large\bfseries}
+ {}{0pt}
+ {\large}
+ [\vspace{2mm}\titlerule]
+\titlespacing*{\section}{0pt}{-40pt}{12pt}
+

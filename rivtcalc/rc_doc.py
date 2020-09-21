@@ -182,7 +182,7 @@ class WriteRST:
             if uS[0:2] == "##":  continue                   # remove comment
             uS = uS[4:]                                     # remove indent
             if len(uS) == 0 : 
-                if len(self.valL) > 0:                      # prnt value table
+                if len(self.valL) > 0:                      # print value table
                     hdrL = ["variable", "value", "[value]", "description"]
                     alignL = ['left','right','right','left' ]            
                     self._vtable(self.valL, hdrL, "rst", alignL)
@@ -229,8 +229,10 @@ class WriteRST:
             calcS (list): utf formatted calc-string (appended)
             setsectD (dict): section settings
         """
-        rcmdL = ["head", "serach", "keys", "code", "pdf"]
-        rmethL = [self._rhead,self._rsearch,self._rkeys,self._rcode,self._rpdf]
+        
+        rcmdL = ["head", "search", "keys", "info", "pdf",  "text", "table",]
+        rmethL = [self._rhead,self._rsearch,self._rkeys,self._rinfo,self._rpdf,
+                                    self.itext,self.itable]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
         self._parseUTF("report", rcmdL, rmethL, rtagL)
@@ -250,7 +252,7 @@ class WriteRST:
     def _rkeys(self, rsL):
         a = 4
 
-    def _rcode(self, rsL):
+    def _rinfo(self, rsL):
         b = 5
 
     def _rpdf(self, rsL):

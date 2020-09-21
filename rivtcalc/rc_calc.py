@@ -231,8 +231,9 @@ class WriteUTF:
             calcS (list): utf formatted calc-string (appended)
             setsectD (dict): section settings
         """
-        rcmdL = ["head", "search", "keys", "code", "pdf"]
-        rmethL = [self._rhead,self._rsearch,self._rkeys,self._rcode,self._rpdf]
+        rcmdL = ["head", "search", "keys", "info", "pdf",  "text", "table",]
+        rmethL = [self._rhead,self._rsearch,self._rkeys,self._rinfo,self._rpdf,
+                                    self.itext, self.itable]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
         self._parseUTF("report", rcmdL, rmethL, rtagL)
@@ -252,7 +253,7 @@ class WriteUTF:
     def _rsearch(self, rsL):
         a = 4
 
-    def _rcode(self, rsL):
+    def _rinfo(self, rsL):
         b = 5
 
     def _rpdf(self, rsL):
@@ -268,8 +269,8 @@ class WriteUTF:
         """
 
         icmdL = ["text", "table", "image"]
-        imethL = [self._itext, self._itable, self._iimage, ]
-        itagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
+        imethL = [self._itext, self._itable, self._iimage]
+        itagL =  ["[page]_","[line]_","[link]_","[literal]_","[foot]_","[latex]_", 
                   "[s]_","[x]_","[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
         
         self._parseUTF("insert", icmdL, imethL, itagL)
@@ -405,6 +406,35 @@ class WriteUTF:
             except: pass
             print(utfS); self.calcS += utfS + "\n"
 
+    def _ilatex(self, iL: list):
+        """insert text from file
+        
+        Args:
+            iL (list): text command list
+        """
+
+        calP = "r"+self.setsectD["cnumS"]
+        txtpath = Path(self.folderD["xpath"]/calP/iL[1].strip())
+        with open(txtpath, 'r') as txtf1:
+            uL = txtf1.readlines()
+        if iL[2].strip() == "indent":
+            txtS = "".join(uL)
+            widthI = self.setcmdD["cwidth"]
+            inS = " "*4
+            uL = textwrap.wrap(txtS, width=widthI)
+            uL = [inS+S1+"\n" for S1 in uL]
+            uS = "".join(uL)
+        elif iL[2].strip() == "literal":
+            txtS = "  ".join(uL)
+            uS = "\n" + txtS
+        else:
+            txtS = "".join(uL)
+            uS = "\n" + txtS
+
+        self.calcS += uS + "\n"
+
+        print(uS); self.calcS += uS + "\n"
+
     def v_utf(self)-> tuple:
         """parse value-string and set method
 
@@ -420,7 +450,7 @@ class WriteUTF:
         vcmdL = ["config", "value", "data", "func", "text", "table", "image"]
         vmethL = [self._vconfig, self._vvalue, self._vdata, self._vfunc, 
                         self._itext, self._itable, self._iimage]
-        vtagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
+        vtagL = ["[page]_","[line]_","[link]_","[literal]_","[foot]_","[latex]_", 
                 "[s]_","[x]_","[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
 
         self._parseUTF("values", vcmdL, vmethL, vtagL)
@@ -662,9 +692,9 @@ class WriteUTF:
             rivtD (list): calculation values         
         """
         
-        tcmdL = ["text", "table", "image"]
-        tmethL = [self._itext, self._itable, self._iimage]
-        ttagL =  ["[page]_", "[line]_", "[link]_", "[literal]_", "[foot]_", 
+        tcmdL = ["text", "table", "image", "latex"]
+        tmethL = [self._itext, self._itable, self._iimage, self.ilatex]
+        ttagL = ["[page]_","[line]_","[link]_","[literal]_","[foot]_","[latex]_", 
                 "[s]", "[x]", "[r]_", "[c]_", "[e]_", "[t]_", "[f]_", "[#]_"] 
         
         self._parseUTF("table", tcmdL, tmethL, ttagL)
