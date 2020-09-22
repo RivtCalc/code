@@ -216,87 +216,113 @@ import numpy as np
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
+from contextlib import suppress
 from rivtcalc.rc_unit import *
 import rivtcalc.rc_calc as _rc_calc
-from contextlib import suppress
-#import rivt.rivt_doc as _rdoc
-#import rivt.rivt_reprt as _reprt
-#import rivt.rivt_chk as _rchk                   
+import rivtcalc.rc_doc as _rc_doc
 
-try: _calcfileS = sys.argv[1]                           #  check source of file
-except: _calcfileS = sys.argv[0]
-if ".py" not in _calcfileS:
-    import __main__; _calcfileS = (__main__.__file__)
-    #print("model file from IDE: ", _modfileS)
- 
+# import rivt.rivt_reprt as _reprt
+# import rivt.rivt_chk as _rchk
+
+try:
+    print("argv1", sys.argv[1])
+    _calcfileS = sys.argv[1]  #  check source of file
+except:
+    print("argv0", sys.argv[0])
+    _calcfileS = sys.argv[0]
+
 _cwdS = os.getcwd()
-_cfull = Path(_calcfileS)                            # calc file full path
-_cfileS   = _cfull.name                              # calc file name
-_cnameS    = _cfileS.split(".py")[0]                 # calc file basename
-_rivpath  = Path("rivtcalc.rivt_lib.py").parent      # rivt program path
-_ppath    = _cfull.parent.parent                     # project folder path
-_cpath    = _cfull.parent                            # calc folder path
-_tpath    = Path(_ppath/"tmp")                       # tmp folder path
-_dpath    = Path(_ppath/"docs")                      # doc folder path
-_rpath    = Path(_dpath/"report")                    # report folder path
-_dname    = "d"+_cnameS[1:]                          # doc file basename
-_utffile  = Path(_cpath/".".join((_dname, "txt")))   # utf output
-_rstfile  = Path(_ppath/".".join((_dname, "rst")))   # rst output
-_expfile  = Path(_cpath /"data"/"".join(_cfileS))    # export file
+_cfull = Path(_calcfileS)  # calc file full path
+_cfileS = _cfull.name  # calc file name
+_cnameS = _cfileS.split(".py")[0]  # calc file basename
+_rivpath = Path("rivtcalc.rivt_lib.py").parent  # rivt program path
+_ppath = _cfull.parent.parent  # project folder path
+_cpath = _cfull.parent  # calc folder path
+_tpath = Path(_ppath / "tmp")  # tmp folder path
+_dpath = Path(_ppath / "docs")  # doc folder path
+_rpath = Path(_dpath / "report")  # report folder path
+_dname = "d" + _cnameS[1:]  # doc file basename
+_utffile = Path(_cpath / ".".join((_dname, "txt")))  # utf output
+_rstfile = Path(_ppath / ".".join((_dname, "rst")))  # rst output
+_expfile = Path(_cpath / "data" / "".join(_cfileS))  # export file
 
 # global variables; folders, sections, commmands
-utfcalcS = """"""                                    # utf calc string
-rstcalcS = """"""                                    # reST calc string
-exportS  = """"""                                    # values export string
-rivtcalcD = {}                                       # values dictonary
-_rstflagB = False                                    # flag for reST generation
+utfcalcS = """"""  # utf calc string
+rstcalcS = """"""  # reST calc string
+exportS = """"""  # values export string
+rivtcalcD = {}  # values dictonary
+_rstflagB = False  # flag for reST generation
 # folder paths
 _foldD = {
-"efile": _expfile,   
-"ppath": _ppath,
-"dpath": _dpath,
-"rpath": _rpath,
-"cpath": Path(_cfull).parent,
-"mpath": Path(_ppath, "tmp"),
-"spath": Path(_cpath, "scripts"),
-"kpath": Path(_cpath, "sketches"),
-"tpath": Path(_cpath, "data"),
-"xpath": Path(_cpath, "text"),
-"hpath": Path(_dpath, "html"),
-"apath": Path(_rpath, "attach")}
+    "efile": _expfile,
+    "ppath": _ppath,
+    "dpath": _dpath,
+    "rpath": _rpath,
+    "cpath": Path(_cfull).parent,
+    "mpath": Path(_ppath, "tmp"),
+    "spath": Path(_cpath, "scripts"),
+    "kpath": Path(_cpath, "sketches"),
+    "tpath": Path(_cpath, "data"),
+    "xpath": Path(_cpath, "text"),
+    "hpath": Path(_dpath, "html"),
+    "apath": Path(_rpath, "attach"),
+}
 # section settings
-_setsectD = {"cnumS":_cnameS[1:5],"dnumS":_cnameS[1:3],"sdnumS":_cnameS[3:5],
-            "snameS":"","snumS":"","swidthI":80,
-            "enumI":0,"tnumI":0, "fnumI":0, "ftqueL":deque([1])}
+_setsectD = {
+    "cnumS": _cnameS[1:5],
+    "dnumS": _cnameS[1:3],
+    "sdnumS": _cnameS[3:5],
+    "snameS": "",
+    "snumS": "",
+    "swidthI": 80,
+    "enumI": 0,
+    "tnumI": 0,
+    "fnumI": 0,
+    "ftqueL": deque([1]),
+}
 # command settings
-_setcmdD = {"cwidthI":30, "calignS":"s", "titleS":"notitle", "writeS":"table",
-            "scale1F": 1., "scale2F": 1., "trmrI": 2, "trmtI": 2,
-            "subB": False, "saveB": False}
+_setcmdD = {
+    "cwidthI": 30,
+    "calignS": "s",
+    "titleS": "notitle",
+    "writeS": "table",
+    "scale1F": 1.0,
+    "scale2F": 1.0,
+    "trmrI": 2,
+    "trmtI": 2,
+    "subB": False,
+    "saveB": False,
+}
 # temp files
-_rbak = Path(_foldD["mpath"] / ".".join((_cnameS, "bak")))
-_logfile = Path(_foldD["mpath"] / ".".join((_cnameS, "log")))
-_rstfile = Path(_foldD["mpath"] / ".".join((_cnameS, "rst"))) 
-#logs and checks
-with open(_cfull, "r") as f2: calcbak = f2.read() 
-with open(_rbak, "w") as f3: f3.write(calcbak)  # write backup
-warnings.filterwarnings('ignore')
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                    datefmt='%m-%d %H:%M',
-                    filename=_logfile,
-                    filemode='w')
+_rbak = Path(_tpath / ".".join((_cnameS, "bak")))
+_logfile = Path(_tpath / ".".join((_cnameS, "log")))
+_rstfile = Path(_tpath / ".".join((_cnameS, "rst")))
+# logs and checks
+with open(_cfull, "r") as f2:
+    calcbak = f2.read()
+with open(_rbak, "w") as f3:
+    f3.write(calcbak)  # write backup
+warnings.filterwarnings("ignore")
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+    datefmt="%m-%d %H:%M",
+    filename=_logfile,
+    filemode="w",
+)
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
-formatter = logging.Formatter('%(levelname)-8s %(message)s')
+formatter = logging.Formatter("%(levelname)-8s %(message)s")
 console.setFormatter(formatter)
-logging.getLogger('').addHandler(console)
+logging.getLogger("").addHandler(console)
 _rshortP = Path(*Path(_cfull).parts[-3:])
 _bshortP = Path(*Path(_rbak).parts[-4:])
 _lshortP = Path(*Path(_logfile).parts[-4:])
-logging.info(f"""calc: {_rshortP}""" )
+logging.info(f"""calc: {_rshortP}""")
 logging.info(f"""backup: {_bshortP}""")
 logging.info(f"""logging: {_lshortP}""")
-print(" ")                       # todo: check folder structure here
+print(" ")  # todo: check folder structure here
+
 
 def _init_utf(rawS: str):
     """return rivt-string utf class instance
@@ -307,10 +333,12 @@ def _init_utf(rawS: str):
     Returns:
         class instance: utf string-type instance
     """
-    sectS,strS = rawS.split("\n",1); _section(sectS)
+    sectS, strS = rawS.split("\n", 1)
+    _section(sectS)
     strL = strS.split("\n")
-    ucalc = _rc_calc.WriteUTF(strL,_foldD,_setcmdD,_setsectD, rivtcalcD, exportS)
-    return ucalc 
+    ucalc = _rc_calc.WriteUTF(strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
+    return ucalc
+
 
 def _init_rst(rawS: str):
     """return rivt-string reST class
@@ -321,42 +349,49 @@ def _init_rst(rawS: str):
     Returns:
         class instance: reST string-type instance
     """
-    sectS,strS = rawS.split("\n",1); _section(sectS)
+    sectS, strS = rawS.split("\n", 1)
+    _section(sectS)
     strL = strS.split("\n")
-    rstcalc = _rc_calc.WriteRST(strL,_foldD,_setcmdD,_setsectD, rivtcalcD, exportS)
-    return rstcalc 
+    rstcalc = _rc_doc.WriteRST(strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
+    return rstcalc
+
 
 def _section(hdrS: str):
-    """format section headings and settings 
+    """format section headings and settings
 
     Args:
         hdrS (str): section heading line
     """
     global utfcalcS, _setsectD
 
-    _rgx = r'\[\d\d\]'
-    if re.search(_rgx,hdrS):        
-        _setsectD["enumI"] = 0               # equation number
-        _setsectD["fnum"] = 0               # figure number
-        _setsectD["tnumI"] = 0               # table number
-        nameS = _setsectD["snameS"] = hdrS[hdrS.find("]") + 2:].strip()
-        snumSS = _setsectD["snumS"] = hdrS[hdrS.find("[")+1:hdrS.find("]")]
+    _rgx = r"\[\d\d\]"
+    if re.search(_rgx, hdrS):
+        _setsectD["enumI"] = 0  # equation number
+        _setsectD["fnum"] = 0  # figure number
+        _setsectD["tnumI"] = 0  # table number
+        nameS = _setsectD["snameS"] = hdrS[hdrS.find("]") + 2 :].strip()
+        snumSS = _setsectD["snumS"] = hdrS[hdrS.find("[") + 1 : hdrS.find("]")]
         cnumSS = str(_setsectD["cnumS"])
         widthI = int(_setsectD["swidthI"])
-        headS = " " +  nameS + (cnumSS + " - " +
-                ("[" + snumSS + "]")).rjust(widthI - len(nameS) - 1)
+        headS = (
+            " "
+            + nameS
+            + (cnumSS + " - " + ("[" + snumSS + "]")).rjust(widthI - len(nameS) - 1)
+        )
         bordrS = widthI * "_"
-        utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS +"\n"
-        print(utfS); utfcalcS += utfS
+        utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS + "\n"
+        print(utfS)
+        utfcalcS += utfS
+
 
 def R(rawS: str):
     """repository-string to utf-string
-    
+
     Args:
         rawstrS (str): repository-string
     """
-    global  utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
-    
+    global utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
+
     if _rstflagB:
         rcalc = _init_rst(rawS)
         rcalcS, _setsectD = rcalc.r_rst()
@@ -366,14 +401,15 @@ def R(rawS: str):
         rcalcS, _setsectD = rcalc.r_utf()
         utfcalcS += rcalcS
 
+
 def I(rawS: str):
     """insert-string to utf-string
-    
+
     Args:
         rawstrS (str): insert-string
     """
     global utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
-    
+
     if _rstflagB:
         rcalc = _init_rst(rawS)
         rcalcS, _setsectD = rcalc.r_rst()
@@ -383,9 +419,10 @@ def I(rawS: str):
         icalcS, _setsectD, _setcmdD = icalc.i_utf()
         utfcalcS += icalcS
 
+
 def V(rawS: str):
     """value-string to utf-string
-    
+
     Args:
         rawstr (str): value-string
     """
@@ -400,11 +437,12 @@ def V(rawS: str):
         vcalcS, _setsectD, _setcmdD, rivtcalcD, exportS = vcalc.v_utf()
         utfcalcS += vcalcS
 
+
 def T(rawS: str):
     """table-string to utf-string
-     
-     Args:
-        rawstr (str): table-string   
+
+    Args:
+       rawstr (str): table-string
     """
     global utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
 
@@ -417,98 +455,124 @@ def T(rawS: str):
         tcalcS, _setsectD, _setcmdD, rivtcalcD = tcalc.t_utf()
         utfcalcS += tcalcS
 
+
 def S(rawS: str):
     """skip string
-     
-     Args:
-        rawstr (str): any string to exclude
+
+    Args:
+       rawstr (str): any string to exclude
     """
     pass
 
+
 def write_values():
-    """ write value assignments to csv file
- 
-        File name: calc file name prepended with 'v'
-        File path: data folder      
+    """write value assignments to csv file
+
+    File name: calc file name prepended with 'v'
+    File path: data folder
     """
-    
-    str1 =  ("""header string\n""")
+
+    str1 = """header string\n"""
     str1 = str1 + exportS
-    with open(_expfile, 'w') as expF: expF.write(str1)
+    with open(_expfile, "w") as expF:
+        expF.write(str1)
+
 
 def write_utf():
     """write utf-calc output to file
-    
+
     file is written to calcs folder
     """
     global utfcalcS, _rstflagB
 
     utfcalcS = """"""
-    f1 = open(_cfull, "r"); utfcalcL = f1.readlines(); f1.close()
+    f1 = open(_cfull, "r")
+    utfcalcL = f1.readlines()
+    f1.close()
     print("calc file read: " + str(_cfull))
     indx = 0
-    for iS in enumerate(utfcalcL):                      
-        if "write_utf" in iS[1]: 
-            indx = int(iS[0]); break
-    utfcalcL = utfcalcL[0:indx]+utfcalcL[indx+1:]     # filter write function
-    cmdS = ''.join(utfcalcL); exec(cmdS, globals(), locals())
-    with open(_utffile, "wb") as f1: f1.write(utfcalcS.encode("UTF-8"))
+    for iS in enumerate(utfcalcL):
+        if "write_utf" in iS[1]:
+            indx = int(iS[0])
+            break
+    utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1 :]  # filter write function
+    cmdS = "".join(utfcalcL)
+    exec(cmdS, globals(), locals())
+    with open(_utffile, "wb") as f1:
+        f1.write(utfcalcS.encode("UTF-8"))
     print("INFO  utf calc written to calc folder", flush=True)
     print("INFO  program complete")
     os._exit(1)
 
+
 def _write_html():
-    """read .rst file from tmp folder and write .pdf to docs folder 
+    """read .rst file from tmp folder and write .pdf to docs folder
 
     .rst file converted to .tex file in tmp folder in intermediate step
     """
     with open(_txtfile, "wb") as f1:
         f1.write(utfcalc.encode("UTF-8"))
-        
+
+
 def _write_pdf(stylefileS: str):
-    """read .rst file from tmp folder and write .pdf to docs folder 
+    """read .rst file from tmp folder and write .pdf to docs folder
 
     .rst file converted to .tex file in tmp folder in intermediate step
     """
-    f1 = open(_rstfile, "r"); rstcalcL = f1.readlines(); f1.close()
+    f1 = open(_rstfile, "r")
+    rstcalcL = f1.readlines()
+    f1.close()
     print("INFO  rst file read: " + str(_rstfile))
-    
-    if sys.platform == 'win32': pythoncallS = "python "
-    elif sys.platform == 'linux': pythoncallS = "python3 "
-    elif sys.platform == 'darwin': pythoncallS = "python3 "
-    else: pythoncallS == "python "
-    
-    mpath = _foldD{mpath}; pdfS = ".".join(_cnameS, "pdf")
+
+    if sys.platform == "win32":
+        pythoncallS = "python "
+    elif sys.platform == "linux":
+        pythoncallS = "python3 "
+    elif sys.platform == "darwin":
+        pythoncallS = "python3 "
+    else:
+        pythoncallS == "python "
+
+    mpath = _foldD("mpath")
+    pdfS = ".".join(_cnameS, "pdf")
     path1 = importlib.util.find_spec("rivtcalc")
     rivpath = Path(path1.origin).parent
     pdfD = {
-            "cpdfP":  Path(mpath/".".join(_cnameS, "pdf")),
-            "chtml":  Path(mpath/".".join(_cnameS, "html")),
-            "trst":  Path(mpath/".".join(_cnameS, "rst")),    
-            "ttex1":  Path(mpath/".".join(_cnameS, "tex")),
-            "auxfile": Path(mpath/".".join(_cnameS, ".aux")),
-            "outfile":  Path(mpath/".".join(_cnameS, ".out")),
-            "texmak2":  Path(mpath/".".join(_cnameS, ".fls")),
-            "texmak3":  Path(mpath/".".join(_cnameS, ".fdb_latexmk"))
-            }
+        "cpdfP": Path(mpath / ".".join(_cnameS, "pdf")),
+        "chtml": Path(mpath / ".".join(_cnameS, "html")),
+        "trst": Path(mpath / ".".join(_cnameS, "rst")),
+        "ttex1": Path(mpath / ".".join(_cnameS, "tex")),
+        "auxfile": Path(mpath / ".".join(_cnameS, ".aux")),
+        "outfile": Path(mpath / ".".join(_cnameS, ".out")),
+        "texmak2": Path(mpath / ".".join(_cnameS, ".fls")),
+        "texmak3": Path(mpath / ".".join(_cnameS, ".fdb_latexmk")),
+    }
 
     if stylefileS != "default":
-        style_path = Path(_dpath/"style"/stylefileS)
+        style_path = Path(_dpath / "style" / stylefileS)
     else:
-        style_path = Path(rivpath/"scripts"/"pdfdoc.sty")
-        
-    # generate tex file
-    rst2xeP = Path(rivpath/"scripts"/"rst2xetex.py")
-    texfileP = pdfD("ttex1")
-    tex1S = "".join([pythoncallS, str(rst2xeP),
-                    " --documentclass=report ",
-                    " --documentoptions=12pt,notitle,letterpaper ",
-                    " --stylesheet=",
-                    style_path + " ", _rstfile + " ", str(texfileP])
-    os.chdir(mpath)
-    try: os.system(tex1)
-    except: print("\nINFO  error in docutils call\n" + tex1 +"\n")
+        style_path = Path(rivpath / "scripts" / "pdfdoc.sty")
 
+    # generate tex file
+    rst2xeP = Path(rivpath / "scripts" / "rst2xetex.py")
+    texfileP = pdfD("ttex1")
+    tex1S = "".join(
+        [
+            pythoncallS,
+            str(rst2xeP),
+            " --documentclass=report ",
+            " --documentoptions=12pt,notitle,letterpaper ",
+            " --stylesheet=",
+            style_path + " ",
+            _rstfile + " ",
+            str(texfileP),
+        ]
+    )
+    os.chdir(mpath)
+    try:
+        os.system(tex1)
+    except:
+        print("\nINFO  error in docutils call\n" + tex1 + "\n")
 
     # self.mod_tex(self.texfile2)
     # with open(tfile, 'r') as texin:
@@ -524,53 +588,60 @@ def _write_pdf(stylefileS: str):
     #                     """\\makeatother"""+
     #                     """\\tableofcontents"""+
     #                     """\\listoftables"""+
-    #                     """\\listoffigures""")    
+    #                     """\\listoffigures""")
     # with open (tfile, 'w') as texout:
     #     print(texf, file=texout)
 
-
     # generate pdf file
     os.chdir(mpath)
-    os.system("latexmk -C")        
-    print("\nINFO  temporary Tex files deleted \n")   
-    
-    pdfmkS ="latexmk -pdf -xelatex -quiet -f "+ texfile
-    #print("pdf call:  ", pdfmkS)        
+    os.system("latexmk -C")
+    print("\nINFO  temporary Tex files deleted \n")
+
+    pdfmkS = "latexmk -pdf -xelatex -quiet -f " + texfile
+    # print("pdf call:  ", pdfmkS)
     os.system(pdfmkS)
-    print("\nINFO  pdf file written:\n")   
-    
+    print("\nINFO  pdf file written:\n")
+
     shutil.move(cpdfP, _dpath)
-    os.chdir(_dpath); pdfnameL = list(pdfS)
-    pdfnameL[0]='d'; pdfrenameS = "".join(pdfname)
+    os.chdir(_dpath)
+    pdfnameL = list(pdfS)
+    pdfnameL[0] = "d"
+    pdfrenameS = "".join(pdfname)
     os.rename(pdfS, pdfrenameS)
-    print("INFO  pdf file moved to docs folder", flush=True)    
+    print("INFO  pdf file moved to docs folder", flush=True)
     print("INFO  program complete")
     os._exit(1)
 
-def write_doc(doctypeS: str, stylefileS: str):
-    """write calc output to .rst file in tmp folder
 
-    """
+def write_doc(doctypeS: str, stylefileS: str):
+    """write calc output to .rst file in tmp folder"""
     global rstcalcS, _rstflagB
 
     _rstflagB = True
     rstcalcS = """"""
-    f1 = open(_cfull, "r"); rstcalcL = f1.readlines(); f1.close()
+    f1 = open(_cfull, "r")
+    rstcalcL = f1.readlines()
+    f1.close()
     print("INFO calc file read: " + str(_cfull))
-    
+
     indx = 0
-    for iS in enumerate(rstcalcL):                      
-        if "write_doc" in iS[1]: 
-            indx = int(iS[0]); break
-    rstcalcL = rstcalcL[0:indx]+rstcalcL[indx+1:]     # filter write function
-    cmdS = ''.join(rstcalcL); exec(cmdS, globals(), locals())
-    with open(_rstfile, "wb") as f1: f1.write(rstcalcS.encode("UTF-8"))
+    for iS in enumerate(rstcalcL):
+        if "write_doc" in iS[1]:
+            indx = int(iS[0])
+            break
+    rstcalcL = rstcalcL[0:indx] + rstcalcL[indx + 1 :]  # filter write function
+    cmdS = "".join(rstcalcL)
+    exec(cmdS, globals(), locals())
+    with open(_rstfile, "wb") as f1:
+        f1.write(rstcalcS.encode("UTF-8"))
     print("INFO  rst calc written to tmp folder", flush=True)
-    
-    if docstypeS.strip() == "pdf": _write_pdf(stylefileS)
-    if docstypeS.strip() == "html": _write_html(stylefileS)
+
+    if docstypeS.strip() == "pdf":
+        _write_pdf(stylefileS)
+    if docstypeS.strip() == "html":
+        _write_html(stylefileS)
+
 
 def write_report():
-    """[summary]
-    """
+    """[summary]"""
     pass

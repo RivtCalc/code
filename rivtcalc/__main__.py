@@ -32,6 +32,8 @@ __author__ = "rholland@structurelabs.com"
 if sys.version_info < (3, 7):
     sys.exit("rivtCalc requires Python version 3.7 or later")     
 
+_calcfileS = "empty"
+
 def _cmdlinehelp():
     """command line help """
     print()
@@ -49,17 +51,16 @@ def _cmdlinehelp():
     print("Program and documentation are here: http://rivtcalc.github.io.")
     sys.exit()
 
-_calcfileS = "empty"
 if __name__ == "__main__":
     try:
-        _calcfileS = sys.argv[1]                      # model file argument
-        _cwdS = os.getcwd()
-        _cfull = Path(_calcfileS)                     # model file full path
+        _calcfileS = sys.argv[1]                      # calc file argument
+        _cwdS = os.getcwd()                           # get calc folder
+        _cfull = Path(_calcfileS)                     # calc file full path
         _cfileS = Path(_cfull).name                   # calc file name
-        _cnameS  = _cfileS.split(".py")[0]             # calc file basename
-        print("current folder: ", _cwdS)
-        print("model name: ", _cfileS)
-        importlib.import_module(_cnameS)
+        _cbaseS  = _cfileS.split(".py")[0]            # calc file basename
+        print("MAIN  current folder: ", _cwdS)
+        print("MAIN  calc name: ", _cfileS)
+        importlib.import_module(_cbaseS)
     except ImportError as error:
         print("error---------------------------------------------")
         print(error)
