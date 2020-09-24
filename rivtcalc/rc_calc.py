@@ -395,26 +395,30 @@ class WriteUTF:
         fileS = iL[1].strip()
         calpS = "r" + self.setsectD["cnumS"]
         tfileS = Path(self.folderD["tpath"] / calpS / fileS)
-        with open(tfileS, "r") as csvfile:  # read csv file
-            readL = list(csv.reader(csvfile))
+        extS = fileS.split(".")
+        if extS == "csv":
+            with open(tfileS, "r") as csvfile:  # read csv file
+                readL = list(csv.reader(csvfile))
+        elif extS == "xlsx":
+            pDF1 = pd.read_excel(tfileS)
+            readL = pDF1.values.tolist()
+        else:
+            return
         incl_colL = list(range(len(readL[0])))
         widthI = self.setcmdD["cwidthI"]
         alignS = self.setcmdD["calignS"]
+        saS = alignD(alignS)
         if iL[2].strip():
             widthL = iL[2].split(",")  # new max col width
             widthI = int(widthL[0].strip())
             self.setcmdD.update({"cwidthI": widthI})
-            saS = alignD[widthL[1].strip()]  # new alilgnment
             self.setcmdD.update({"calignS": saS})
-        naS = saS
-        if saS == "decimal":
-            saS = ""
-            naS = "decimal"
-        ttitleS = ""
-        ttitleS = self.setcmdD["titleS"]
+            saS = alignD[widthL[1].strip()]
         if iL[3].strip():  # title
             ttitleS = iL[3].strip()
             self.setcmdD.update({"titleS": ttitleS})
+        ttitleS = self.setcmdD["titleS"]
+        # new alignment
         totalL = [""] * len(incl_colL)
         if iL[4].strip():  # columns
             if iL[4].strip() == "[:]":
@@ -447,8 +451,8 @@ class WriteUTF:
                 wcontentL,
                 tablefmt="rst",
                 headers="firstrow",
-                numalign=naS,
-                stralign=saS,
+                numalign="decimal",
+                stralign="saS",
             )
         )
         utfS = output.getvalue()
