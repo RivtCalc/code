@@ -225,11 +225,16 @@ import rivtcalc.rc_doc as _rc_doc
 # import rivt.rivt_chk as _rchk
 
 try:
-    print("argv1", sys.argv[1])
-    _calcfileS = sys.argv[1]  #  check source of file
+    # print("argv1", sys.argv[1])
+    _calcfileS = sys.argv[1]
 except:
-    print("argv0", sys.argv[0])
+    # print("argv0", sys.argv[0])
     _calcfileS = sys.argv[0]
+if ".py" not in _calcfileS:
+    import __main__
+
+    _calcfileS = __main__.__file__
+
 
 _cwdS = os.getcwd()
 _cfull = Path(_calcfileS)  # calc file full path
@@ -284,7 +289,6 @@ _setsectD = {
 _setcmdD = {
     "cwidthI": 30,
     "calignS": "s",
-    "titleS": "notitle",
     "writeS": "table",
     "scale1F": 1.0,
     "scale2F": 1.0,
