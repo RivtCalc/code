@@ -410,9 +410,9 @@ class OutputUTF:
             iL (list): text command list
         """
 
-        calP = "r" + self.setsectD["cnumS"]
-        txtpath = Path(self.folderD["xpath"] / calP / iL[1].strip())
-        with open(txtpath, "r") as txtf1:
+        calP = "c" + self.setsectD["cnumS"]
+        txapath = Path(self.folderD["xpath"] / calP / iL[1].strip())
+        with open(txapath, "r") as txtf1:
             uL = txtf1.readlines()
         if iL[2].strip() == "indent":
             txtS = "".join(uL)
@@ -459,8 +459,8 @@ class OutputUTF:
         contentL = []
         sumL = []
         fileS = iL[1].strip()
-        calpS = "r" + self.setsectD["cnumS"]
-        tfileS = Path(self.folderD["tpath"] / calpS / fileS)
+        calpS = "c" + self.setsectD["cnumS"]
+        tfileS = Path(self.folderD["apath"] / calpS / fileS)
         extS = fileS.split(".")[1]
         if extS == "csv":
             with open(tfileS, "r") as csvfile:  # read csv file
@@ -536,7 +536,7 @@ class OutputUTF:
             fileS = iL[1].split(",")
             file1S = fileS[0].strip()
             file2S = fileS[1].strip()
-            calpS = "r" + self.setsectD["cnumS"]
+            calpS = "c" + self.setsectD["cnumS"]
             img1S = str(Path(self.folderD["hpath"] / calpS / file1S))
             img2S = str(Path(self.folderD["hpath"] / calpS / file2S))
             pshrt1S = str(Path(*Path(img1S).parts[-4:]))
@@ -554,7 +554,7 @@ class OutputUTF:
             self.setcmdD.update({"scale1F": scale1F})
             fileS = iL[1].split(",")
             file1S = fileS[0].strip()
-            calpS = "r" + self.setsectD["cnumS"]
+            calpS = "c" + self.setsectD["cnumS"]
             img1S = str(Path(self.folderD["hpath"] / calpS / file1S))
             pthshort1S = str(Path(*Path(img1S).parts[-4:]))
             utfS += "Figure path: " + pthshort1S + "\n"
@@ -572,9 +572,9 @@ class OutputUTF:
             iL (list): text command list
         """
 
-        calP = "r" + self.setsectD["cnumS"]
-        txtpath = Path(self.folderD["xpath"] / calP / iL[1].strip())
-        with open(txtpath, "r") as txtf1:
+        calP = "c" + self.setsectD["cnumS"]
+        txapath = Path(self.folderD["xpath"] / calP / iL[1].strip())
+        with open(txapath, "r") as txtf1:
             uL = txtf1.readlines()
         if iL[2].strip() == "indent":
             txtS = "".join(uL)
@@ -758,8 +758,8 @@ class OutputUTF:
         valL = []
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
-        calpS = "r" + self.setsectD["cnumS"]
-        vfileS = Path(self.folderD["tpath"] / calpS / vL[1].strip())
+        calpS = "c" + self.setsectD["cnumS"]
+        vfileS = Path(self.folderD["apath"] / calpS / vL[1].strip())
         with open(vfileS, "r") as csvfile:
             readL = list(csv.reader(csvfile))
         for vaL in readL[1:]:
@@ -801,7 +801,7 @@ class OutputUTF:
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
         valL.append(["variable", "values"])
-        vfileS = Path(self.folderD["tpath"] / vL[2].strip())
+        vfileS = Path(self.folderD["apath"] / vL[2].strip())
         vecL = eval(vL[3].strip())
         with open(vfileS, "r") as csvF:
             reader = csv.reader(csvF)

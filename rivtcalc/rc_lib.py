@@ -211,7 +211,6 @@ import textwrap
 import logging
 import warnings
 import re
-import runpy
 import importlib.util
 import shutil
 import numpy as np
@@ -241,16 +240,16 @@ _cwdS = os.getcwd()
 _cfull = Path(_calcfileS)  # calc file full path
 _cfileS = _cfull.name  # calc file name
 _cnameS = _cfileS.split(".py")[0]  # calc file basename
+_cnumS = _cnameS[0:5]
 _rivpath = Path("rivtcalc.rivt_lib.py").parent  # rivtcalc program path
 _ppath = _cfull.parent.parent  # project folder path
 _cpath = _cfull.parent  # calc folder path
 _mpath = Path(_ppath / "tmp")  # tmp folder path
 _dpath = Path(_ppath / "docs")  # doc folder path
-_dname = "d" + _cnameS[1:]  # doc file basename
-_utffile = Path(_cpath / ".".join((_cnameS, "txt")))  # utf output
-_rstfile = Path(_ppath / ".".join((_dname, "rst")))  # rst output
-_pdffile = Path(_ppath / ".".join((_dname, "pdf")))  # rst output
-_expfile = Path(_cpath / "data" / "".join(_cfileS))  # export file
+_utffile = Path(_cpath / "data" / ".".join((_cnameS, "txt")))  # utf output
+_expfile = Path(_cpath / "data" / _cnumS / ".".join(_cnameS, "csv"))  # export file
+_rstfile = Path(_mpath / ".".join((_cnameS, "rst")))  # rst output
+_pdffile = Path(_dpath / ".".join((_cnameS, "pdf")))  # pdf output
 
 # global variables and dictionaries
 utfcalcS = """"""  # utf calc string
@@ -267,8 +266,7 @@ _foldD = {
     "mpath": Path(_ppath, "tmp"),
     "spath": Path(_cpath, "scripts"),
     "kpath": Path(_cpath, "scripts", "sketches"),
-    "tpath": Path(_cpath, "data"),
-    "xpath": Path(_cpath, "text"),
+    "apath": Path(_cpath, "data"),
     "hpath": Path(_dpath, "html"),
     "ipath": Path(_dpath, "info"),
 }
@@ -333,7 +331,7 @@ def _init_utf(rawS: str):
     """return rivt-string utf class instance
 
     Args:
-        rawstr (str): rivt-string
+        rawS (str): rivt-string
 
     Returns:
         class instance: utf string-type instance
@@ -470,55 +468,6 @@ def S(rawS: str):
     pass
 
 
-def write_values():
-    """write value assignments to csv file
-
-    File name: calc file name prepended with 'v'
-    File path: data folder
-    """
-
-    str1 = """header string\n"""
-    str1 = str1 + exportS
-    with open(_expfile, "w") as expF:
-        expF.write(str1)
-
-
-def write_utf():
-    """write utf-calc output to file
-
-    file is written to calcs folder
-    """
-    global utfcalcS, _rstflagB
-
-    utfcalcS = """"""
-    f1 = open(_cfull, "r")
-    utfcalcL = f1.readlines()
-    f1.close()
-    print("INFO calc file read: " + str(_cfull))
-    indx = 0
-    for iS in enumerate(utfcalcL):
-        if "write_utf" in iS[1]:
-            indx = int(iS[0])
-            break
-    utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1 :]  # filter write function
-    cmdS = "".join(utfcalcL)
-    exec(cmdS, globals(), locals())
-    with open(_utffile, "wb") as f1:
-        f1.write(utfcalcS.encode("UTF-8"))
-    print("INFO  utf calc written to calc folder", flush=True)
-    print("INFO  program complete")
-    os._exit(1)
-
-
-def _write_html():
-    """read .rst file from tmp folder and write .pdf to docs folder
-
-    .rst file converted to .tex file in tmp folder in intermediate step
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-
 def _write_pdf(stylefileS: str):
     """read .rst file from tmp folder and write .pdf to docs folder
 
@@ -536,7 +485,7 @@ def _write_pdf(stylefileS: str):
     elif sys.platform == "darwin":
         pythoncallS = "python3 "
     else:
-        pythoncallS == "python "
+        pythoncallS = "python "
 
     mpath = _foldD("mpath")
     pdfS = ".".join(_cnameS, "pdf")
@@ -618,8 +567,56 @@ def _write_pdf(stylefileS: str):
     os._exit(1)
 
 
+def _write_html():
+    """read .rst file from tmp folder and write .pdf to docs folder
+
+    .rst file converted to .tex file in tmp folder in intermediate step
+    """
+    with open(_txtfile, "wb") as f1:
+        f1.write(utfcalc.encode("UTF-8"))
+
+
+def write_utf():
+    """write utf-calc and values to output files
+
+    .txt calc file is written to calc subfolder
+    .csv value file is written to calc subfolder
+    """
+    global utfcalcS, _rstflagB
+
+    utfcalcS = """"""
+    f1 = open(_cfull, "r")
+    utfcalcL = f1.readlines()
+    f1.close()
+    print("INFO calc file read: " + str(_cfull))
+    indx = 0
+    for iS in enumerate(utfcalcL):
+        if "write_utf" in iS[1]:
+            indx = int(iS[0])
+            break
+    utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1 :]  # avoid recursion
+    cmdS = "".join(utfcalcL)
+    exec(cmdS, globals(), locals())
+
+    str1 = """header string\n"""
+    str1 = str1 + exportS
+    with open(_expfile, "w") as expF:
+        expF.write(str1)
+    print("INFO  values file written to calc folder", flush=True)
+
+    with open(_utffile, "wb") as f1:
+        f1.write(utfcalcS.encode("UTF-8"))
+    print("INFO  utf calc written to calc folder", flush=True)
+    print("INFO  program complete")
+    os._exit(1)
+
+
 def write_doc(doctypeS: str, stylefileS: str):
-    """write calc output to .rst file in tmp folder"""
+    """write rst-calc and values to output files
+
+    .rst calc file is written to tmp folder
+    .csv value file is written to calc subfolder
+    """
     global rstcalcS, _rstflagB
 
     _rstflagB = True
@@ -641,9 +638,9 @@ def write_doc(doctypeS: str, stylefileS: str):
         f1.write(rstcalcS.encode("UTF-8"))
     print("INFO  rst calc written to tmp folder", flush=True)
 
-    if docstypeS.strip() == "pdf":
+    if doctypeS.strip() == "pdf":
         _write_pdf(stylefileS)
-    if docstypeS.strip() == "html":
+    if doctypeS.strip() == "html":
         _write_html(stylefileS)
 
 

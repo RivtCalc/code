@@ -255,8 +255,7 @@ class WriteRST:
 
         rcmdL = [
             "head",
-            "search"
-            "keys",
+            "search" "keys",
             "info",
             "pdf",
             "text",
@@ -429,8 +428,8 @@ class WriteRST:
             iL (list): text command list
         """
         calP = "r" + self.setsectD["cnumS"]
-        txtpath = Path(self.folderD["xpath"] / calP / iL[1].strip())
-        with open(txtpath, "r") as txtf1:
+        txapath = Path(self.folderD["xpath"] / calP / iL[1].strip())
+        with open(txapath, "r") as txtf1:
             uL = txtf1.readlines()
         if iL[2].strip() == "indent":
             txtS = "".join(uL)
@@ -475,7 +474,7 @@ class WriteRST:
         sumL = []
         fileS = iL[1].strip()
         calpS = "r" + self.setsectD["cnumS"]
-        tfileS = Path(self.folderD["tpath"] / calpS / fileS)
+        tfileS = Path(self.folderD["apath"] / calpS / fileS)
         extS = fileS.split(".")[1]
         if extS == "csv":
             with open(tfileS, "r") as csvfile:  # read csv file
@@ -751,7 +750,7 @@ class WriteRST:
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
         calpS = "r" + self.setsectD["cnumS"]
-        vfileS = Path(self.folderD["tpath"] / calpS / vL[1].strip())
+        vfileS = Path(self.folderD["apath"] / calpS / vL[1].strip())
         with open(vfileS, "r") as csvfile:
             readL = list(csv.reader(csvfile))
         for vaL in readL[1:]:
@@ -793,7 +792,7 @@ class WriteRST:
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
         valL.append(["variable", "values"])
-        vfileS = Path(self.folderD["tpath"] / vL[2].strip())
+        vfileS = Path(self.folderD["apath"] / vL[2].strip())
         vecL = eval(vL[3].strip())
         with open(vfileS, "r") as csvF:
             reader = csv.reader(csvF)
