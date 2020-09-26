@@ -1,7 +1,7 @@
 #! python
 """converts calc-strings to utf-strings
 
-The WriteUTF class converts model-strings to calc-strings and prints results to
+The OutputUTF class converts model-strings to calc-strings and prints results to
 the terminal. Model-strings must be indented 4 spaces. Commands are single line
 and typically start with a double bar (||). Tags are in line with the
 associated text. """
@@ -34,7 +34,7 @@ logging.getLogger("numexpr").setLevel(logging.WARNING)
 # tabulate.PRESERVE_WHITESPACE = True
 
 
-class WriteUTF:
+class OutputUTF:
     """write UTF8 calc output to terminal"""
 
     def __init__(
@@ -49,18 +49,18 @@ class WriteUTF:
 
         """process rivt-string to UTF8 calc-string
 
-        The WriteUTF class converts rivt-strings to calc-strings.
+        The OutputUTF class converts rivt-strings to calc-strings.
         Rivt-strings must be indented 4 spaces. Commands start with
         a double bar (||) and are single line, except where noted. Tags
         are inserted inline with the associated text.
 
         Args:
-            exportS (str): stores values that are written to file
             strL (list): calc lines
             folderD (dict): folder paths
             setcmdD (dict): command settings
             setsectD (dict): section settings
             rivtD (dict): global rivt dictionary
+            exportS (str): stores values that are written to file
         """
 
         self.calcS = """"""  # calc string
@@ -76,12 +76,11 @@ class WriteUTF:
         """reference label for equations, tables and figures
 
         Args:
-            objnumI (int): equation, table or figure numbers
-            setsectD (dict): section dictionary
+            objnumI (int): equation, table or figure section number
             typeS (str): label type
 
         Returns:
-            str: [description]
+            refS (str): reference label
         """
 
         objfillS = str(objnumI).zfill(2)
@@ -101,7 +100,6 @@ class WriteUTF:
 
         Return:
             uS (str): utf string
-            setsectD (dict): updated section dictionary
         """
 
         tagS = tagS.rstrip()
@@ -221,32 +219,32 @@ class WriteUTF:
                 print(utgS.rstrip())
                 self.calcS += utgS.rstrip() + "\n"
                 continue
-            if typeS == "values":  # chk for values
+            if typeS == "values":  # check for values string
                 self.setcmdD["saveB"] = False
-                if "=" in uS and uS.strip()[-2] == "||":  # value to file
+                if "=" in uS and uS.strip()[-2] == "||":  # write value to file
                     uS = uS.replace("||", " ")
                     self.setcmdD["saveB"] = True
                 if "=" in uS:  # assign value
                     uL = uS.split("|")
                     self._vassign(uL)
                     continue
-            if typeS == "table":  # check for table
+            if typeS == "table":  # check for table string
                 if uS[0:2] == "||":
                     uL = uS[2:].split("|")
                     indxI = cmdL.index(uL[0].strip())
                     methL[indxI](uL)
                     continue
                 else:
-                    exec(uS)
-                    continue  # exec table code
-            if uS[0:2] == "||":  # check for cmd
+                    exec(uS)  # exec table code
+                    continue
+            if uS[0:2] == "||":  # check for command
                 uL = uS[2:].split("|")
                 indxI = cmdL.index(uL[0].strip())
                 methL[indxI](uL)
-                continue  # call any cmd
+                continue
 
             self.rivtD.update(locals())
-            if typeS != "table":  # skip table prnt
+            if typeS != "table":  # skip table print
                 print(uS)
                 self.calcS += uS.rstrip() + "\n"
 
@@ -257,24 +255,8 @@ class WriteUTF:
              calcS (list): utf formatted calc-string (appended)
              setsectD (dict): section settings
         """
-        rcmdL = [
-            "head",
-            "search",
-            "keys",
-            "info",
-            "pdf",
-            "text",
-            "table",
-        ]
-        rmethL = [
-            self._rhead,
-            self._rsearch,
-            self._rkeys,
-            self._rinfo,
-            self._rpdf,
-            self._itext,
-            self._itable,
-        ]
+        rcmdL = ["head", "search", "keys", "info", "pdf"]
+        rmethL = [self._rhead, self._rsearch, self._rkeys, self._rinfo, self._rpdf]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
         self._parseUTF("report", rcmdL, rmethL, rtagL)
@@ -282,15 +264,13 @@ class WriteUTF:
         return self.calcS, self.setsectD
 
     def _rhead(self, rL):
-        if len(rL) < 5:
-            rL += [""] * (5 - len(rL))  # pad parameters
+        if len(rL) < 4:
+            rL += [""] * (4 - len(rL))  # pad parameters
         if rL[1]:
             calctitleS = rL[1].strip()
-        if rL[2] == "toc":
-            pass
-        if rL[3] == "readme":
-            pass
-        if rL[4]:
+        if rL[2]:
+            dateS = rL[2].strip()
+        if rL[3] == "toc":
             pass
 
     def _rkeys(self, rsL):
@@ -300,7 +280,7 @@ class WriteUTF:
         a = 4
 
     def _rinfo(self, rL):
-        """insert table from csv or xlsx file
+        """insert table from csv, xlsx or txt file
 
         Args:
             rL (list): parameter list

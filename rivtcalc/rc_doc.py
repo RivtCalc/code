@@ -255,7 +255,7 @@ class WriteRST:
 
         rcmdL = [
             "head",
-            "search",
+            "search"
             "keys",
             "info",
             "pdf",
@@ -295,8 +295,94 @@ class WriteRST:
     def _rkeys(self, rsL):
         a = 4
 
-    def _rinfo(self, rsL):
-        b = 5
+    def _rinfo(self, rL):
+        """insert table from csv or xlsx file
+
+        Args:
+            rL (list): parameter list
+
+        The command is identical to itable except file is read from docs/info.
+
+        """
+        alignD = {"s": "", "d": "decimal", "c": "center", "r": "right", "l": "left"}
+        rtagL = [
+            "[page]_",
+            "[line]_",
+            "[link]_",
+            "[literal]_",
+            "[foot]_",
+            "[r]_",
+            "[c]_",
+            "[e]_",
+            "[t]_",
+            "[f]_",
+            "[#]_",
+        ]
+        if len(rL) < 4:
+            rL += [""] * (4 - len(rL))  # pad parameters
+        utfS = ""
+        contentL = []
+        sumL = []
+        fileS = rL[1].strip()
+        tfileS = Path(self.folderD["dpath"] / "info" / fileS)
+        extS = fileS.split(".")[1]
+        if extS == "csv":
+            with open(tfileS, "r") as csvfile:  # read csv file
+                readL = list(csv.reader(csvfile))
+        elif extS == "xlsx":
+            xDF = pd.read_excel(tfileS, header=None)
+            readL = xDF.values.tolist()
+        else:
+            return
+        incl_colL = list(range(len(readL[0])))
+        widthI = self.setcmdD["cwidthI"]
+        alignS = self.setcmdD["calignS"]
+        saS = alignD[alignS]
+        if rL[2].strip():
+            widthL = rL[2].split(",")  # new max col width
+            widthI = int(widthL[0].strip())
+            alignS = widthL[1].strip()
+            saS = alignD[alignS]
+            self.setcmdD.update({"cwidthI": widthI})
+            self.setcmdD.update({"calignS": alignS})
+        totalL = [""] * len(incl_colL)  # new alignment
+        if rL[3].strip():  # columns
+            if rL[3].strip() == "[:]":
+                totalL = [""] * len(incl_colL)
+            else:
+                incl_colL = eval(rL[3].strip())
+                totalL = [""] * len(incl_colL)
+        ttitleS = readL[0][0].strip() + " [t]_"
+        utgS = self._tags(ttitleS, rtagL)
+        print(utgS.rstrip() + "\n")
+        self.calcS += utgS.rstrip() + "\n\n"
+        for row in readL[1:]:
+            contentL.append([row[i] for i in incl_colL])
+        wcontentL = []
+        for rowL in contentL:
+            wrowL = []
+            for iS in rowL:
+                templist = textwrap.wrap(str(iS), int(widthI))
+                templist = [i.replace("""\\n""", """\n""") for i in templist]
+                wrowL.append("""\n""".join(templist))
+            wcontentL.append(wrowL)
+        sys.stdout.flush()
+        old_stdout = sys.stdout
+        output = StringIO()
+        output.write(
+            tabulate(
+                wcontentL,
+                tablefmt="rst",
+                headers="firstrow",
+                numalign="decimal",
+                stralign=saS,
+            )
+        )
+        utfS = output.getvalue()
+        sys.stdout = old_stdout
+
+        print(utfS)
+        self.calcS += utfS + "\n"
 
     def _rpdf(self, rsL):
         b = 5
@@ -363,7 +449,7 @@ class WriteRST:
         self.calcS += uS + "\n"
 
     def _itable(self, iL: list):
-        """insert table from csv file
+        """insert table from csv or xlsx file
 
         Args:
             ipl (list): parameter list
@@ -382,52 +468,49 @@ class WriteRST:
             "[f]_",
             "[#]_",
         ]
-        if len(iL) < 5:
-            iL += [""] * (5 - len(iL))  # pad parameters
+        if len(iL) < 4:
+            iL += [""] * (4 - len(iL))  # pad parameters
         utfS = ""
         contentL = []
         sumL = []
         fileS = iL[1].strip()
         calpS = "r" + self.setsectD["cnumS"]
         tfileS = Path(self.folderD["tpath"] / calpS / fileS)
-        with open(tfileS, "r") as csvfile:  # read csv file
-            readL = list(csv.reader(csvfile))
-        incl_colL = list(range(len(readL[0])))
+        extS = fileS.split(".")[1]
+        if extS == "csv":
+            with open(tfileS, "r") as csvfile:  # read csv file
+                readL = list(csv.reader(csvfile))
+        elif extS == "xlsx":
+            pDF1 = pd.read_excel(tfileS, header=None)
+            readL = pDF1.values.tolist()
+        else:
+            return
+        incl_colL = list(range(len(readL[1])))
         widthI = self.setcmdD["cwidthI"]
         alignS = self.setcmdD["calignS"]
+        saS = alignD[alignS]
         if iL[2].strip():
             widthL = iL[2].split(",")  # new max col width
             widthI = int(widthL[0].strip())
+            alignS = widthL[1].strip()
+            saS = alignD[alignS]  # new align
             self.setcmdD.update({"cwidthI": widthI})
-            saS = alignD[widthL[1].strip()]  # new alilgnment
-            self.setcmdD.update({"calignS": saS})
-        naS = saS
-        if saS == "decimal":
-            saS = ""
-            naS = "decimal"
-        ttitleS = ""
-        ttitleS = self.setcmdD["titleS"]
-        if iL[3].strip():  # title
-            ttitleS = iL[3].strip()
-            self.setcmdD.update({"titleS": ttitleS})
+            self.setcmdD.update({"calignS": alignS})
         totalL = [""] * len(incl_colL)
-        if iL[4].strip():  # columns
-            if iL[4].strip() == "[:]":
+        if iL[3].strip():  # columns
+            if iL[3].strip() == "[:]":
                 totalL = [""] * len(incl_colL)
-        else:
-            incl_colL = eval(iL[4].strip())
-            totalL = [""] * len(incl_colL)
-        for row in readL:
-            if ttitleS == "title":  # first row title
-                ttitleS = row[0].strip() + " [t]_"
-                utgS = self._tags(ttitleS, itagL)
-                print(utgS.rstrip() + "\n")
-                self.calcS += utgS.rstrip() + "\n\n"
-                ttitleS = ""
-                continue
+            else:
+                incl_colL = eval(iL[3].strip())
+                totalL = [""] * len(incl_colL)
+        ttitleS = readL[0][0].strip() + " [t]_"
+        utgS = self._tags(ttitleS, itagL)
+        print(utgS.rstrip() + "\n")
+        self.calcS += utgS.rstrip() + "\n\n"
+        for row in readL[1:]:
             contentL.append([row[i] for i in incl_colL])
         wcontentL = []
-        for rowL in contentL:
+        for rowL in contentL:  # wrap columns
             wrowL = []
             for iS in rowL:
                 templist = textwrap.wrap(str(iS), int(widthI))
@@ -442,13 +525,14 @@ class WriteRST:
                 wcontentL,
                 tablefmt="rst",
                 headers="firstrow",
-                numalign=naS,
+                numalign="decimal",
                 stralign=saS,
             )
         )
         utfS = output.getvalue()
         sys.stdout = old_stdout
 
+        print(utfS)
         self.calcS += utfS + "\n"
 
     def _iimage(self, iL: list):

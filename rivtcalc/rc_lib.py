@@ -22,7 +22,7 @@
     Rivt function - Input -----------------------------------------------------
     type     API  any text       commands 
     ======= ===== ========= ===================================================
-    Report   R()    yes       head, search, info, keys, pdf, text, table
+    Repo     R()    yes       head, search, info, keys, pdf
     Insert   I()    yes       text, table, image, latex
     Values   V()    no        =, config, value, data, func, + insert commands
     Table    T()    no        Python simple statements, + insert commands  
@@ -68,57 +68,58 @@
 Input Syntax and commands -----------------------------------------------------
 
 from rivtcalc import rc_lib as rc
-rc.R('''[01]_ The report-string defines report and repository content
+rc.R('''[01]_ The repository-string defines repository and report content
     
-    Report-strings may include arbitrary text. The first paragraph of the calcs
-    specified in the ||search command (see below) becomes part of the
-    README.rst file for the project. The README is used in various (i.e.
-    Github) repository search functions.
+    Repository-strings may include arbitrary text. The first paragraph of the
+    calcs specified in the ||search command (see below) becomes part of the
+    README.rst file for the project. The README is used in various repository
+    search functions (i.e. Github). Arguments to commands in parenthesis are
+    used provided. Otherwise they are literal. Parameter options are separated
+    by semicolons.
     
-    ||search | (calc num), (calc num), (calc num)
+    ||search | (calc num), (calc num), (calc num) ...
 
     The ||search command generates a README and specifies a list of calc
     numbers that are searched against a master category list for terms to be
-    included. The calc number list is also used for the ||keys command. Because
-    the search command is execcuted at the project level across multipel calcs,
-    it is usually included in the first calc in a project. The command
-    overwrites existing README files.
+    included. Because the search command is executed at the project level
+    across multiple calcs, it is usually included in the first project calc.
+    The command overwrites an existing README file.
 
-    The ||keys command is a list of keywords included in the README that
-    describe the scope of the calc, with up to five terms per command.
+    The calc number list is also used for the ||keys command. The ||keys
+    command is a list of keywords included in the README that describe the
+    scope of the calc, with up to six calcs per command.
     
     ||keys | (discipline), (object), (purpose), (assembly), (component)
 
     The ||head command specifies an optional calc title and date printed at the
-    top of each page, and table of contents printed before the string text.
-    Arguments not in parenthesis are literal. Parameter options are separated
-    by semicolons. The toc argument generates a table of contents from the
+    top of each doc page, and table of contents printed before the string text.
+    The toc argument generates a table of contents from the
     section tags.
 
     ||head | (calc title) | (date) | toc; notoc  
 
-    The ||info command is similar to the the ||text command with a difference
-    in file location and use. ||info files are used for project specific
-    information (clients, addresses, etc) and are read from the docs/info
-    folder which is not shared, rather than the text folder. Also, the info is
-    only written to docs and not to the utf-calcs. This keeps project
-    information separated from the shareable calc information contained in the
-    calc folder. The *literal* argument keeps the text file formatting. The
-    *indent* argument indents and wraps the imported text. Leave the argument
-    blank for wrapping with no indent.
+    The ||info command is similar to the the ||table and ||text commands with
+    differences in file location and use. See those commands for details.
+    ||info files are used for project specific information (clients, addresses,
+    etc) and are read from the docs/info folder which is not shared. Also, the
+    info command is only written to docs, and not to utf-calcs. This keeps
+    confidential project information separated from the shareable calc
+    information contained in the calcs folder. ||info tables do not contain
+    titles and should not be numbered.
 
     ||info | (project.txt) | literal; indent
-    ||table | (codes.txt) | 60,l | title; notitle | (2,1,4; :) 
-                {max width, align}  {read title from file} {cols or all}  
-
+    ||info | (project.csv or .xlsx) | ([1,2,3] or [:]
+    
     The ||pdf command attaches existing pdf documents, stored in the
     docs/attach folder, to the front or back of the calc doc. The *functions*
-    or *docstrings* determine whether the complete function code or just the
-    docstrings are appended to the calc.
+    or *docstrings* arguments determine whether the complete function code or
+    just the docstrings of functions used with the ||func commmand are appended
+    to the calc. The title is written to a cover page that can be referred to
+    in the calcs.
     
-    ||pdf | front | (calccoverfile.pdf)         
-    ||pdf | back | functions; docstrings
-    ||pdf | back | (appendixfile.pdf) 
+    ||pdf | front | (calccoverfile.pdf) | (title)        
+    ||pdf | back | functions; docstrings |(title)
+    ||pdf | back | (appendixfile.pdf) | (title)
     ''')
 rc.I('''The insert-string contains static text, tables and images.  
     
@@ -196,10 +197,11 @@ rc.V('''[02]_ The value-string defines active values and equations
     ||image | x.png | 50
     A figure caption [f]_
     ''') 
-rc.T('''The table-string defines tables and plots using simple Python statements
+rc.T('''The table-string defines active tables and plots that use simple Python statements
     
      Table-strings may include any simple Python statement (single line),
-     commands or tags except value assignments with an = sign.
+     and all commands or tags, except value assignments with an = sign.  It may
+     not include 
     ''')
 """
 import os
@@ -235,42 +237,40 @@ if ".py" not in _calcfileS:
 
     _calcfileS = __main__.__file__
 
-
 _cwdS = os.getcwd()
 _cfull = Path(_calcfileS)  # calc file full path
 _cfileS = _cfull.name  # calc file name
 _cnameS = _cfileS.split(".py")[0]  # calc file basename
-_rivpath = Path("rivtcalc.rivt_lib.py").parent  # rivt program path
+_rivpath = Path("rivtcalc.rivt_lib.py").parent  # rivtcalc program path
 _ppath = _cfull.parent.parent  # project folder path
 _cpath = _cfull.parent  # calc folder path
-_tpath = Path(_ppath / "tmp")  # tmp folder path
+_mpath = Path(_ppath / "tmp")  # tmp folder path
 _dpath = Path(_ppath / "docs")  # doc folder path
-_rpath = Path(_dpath / "report")  # report folder path
 _dname = "d" + _cnameS[1:]  # doc file basename
-_utffile = Path(_cpath / ".".join((_dname, "txt")))  # utf output
+_utffile = Path(_cpath / ".".join((_cnameS, "txt")))  # utf output
 _rstfile = Path(_ppath / ".".join((_dname, "rst")))  # rst output
+_pdffile = Path(_ppath / ".".join((_dname, "pdf")))  # rst output
 _expfile = Path(_cpath / "data" / "".join(_cfileS))  # export file
 
-# global variables; folders, sections, commmands
+# global variables and dictionaries
 utfcalcS = """"""  # utf calc string
 rstcalcS = """"""  # reST calc string
-exportS = """"""  # values export string
+exportS = """"""  # values string exports
 rivtcalcD = {}  # values dictonary
-_rstflagB = False  # flag for reST generation
+_rstflagB = False  # reST generation flag
 # folder paths
 _foldD = {
     "efile": _expfile,
     "ppath": _ppath,
     "dpath": _dpath,
-    "rpath": _rpath,
     "cpath": Path(_cfull).parent,
     "mpath": Path(_ppath, "tmp"),
     "spath": Path(_cpath, "scripts"),
-    "kpath": Path(_cpath, "sketches"),
+    "kpath": Path(_cpath, "scripts", "sketches"),
     "tpath": Path(_cpath, "data"),
     "xpath": Path(_cpath, "text"),
     "hpath": Path(_dpath, "html"),
-    "apath": Path(_rpath, "attach"),
+    "ipath": Path(_dpath, "info"),
 }
 # section settings
 _setsectD = {
@@ -297,10 +297,11 @@ _setcmdD = {
     "subB": False,
     "saveB": False,
 }
+
 # temp files
-_rbak = Path(_tpath / ".".join((_cnameS, "bak")))
-_logfile = Path(_tpath / ".".join((_cnameS, "log")))
-_rstfile = Path(_tpath / ".".join((_cnameS, "rst")))
+_rbak = Path(_mpath / ".".join((_cnameS, "bak")))
+_logfile = Path(_mpath / ".".join((_cnameS, "log")))
+_rstfile = Path(_mpath / ".".join((_cnameS, "rst")))
 # logs and checks
 with open(_cfull, "r") as f2:
     calcbak = f2.read()
@@ -340,7 +341,7 @@ def _init_utf(rawS: str):
     sectS, strS = rawS.split("\n", 1)
     _section(sectS)
     strL = strS.split("\n")
-    ucalc = _rc_calc.WriteUTF(strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
+    ucalc = _rc_calc.OutputUTF(strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
     return ucalc
 
 
@@ -493,7 +494,7 @@ def write_utf():
     f1 = open(_cfull, "r")
     utfcalcL = f1.readlines()
     f1.close()
-    print("calc file read: " + str(_cfull))
+    print("INFO calc file read: " + str(_cfull))
     indx = 0
     for iS in enumerate(utfcalcL):
         if "write_utf" in iS[1]:
