@@ -1,36 +1,38 @@
 #! python
 """rivtcalc API  
 
-    The API includes eight input and output functions. Input functions take
-    rivt-markup strings (calcs) as arguments and write formatted utf
-    calculations to the terminal (calcs). Ouput functions write formatted
-    calculations (docs) to files in utf-8, pdf and html formats.
+    The API includes eight functions. Input functions take a rivt-markup string
+    (calc) as the single function argument and write formatted utf calculations
+    to the terminal. Ouput functions take a file of rivt-strings (calcs) and
+    write formatted calculations to files in utf-8, pdf and html formats
+    (docs).
 
     Example calcs are here:
 
     
-    and here:
+    and interactive calcs are here:
 
 
-    Rivt-markup may include unicode, reStructuredText, commands, tags and
-    Python code. The options depend on the rivt-string type (R,I,V or T).
-    Commands and tags for each string type are described and illustrated below.
-    Commands include processing parameters that start in the first column with
-    ||. Tags are encapsulated with []_ and operate on a line of text. Block tags are
-    encapsulated with []__ and operate on indented blocks.
+    Rivt-strings are written in rivt-markup which includes unicode,
+    reStructuredText, rivt commands, rivt tags and Python code. The options
+    depend on the rivt function (R,I,V or T). Commands include processing
+    parameters generally operate on files, and start in the first column with
+    ||. Tags are encapsulated with []_ and generally operate on a single line
+    of text. Block tags are encapsulated with []__ and operate on indented
+    blocks.
 
     Rivt function - Input -----------------------------------------------------
     type     API  any text       commands 
     ======= ===== ========= ===================================================
-    Repo     R()    yes       head, search, info, keys, pdf
+    Repo     R()    yes       head, search, info, keys, text, table, pdf
     Insert   I()    yes       text, table, image, latex
     Values   V()    no        =, config, value, data, func, + insert commands
     Table    T()    no        Python simple statements, + insert commands  
     Skip     S()    --        Skip rivt-string evaluation
 
 
-    Tags ----------------------------------------------------------------------
-       tag               description
+    Rivt tags -----------------------------------------------------------------
+       tag                                 description
     ===============  ==========================================================
     [nn]_ (abc def)       string descriptor section number and title
     (description) [e]_    autoincrement and insert equation number and description
@@ -58,12 +60,13 @@
     ============================ ==============================================
     
     The first line of each rivt-string includes the string function name and
-    optional description which may be tagged as a section. String input, by
-    design, must be indented 4 spaces after the function call to provide code
+    description, which may be tagged as a section. String input, by design,
+    must be indented 4 spaces after the function call line to provide code
     structure and improve legibility.
     
-    Arguments in parenthesis are provided by the user. Either/or argumens are
-    separated by semi-colons. Comments are in braces below the arguments.
+    in the examples below, arguments in parenthesis are provided by the user.
+    Either/or argumens are separated by semi-colons. Comments are in braces
+    below the arguments.
 
 Input Syntax and commands -----------------------------------------------------
 
@@ -167,25 +170,28 @@ rc.V('''[02]_ The value-string defines active values and equations
     (y1 = 12.1)    | (unit, alt unit | description ||
                             {save to value file if trailing ||} 
 
+
+    ||values | (file.csv or .xlxs)
+
     Import values from a csv or xlxs file, starting with the second row. The
     first row is a descriptive heading. For a value file the csv or xlsx file
     must have the structure:
     
-    [literal]_
+    [literal]__
         variable name, value, primary unit, secondary unit, description
     
-    ||values | (file.csv or .xlxs)
     
+    ||data | file.csv | [1:4] {rows to import} 
+
     Import a list of values from rows of a csv or xlsx file. For a data file
     the csv file must have the structure:
-    [literal]_
+    [literal]__
         variable name, value1, value2, value3, ....
 
-    ||data | f.csv | [1:4] {rows to import} 
     
     an equation [e]_
     v1 = x + 4*M  | unit, alt unit
-    save an equation result by appending double bars [e]_
+    save an equation result to the values file by appending double bars [e]_
     y1 = v1 / 4   | unit, alt unit ||         
 
     Functions may be defined in a table-string or imported from a file.
@@ -355,7 +361,7 @@ def _init_rst(rawS: str):
     sectS, strS = rawS.split("\n", 1)
     _section(sectS)
     strL = strS.split("\n")
-    rstcalc = _rc_doc.WriteRST(strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
+    rstcalc = _rc_doc.OutputRST(strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
     return rstcalc
 
 

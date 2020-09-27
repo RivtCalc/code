@@ -1,10 +1,8 @@
 #! python
-"""converts calc-strings to utf-strings
+"""converts rivt-strings to utf-strings
 
-The OutputUTF class converts model-strings to calc-strings and prints results to
-the terminal. Model-strings must be indented 4 spaces. Commands are single line
-and typically start with a double bar (||). Tags are in line with the
-associated text. """
+The OutputUTF class converts rivt-strings to utf-strings and prints results to
+the terminal."""
 
 import os
 import sys
@@ -35,7 +33,7 @@ logging.getLogger("numexpr").setLevel(logging.WARNING)
 
 
 class OutputUTF:
-    """write UTF8 calc output to terminal"""
+    """convert rivt-string to UTF8 calc and write to terminal"""
 
     def __init__(
         self,
@@ -50,9 +48,6 @@ class OutputUTF:
         """process rivt-string to UTF8 calc-string
 
         The OutputUTF class converts rivt-strings to calc-strings.
-        Rivt-strings must be indented 4 spaces. Commands start with
-        a double bar (||) and are single line, except where noted. Tags
-        are inserted inline with the associated text.
 
         Args:
             strL (list): calc lines
@@ -63,7 +58,7 @@ class OutputUTF:
             exportS (str): stores values that are written to file
         """
 
-        self.calcS = """"""  # calc string
+        self.calcS = """"""  # utf calc string
         self.exportS = exportS
         self.strL = strL
         self.folderD = folderD
@@ -191,7 +186,7 @@ class OutputUTF:
 
         for uS in self.strL:
             if uS[0:2] == "##":
-                continue  # remove comment
+                continue  # remove review comment
             uS = uS[4:]  # remove indent
             if len(uS) == 0:
                 if len(self.valL) > 0:  # prnt value table
@@ -211,7 +206,7 @@ class OutputUTF:
                 if uS[0] == "#":
                     continue  # remove comment
             except:
-                print(" ")
+                print(" ")  # if uS[0] throws error
                 self.calcS += "\n"
                 continue
             if re.search(_rgx, uS):  # check for tag
@@ -219,23 +214,23 @@ class OutputUTF:
                 print(utgS.rstrip())
                 self.calcS += utgS.rstrip() + "\n"
                 continue
-            if typeS == "values":  # check for values string
+            if typeS == "values":
                 self.setcmdD["saveB"] = False
-                if "=" in uS and uS.strip()[-2] == "||":  # write value to file
+                if "=" in uS and uS.strip()[-2] == "||":  # set save flag
                     uS = uS.replace("||", " ")
                     self.setcmdD["saveB"] = True
-                if "=" in uS:  # assign value
+                if "=" in uS:  # just assign value
                     uL = uS.split("|")
                     self._vassign(uL)
                     continue
-            if typeS == "table":  # check for table string
-                if uS[0:2] == "||":
+            if typeS == "table":
+                if uS[0:2] == "||":  # check for command
                     uL = uS[2:].split("|")
                     indxI = cmdL.index(uL[0].strip())
                     methL[indxI](uL)
                     continue
                 else:
-                    exec(uS)  # exec table code
+                    exec(uS)  # otherwise exec Python code
                     continue
             if uS[0:2] == "||":  # check for command
                 uL = uS[2:].split("|")
@@ -255,15 +250,33 @@ class OutputUTF:
              calcS (list): utf formatted calc-string (appended)
              setsectD (dict): section settings
         """
-        rcmdL = ["head", "search", "keys", "info", "pdf"]
-        rmethL = [self._rhead, self._rsearch, self._rkeys, self._rinfo, self._rpdf]
+        rcmdL = ["head", "search", "keys", "info", "table", "text", "pdf"]
+        rmethL = [
+            self._rhead,
+            self._rsearch,
+            self._rkeys,
+            self._rinfo,
+            self._itable,
+            self._itext,
+            self._rpdf,
+        ]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
-        self._parseUTF("report", rcmdL, rmethL, rtagL)
+        self._parseUTF("repository", rcmdL, rmethL, rtagL)
 
         return self.calcS, self.setsectD
 
     def _rhead(self, rL):
+        """format header information
+
+        Args:
+            rL (list): list of header parameters
+
+        String Parameters:
+            (title): print title at top of each page
+            (date): print date at top of each
+            toc; notoc: print table of contents
+        """
         if len(rL) < 4:
             rL += [""] * (4 - len(rL))  # pad parameters
         if rL[1]:
@@ -272,101 +285,35 @@ class OutputUTF:
             dateS = rL[2].strip()
         if rL[3] == "toc":
             pass
+        else:
+            pass
 
     def _rkeys(self, rsL):
+        """[summary]
+
+        Args:
+            rsL ([type]): [description]
+        """
         a = 4
 
     def _rsearch(self, rsL):
+        """[summary]
+
+        Args:
+            rsL ([type]): [description]
+        """
         a = 4
 
     def _rinfo(self, rL):
-        """insert table from csv, xlsx or txt file
+        """skip info command for utf calcs
+
+        Command is executed only for docs in order to
+        separate protected information for shareable calcs.
 
         Args:
             rL (list): parameter list
-
-        The command is identical to itable except file is read from docs/info.
-
         """
-        alignD = {"s": "", "d": "decimal", "c": "center", "r": "right", "l": "left"}
-        rtagL = [
-            "[page]_",
-            "[line]_",
-            "[link]_",
-            "[literal]_",
-            "[foot]_",
-            "[r]_",
-            "[c]_",
-            "[e]_",
-            "[t]_",
-            "[f]_",
-            "[#]_",
-        ]
-        if len(rL) < 4:
-            rL += [""] * (4 - len(rL))  # pad parameters
-        utfS = ""
-        contentL = []
-        sumL = []
-        fileS = rL[1].strip()
-        tfileS = Path(self.folderD["dpath"] / "info" / fileS)
-        extS = fileS.split(".")[1]
-        if extS == "csv":
-            with open(tfileS, "r") as csvfile:  # read csv file
-                readL = list(csv.reader(csvfile))
-        elif extS == "xlsx":
-            xDF = pd.read_excel(tfileS, header=None)
-            readL = xDF.values.tolist()
-        else:
-            return
-        incl_colL = list(range(len(readL[0])))
-        widthI = self.setcmdD["cwidthI"]
-        alignS = self.setcmdD["calignS"]
-        saS = alignD[alignS]
-        if rL[2].strip():
-            widthL = rL[2].split(",")  # new max col width
-            widthI = int(widthL[0].strip())
-            alignS = widthL[1].strip()
-            saS = alignD[alignS]
-            self.setcmdD.update({"cwidthI": widthI})
-            self.setcmdD.update({"calignS": alignS})
-        totalL = [""] * len(incl_colL)  # new alignment
-        if rL[3].strip():  # columns
-            if rL[3].strip() == "[:]":
-                totalL = [""] * len(incl_colL)
-            else:
-                incl_colL = eval(rL[3].strip())
-                totalL = [""] * len(incl_colL)
-        ttitleS = readL[0][0].strip() + " [t]_"
-        utgS = self._tags(ttitleS, rtagL)
-        print(utgS.rstrip() + "\n")
-        self.calcS += utgS.rstrip() + "\n\n"
-        for row in readL[1:]:
-            contentL.append([row[i] for i in incl_colL])
-        wcontentL = []
-        for rowL in contentL:
-            wrowL = []
-            for iS in rowL:
-                templist = textwrap.wrap(str(iS), int(widthI))
-                templist = [i.replace("""\\n""", """\n""") for i in templist]
-                wrowL.append("""\n""".join(templist))
-            wcontentL.append(wrowL)
-        sys.stdout.flush()
-        old_stdout = sys.stdout
-        output = StringIO()
-        output.write(
-            tabulate(
-                wcontentL,
-                tablefmt="rst",
-                headers="firstrow",
-                numalign="decimal",
-                stralign=saS,
-            )
-        )
-        utfS = output.getvalue()
-        sys.stdout = old_stdout
-
-        print(utfS)
-        self.calcS += utfS + "\n"
+        pass
 
     def _rpdf(self, rsL):
         b = 5

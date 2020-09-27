@@ -1,10 +1,8 @@
-#!
-"""converts calc-strings to reST-strings
+#!python
+"""converts rivt-strings to reST-strings
 
-The ParseReST class converts model-strings to intermediate reST-strings which
-are then converted to pdf or html docs.Model-strings must be indented 4 spaces.
-Commands start with a double bar (||) and are single line, except where noted.
-Tags are included inline, with the associated text. """
+The OutputRST class converts rivt-strings to intermediate reST-strings which
+may then be converted to pdf or html docs. """
 
 import os
 import sys
@@ -42,8 +40,8 @@ from rivtcalc.rc_unit import *
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 
 
-class WriteRST:
-    """write calc output to reST file"""
+class OutputRST:
+    """convert rivt-string to reST string"""
 
     def __init__(
         self,
@@ -57,10 +55,7 @@ class WriteRST:
 
         """process rivt-string to reST-string
 
-        The WriteRST class converts rivt-strings to reST-strings.
-        Rivt-strings must be indented 4 spaces. Commands start with
-        a double bar (||) and are single line, except where noted. Tags
-        are inserted inline with the associated text.
+        The OutputRST class converts rivt-strings to reST-strings..
 
         Args:
             exportS (str): stores values that are written to file
@@ -71,7 +66,7 @@ class WriteRST:
             rivtD (dict): global rivt dictionary
         """
 
-        self.calcS = """"""  # calc string
+        self.rstS = """"""  # restructured text string
         self.exportS = exportS
         self.strL = strL
         self.folderD = folderD
@@ -108,7 +103,7 @@ class WriteRST:
             setsectD (dict): section dictionary
 
         Return:
-            rstS (str): restrutured text string
+            rstS (str): restructured text string
             setsectD (dict): updated section dictionary
         """
 
@@ -249,34 +244,37 @@ class WriteRST:
         """parse repository string
 
         Returns:
-             calcS (list): utf formatted calc-string (appended)
+             rstS (list): utf formatted calc-string (appended)
              setsectD (dict): section settings
         """
 
-        rcmdL = [
-            "head",
-            "search" "keys",
-            "info",
-            "pdf",
-            "text",
-            "table",
-        ]
+        rcmdL = ["head", "search", "keys", "info", "text", "table", "pdf"]
         rmethL = [
             self._rhead,
             self._rsearch,
             self._rkeys,
             self._rinfo,
-            self._rpdf,
             self._itext,
             self._itable,
+            self._rpdf,
         ]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
-        self._parseRST("report", rcmdL, rmethL, rtagL)
+        self._parseRST("repository", rcmdL, rmethL, rtagL)
 
-        return self.calcS, self.setsectD
+        return self.rstS, self.setsectD
 
     def _rhead(self, rL):
+        """format header information
+
+        Args:
+            rL (list): list of header parameters
+
+        String Parameters:
+            (title): print title at top of each page
+            (date): print date at top of each
+            toc; notoc: print table of contents
+        """
         if len(rL) < 5:
             rL += [""] * (5 - len(rL))  # pad parameters
         if rL[1]:
@@ -295,11 +293,12 @@ class WriteRST:
         a = 4
 
     def _rinfo(self, rL):
-        """insert table from csv or xlsx file
+        """insert tables or text from csv, xlsx or txt file
 
         Args:
             rL (list): parameter list
 
+        Files are read from /docs/docfolder
         The command is identical to itable except file is read from docs/info.
 
         """
@@ -319,7 +318,7 @@ class WriteRST:
         ]
         if len(rL) < 4:
             rL += [""] * (4 - len(rL))  # pad parameters
-        utfS = ""
+        rstS = ""
         contentL = []
         sumL = []
         fileS = rL[1].strip()
@@ -341,10 +340,10 @@ class WriteRST:
             widthL = rL[2].split(",")  # new max col width
             widthI = int(widthL[0].strip())
             alignS = widthL[1].strip()
-            saS = alignD[alignS]
+            saS = alignD[alignS]  # new alignment
             self.setcmdD.update({"cwidthI": widthI})
             self.setcmdD.update({"calignS": alignS})
-        totalL = [""] * len(incl_colL)  # new alignment
+        totalL = [""] * len(incl_colL)
         if rL[3].strip():  # columns
             if rL[3].strip() == "[:]":
                 totalL = [""] * len(incl_colL)
@@ -352,9 +351,9 @@ class WriteRST:
                 incl_colL = eval(rL[3].strip())
                 totalL = [""] * len(incl_colL)
         ttitleS = readL[0][0].strip() + " [t]_"
-        utgS = self._tags(ttitleS, rtagL)
-        print(utgS.rstrip() + "\n")
-        self.calcS += utgS.rstrip() + "\n\n"
+        rstgS = self._tags(ttitleS, rtagL)
+        print(rstgS.rstrip() + "\n")
+        self.calcS += rstgS.rstrip() + "\n\n"
         for row in readL[1:]:
             contentL.append([row[i] for i in incl_colL])
         wcontentL = []
@@ -377,11 +376,11 @@ class WriteRST:
                 stralign=saS,
             )
         )
-        utfS = output.getvalue()
+        rstS = output.getvalue()
         sys.stdout = old_stdout
 
-        print(utfS)
-        self.calcS += utfS + "\n"
+        print(rstS)
+        self.calcS += rstS + "\n"
 
     def _rpdf(self, rsL):
         b = 5
