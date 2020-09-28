@@ -9,7 +9,7 @@ and the calc is written to the calc folder. The calc number ddss is used for
 document and report organization, where dd is a two digit division number and
 ss is a two digit subdivision number. UTF calcs are always printed to to the
 terminal when the a calc file or interactive cell is run. If a file output
-function (write_utf, write_pdf write_html) is specified in the calc, the entire
+function (write_text, write_pdf write_html) is specified in the calc, the entire
 calc is processed and the calc file is written to the calc folder."""
 
 import os
@@ -30,9 +30,10 @@ import rivtcalc.rc_calc as _rc_calc
 __version__ = "0.8.1-beta.1"
 __author__ = "rholland@structurelabs.com"
 if sys.version_info < (3, 7):
-    sys.exit("rivtCalc requires Python version 3.7 or later")     
+    sys.exit("rivtCalc requires Python version 3.7 or later")
 
 _calcfileS = "empty"
+
 
 def _cmdlinehelp():
     """command line help """
@@ -51,13 +52,14 @@ def _cmdlinehelp():
     print("Program and documentation are here: http://rivtcalc.github.io.")
     sys.exit()
 
+
 if __name__ == "__main__":
     try:
-        _calcfileS = sys.argv[1]                      # calc file argument
-        _cwdS = os.getcwd()                           # get calc folder
-        _cfull = Path(_calcfileS)                     # calc file full path
-        _cfileS = Path(_cfull).name                   # calc file name
-        _cbaseS  = _cfileS.split(".py")[0]            # calc file basename
+        _calcfileS = sys.argv[1]  # calc file argument
+        _cwdS = os.getcwd()  # get calc folder
+        _cfull = Path(_calcfileS)  # calc file full path
+        _cfileS = Path(_cfull).name  # calc file name
+        _cbaseS = _cfileS.split(".py")[0]  # calc file basename
         print("MAIN  current folder: ", _cwdS)
         print("MAIN  calc name: ", _cfileS)
         importlib.import_module(_cbaseS)
@@ -68,5 +70,3 @@ if __name__ == "__main__":
         # Output unexpected Exceptions.
         print("exception-----------------------------------------")
         print(exception)
-
-

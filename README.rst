@@ -44,7 +44,7 @@ API Functions
   I()            insert descriptive text, tables, figures and equations
   V()            define and import values, equations and functions 
   T()            define and import tables and plots   
-write_utfcalc()  write utf calc to file
+write_textcalc()  write utf calc to file
 write_pdfdoc()   write pdf doc to file (includes images)
 write_htmldoc()  write html doc to file (includes images) 
 write_report()   compile pdf docs into a report

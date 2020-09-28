@@ -829,8 +829,8 @@ class OutputUTF:
                         out3 = out3.replace("-" * _cnt, u"\u2014" * _cnt)
                     _cnt = 0
             # print('out3b \n', out3)
-            self._write_utf(out3, 1, 0)  # print substituted form
-            self._write_utf(" ", 0, 0)
+            self._write_text(out3, 1, 0)  # print substituted form
+            self._write_text(" ", 0, 0)
         except:
             pass
 

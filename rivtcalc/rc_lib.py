@@ -54,7 +54,7 @@
     Rivt function - Output ----------------------------------------------------
         name                          description
     ============================ ==============================================
-    write_utf()                    write calc to utf8 doc file
+    write_text()                    write calc to utf8 doc file
     write_doc(type, style)         write calc to pdf or html doc file
     write_report()                 combine pdf docs into pdf report file
     ============================ ==============================================
@@ -252,8 +252,6 @@ _ppath = _cfull.parent.parent  # project folder path
 _cpath = _cfull.parent  # calc folder path
 _mpath = Path(_ppath / "tmp")  # tmp folder path
 _dpath = Path(_ppath / "docs")  # doc folder path
-_utffile = Path(_cpath / "data" / ".".join((_cnameS, "txt")))  # utf output
-_expfile = Path(_cpath / "data" / _cnumS / ".".join(_cnameS, "csv"))  # export file
 _rstfile = Path(_mpath / ".".join((_cnameS, "rst")))  # rst output
 _pdffile = Path(_dpath / ".".join((_cnameS, "pdf")))  # pdf output
 
@@ -265,19 +263,18 @@ rivtcalcD = {}  # values dictonary
 _rstflagB = False  # reST generation flag
 # folder paths
 _foldD = {
-    "efile": _expfile,
     "ppath": _ppath,
-    "dpath": _dpath,
-    "cpath": Path(_cfull).parent,
+    "cpath": Path(_ppath, "calcs"),
+    "dpath": Path(_ppath, "docs"),
     "mpath": Path(_ppath, "tmp"),
     "spath": Path(_cpath, "scripts"),
     "kpath": Path(_cpath, "scripts", "sketches"),
-    "apath": Path(_cpath, "data"),
     "hpath": Path(_dpath, "html"),
     "ipath": Path(_dpath, "info"),
 }
 # section settings
 _setsectD = {
+    "fnumS": _cnameS[0:5],
     "cnumS": _cnameS[1:5],
     "dnumS": _cnameS[1:3],
     "sdnumS": _cnameS[3:5],
@@ -330,7 +327,9 @@ _lshortP = Path(*Path(_logfile).parts[-4:])
 logging.info(f"""calc: {_rshortP}""")
 logging.info(f"""backup: {_bshortP}""")
 logging.info(f"""logging: {_lshortP}""")
-print(" ")  # todo: check folder structure here
+print(" ")
+# todo: check folder structure
+# todo: check for units file in c0000, supplement default units
 
 
 def _init_utf(rawS: str):
@@ -399,7 +398,7 @@ def R(rawS: str):
     Args:
         rawstrS (str): repository-string
     """
-    global utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
+    global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
 
     if _rstflagB:
         rcalc = _init_rst(rawS)
@@ -417,7 +416,7 @@ def I(rawS: str):
     Args:
         rawstrS (str): insert-string
     """
-    global utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
+    global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
 
     if _rstflagB:
         rcalc = _init_rst(rawS)
@@ -435,7 +434,7 @@ def V(rawS: str):
     Args:
         rawstr (str): value-string
     """
-    global utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
+    global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
 
     if _rstflagB:
         rcalc = _init_rst(rawS)
@@ -453,7 +452,7 @@ def T(rawS: str):
     Args:
        rawstr (str): table-string
     """
-    global utfcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
+    global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
 
     if _rstflagB:
         rcalc = _init_rst(rawS)
@@ -474,29 +473,17 @@ def S(rawS: str):
     pass
 
 
-def _write_pdf(stylefileS: str):
+def _write_pdf(docpathS: str, stylefileS: str):
     """read .rst file from tmp folder and write .pdf to docs folder
 
-    .rst file converted to .tex file in tmp folder in intermediate step
+    .rst file is converted to .tex file and then to .pdf
     """
     f1 = open(_rstfile, "r")
     rstcalcL = f1.readlines()
     f1.close()
     print("INFO  rst file read: " + str(_rstfile))
 
-    if sys.platform == "win32":
-        pythoncallS = "python "
-    elif sys.platform == "linux":
-        pythoncallS = "python3 "
-    elif sys.platform == "darwin":
-        pythoncallS = "python3 "
-    else:
-        pythoncallS = "python "
-
     mpath = _foldD("mpath")
-    pdfS = ".".join(_cnameS, "pdf")
-    path1 = importlib.util.find_spec("rivtcalc")
-    rivpath = Path(path1.origin).parent
     pdfD = {
         "cpdfP": Path(mpath / ".".join(_cnameS, "pdf")),
         "chtml": Path(mpath / ".".join(_cnameS, "html")),
@@ -509,9 +496,15 @@ def _write_pdf(stylefileS: str):
     }
 
     if stylefileS != "default":
-        style_path = Path(_dpath / "style" / stylefileS)
+        style_path = Path(_dpath / "d0000" / stylefileS)
     else:
         style_path = Path(rivpath / "scripts" / "pdfdoc.sty")
+
+    pythoncallS = "python "
+    if sys.platform == "linux":
+        pythoncallS = "python3 "
+    elif sys.platform == "darwin":
+        pythoncallS = "python3 "
 
     # generate tex file
     rst2xeP = Path(rivpath / "scripts" / "rst2xetex.py")
@@ -530,9 +523,33 @@ def _write_pdf(stylefileS: str):
     )
     os.chdir(mpath)
     try:
-        os.system(tex1)
+        os.system(tex1S)
+        print("INFO  tex file written\n")
     except:
-        print("\nINFO  error in docutils call\n" + tex1 + "\n")
+        print("INFO  error in docutils call\n" + tex1S + "\n")
+
+    # clean temp files and generate pdf file
+    try:
+        os.chdir(mpath)
+        os.system("latexmk -C")
+        print("\nINFO  temporary Tex files deleted \n")
+        pdfmkS = "latexmk -pdf -xelatex -quiet -f " + texfileP
+        os.system(pdfmkS)
+        print("\nINFO  pdf file written:\n")
+    except:
+        print("INFO error in pdf call:  ", pdfmkS)
+
+    # move pdf to specified folder
+    docfileP = Path(_dpath / _setsectD("fnumS") / ".".join((_cnameS, "pdf")))
+    if docpathS == "defaultdocpath":  # doc file write location
+        rstpthP = docfileP
+    else:
+        rstpthP = Path(_cpath / docpathS / ".".join((_cnameS, "txt")))
+    shutil.move(pdfD("cpdfP"), rstpthP)
+    os.chdir(_dpath)
+    print("INFO  pdf file moved to docs folder", flush=True)
+    print("INFO  program complete")
+    os._exit(1)
 
     # self.mod_tex(self.texfile2)
     # with open(tfile, 'r') as texin:
@@ -552,26 +569,6 @@ def _write_pdf(stylefileS: str):
     # with open (tfile, 'w') as texout:
     #     print(texf, file=texout)
 
-    # generate pdf file
-    os.chdir(mpath)
-    os.system("latexmk -C")
-    print("\nINFO  temporary Tex files deleted \n")
-
-    pdfmkS = "latexmk -pdf -xelatex -quiet -f " + texfile
-    # print("pdf call:  ", pdfmkS)
-    os.system(pdfmkS)
-    print("\nINFO  pdf file written:\n")
-
-    shutil.move(cpdfP, _dpath)
-    os.chdir(_dpath)
-    pdfnameL = list(pdfS)
-    pdfnameL[0] = "d"
-    pdfrenameS = "".join(pdfname)
-    os.rename(pdfS, pdfrenameS)
-    print("INFO  pdf file moved to docs folder", flush=True)
-    print("INFO  program complete")
-    os._exit(1)
-
 
 def _write_html():
     """read .rst file from tmp folder and write .pdf to docs folder
@@ -582,12 +579,13 @@ def _write_html():
         f1.write(utfcalc.encode("UTF-8"))
 
 
-def write_utf():
-    """write utf-calc and values to output files
+def write_text(filepathS: str):
+    """write utf-calc and values to files
 
-    .txt calc file is written to calc subfolder
+    .txt calc file is written to calc subfolder (default)
     .csv value file is written to calc subfolder
     """
+
     global utfcalcS, _rstflagB
 
     utfcalcS = """"""
@@ -597,31 +595,42 @@ def write_utf():
     print("INFO calc file read: " + str(_cfull))
     indx = 0
     for iS in enumerate(utfcalcL):
-        if "write_utf" in iS[1]:
+        if "write_text" in iS[1]:
             indx = int(iS[0])
             break
     utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1 :]  # avoid recursion
     cmdS = "".join(utfcalcL)
     exec(cmdS, globals(), locals())
 
-    str1 = """header string\n"""
+    utffile = Path(_cpath / _setsectD("fnumS") / ".".join((_cnameS, "txt")))
+    exprtfile = Path(_cpath / _setsectD("fnumS") / ".".join(_cnameS, "csv"))
+
+    str1 = """header string\n"""  # write values file
     str1 = str1 + exportS
-    with open(_expfile, "w") as expF:
+    with open(exprtfile, "w") as expF:
         expF.write(str1)
     print("INFO  values file written to calc folder", flush=True)
 
-    with open(_utffile, "wb") as f1:
+    if filepathS == "defaultpath":  # check calc file write location
+        utfpthS = Path(utffile)
+    else:
+        utfpthS = Path(_cpath / filepathS / ".".join((_cnameS, "txt")))
+
+    with open(utfpthS, "wb") as f1:
         f1.write(utfcalcS.encode("UTF-8"))
     print("INFO  utf calc written to calc folder", flush=True)
     print("INFO  program complete")
+
     os._exit(1)
 
 
-def write_doc(doctypeS: str, stylefileS: str):
-    """write rst-calc and values to output files
+def write_doc(doctypeS: str, docpathS: str, stylefileS: str):
+    """write rst-calc and values to files
 
     .rst calc file is written to tmp folder
     .csv value file is written to calc subfolder
+    .pdf file is written to doc folder (default)
+    .style file is read from rivtcalc library (default)
     """
     global rstcalcS, _rstflagB
 
@@ -633,11 +642,11 @@ def write_doc(doctypeS: str, stylefileS: str):
     print("INFO calc file read: " + str(_cfull))
 
     indx = 0
-    for iS in enumerate(rstcalcL):
+    for iS in enumerate(rstcalcL):  # find write_doc
         if "write_doc" in iS[1]:
             indx = int(iS[0])
             break
-    rstcalcL = rstcalcL[0:indx] + rstcalcL[indx + 1 :]  # filter write function
+    rstcalcL = rstcalcL[0:indx] + rstcalcL[indx + 1 :]  # now skip write_doc
     cmdS = "".join(rstcalcL)
     exec(cmdS, globals(), locals())
     with open(_rstfile, "wb") as f1:
@@ -645,7 +654,7 @@ def write_doc(doctypeS: str, stylefileS: str):
     print("INFO  rst calc written to tmp folder", flush=True)
 
     if doctypeS.strip() == "pdf":
-        _write_pdf(stylefileS)
+        _write_pdf(docpathS, stylefileS)
     if doctypeS.strip() == "html":
         _write_html(stylefileS)
 

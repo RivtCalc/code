@@ -66,7 +66,7 @@ class OutputRST:
             rivtD (dict): global rivt dictionary
         """
 
-        self.rstS = """"""  # restructured text string
+        self.restS = """"""  # restructured text string
         self.exportS = exportS
         self.strL = strL
         self.folderD = folderD
@@ -161,6 +161,7 @@ class OutputRST:
             uS = tagL[0].strip() + " \\hfill " + refS
         elif tag == "[foot]_":  # footnote label
             tagS = tagS.strip("[foot]_").strip()
+            # ".. target-notes::\n\n"
             uS = ".. [*] " + tagS
         else:
             uS = tagS
@@ -181,7 +182,6 @@ class OutputRST:
         indxI = -1  # method index
         _rgx = r"\[([^\]]+)]_"  # find tags
 
-        self.calcS += ".. target-notes::\n\n"
         for uS in self.strL:
             if uS[0:2] == "##":
                 continue  # remove comment
@@ -193,23 +193,23 @@ class OutputRST:
                     self._vtable(self.valL, hdrL, "rst", alignL)
                     self.valL = []
                     print(uS.rstrip(" "))
-                    self.calcS += " \n"
+                    self.restS += " \n"
                     self.rivtD.update(locals())
                     continue
                 else:
-                    self.calcS += "\n"
+                    self.restS += "\n"
                     continue
             try:
                 if uS[0] == "#":
                     continue  # remove comment
             except:
-                self.calcS += "\n"
+                self.restS += "\n"
                 continue
             if uS.strip() == "[literal]_":
                 continue
             if re.search(_rgx, uS):  # check for tag
                 utgS = self._tags(uS, tagL)
-                self.calcS += utgS.rstrip() + "\n"
+                self.restS += utgS.rstrip() + "\n"
                 continue
             if typeS == "values":  # chk for values
                 self.setcmdD["saveB"] = False
@@ -238,7 +238,7 @@ class OutputRST:
             self.rivtD.update(locals())
             if typeS != "table":  # skip table prnt
                 print(uS)
-                self.calcS += uS.rstrip() + "\n"
+                self.restS += uS.rstrip() + "\n"
 
     def r_rst(self) -> str:
         """parse repository string
@@ -262,7 +262,7 @@ class OutputRST:
 
         self._parseRST("repository", rcmdL, rmethL, rtagL)
 
-        return self.rstS, self.setsectD
+        return self.restS, self.setsectD
 
     def _rhead(self, rL):
         """format header information
@@ -322,7 +322,7 @@ class OutputRST:
         contentL = []
         sumL = []
         fileS = rL[1].strip()
-        tfileS = Path(self.folderD["dpath"] / "info" / fileS)
+        tfileS = Path(self.folderD["dpath"] / "d0000" / fileS)
         extS = fileS.split(".")[1]
         if extS == "csv":
             with open(tfileS, "r") as csvfile:  # read csv file
@@ -353,7 +353,7 @@ class OutputRST:
         ttitleS = readL[0][0].strip() + " [t]_"
         rstgS = self._tags(ttitleS, rtagL)
         print(rstgS.rstrip() + "\n")
-        self.calcS += rstgS.rstrip() + "\n\n"
+        self.restS += rstgS.rstrip() + "\n\n"
         for row in readL[1:]:
             contentL.append([row[i] for i in incl_colL])
         wcontentL = []
@@ -380,7 +380,7 @@ class OutputRST:
         sys.stdout = old_stdout
 
         print(rstS)
-        self.calcS += rstS + "\n"
+        self.restS += rstS + "\n"
 
     def _rpdf(self, rsL):
         b = 5
@@ -472,8 +472,8 @@ class OutputRST:
         contentL = []
         sumL = []
         fileS = iL[1].strip()
-        calpS = "r" + self.setsectD["cnumS"]
-        tfileS = Path(self.folderD["apath"] / calpS / fileS)
+        calpS = self.setsectD["fnumS"]
+        tfileS = Path(self.folderD["cpath"] / calpS / fileS)
         extS = fileS.split(".")[1]
         if extS == "csv":
             with open(tfileS, "r") as csvfile:  # read csv file
@@ -504,7 +504,7 @@ class OutputRST:
         ttitleS = readL[0][0].strip() + " [t]_"
         utgS = self._tags(ttitleS, itagL)
         print(utgS.rstrip() + "\n")
-        self.calcS += utgS.rstrip() + "\n\n"
+        self.restS += utgS.rstrip() + "\n\n"
         for row in readL[1:]:
             contentL.append([row[i] for i in incl_colL])
         wcontentL = []
@@ -527,11 +527,11 @@ class OutputRST:
                 stralign=saS,
             )
         )
-        utfS = output.getvalue()
+        rstS = output.getvalue()
         sys.stdout = old_stdout
 
-        print(utfS)
-        self.calcS += utfS + "\n"
+        print(rstS)
+        self.restS += rstS + "\n"
 
     def _iimage(self, iL: list):
         """insert one or two images from file
@@ -872,8 +872,8 @@ class OutputRST:
                         out3 = out3.replace("-" * _cnt, u"\u2014" * _cnt)
                     _cnt = 0
             # print('out3b \n', out3)
-            self._write_utf(out3, 1, 0)  # print substituted form
-            self._write_utf(" ", 0, 0)
+            self._write_text(out3, 1, 0)  # print substituted form
+            self._write_text(" ", 0, 0)
         except:
             pass
 
