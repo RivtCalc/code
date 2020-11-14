@@ -7,10 +7,10 @@
     units: Kips, in
 
     **Element Properties**
-    [t] elastic modulus (ksi)        | e_1 = 29000*KSI.asNumber()
-    [t] cross section 1 (sq.in.)     | a_1 = 10*(IN**2).asNumber()
-    [t] cross section 2 (sq.in.)     | a_2 = 15*(IN**2).asNumber()
-    [t] cross section 3 (sq.in.)     | a_3 = 25*(IN**2).asNumber()
+    [t] elastic modulus (ksi)        | e_1 = 29000*KSI.asnumSber()
+    [t] cross section 1 (sq.in.)     | a_1 = 10*(IN**2).asnumSber()
+    [t] cross section 2 (sq.in.)     | a_2 = 15*(IN**2).asnumSber()
+    [t] cross section 3 (sq.in.)     | a_3 = 25*(IN**2).asnumSber()
 
     **Node coordinates** [node number, x, y]
     [t] node 0      | n_0  = [0,   0.,      0.]
