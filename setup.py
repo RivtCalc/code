@@ -3,7 +3,6 @@ from distutils.core import setup
 setup(
     name="rivtcalc",
     author="rhholland",
-    version="0.8.2-beta.0",
     packages=[
         "rivtcalc",
         "rivtcalc.unum",
