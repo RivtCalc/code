@@ -11,7 +11,6 @@ setup(
     ],
     license="GPLv3",
     long_description=open("README.rst").read(),
-    python_requires=">=3.7",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
