@@ -9,6 +9,8 @@ setup(
         "rivtcalc.unum.units",
         "rivtcalc.unum.units.si",
     ],
+    version='0.8.2-beta.0',
+    python_requires='>=3.7',
     license="GPLv3",
     long_description=open("README.rst").read(),
     classifiers=[
