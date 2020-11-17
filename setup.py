@@ -26,6 +26,7 @@ setup(
         "matplotlib",
         "jupyter",
         "docutils",
+        "xlrd",
         "antlr4-python3-runtime>=4.7,<4.8",
     ],
 )
