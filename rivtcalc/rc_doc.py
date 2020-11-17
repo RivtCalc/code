@@ -139,7 +139,7 @@ class OutputRST:
         elif tag == "[s]_":  # format sympy
             tagL = tagS.strip().split("[s]_")
             spS = tagL[0].strip()
-            txS = latex(S(spS))
+            txS = sp.latex(S(spS))
             uS = ".. raw:: math\n\n   " + txS + "\n"
         elif tag == "[f]_":  # figure caption
             tagL = tagS.strip().split("[f]_")
@@ -230,6 +230,7 @@ class OutputRST:
                     exec(uS)
                     continue  # exec table code
             if uS[0:2] == "||":  # check for cmd
+                # print(f"{cmdL=}")
                 uL = uS[2:].split("|")
                 indxI = cmdL.index(uL[0].strip())
                 methL[indxI](uL)
@@ -416,9 +417,9 @@ class OutputRST:
             "[#]_",
         ]
 
-        self._parseUTF("insert", icmdL, imethL, itagL)
+        self._parseRST("insert", icmdL, imethL, itagL)
 
-        return self.calcS, self.setsectD, self.setcmdD
+        return self.restS, self.setsectD, self.setcmdD
 
     def _itext(self, iL: list):
         """insert text from file
@@ -429,22 +430,22 @@ class OutputRST:
         calP = "r" + self.setsectD["cnumS"]
         txapath = Path(self.folderD["xpath"] / calP / iL[1].strip())
         with open(txapath, "r") as txtf1:
-            uL = txtf1.readlines()
+            rstL = txtf1.readlines()
         if iL[2].strip() == "indent":
-            txtS = "".join(uL)
+            txtS = "".join(rstL)
             widthI = self.setcmdD["cwidth"]
             inS = " " * 4
-            uL = textwrap.wrap(txtS, width=widthI)
-            uL = [inS + S1 + "\n" for S1 in uL]
-            uS = "".join(uL)
+            rstL = textwrap.wrap(txtS, width=widthI)
+            rstL = [inS + S1 + "\n" for S1 in rstL]
+            rstS = "".join(rstL)
         elif iL[2].strip() == "literal":
-            txtS = "  ".join(uL)
-            uS = "::\n\n" + txtS + "\n"
+            txtS = "  ".join(rstL)
+            rstS = "::\n\n" + txtS + "\n"
         else:
-            txtS = "".join(uL)
-            uS = "\n" + txtS
+            txtS = "".join(rstL)
+            rstS = "\n" + txtS
 
-        self.calcS += uS + "\n"
+        self.restS += rstS + "\n"
 
     def _itable(self, iL: list):
         """insert table from csv or xlsx file
@@ -542,10 +543,10 @@ class OutputRST:
         rstS = ""
         if "," in iL[1]:  # two images
             scaleF = iL[2].split(",")
-            scale1F = float(scaleF[0])
-            scale2F = float(scaleF[1])
-            self.setcmdD.update({"scale1F": scale1F})
-            self.setcmdD.update({"scale2F": scale2F})
+            scale1S = str(float(scaleF[0]))
+            scale2S = str(float(scaleF[1]))
+            self.setcmdD.update({"scale1F": scale1S})
+            self.setcmdD.update({"scale2F": scale2S})
             fileS = iL[1].split(",")
             file1S = fileS[0].strip()
             file2S = fileS[1].strip()
@@ -557,18 +558,18 @@ class OutputRST:
                 + img1S
                 + "\n"
                 + "   :width: "
-                + scale1F
+                + scale1S
                 + "\n"
                 + ".. :image:: "
                 + img2S
                 + "\n"
                 + "   :width: "
-                + scale2F
+                + scale2S
                 + "\n"
             )
         else:  # one image
-            scale1F = float(iL[2])
-            self.setcmdD.update({"scale1F": scale1F})
+            scale1S = str(float(iL[2]))
+            self.setcmdD.update({"scale1F": scale1S})
             fileS = iL[1].split(",")
             file1S = fileS[0].strip()
             calpS = "r" + self.setsectD["cnumS"]
@@ -578,11 +579,11 @@ class OutputRST:
                 + img1S
                 + "\n"
                 + "   :width: "
-                + scale1F
+                + scale1S
                 + "\n"
                 + "   :align: center \n"
             )
-            self.calcS += rstS + "\n"
+            self.restS += rstS + "\n"
 
     def v_rst(self) -> tuple:
         """parse value-string and set method
@@ -623,7 +624,7 @@ class OutputRST:
             "[#]_",
         ]
 
-        self._parseUTF("values", vcmdL, vmethL, vtagL)
+        self._parseRST("values", vcmdL, vmethL, vtagL)
         self.rivtD.update(locals())
         return self.calcS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
 
@@ -869,7 +870,7 @@ class OutputRST:
                     continue
                 else:
                     if _cnt > 1:
-                        out3 = out3.replace("-" * _cnt, u"\u2014" * _cnt)
+                        out3 = out3.replace("-" * _cnt, "\u2014" * _cnt)
                     _cnt = 0
             # print('out3b \n', out3)
             self._write_text(out3, 1, 0)  # print substituted form

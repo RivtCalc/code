@@ -80,28 +80,28 @@ rc.R('''[01]_ The repository-string defines repository and report content
     used provided. Otherwise they are literal. Parameter options are separated
     by semicolons.
     
-    ||search | (calc num), (calc num), (calc num) ...
+    || search | (calc num), (calc num), (calc num) ...
 
-    The ||search command generates a README and specifies a list of calc
+    The || search command generates a README and specifies a list of calc
     numbers that are searched against a master category list for terms to be
-    included. Because the search command is executed at the project level
-    across multiple calcs, it is usually included in the first project calc.
-    The command overwrites an existing README file.
+    included in the README. Because the search command is executed at the
+    project level across multiple calcs, it is usually included in the first
+    project calc. The command overwrites any existing README file.
 
     The calc number list is also used for the ||keys command. The ||keys
     command is a list of keywords included in the README that describe the
     scope of the calc, with up to six calcs per command.
     
-    ||keys | (discipline), (object), (purpose), (assembly), (component)
+    || keys | (discipline), (object), (purpose), (assembly), (component)
 
     The ||head command specifies an optional calc title and date printed at the
     top of each doc page, and table of contents printed before the string text.
     The toc argument generates a table of contents from the
     section tags.
 
-    ||head | (calc title) | (date) | toc; notoc  
+    || head | (calc title) | (date) | toc; notoc  
 
-    The ||info command is similar to the the ||table and ||text commands with
+    The || info command is similar to the the ||table and ||text commands with
     differences in file location and use. See those commands for details.
     ||info files are used for project specific information (clients, addresses,
     etc) and are read from the docs/info folder which is not shared. Also, the
@@ -110,19 +110,19 @@ rc.R('''[01]_ The repository-string defines repository and report content
     information contained in the calcs folder. ||info tables do not contain
     titles and should not be numbered.
 
-    ||info | (project.txt) | literal; indent
-    ||info | (project.csv or .xlsx) | ([1,2,3] or [:]
+    || info | (project.txt) | literal; indent
+    || info | (project.csv or .xlsx) | ([1,2,3] or [:]
     
     The ||pdf command attaches existing pdf documents, stored in the
-    docs/attach folder, to the front or back of the calc doc. The *functions*
+    docs/attach folder, to the front or back  of the calc doc. The *functions*
     or *docstrings* arguments determine whether the complete function code or
     just the docstrings of functions used with the ||func commmand are appended
     to the calc. The title is written to a cover page that can be referred to
     in the calcs.
     
-    ||pdf | front | (calccoverfile.pdf) | (title)        
-    ||pdf | back | functions; docstrings |(title)
-    ||pdf | back | (appendixfile.pdf) | (title)
+    || pdf | front | (calccoverfile.pdf) | (title)        
+    || pdf | back | functions; docstrings |(title)
+    || pdf | back | (appendixfile.pdf) | (title)
     ''')
 rc.I('''The insert-string contains static text, tables and images.  
     
@@ -136,19 +136,19 @@ rc.I('''The insert-string contains static text, tables and images.
     sympy equation  [e]_
     x = 32 + (y/2)  [s]_            
     
-    ||text | (file.txt) | literal; indent 
+    || text | (file.txt) | literal; indent 
 
-    ||latex | (file.txt) 
+    || latex | (file.txt) 
     
     table title  [t]_
-    ||table | (file.csv or .xlst) | (60,c) | title; notitle | (2,1,4; :) 
+    || table | (file.csv or .xlst) | (60,c) | title; notitle | (2,1,4; :) 
     
-    ||image | (file.png) | (50) 
+    || image | (file.png) | (50) 
                         {scale as percent of page wdith}
     figure caption [f]_ 
     
     Insert two images side by side using the following:
-    ||image | f1.png, f2.jpg | (45,45) 
+    || image | f1.png, f2.jpg | (45,45) 
     [a] first figure caption  [f]_
     [b] second figure caption  [f]_
 
@@ -171,7 +171,7 @@ rc.V('''[02]_ The value-string defines active values and equations
                             {save to value file if trailing ||} 
 
 
-    ||values | (file.csv or .xlxs)
+    || values | (file.csv or .xlxs)
 
     Import values from a csv or xlxs file, starting with the second row. The
     first row is a descriptive heading. For a value file the csv or xlsx file
@@ -181,7 +181,7 @@ rc.V('''[02]_ The value-string defines active values and equations
         variable name, value, primary unit, secondary unit, description
     
     
-    ||data | file.csv | [1:4] {rows to import} 
+    || data | file.csv | [1:4] {rows to import} 
 
     Import a list of values from rows of a csv or xlsx file. For a data file
     the csv file must have the structure:
@@ -195,12 +195,12 @@ rc.V('''[02]_ The value-string defines active values and equations
     y1 = v1 / 4   | unit, alt unit ||         
 
     Functions may be defined in a table-string or imported from a file.
-    ||func | (function_file.py) | (function_name) | 
+    || func | (function_file.py) | (function_name) | 
 
     A table title [t]_
-    ||table | x.csv | 60    
+    || table | x.csv | 60    
     
-    ||image | x.png | 50
+    || image | x.png | 50
     A figure caption [f]_
     ''') 
 rc.T('''The table-string defines active tables and plots that use simple Python statements
@@ -420,7 +420,7 @@ def I(rawS: str):
 
     if _rstflagB:
         rcalc = _init_rst(rawS)
-        rcalcS, _setsectD = rcalc.r_rst()
+        rcalcS, _setsectD, _setcmdD = rcalc.i_rst()
         rstcalcS += rcalcS
     else:
         icalc = _init_utf(rawS)
@@ -438,7 +438,7 @@ def V(rawS: str):
 
     if _rstflagB:
         rcalc = _init_rst(rawS)
-        rcalcS, _setsectD = rcalc.r_rst()
+        rcalcS, _setsectD, _setcmdD, rivtcalcD, exportS = rcalc.v_rst()
         rstcalcS += rcalcS
     else:
         vcalc = _init_utf(rawS)
@@ -456,7 +456,7 @@ def T(rawS: str):
 
     if _rstflagB:
         rcalc = _init_rst(rawS)
-        rcalcS, _setsectD = rcalc.r_rst()
+        rcalcS, _setsectD = rcalc.t_rst()
         rstcalcS += rcalcS
     else:
         tcalc = _init_utf(rawS)
@@ -483,16 +483,16 @@ def _write_pdf(docpathS: str, stylefileS: str):
     f1.close()
     print("INFO  rst file read: " + str(_rstfile))
 
-    mpath = _foldD("mpath")
+    mpath = _foldD["mpath"]
     pdfD = {
-        "cpdfP": Path(mpath / ".".join(_cnameS, "pdf")),
-        "chtml": Path(mpath / ".".join(_cnameS, "html")),
-        "trst": Path(mpath / ".".join(_cnameS, "rst")),
-        "ttex1": Path(mpath / ".".join(_cnameS, "tex")),
-        "auxfile": Path(mpath / ".".join(_cnameS, ".aux")),
-        "outfile": Path(mpath / ".".join(_cnameS, ".out")),
-        "texmak2": Path(mpath / ".".join(_cnameS, ".fls")),
-        "texmak3": Path(mpath / ".".join(_cnameS, ".fdb_latexmk")),
+        "cpdfP": Path(mpath / ".".join([_cnameS, "pdf"])),
+        "chtml": Path(mpath / ".".join([_cnameS, "html"])),
+        "trst": Path(mpath / ".".join([_cnameS, "rst"])),
+        "ttex1": Path(mpath / ".".join([_cnameS, "tex"])),
+        "auxfile": Path(mpath / ".".join([_cnameS, ".aux"])),
+        "outfile": Path(mpath / ".".join([_cnameS, ".out"])),
+        "texmak2": Path(mpath / ".".join([_cnameS, ".fls"])),
+        "texmak3": Path(mpath / ".".join([_cnameS, ".fdb_latexmk"])),
     }
 
     if stylefileS != "default":
@@ -508,7 +508,7 @@ def _write_pdf(docpathS: str, stylefileS: str):
 
     # generate tex file
     rst2xeP = Path(rivpath / "scripts" / "rst2xetex.py")
-    texfileP = pdfD("ttex1")
+    texfileP = pdfD["ttex1"]
     tex1S = "".join(
         [
             pythoncallS,
@@ -516,8 +516,8 @@ def _write_pdf(docpathS: str, stylefileS: str):
             " --documentclass=report ",
             " --documentoptions=12pt,notitle,letterpaper ",
             " --stylesheet=",
-            style_path + " ",
-            _rstfile + " ",
+            str(style_path) + " ",
+            str(_rstfile) + " ",
             str(texfileP),
         ]
     )
@@ -529,23 +529,23 @@ def _write_pdf(docpathS: str, stylefileS: str):
         print("INFO  error in docutils call\n" + tex1S + "\n")
 
     # clean temp files and generate pdf file
+    pdfmkS = "latexmk -pdf -xelatex -quiet -f " + str(texfileP)
     try:
         os.chdir(mpath)
         os.system("latexmk -C")
         print("\nINFO  temporary Tex files deleted \n")
-        pdfmkS = "latexmk -pdf -xelatex -quiet -f " + texfileP
         os.system(pdfmkS)
         print("\nINFO  pdf file written:\n")
     except:
         print("INFO error in pdf call:  ", pdfmkS)
 
     # move pdf to specified folder
-    docfileP = Path(_dpath / _setsectD("fnumS") / ".".join((_cnameS, "pdf")))
+    docfileP = Path(_dpath / _setsectD["fnumS"] / ".".join([_cnameS, "pdf"]))
     if docpathS == "defaultdocpath":  # doc file write location
         rstpthP = docfileP
     else:
-        rstpthP = Path(_cpath / docpathS / ".".join((_cnameS, "txt")))
-    shutil.move(pdfD("cpdfP"), rstpthP)
+        rstpthP = Path(_cpath / docpathS / ".".join([_cnameS, "txt"]))
+    shutil.move(pdfD["cpdfP"], rstpthP)
     os.chdir(_dpath)
     print("INFO  pdf file moved to docs folder", flush=True)
     print("INFO  program complete")
