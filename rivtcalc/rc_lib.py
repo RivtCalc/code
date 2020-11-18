@@ -264,6 +264,7 @@ _rstflagB = False  # reST generation flag
 # folder paths
 _foldD = {
     "ppath": _ppath,
+    "docpath": _dpath,
     "cpath": Path(_ppath, "calcs"),
     "dpath": Path(_ppath, "docs"),
     "mpath": Path(_ppath, "tmp"),
@@ -473,112 +474,6 @@ def S(rawS: str):
     pass
 
 
-def _write_pdf(docpathS: str, stylefileS: str):
-    """read .rst file from tmp folder and write .pdf to docs folder
-
-    .rst file is converted to .tex file and then to .pdf
-    """
-    f1 = open(_rstfile, "r")
-    rstcalcL = f1.readlines()
-    f1.close()
-    print("INFO  rst file read: " + str(_rstfile))
-
-    mpath = _foldD["mpath"]
-    pdfD = {
-        "cpdfP": Path(mpath / ".".join([_cnameS, "pdf"])),
-        "chtml": Path(mpath / ".".join([_cnameS, "html"])),
-        "trst": Path(mpath / ".".join([_cnameS, "rst"])),
-        "ttex1": Path(mpath / ".".join([_cnameS, "tex"])),
-        "auxfile": Path(mpath / ".".join([_cnameS, ".aux"])),
-        "outfile": Path(mpath / ".".join([_cnameS, ".out"])),
-        "texmak2": Path(mpath / ".".join([_cnameS, ".fls"])),
-        "texmak3": Path(mpath / ".".join([_cnameS, ".fdb_latexmk"])),
-    }
-
-    if stylefileS != "default":
-        style_path = Path(_dpath / "d0000" / stylefileS)
-    else:
-        style_path = Path(rivpath / "scripts" / "pdfdoc.sty")
-
-    pythoncallS = "python "
-    if sys.platform == "linux":
-        pythoncallS = "python3 "
-    elif sys.platform == "darwin":
-        pythoncallS = "python3 "
-
-    # generate tex file
-    rst2xeP = Path(rivpath / "scripts" / "rst2xetex.py")
-    texfileP = pdfD["ttex1"]
-    tex1S = "".join(
-        [
-            pythoncallS,
-            str(rst2xeP),
-            " --documentclass=report ",
-            " --documentoptions=12pt,notitle,letterpaper ",
-            " --stylesheet=",
-            str(style_path) + " ",
-            str(_rstfile) + " ",
-            str(texfileP),
-        ]
-    )
-    os.chdir(mpath)
-    try:
-        os.system(tex1S)
-        print("INFO  tex file written\n")
-    except:
-        print("INFO  error in docutils call\n" + tex1S + "\n")
-
-    # clean temp files and generate pdf file
-    pdfmkS = "latexmk -pdf -xelatex -quiet -f " + str(texfileP)
-    try:
-        os.chdir(mpath)
-        os.system("latexmk -C")
-        print("\nINFO  temporary Tex files deleted \n")
-        os.system(pdfmkS)
-        print("\nINFO  pdf file written:\n")
-    except:
-        print("INFO error in pdf call:  ", pdfmkS)
-
-    # move pdf to specified folder
-    docfileP = Path(_dpath / _setsectD["fnumS"] / ".".join([_cnameS, "pdf"]))
-    if docpathS == "defaultdocpath":  # doc file write location
-        rstpthP = docfileP
-    else:
-        rstpthP = Path(_cpath / docpathS / ".".join([_cnameS, "txt"]))
-    shutil.move(pdfD["cpdfP"], rstpthP)
-    os.chdir(_dpath)
-    print("INFO  pdf file moved to docs folder", flush=True)
-    print("INFO  program complete")
-    os._exit(1)
-
-    # self.mod_tex(self.texfile2)
-    # with open(tfile, 'r') as texin:
-    #     texf = texin.read()
-    # texf = texf.replace("""inputenc""", """ """)
-    # texf = texf.replace("aaxbb ", """\\hfill""")
-    # texf = texf.replace("""\\begin{document}""",
-    #                     """\\renewcommand{\contentsname}{"""+
-    #                     self.calctitle + "}\n"+
-    #                     """\\begin{document}"""+"\n"+
-    #                     """\\makeatletter"""+
-    #                     """\\renewcommand\@dotsep{10000}"""+
-    #                     """\\makeatother"""+
-    #                     """\\tableofcontents"""+
-    #                     """\\listoftables"""+
-    #                     """\\listoffigures""")
-    # with open (tfile, 'w') as texout:
-    #     print(texf, file=texout)
-
-
-def _write_html():
-    """read .rst file from tmp folder and write .pdf to docs folder
-
-    .rst file converted to .tex file in tmp folder in intermediate step
-    """
-    with open(_txtfile, "wb") as f1:
-        f1.write(utfcalc.encode("UTF-8"))
-
-
 def write_text(filepathS: str):
     """write utf-calc and values to files
 
@@ -624,13 +519,115 @@ def write_text(filepathS: str):
     os._exit(1)
 
 
-def write_doc(doctypeS: str, docpathS: str, stylefileS: str):
+def _write_pdf(stylefileS: str):
+    """read .rst file, write .tex and .pdf to tmp folder
+
+    move .pdf file to doc subfolder
+
+    """
+    f1 = open(_rstfile, "r")
+    rstcalcL = f1.readlines()
+    f1.close()
+    print("INFO  rst file read: " + str(_rstfile))
+
+    mpath = _foldD["mpath"]
+    pdfD = {
+        "cpdfP": Path(mpath / ".".join([_cnameS, "pdf"])),
+        "chtml": Path(mpath / ".".join([_cnameS, "html"])),
+        "trst": Path(mpath / ".".join([_cnameS, "rst"])),
+        "ttex1": Path(mpath / ".".join([_cnameS, "tex"])),
+        "auxfile": Path(mpath / ".".join([_cnameS, ".aux"])),
+        "outfile": Path(mpath / ".".join([_cnameS, ".out"])),
+        "texmak2": Path(mpath / ".".join([_cnameS, ".fls"])),
+        "texmak3": Path(mpath / ".".join([_cnameS, ".fdb_latexmk"])),
+    }
+
+    style_path = Path(_dpath / "d0000" / stylefileS)
+    print("INFO  style sheet: " + str(style_path))
+    pythoncallS = "python "
+    if sys.platform == "linux":
+        pythoncallS = "python3 "
+    elif sys.platform == "darwin":
+        pythoncallS = "python3 "
+
+    # generate tex file
+    rst2xeP = Path(rivpath / "scripts" / "rst2xetex.py")
+    texfileP = pdfD["ttex1"]
+    tex1S = "".join(
+        [
+            pythoncallS,
+            str(rst2xeP),
+            " --embed-stylesheet ",
+            " --documentclass=report ",
+            " --documentoptions=12pt,notitle,letterpaper ",
+            " --stylesheet=",
+            str(style_path) + " ",
+            str(_rstfile) + " ",
+            str(texfileP),
+        ]
+    )
+    os.chdir(mpath)
+    # print(tex1S)
+    os.system(tex1S)
+    print("INFO  tex file written : " + str(texfileP) + "\n")
+
+    # fix escape sequences
+    with open(texfileP, "r") as texin:
+        texf = texin.read()
+    texf = texf.replace("?x?", """\\""")
+    # texf = texf.replace("""inputenc""", """ """)
+    # texf = texf.replace(
+    #     """\\begin{document}""",
+    #     """\\renewcommand{\contentsname}{"""
+    #     + self.calctitle
+    #     + "}\n"
+    #     + """\\begin{document}"""
+    #     + "\n"
+    #     + """\\makeatletter"""
+    #     + """\\renewcommand\@dotsep{10000}"""
+    #     + """\\makeatother"""
+    #     + """\\tableofcontents"""
+    #     + """\\listoftables"""
+    #     + """\\listoffigures""",
+    # )
+
+    with open(texfileP, "w") as texout:
+        print(texf, file=texout)
+
+    dnameS = _cnameS.replace("c", "d", 1)
+    dfolderS = str(_setsectD["fnumS"]).replace("c", "d", 1)
+    docpdfP = Path(_dpath / dfolderS / ".".join([dnameS, "pdf"]))
+
+    # clean temp files and generate pdf file
+    pdfmkS = "latexmk -pdf -xelatex -quiet -f " + str(texfileP)
+    os.chdir(mpath)
+    os.system("latexmk -c")
+    print("\nINFO  temporary Tex files deleted \n")
+    os.system(pdfmkS)
+    print("\nINFO  pdf file written: " + ".".join([_cnameS, "pdf"]))
+
+    # move pdf to specified folder
+    os.chdir(mpath)
+    pdfS = ".".join([_cnameS, "pdf"])
+    shutil.move(pdfS, docpdfP)
+    os.chdir(_dpath)
+    print("INFO  pdf file moved to docs folder", flush=True)
+    print("INFO  program complete")
+    os._exit(1)
+
+
+def _write_html(stylefileS):
+    pass
+
+
+def write_doc(doctypeS: str, stylefileS: str):
     """write rst-calc and values to files
 
-    .rst calc file is written to tmp folder
     .csv value file is written to calc subfolder
-    .pdf file is written to doc folder (default)
+    .rst calc file is written to tmp folder
     .style file is read from rivtcalc library (default)
+    .pdf file is written to doc folder (default)
+
     """
     global rstcalcS, _rstflagB
 
@@ -654,7 +651,7 @@ def write_doc(doctypeS: str, docpathS: str, stylefileS: str):
     print("INFO  rst calc written to tmp folder", flush=True)
 
     if doctypeS.strip() == "pdf":
-        _write_pdf(docpathS, stylefileS)
+        _write_pdf(stylefileS)
     if doctypeS.strip() == "html":
         _write_html(stylefileS)
 

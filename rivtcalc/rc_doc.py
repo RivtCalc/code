@@ -41,7 +41,7 @@ logging.getLogger("numexpr").setLevel(logging.WARNING)
 
 
 class OutputRST:
-    """convert rivt-string to reST string"""
+    """convert rivt-strings to reST strings"""
 
     def __init__(
         self,
@@ -53,13 +53,11 @@ class OutputRST:
         exportS: str,
     ):
 
-        """process rivt-string to reST-string
-
-        The OutputRST class converts rivt-strings to reST-strings..
+        """convert rivt-strings to reST-strings
 
         Args:
             exportS (str): stores values that are written to file
-            strL (list): calc lines
+            strL (list): calc rivt-strings
             folderD (dict): folder paths
             setcmdD (dict): command settings
             setsectD (dict): section settings
@@ -67,13 +65,13 @@ class OutputRST:
         """
 
         self.restS = """"""  # restructured text string
-        self.exportS = exportS
-        self.strL = strL
+        self.exportS = exportS  # value export string
+        self.strL = strL  # rivt-string list
+        self.valL = []  # value blocklist
         self.folderD = folderD
         self.setsectD = setsectD
         self.setcmdD = setcmdD
         self.rivtD = rivtD
-        self.valL = []  # value list
 
     def _refs(self, objnumI: int, typeS: str) -> str:
         """reference label for equations, tables and figures
@@ -119,7 +117,7 @@ class OutputRST:
         if tag == "[#]_":  # auto increment footnote mark
             uS = tagS + "\n"
         elif tag == "[page]_":  # new page
-            uS = ".. raw:: latex \n\n \\newpage"
+            uS = ".. raw:: latex \n\n ?xx? newpage"
         elif tag == "[line]_":  # horizontal line
             uS = int(self.setsectD["swidthI"]) * "-"
         elif tag == "[link]_":  # url link
@@ -128,10 +126,10 @@ class OutputRST:
             uS = ".. _" + tgL[0].strip() + ": " + tgL[1].strip()
         elif tag == "[r]_":  # right adjust text
             tagL = tagS.strip().split("[r]_")
-            uS = "\\hfill" + tagL[0].strip()
+            uS = "?x?hfill " + tagL[0].strip()
         elif tag == "[c]_":  # center text
             tagL = tagS.strip().split("[c]_")
-            uS = "\\begin{center} " + tagL[0].strip() + " \\end{center}"
+            uS = "?x?begin{center} " + tagL[0].strip() + "?x?end{center}"
         elif tag == "[x]_":  # format tex
             tagL = tagS.strip().split("[x]_")
             txS = tagL[0].strip()
@@ -146,19 +144,19 @@ class OutputRST:
             fnumI = int(self.setsectD["fnumI"]) + 1
             self.setsectD["fnumI"] = fnumI
             refS = self._refs(fnumI, "[ Fig: ") + " ]"
-            uS = tagL[0].strip() + " \\hfill " + refS
+            uS = tagL[0].strip() + " ?x?hfill " + refS
         elif tag == "[e]_":  # equation label
             tagL = tagS.strip().split("[e]_")
             enumI = int(self.setsectD["enumI"]) + 1
             self.setsectD["enumI"] = enumI
             refS = self._refs(enumI, "[ Equ: ")
-            uS = tagL[0].strip() + " \\hfill " + refS
+            uS = tagL[0].strip() + " ?x?hfill " + refS
         elif tag == "[t]_":  # table label
             tagL = tagS.strip().split("[t]_")
             tnumI = int(self.setsectD["tnumI"]) + 1
             self.setsectD["tnumI"] = tnumI
             refS = self._refs(tnumI, "[Table: ") + "]"
-            uS = tagL[0].strip() + " \\hfill " + refS
+            uS = tagL[0].strip() + " ?x?hfill  " + refS
         elif tag == "[foot]_":  # footnote label
             tagS = tagS.strip("[foot]_").strip()
             # ".. target-notes::\n\n"
@@ -480,10 +478,11 @@ class OutputRST:
             with open(tfileS, "r") as csvfile:  # read csv file
                 readL = list(csv.reader(csvfile))
         elif extS == "xlsx":
-            pDF1 = pd.read_excel(tfileS, header=None)
-            readL = pDF1.values.tolist()
+            tDF1 = pd.read_excel(tfileS, header=None)
+            readL = tDF1.values.tolist()
         else:
             return
+
         incl_colL = list(range(len(readL[1])))
         widthI = self.setcmdD["cwidthI"]
         alignS = self.setcmdD["calignS"]
@@ -492,9 +491,9 @@ class OutputRST:
             widthL = iL[2].split(",")  # new max col width
             widthI = int(widthL[0].strip())
             alignS = widthL[1].strip()
-            saS = alignD[alignS]  # new align
             self.setcmdD.update({"cwidthI": widthI})
             self.setcmdD.update({"calignS": alignS})
+            saS = alignD[alignS]  # new align
         totalL = [""] * len(incl_colL)
         if iL[3].strip():  # columns
             if iL[3].strip() == "[:]":
@@ -509,6 +508,7 @@ class OutputRST:
         for row in readL[1:]:
             contentL.append([row[i] for i in incl_colL])
         wcontentL = []
+        print(f"{widthI=}")
         for rowL in contentL:  # wrap columns
             wrowL = []
             for iS in rowL:
@@ -531,7 +531,7 @@ class OutputRST:
         rstS = output.getvalue()
         sys.stdout = old_stdout
 
-        print(rstS)
+        # print(rstS)
         self.restS += rstS + "\n"
 
     def _iimage(self, iL: list):
@@ -541,26 +541,28 @@ class OutputRST:
             il (list): image parameters
         """
         rstS = ""
+        dfoldS = "d" + self.setsectD["cnumS"]
+        fileS = iL[1].split(",")
+        file1S = fileS[0].strip()
+        fileS = iL[1].split(",")
+        file1S = fileS[0].strip()
+        img1S = str(Path(self.folderD["docpath"], dfoldS, file1S).as_posix())
+        scaleF = iL[2].split(",")
+        scale1S = str(float(scaleF[0])) + " %"
+        self.setcmdD.update({"scale1F": scale1S})
         if "," in iL[1]:  # two images
-            scaleF = iL[2].split(",")
-            scale1S = str(float(scaleF[0]))
-            scale2S = str(float(scaleF[1]))
-            self.setcmdD.update({"scale1F": scale1S})
+            scale2S = str(float(scaleF[1])) + " %"
             self.setcmdD.update({"scale2F": scale2S})
-            fileS = iL[1].split(",")
-            file1S = fileS[0].strip()
             file2S = fileS[1].strip()
-            calpS = "r" + self.setsectD["cnumS"]
-            img1S = str(Path(self.folderD["hpath"] / calpS / file1S))
-            img2S = str(Path(self.folderD["hpath"] / calpS / file2S))
+            img2S = str(Path(self.folderD["docpath"] / dfoldS / file2S).as_posix)
             rstS += (
-                ".. image:: "
+                "  .. image:: "
                 + img1S
                 + "\n"
                 + "   :width: "
                 + scale1S
                 + "\n"
-                + ".. :image:: "
+                + ".. image:: "
                 + img2S
                 + "\n"
                 + "   :width: "
@@ -568,12 +570,6 @@ class OutputRST:
                 + "\n"
             )
         else:  # one image
-            scale1S = str(float(iL[2]))
-            self.setcmdD.update({"scale1F": scale1S})
-            fileS = iL[1].split(",")
-            file1S = fileS[0].strip()
-            calpS = "r" + self.setsectD["cnumS"]
-            img1S = str(Path(self.folderD["hpath"] / calpS / file1S))
             rstS += (
                 ".. image:: "
                 + img1S
@@ -583,7 +579,8 @@ class OutputRST:
                 + "\n"
                 + "   :align: center \n"
             )
-            self.restS += rstS + "\n"
+
+        self.restS += rstS + "\n"
 
     def v_rst(self) -> tuple:
         """parse value-string and set method
