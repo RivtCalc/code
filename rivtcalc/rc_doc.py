@@ -88,7 +88,7 @@ class OutputRST:
         objfillS = str(objnumI).zfill(2)
         sfillS = str(self.setsectD["snumS"]).strip().zfill(2)
         cnumSS = str(self.setsectD["cnumS"])
-        refS = typeS + cnumSS + "." + sfillS + "." + objfillS
+        refS = typeS + cnumSS + "." + objfillS
 
         return refS
 
@@ -144,23 +144,27 @@ class OutputRST:
             fnumI = int(self.setsectD["fnumI"]) + 1
             self.setsectD["fnumI"] = fnumI
             refS = self._refs(fnumI, "[ Fig: ") + " ]"
-            uS = tagL[0].strip() + " ?x?hfill " + refS
+            uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**?x?newline"
         elif tag == "[e]_":  # equation label
             tagL = tagS.strip().split("[e]_")
             enumI = int(self.setsectD["enumI"]) + 1
             self.setsectD["enumI"] = enumI
             refS = self._refs(enumI, "[ Equ: ")
-            uS = tagL[0].strip() + " ?x?hfill " + refS
+            uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**"
         elif tag == "[t]_":  # table label
             tagL = tagS.strip().split("[t]_")
             tnumI = int(self.setsectD["tnumI"]) + 1
             self.setsectD["tnumI"] = tnumI
             refS = self._refs(tnumI, "[Table: ") + "]"
-            uS = tagL[0].strip() + " ?x?hfill  " + refS
+            uS = "**" + tagL[0].strip() + " ?x?hfill  " + refS + "**"
         elif tag == "[foot]_":  # footnote label
             tagS = tagS.strip("[foot]_").strip()
             # ".. target-notes::\n\n"
             uS = ".. [*] " + tagS
+        elif tag == "[n]_":  # new line
+            tagL = tagS.strip().split("[n]_")
+            tagS = tagL[0] + "\n"
+            uS = tagS
         else:
             uS = tagS
 
@@ -190,11 +194,11 @@ class OutputRST:
                     alignL = ["left", "right", "right", "left"]
                     self._vtable(self.valL, hdrL, "rst", alignL)
                     self.valL = []
-                    print(uS.rstrip(" "))
-                    self.restS += " \n"
+                    self.restS += "\n"
                     self.rivtD.update(locals())
                     continue
                 else:
+                    # self.restS += "?x?vspace{7pt}"
                     self.restS += "\n"
                     continue
             try:
@@ -236,7 +240,6 @@ class OutputRST:
 
             self.rivtD.update(locals())
             if typeS != "table":  # skip table prnt
-                print(uS)
                 self.restS += uS.rstrip() + "\n"
 
     def r_rst(self) -> str:
@@ -247,9 +250,8 @@ class OutputRST:
              setsectD (dict): section settings
         """
 
-        rcmdL = ["head", "search", "keys", "info", "text", "table", "pdf"]
+        rcmdL = ["search", "keys", "info", "text", "table", "pdf"]
         rmethL = [
-            self._rhead,
             self._rsearch,
             self._rkeys,
             self._rinfo,
@@ -262,28 +264,6 @@ class OutputRST:
         self._parseRST("repository", rcmdL, rmethL, rtagL)
 
         return self.restS, self.setsectD
-
-    def _rhead(self, rL):
-        """format header information
-
-        Args:
-            rL (list): list of header parameters
-
-        String Parameters:
-            (title): print title at top of each page
-            (date): print date at top of each
-            toc; notoc: print table of contents
-        """
-        if len(rL) < 5:
-            rL += [""] * (5 - len(rL))  # pad parameters
-        if rL[1]:
-            calctitleS = rL[1].strip()
-        if rL[2] == "toc":
-            pass
-        if rL[3] == "readme":
-            pass
-        if rL[4]:
-            pass
 
     def _rsearch(self, rsL):
         a = 4
@@ -351,7 +331,6 @@ class OutputRST:
                 totalL = [""] * len(incl_colL)
         ttitleS = readL[0][0].strip() + " [t]_"
         rstgS = self._tags(ttitleS, rtagL)
-        print(rstgS.rstrip() + "\n")
         self.restS += rstgS.rstrip() + "\n\n"
         for row in readL[1:]:
             contentL.append([row[i] for i in incl_colL])
@@ -378,7 +357,6 @@ class OutputRST:
         rstS = output.getvalue()
         sys.stdout = old_stdout
 
-        print(rstS)
         self.restS += rstS + "\n"
 
     def _rpdf(self, rsL):
@@ -464,6 +442,7 @@ class OutputRST:
             "[t]_",
             "[f]_",
             "[#]_",
+            "[n]_",
         ]
         if len(iL) < 4:
             iL += [""] * (4 - len(iL))  # pad parameters
@@ -503,12 +482,10 @@ class OutputRST:
                 totalL = [""] * len(incl_colL)
         ttitleS = readL[0][0].strip() + " [t]_"
         utgS = self._tags(ttitleS, itagL)
-        print(utgS.rstrip() + "\n")
         self.restS += utgS.rstrip() + "\n\n"
         for row in readL[1:]:
             contentL.append([row[i] for i in incl_colL])
         wcontentL = []
-        print(f"{widthI=}")
         for rowL in contentL:  # wrap columns
             wrowL = []
             for iS in rowL:
@@ -554,15 +531,17 @@ class OutputRST:
             scale2S = str(float(scaleF[1])) + " %"
             self.setcmdD.update({"scale2F": scale2S})
             file2S = fileS[1].strip()
-            img2S = str(Path(self.folderD["docpath"] / dfoldS / file2S).as_posix)
+            img2S = str(Path(self.folderD["docpath"] / dfoldS / file2S).as_posix())
             rstS += (
-                "  .. image:: "
+                "|pic1|  |pic2| "
+                + "\n\n"
+                + ".. |pic1| image:: "
                 + img1S
                 + "\n"
                 + "   :width: "
                 + scale1S
-                + "\n"
-                + ".. image:: "
+                + "\n\n"
+                + ".. |pic2| image:: "
                 + img2S
                 + "\n"
                 + "   :width: "
@@ -577,7 +556,7 @@ class OutputRST:
                 + "   :width: "
                 + scale1S
                 + "\n"
-                + "   :align: center \n"
+                + "   :align: left \n"
             )
 
         self.restS += rstS + "\n"
@@ -667,7 +646,6 @@ class OutputRST:
                 utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
             except:
                 pass
-            print("\n" + utfS + "\n")
             self.calcS += "\n" + utfS + "\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
@@ -731,7 +709,6 @@ class OutputRST:
         sys.stdout.flush()
         utfS = output.getvalue()
         sys.stdout = old_stdout
-        print(utfS)
         self.calcS += utfS + "\n"
         self.rivtD.update(locals())
 
@@ -827,10 +804,8 @@ class OutputRST:
             eqS = "Eq(" + eqL[0] + ",(" + eqL[1] + "))"
             # sps = sps.encode('unicode-escape').decode()
             utfs = sp.pretty(sp.sympify(eqS, _clash2, evaluate=False))
-            print(utfs)
             self.calcl.append(utfs)
         except:
-            print(utfs)
             self.calcl.append(utfs)
         try:
             symeq = sp.sympify(eqS.strip())  # substitute

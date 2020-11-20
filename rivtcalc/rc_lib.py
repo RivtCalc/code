@@ -94,13 +94,6 @@ rc.R('''[01]_ The repository-string defines repository and report content
     
     || keys | (discipline), (object), (purpose), (assembly), (component)
 
-    The ||head command specifies an optional calc title and date printed at the
-    top of each doc page, and table of contents printed before the string text.
-    The toc argument generates a table of contents from the
-    section tags.
-
-    || head | (calc title) | (date) | toc; notoc  
-
     The || info command is similar to the the ||table and ||text commands with
     differences in file location and use. See those commands for details.
     ||info files are used for project specific information (clients, addresses,
@@ -371,20 +364,34 @@ def _section(hdrS: str):
     Args:
         hdrS (str): section heading line
     """
-    global utfcalcS, _setsectD
+    global utfcalcS, _setsectD, rstcalcS
 
     _rgx = r"\[\d\d\]"
     if re.search(_rgx, hdrS):
-        _setsectD["enumI"] = 0  # equation number
-        _setsectD["fnum"] = 0  # figure number
-        _setsectD["tnumI"] = 0  # table number
-        nameS = _setsectD["snameS"] = hdrS[hdrS.find("]") + 2 :].strip()
+        nameSS = _setsectD["snameS"] = hdrS[hdrS.find("]") + 2 :].strip()
         snumSS = _setsectD["snumS"] = hdrS[hdrS.find("[") + 1 : hdrS.find("]")]
         cnumSS = str(_setsectD["cnumS"])
         widthI = int(_setsectD["swidthI"])
+    if _rstflagB:
+        # draw horizontal line
+        headS = (
+            ".. raw:: latex"
+            + "\n\n"
+            + "   ?x?textbf{"
+            + nameSS
+            + "}"
+            + "   ?x?hfill?x?textbf{Section "
+            + snumSS
+            + "}\n"
+            + "   ?x?newline"
+            + "   ?x?vspace{-.15}   {?x?color{black}?x?hrulefill}"
+            + "\n"
+        )
+        rstcalcS += headS
+    else:
         headS = (
             " "
-            + nameS
+            + nameSS
             + (cnumSS + " - " + ("[" + snumSS + "]")).rjust(widthI - len(nameS) - 1)
         )
         bordrS = widthI * "_"
@@ -519,7 +526,7 @@ def write_text(filepathS: str):
     os._exit(1)
 
 
-def _write_pdf(stylefileS: str):
+def _write_pdf(stylefileS: str, calctitleS: str):
     """read .rst file, write .tex and .pdf to tmp folder
 
     move .pdf file to doc subfolder
@@ -574,8 +581,12 @@ def _write_pdf(stylefileS: str):
     # fix escape sequences
     with open(texfileP, "r") as texin:
         texf = texin.read()
-    texf = texf.replace("?x?", """\\""")
-    # texf = texf.replace("""inputenc""", """ """)
+        texf = texf.replace("?x?", """\\""")
+        texf = texf.replace(
+            """fancyhead[L]{\leftmark}""",
+            """fancyhead[L]{\\normalsize  """ + calctitleS + "}",
+        )
+
     # texf = texf.replace(
     #     """\\begin{document}""",
     #     """\\renewcommand{\contentsname}{"""
@@ -592,7 +603,7 @@ def _write_pdf(stylefileS: str):
     # )
 
     with open(texfileP, "w") as texout:
-        print(texf, file=texout)
+        texout.write(texf)
 
     dnameS = _cnameS.replace("c", "d", 1)
     dfolderS = str(_setsectD["fnumS"]).replace("c", "d", 1)
@@ -620,7 +631,7 @@ def _write_html(stylefileS):
     pass
 
 
-def write_doc(doctypeS: str, stylefileS: str):
+def write_doc(doctypeS: str, stylefileS: str, calctitleS: str):
     """write rst-calc and values to files
 
     .csv value file is written to calc subfolder
@@ -651,7 +662,7 @@ def write_doc(doctypeS: str, stylefileS: str):
     print("INFO  rst calc written to tmp folder", flush=True)
 
     if doctypeS.strip() == "pdf":
-        _write_pdf(stylefileS)
+        _write_pdf(stylefileS, calctitleS)
     if doctypeS.strip() == "html":
         _write_html(stylefileS)
 

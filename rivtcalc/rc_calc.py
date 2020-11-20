@@ -81,7 +81,7 @@ class OutputUTF:
         objfillS = str(objnumI).zfill(2)
         sfillS = str(self.setsectD["snumS"]).strip().zfill(2)
         cnumSS = str(self.setsectD["cnumS"])
-        refS = typeS + cnumSS + "." + sfillS + "." + objfillS
+        refS = typeS + cnumSS + "." + objfillS
 
         return refS
 
@@ -165,6 +165,10 @@ class OutputUTF:
             spS = "Eq(" + spL[0] + ",(" + spL[1] + "))"
             # sps = sps.encode('unicode-escape').decode()
             uS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
+        elif tag == "[n]_":  # new line
+            tagL = tagS.strip().split("[n]_")
+            tagS = tagL[0]
+            uS = tagS
         else:
             uS = tagS
 
@@ -250,9 +254,8 @@ class OutputUTF:
              calcS (list): utf formatted calc-string (appended)
              setsectD (dict): section settings
         """
-        rcmdL = ["head", "search", "keys", "info", "table", "text", "pdf"]
+        rcmdL = ["search", "keys", "info", "table", "text", "pdf"]
         rmethL = [
-            self._rhead,
             self._rsearch,
             self._rkeys,
             self._rinfo,
@@ -265,28 +268,6 @@ class OutputUTF:
         self._parseUTF("repository", rcmdL, rmethL, rtagL)
 
         return self.calcS, self.setsectD
-
-    def _rhead(self, rL):
-        """format header information
-
-        Args:
-            rL (list): list of header parameters
-
-        String Parameters:
-            (title): print title at top of each page
-            (date): print date at top of each
-            toc; notoc: print table of contents
-        """
-        if len(rL) < 4:
-            rL += [""] * (4 - len(rL))  # pad parameters
-        if rL[1]:
-            calctitleS = rL[1].strip()
-        if rL[2]:
-            dateS = rL[2].strip()
-        if rL[3] == "toc":
-            pass
-        else:
-            pass
 
     def _rkeys(self, rsL):
         """[summary]
@@ -406,7 +387,7 @@ class OutputUTF:
         contentL = []
         sumL = []
         fileS = iL[1].strip()
-        calpS = "c" + self.setsectD["cnumS"]
+        calpS = self.setsectD["fnumS"]
         tfileS = Path(self.folderD["apath"] / calpS / fileS)
         extS = fileS.split(".")[1]
         if extS == "csv":
