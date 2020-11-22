@@ -117,7 +117,7 @@ class OutputRST:
         if tag == "[#]_":  # auto increment footnote mark
             uS = tagS + "\n"
         elif tag == "[page]_":  # new page
-            uS = ".. raw:: latex \n\n ?xx? newpage"
+            uS = ".. raw:: latex \n\n ?x?newpage \n"
         elif tag == "[line]_":  # horizontal line
             uS = int(self.setsectD["swidthI"]) * "-"
         elif tag == "[link]_":  # url link
@@ -403,8 +403,8 @@ class OutputRST:
         Args:
             iL (list): text command list
         """
-        calP = "r" + self.setsectD["cnumS"]
-        txapath = Path(self.folderD["xpath"] / calP / iL[1].strip())
+        calpS = "c" + self.setsectD["cnumS"]
+        txapath = Path(self.folderD["cpath"] / calpS / iL[1].strip())
         with open(txapath, "r") as txtf1:
             rstL = txtf1.readlines()
         if iL[2].strip() == "indent":
@@ -415,8 +415,11 @@ class OutputRST:
             rstL = [inS + S1 + "\n" for S1 in rstL]
             rstS = "".join(rstL)
         elif iL[2].strip() == "literal":
-            txtS = "  ".join(rstL)
+            txtS = " ".join(rstL)
             rstS = "::\n\n" + txtS + "\n"
+        elif iL[2].strip() == "raw":
+            txtS = "".join(rstL)
+            rstS = "\n" + txtS
         else:
             txtS = "".join(rstL)
             rstS = "\n" + txtS

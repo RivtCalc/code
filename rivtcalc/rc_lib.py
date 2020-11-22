@@ -100,13 +100,13 @@ rc.R('''[01]_ The repository-string defines repository and report content
     etc) and are read from the docs/info folder which is not shared. Also, the
     info command is only written to docs, and not to utf-calcs. This keeps
     confidential project information separated from the shareable calc
-    information contained in the calcs folder. ||info tables do not contain
+    information contained in the calcs folder. || info tables do not contain
     titles and should not be numbered.
 
     || info | (project.txt) | literal; indent
     || info | (project.csv or .xlsx) | ([1,2,3] or [:]
     
-    The ||pdf command attaches existing pdf documents, stored in the
+    The || pdf command attaches existing pdf documents, stored in the
     docs/attach folder, to the front or back  of the calc doc. The *functions*
     or *docstrings* arguments determine whether the complete function code or
     just the docstrings of functions used with the ||func commmand are appended
@@ -532,7 +532,43 @@ def _write_pdf(stylefileS: str, calctitleS: str):
     move .pdf file to doc subfolder
 
     """
-    f1 = open(_rstfile, "r")
+
+
+def _write_html(stylefileS):
+    pass
+
+
+def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str):
+    """write rst-calc and values to files
+
+    .csv value file is written to calc subfolder
+    .rst calc file is written to tmp folder
+    .style file is read from rivtcalc library (default)
+    .tex file is written to tmp folder (default)
+
+    """
+    global rstcalcS, _rstflagB
+
+    _rstflagB = True
+    rstcalcS = """"""
+    f1 = open(_cfull, "r")
+    rstcalcL = f1.readlines()
+    f1.close()
+    print("INFO calc file read: " + str(_cfull))
+
+    indx = 0
+    for iS in enumerate(rstcalcL):  # find write_doc
+        if "write_doc" in iS[1]:
+            indx = int(iS[0])
+            break
+    rstcalcL = rstcalcL[0:indx] + rstcalcL[indx + 1 :]  # now skip write_doc
+    cmdS = "".join(rstcalcL)
+    exec(cmdS, globals(), locals())
+    with open(_rstfile, "wb") as f1:
+        f1.write(rstcalcS.encode("UTF-8"))
+    print("INFO  rst calc written to tmp folder", flush=True)
+
+    f1 = open(_rstfile, "r", encoding="utf-8", errors="ignore")
     rstcalcL = f1.readlines()
     f1.close()
     print("INFO  rst file read: " + str(_rstfile))
@@ -579,7 +615,7 @@ def _write_pdf(stylefileS: str, calctitleS: str):
     print("INFO  tex file written : " + str(texfileP) + "\n")
 
     # fix escape sequences
-    with open(texfileP, "r") as texin:
+    with open(texfileP, "r", encoding="utf-8", errors="ignore") as texin:
         texf = texin.read()
         texf = texf.replace("?x?", """\\""")
         texf = texf.replace(
@@ -605,66 +641,26 @@ def _write_pdf(stylefileS: str, calctitleS: str):
     with open(texfileP, "w") as texout:
         texout.write(texf)
 
-    dnameS = _cnameS.replace("c", "d", 1)
-    dfolderS = str(_setsectD["fnumS"]).replace("c", "d", 1)
-    docpdfP = Path(_dpath / dfolderS / ".".join([dnameS, "pdf"]))
+    if doctypeS == "pdf":  # generate pdf
+        dnameS = _cnameS.replace("c", "d", 1)
+        dfolderS = str(_setsectD["fnumS"]).replace("c", "d", 1)
+        docpdfP = Path(_dpath / dfolderS / ".".join([dnameS, "pdf"]))
+        # clean temp files and generate pdf file
+        pdfmkS = "latexmk -pdf -xelatex -quiet -f " + str(texfileP)
+        os.chdir(mpath)
+        os.system("latexmk -c")
+        print("\nINFO  temporary Tex files deleted \n")
+        os.system(pdfmkS)
+        print("\nINFO  pdf file written: " + ".".join([_cnameS, "pdf"]))
 
-    # clean temp files and generate pdf file
-    pdfmkS = "latexmk -pdf -xelatex -quiet -f " + str(texfileP)
-    os.chdir(mpath)
-    os.system("latexmk -c")
-    print("\nINFO  temporary Tex files deleted \n")
-    os.system(pdfmkS)
-    print("\nINFO  pdf file written: " + ".".join([_cnameS, "pdf"]))
-
-    # move pdf to specified folder
-    os.chdir(mpath)
-    pdfS = ".".join([_cnameS, "pdf"])
-    shutil.move(pdfS, docpdfP)
-    os.chdir(_dpath)
-    print("INFO  pdf file moved to docs folder", flush=True)
-    print("INFO  program complete")
+        # move pdf to specified folder
+        os.chdir(mpath)
+        pdfS = ".".join([_cnameS, "pdf"])
+        shutil.move(pdfS, docpdfP)
+        os.chdir(_dpath)
+        print("INFO  pdf file moved to docs folder", flush=True)
+        print("INFO  program complete")
     os._exit(1)
-
-
-def _write_html(stylefileS):
-    pass
-
-
-def write_doc(doctypeS: str, stylefileS: str, calctitleS: str):
-    """write rst-calc and values to files
-
-    .csv value file is written to calc subfolder
-    .rst calc file is written to tmp folder
-    .style file is read from rivtcalc library (default)
-    .pdf file is written to doc folder (default)
-
-    """
-    global rstcalcS, _rstflagB
-
-    _rstflagB = True
-    rstcalcS = """"""
-    f1 = open(_cfull, "r")
-    rstcalcL = f1.readlines()
-    f1.close()
-    print("INFO calc file read: " + str(_cfull))
-
-    indx = 0
-    for iS in enumerate(rstcalcL):  # find write_doc
-        if "write_doc" in iS[1]:
-            indx = int(iS[0])
-            break
-    rstcalcL = rstcalcL[0:indx] + rstcalcL[indx + 1 :]  # now skip write_doc
-    cmdS = "".join(rstcalcL)
-    exec(cmdS, globals(), locals())
-    with open(_rstfile, "wb") as f1:
-        f1.write(rstcalcS.encode("UTF-8"))
-    print("INFO  rst calc written to tmp folder", flush=True)
-
-    if doctypeS.strip() == "pdf":
-        _write_pdf(stylefileS, calctitleS)
-    if doctypeS.strip() == "html":
-        _write_html(stylefileS)
 
 
 def write_report():
