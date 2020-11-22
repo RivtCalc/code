@@ -1,15 +1,16 @@
 Program Structure
 ----------------- 
 
-**RivtCalc** is a cross-platform, open source tool for writing engineering
-calculation documents. The intention is to improve calculation clarity and
-reuse. It is implemented as a Python library that produces calculation
+**rivtcalc** is an open source document generator and databbase for engineering
+calculations. It simplifies writing, checking and sharing calculations, and 
+runs on all desktop, mobile and server platforms. It is implemented as 
+a Python library that produces calculation
 documents and reports in UTF8, HTML and PDF file formats from plain text input.
 Calculations are written in **rivt**, a light-weight, procedural markup
-language. The language includes a dozen commands and tags, and incorporate a
+language. The language includes commands and tags, and incorporates a
 subset of reStructuredText.
 
-A **RivtCalc** file is a Python file that imports *rivtcalc.rc_lib as rc* and
+A **rivtcalc** file is a Python file that imports *rivtcalc.rc_lib as rc* and
 calls functions on **rivt-strings**. A **rivt-string** contains text,
 commands and tags defining the calculation. A function call is of the form::
 
