@@ -1,11 +1,11 @@
 #! python
 """rivtcalc API  
 
-    The API includes eight functions. Input functions take a rivt-markup string
-    (calc) as the single function argument and write formatted utf calculations
+    The API includes eight functions. Input functions take a rivt-string
+    as the single function argument and write formatted utf calculations
     to the terminal. Ouput functions take a file of rivt-strings (calcs) and
     write formatted calculations to files in utf-8, pdf and html formats
-    (docs).
+    (docs)..
 
     Example calcs are here:
 
@@ -24,10 +24,10 @@
     Rivt function - Input -----------------------------------------------------
     type     API  any text       commands 
     ======= ===== ========= ===================================================
-    Repo     R()    yes       head, search, info, keys, text, table, pdf
+    Repo     R()    yes       search, info, keys, text, table, pdf
     Insert   I()    yes       text, table, image, latex
-    Values   V()    no        =, config, value, data, func, + insert commands
-    Table    T()    no        Python simple statements, + insert commands  
+    Values   V()    no        =, config, value, data, func, I() commands
+    Table    T()    no        Python simple statements, I() commands  
     Skip     S()    --        Skip rivt-string evaluation
 
 
@@ -54,8 +54,9 @@
     Rivt function - Output ----------------------------------------------------
         name                          description
     ============================ ==============================================
-    write_text()                    write calc to utf8 doc file
-    write_doc(type, style)         write calc to pdf or html doc file
+    write_text()                   write calc to utf8 doc file
+    write_pdf(type, style)         write calc to tex and pdf file
+    write_html(style)              write calc to html file
     write_report()                 combine pdf docs into pdf report file
     ============================ ==============================================
     
@@ -225,14 +226,15 @@ import rivtcalc.rc_doc as _rc_doc
 # import rivt.rivt_chk as _rchk
 
 try:
-    # print("argv1", sys.argv[1])
+    print("argv1", sys.argv[1])
     _calcfileS = sys.argv[1]
 except:
-    # print("argv0", sys.argv[0])
+    print("argv0", sys.argv[0])
     _calcfileS = sys.argv[0]
 if ".py" not in _calcfileS:
     import __main__
 
+    print(dir(__main__))
     _calcfileS = __main__.__file__
 
 _cwdS = os.getcwd()
@@ -291,6 +293,7 @@ _setcmdD = {
     "trmtI": 2,
     "subB": False,
     "saveB": False,
+    "substB": False,
 }
 
 # temp files
@@ -392,7 +395,7 @@ def _section(hdrS: str):
         headS = (
             " "
             + nameSS
-            + (cnumSS + " - " + ("[" + snumSS + "]")).rjust(widthI - len(nameS) - 1)
+            + (cnumSS + " - " + ("[" + snumSS + "]")).rjust(widthI - len(nameSS) - 1)
         )
         bordrS = widthI * "_"
         utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS + "\n"
@@ -526,15 +529,7 @@ def write_text(filepathS: str):
     os._exit(1)
 
 
-def _write_pdf(stylefileS: str, calctitleS: str):
-    """read .rst file, write .tex and .pdf to tmp folder
-
-    move .pdf file to doc subfolder
-
-    """
-
-
-def _write_html(stylefileS):
+def write_html(stylefileS):
     pass
 
 
@@ -558,7 +553,7 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str):
 
     indx = 0
     for iS in enumerate(rstcalcL):  # find write_doc
-        if "write_doc" in iS[1]:
+        if "write_pdf" in iS[1]:
             indx = int(iS[0])
             break
     rstcalcL = rstcalcL[0:indx] + rstcalcL[indx + 1 :]  # now skip write_doc
@@ -638,7 +633,7 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str):
     #     + """\\listoffigures""",
     # )
 
-    with open(texfileP, "w") as texout:
+    with open(texfileP, "w", encoding="utf8") as texout:
         texout.write(texf)
 
     if doctypeS == "pdf":  # generate pdf

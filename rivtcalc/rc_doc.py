@@ -605,7 +605,7 @@ class OutputRST:
 
         self._parseRST("values", vcmdL, vmethL, vtagL)
         self.rivtD.update(locals())
-        return self.calcS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
+        return self.restS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
 
     def _vconfig(self, vL: list):
         """update dictionary format values
@@ -646,13 +646,13 @@ class OutputRST:
             utfS = vL[0]
             spS = "Eq(" + varS + ",(" + valS + "))"  # pretty prnt
             try:
-                utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
+                rstS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
             except:
                 pass
-            self.calcS += "\n" + utfS + "\n"
+            self.restS += "\n" + rstS + "\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
-            if self.setcmdD["subst"]:
+            if self.setcmdD["substB"]:
                 self._vsub(vL)
             else:
                 hdrL = []
@@ -710,9 +710,9 @@ class OutputRST:
         valS = output.getvalue()
         sys.stdout = old_stdout
         sys.stdout.flush()
-        utfS = output.getvalue()
+        rstS = output.getvalue()
         sys.stdout = old_stdout
-        self.calcS += utfS + "\n"
+        self.restS += rstS + "\n"
         self.rivtD.update(locals())
 
     def _vvalue(self, vL: list):
@@ -726,8 +726,8 @@ class OutputRST:
         valL = []
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
-        calpS = "r" + self.setsectD["cnumS"]
-        vfileS = Path(self.folderD["apath"] / calpS / vL[1].strip())
+        calpS = self.setsectD["fnumS"]
+        vfileS = Path(self.folderD["cpath"] / calpS / vL[1].strip())
         with open(vfileS, "r") as csvfile:
             readL = list(csv.reader(csvfile))
         for vaL in readL[1:]:

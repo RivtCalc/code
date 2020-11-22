@@ -388,7 +388,7 @@ class OutputUTF:
         sumL = []
         fileS = iL[1].strip()
         calpS = self.setsectD["fnumS"]
-        tfileS = Path(self.folderD["apath"] / calpS / fileS)
+        tfileS = Path(self.folderD["cpath"] / calpS / fileS)
         extS = fileS.split(".")[1]
         if extS == "csv":
             with open(tfileS, "r") as csvfile:  # read csv file
@@ -611,7 +611,7 @@ class OutputUTF:
             self.calcS += "\n" + utfS + "\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
-            if self.setcmdD["subst"]:
+            if self.setcmdD["substB"]:
                 self._vsub(vL)
             else:
                 hdrL = []
@@ -687,7 +687,7 @@ class OutputUTF:
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
         calpS = "c" + self.setsectD["cnumS"]
-        vfileS = Path(self.folderD["apath"] / calpS / vL[1].strip())
+        vfileS = Path(self.folderD["cpath"] / calpS / vL[1].strip())
         with open(vfileS, "r") as csvfile:
             readL = list(csv.reader(csvfile))
         for vaL in readL[1:]:
@@ -729,7 +729,7 @@ class OutputUTF:
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
         valL.append(["variable", "values"])
-        vfileS = Path(self.folderD["apath"] / vL[2].strip())
+        vfileS = Path(self.folderD["cpath"] / vL[2].strip())
         vecL = eval(vL[3].strip())
         with open(vfileS, "r") as csvF:
             reader = csv.reader(csvF)
