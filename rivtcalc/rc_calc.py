@@ -541,6 +541,7 @@ class OutputUTF:
             self._vvalue,
             self._vdata,
             self._vfunc,
+            self._vtable,
             self._itext,
             self._itable,
             self._iimage,

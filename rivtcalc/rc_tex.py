@@ -192,9 +192,9 @@ class OutputRST:
                 if len(self.valL) > 0:  # print value table
                     hdrL = ["variable", "value", "[value]", "description"]
                     alignL = ["left", "right", "right", "left"]
-                    self._vtable(self.valL, hdrL, "rst", alignL)
+                    self._vtable(self.valL, hdrL, "latex", alignL)
                     self.valL = []
-                    self.restS += "\n"
+                    self.restS += "\n\n"
                     self.rivtD.update(locals())
                     continue
                 else:
@@ -229,8 +229,8 @@ class OutputRST:
                     methL[indxI](uL)
                     continue
                 else:
-                    exec(uS)
-                    continue  # exec table code
+                    exec(uS)  # exec table code
+                    continue
             if uS[0:2] == "||":  # check for cmd
                 # print(f"{cmdL=}")
                 uL = uS[2:].split("|")
@@ -502,7 +502,7 @@ class OutputRST:
         output.write(
             tabulate(
                 wcontentL,
-                tablefmt="rst",
+                tablefmt="latex",
                 headers="firstrow",
                 numalign="decimal",
                 stralign=saS,
@@ -512,7 +512,11 @@ class OutputRST:
         sys.stdout = old_stdout
 
         # print(rstS)
-        self.restS += rstS + "\n"
+        self.restS += ".. raw:: latex" + "\n\n"
+        inrstS = ""
+        for i in rstS.split("\n"):
+            inrstS += "  " + i
+        self.restS += inrstS + "\n\n"
 
     def _iimage(self, iL: list):
         """insert one or two images from file
@@ -582,6 +586,7 @@ class OutputRST:
             self._vvalue,
             self._vdata,
             self._vfunc,
+            self._vtable,
             self._itext,
             self._itable,
             self._iimage,
@@ -643,7 +648,7 @@ class OutputRST:
                     valU = eval(varS).cast_unit(eval(unit1S))
                     val1U = str(valU.number()) + " " + str(valU.unit())  # case=1
                     val2U = valU.cast_unit(eval(unit2S))
-            utfS = vL[0]
+            rstS = vL[0]
             spS = "Eq(" + varS + ",(" + valS + "))"  # pretty prnt
             try:
                 rstS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
@@ -702,17 +707,21 @@ class OutputRST:
         sys.stdout.flush()
         old_stdout = sys.stdout
         output = StringIO()
-        output.write(
-            tabulate(
-                tbl, tablefmt=tblfmt, headers=hdrL, showindex=False, colalign=alignL
-            )
+        tableS = tabulate(
+            tbl, tablefmt=tblfmt, headers=hdrL, showindex=False, colalign=alignL
         )
+        output.write(tableS)
         valS = output.getvalue()
         sys.stdout = old_stdout
         sys.stdout.flush()
         rstS = output.getvalue()
         sys.stdout = old_stdout
-        self.restS += rstS + "\n"
+        inrstS = ""
+        for i in rstS.split("\n"):
+            inrstS += "  " + i
+            self.restS += inrstS + "\n"
+        self.restS += ".. raw:: latex" + "\n\n"
+        self.restS += inrstS + "\n"
         self.rivtD.update(locals())
 
     def _vvalue(self, vL: list):
@@ -847,9 +856,6 @@ class OutputRST:
                     if _cnt > 1:
                         out3 = out3.replace("-" * _cnt, "\u2014" * _cnt)
                     _cnt = 0
-            # print('out3b \n', out3)
-            self._write_text(out3, 1, 0)  # print substituted form
-            self._write_text(" ", 0, 0)
         except:
             pass
 

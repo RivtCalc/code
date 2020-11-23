@@ -220,7 +220,7 @@ from typing import List, Set, Dict, Tuple, Optional
 from contextlib import suppress
 from rivtcalc.rc_unit import *
 import rivtcalc.rc_calc as _rc_calc
-import rivtcalc.rc_doc as _rc_doc
+import rivtcalc.rc_tex as _rc_tex
 
 # import rivt.rivt_reprt as _reprt
 # import rivt.rivt_chk as _rchk
@@ -357,7 +357,7 @@ def _init_rst(rawS: str):
     sectS, strS = rawS.split("\n", 1)
     _section(sectS)
     strL = strS.split("\n")
-    rstcalc = _rc_doc.OutputRST(strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
+    rstcalc = _rc_tex.OutputRST(strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
     return rstcalc
 
 
@@ -380,6 +380,7 @@ def _section(hdrS: str):
         headS = (
             ".. raw:: latex"
             + "\n\n"
+            + "   ?x?vspace{.2in}"
             + "   ?x?textbf{"
             + nameSS
             + "}"
@@ -387,8 +388,8 @@ def _section(hdrS: str):
             + snumSS
             + "}\n"
             + "   ?x?newline"
-            + "   ?x?vspace{-.15}   {?x?color{black}?x?hrulefill}"
-            + "\n"
+            + "   ?x?vspace{.05in}   {?x?color{black}?x?hrulefill}"
+            + "\n\n"
         )
         rstcalcS += headS
     else:
@@ -529,10 +530,6 @@ def write_text(filepathS: str):
     os._exit(1)
 
 
-def write_html(stylefileS):
-    pass
-
-
 def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str):
     """write rst-calc and values to files
 
@@ -610,12 +607,17 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str):
     print("INFO  tex file written : " + str(texfileP) + "\n")
 
     # fix escape sequences
+    fnumS = _setsectD["fnumS"]
     with open(texfileP, "r", encoding="utf-8", errors="ignore") as texin:
         texf = texin.read()
         texf = texf.replace("?x?", """\\""")
         texf = texf.replace(
             """fancyhead[L]{\leftmark}""",
             """fancyhead[L]{\\normalsize  """ + calctitleS + "}",
+        )
+        texf = texf.replace(
+            """fancyhead[R]{\\normalsize Page""",
+            """fancyhead[R]{\\normalsize """ + fnumS + " | ",
         )
 
     # texf = texf.replace(
@@ -655,7 +657,13 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str):
         os.chdir(_dpath)
         print("INFO  pdf file moved to docs folder", flush=True)
         print("INFO  program complete")
+    elif doctypeS == "tex":
+        pass
     os._exit(1)
+
+
+def write_html(stylefileS):
+    pass
 
 
 def write_report():
