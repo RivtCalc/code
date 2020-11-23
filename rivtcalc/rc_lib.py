@@ -285,7 +285,7 @@ _setsectD = {
 # command settings
 _setcmdD = {
     "cwidthI": 30,
-    "calignS": "s",
+    "calignS": "C",
     "writeS": "table",
     "scale1F": 1.0,
     "scale2F": 1.0,
@@ -384,7 +384,7 @@ def _section(hdrS: str):
             + "   ?x?textbf{"
             + nameSS
             + "}"
-            + "   ?x?hfill?x?textbf{Section "
+            + "   ?x?hfill?x?textbf{SECTION "
             + snumSS
             + "}\n"
             + "   ?x?newline"

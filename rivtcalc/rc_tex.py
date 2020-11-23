@@ -144,19 +144,19 @@ class OutputRST:
             fnumI = int(self.setsectD["fnumI"]) + 1
             self.setsectD["fnumI"] = fnumI
             refS = self._refs(fnumI, "[ Fig: ") + " ]"
-            uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**?x?newline"
+            uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**"
         elif tag == "[e]_":  # equation label
             tagL = tagS.strip().split("[e]_")
             enumI = int(self.setsectD["enumI"]) + 1
             self.setsectD["enumI"] = enumI
             refS = self._refs(enumI, "[ Equ: ")
-            uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**?x?newline"
+            uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**"
         elif tag == "[t]_":  # table label
             tagL = tagS.strip().split("[t]_")
             tnumI = int(self.setsectD["tnumI"]) + 1
             self.setsectD["tnumI"] = tnumI
             refS = self._refs(tnumI, "[Table: ") + "]"
-            uS = "**" + tagL[0].strip() + " ?x?hfill  " + refS + "**?x?newline"
+            uS = "**" + tagL[0].strip() + " ?x?hfill  " + refS + "**"
         elif tag == "[foot]_":  # footnote label
             tagS = tagS.strip("[foot]_").strip()
             # ".. target-notes::\n\n"
@@ -192,7 +192,7 @@ class OutputRST:
                 if len(self.valL) > 0:  # print value table
                     hdrL = ["variable", "value", "[value]", "description"]
                     alignL = ["left", "right", "right", "left"]
-                    self._vtable(self.valL, hdrL, "latex", alignL)
+                    self._vtable(self.valL, hdrL, "rst", alignL)
                     self.valL = []
                     self.restS += "\n\n"
                     self.rivtD.update(locals())
@@ -432,7 +432,7 @@ class OutputRST:
         Args:
             ipl (list): parameter list
         """
-        alignD = {"s": "", "d": "decimal", "c": "center", "r": "right", "l": "left"}
+        alignD = {"s": "", "d": "decimal", "C": "center", "R": "right", "L": "left"}
         itagL = [
             "[page]_",
             "[line]_",
@@ -507,7 +507,7 @@ class OutputRST:
         for i in rstS.split("\n"):
             counter = i.count("&")
             if counter > 0:
-                cS = "{" + "C" * (counter + 1) + "}"
+                cS = "{" + alignS * (counter + 1) + "}"
                 continue
         self.restS += "  \\vspace{-.1in}"
         self.restS += "  \\begin{tabulary}{1.0\\textwidth}" + cS + "\n"
@@ -711,17 +711,17 @@ class OutputRST:
             tbl, tablefmt=tblfmt, headers=hdrL, showindex=False, colalign=alignL
         )
         output.write(tableS)
-        valS = output.getvalue()
-        sys.stdout = old_stdout
-        sys.stdout.flush()
         rstS = output.getvalue()
         sys.stdout = old_stdout
+        sys.stdout.flush()
+        print("**********", rstS)
         inrstS = ""
+        self.restS += ":: " + "\n\n"
         for i in rstS.split("\n"):
-            inrstS += "  " + i
+            print("xxxxx", i)
+            inrstS = "  " + i
             self.restS += inrstS + "\n"
-        self.restS += ".. raw:: latex" + "\n\n"
-        self.restS += inrstS + "\n"
+        self.restS += "\n\n"
         self.rivtD.update(locals())
 
     def _vvalue(self, vL: list):

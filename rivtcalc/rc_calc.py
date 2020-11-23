@@ -667,11 +667,9 @@ class OutputUTF:
                 tbl, tablefmt=tblfmt, headers=hdrL, showindex=False, colalign=alignL
             )
         )
-        valS = output.getvalue()
-        sys.stdout = old_stdout
-        sys.stdout.flush()
         utfS = output.getvalue()
         sys.stdout = old_stdout
+        sys.stdout.flush()
         print(utfS)
         self.calcS += utfS + "\n"
         self.rivtD.update(locals())
