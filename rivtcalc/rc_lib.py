@@ -619,6 +619,14 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str):
             """fancyhead[R]{\\normalsize Page""",
             """fancyhead[R]{\\normalsize """ + fnumS + " | ",
         )
+        texf = texf.replace(
+            """\\begin{tabular}""",
+            """%% """,
+        )
+        texf = texf.replace(
+            """\\end{tabular}""",
+            """%% """,
+        )
 
     # texf = texf.replace(
     #     """\\begin{document}""",

@@ -150,13 +150,13 @@ class OutputRST:
             enumI = int(self.setsectD["enumI"]) + 1
             self.setsectD["enumI"] = enumI
             refS = self._refs(enumI, "[ Equ: ")
-            uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**"
+            uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**?x?newline"
         elif tag == "[t]_":  # table label
             tagL = tagS.strip().split("[t]_")
             tnumI = int(self.setsectD["tnumI"]) + 1
             self.setsectD["tnumI"] = tnumI
             refS = self._refs(tnumI, "[Table: ") + "]"
-            uS = "**" + tagL[0].strip() + " ?x?hfill  " + refS + "**"
+            uS = "**" + tagL[0].strip() + " ?x?hfill  " + refS + "**?x?newline"
         elif tag == "[foot]_":  # footnote label
             tagS = tagS.strip("[foot]_").strip()
             # ".. target-notes::\n\n"
@@ -464,7 +464,6 @@ class OutputRST:
             readL = tDF1.values.tolist()
         else:
             return
-
         incl_colL = list(range(len(readL[1])))
         widthI = self.setcmdD["cwidthI"]
         alignS = self.setcmdD["calignS"]
@@ -488,20 +487,12 @@ class OutputRST:
         self.restS += utgS.rstrip() + "\n\n"
         for row in readL[1:]:
             contentL.append([row[i] for i in incl_colL])
-        wcontentL = []
-        for rowL in contentL:  # wrap columns
-            wrowL = []
-            for iS in rowL:
-                templist = textwrap.wrap(str(iS), int(widthI))
-                templist = [i.replace("""\\n""", """\n""") for i in templist]
-                wrowL.append("""\n""".join(templist))
-            wcontentL.append(wrowL)
         sys.stdout.flush()
         old_stdout = sys.stdout
         output = StringIO()
         output.write(
             tabulate(
-                wcontentL,
+                contentL,
                 tablefmt="latex",
                 headers="firstrow",
                 numalign="decimal",
@@ -513,10 +504,19 @@ class OutputRST:
 
         # print(rstS)
         self.restS += ".. raw:: latex" + "\n\n"
+        for i in rstS.split("\n"):
+            counter = i.count("&")
+            if counter > 0:
+                cS = "{" + "C" * (counter + 1) + "}"
+                continue
+        self.restS += "  \\vspace{-.1in}"
+        self.restS += "  \\begin{tabulary}{1.0\\textwidth}" + cS + "\n"
         inrstS = ""
         for i in rstS.split("\n"):
-            inrstS += "  " + i
-        self.restS += inrstS + "\n\n"
+            inrstS += "  " + i + "\n"
+        self.restS += inrstS
+        self.restS += "  \\end{tabulary}\n"
+        self.restS += "  \\vspace{.15in}\n"
 
     def _iimage(self, iL: list):
         """insert one or two images from file
