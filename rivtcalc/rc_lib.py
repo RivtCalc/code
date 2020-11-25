@@ -14,12 +14,11 @@
 
 
     Rivt-strings are written in rivt-markup which includes unicode,
-    reStructuredText, rivt commands, rivt tags and Python code. The options
-    depend on the rivt function (R,I,V or T). Commands include processing
-    parameters generally operate on files, and start in the first column with
-    ||. Tags are encapsulated with []_ and generally operate on a single line
-    of text. Block tags are encapsulated with []__ and operate on indented
-    blocks.
+    reStructuredText, rivt commands, rivt tags and Python code. Valid markup
+    depends on the rivt function (R,I,V or T). Commands generally operate on
+    files and start in the first column with ||. Tags are encapsulated with
+    []_ and generally format a single line of text. Block tags are
+    encapsulated with []__ and operate on indented blocks of text.
 
     Rivt function - Input -----------------------------------------------------
     type     API  any text       commands 
@@ -206,6 +205,7 @@ rc.T('''The table-string defines active tables and plots that use simple Python 
 """
 import os
 import sys
+import subprocess
 import time
 import textwrap
 import logging
@@ -530,7 +530,7 @@ def write_text(filepathS: str):
     os._exit(1)
 
 
-def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str):
+def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str, startpageS: str):
     """write rst-calc and values to files
 
     .csv value file is written to calc subfolder
@@ -615,17 +615,12 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str):
             """fancyhead[L]{\leftmark}""",
             """fancyhead[L]{\\normalsize  """ + calctitleS + "}",
         )
+        texf = texf.replace("x*x*x", fnumS)
+        texf = texf.replace("""\\begin{tabular}""", "%% ")
+        texf = texf.replace("""\\end{tabular}""", "%% ")
         texf = texf.replace(
-            """fancyhead[R]{\\normalsize Page""",
-            """fancyhead[R]{\\normalsize """ + fnumS + " | ",
-        )
-        texf = texf.replace(
-            """\\begin{tabular}""",
-            """%% """,
-        )
-        texf = texf.replace(
-            """\\end{tabular}""",
-            """%% """,
+            """\\begin{document}""",
+            """\\begin{document}\n\\setcounter{page}{""" + startpageS + "}\n",
         )
 
     # texf = texf.replace(
@@ -665,6 +660,10 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str):
         os.chdir(_dpath)
         print("INFO  pdf file moved to docs folder", flush=True)
         print("INFO  program complete")
+        cmdS = "c:/users/rodhh/rivtcalc/sumatra.exe " + str(docpdfP)
+        print("************", cmdS)
+        subprocess.run(cmdS)
+
     elif doctypeS == "tex":
         pass
     os._exit(1)

@@ -149,7 +149,7 @@ class OutputRST:
             tagL = tagS.strip().split("[e]_")
             enumI = int(self.setsectD["enumI"]) + 1
             self.setsectD["enumI"] = enumI
-            refS = self._refs(enumI, "[ Equ: ")
+            refS = self._refs(enumI, "[ Equ: ") + "]"
             uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**"
         elif tag == "[t]_":  # table label
             tagL = tagS.strip().split("[t]_")
@@ -503,6 +503,7 @@ class OutputRST:
         sys.stdout = old_stdout
 
         # print(rstS)
+        cS = 0
         self.restS += ".. raw:: latex" + "\n\n"
         for i in rstS.split("\n"):
             counter = i.count("&")
@@ -664,8 +665,10 @@ class OutputRST:
                 valL = []
                 hdrL.append(varS)
                 hdrL.append("[" + varS + "]")
+                hdrL.append("=")
                 valL.append(str(val1U))
                 valL.append(str(val2U))
+                valL.append("=")
                 for sym in eqatom:
                     hdrL.append(str(sym))
                     valL.append(eval(str(sym)))
@@ -675,7 +678,6 @@ class OutputRST:
                 pyS = vL[0] + vL[1] + "  # equation" + "\n"
                 # print(pyS)
                 self.exportS += pyS
-            locals().update(self.rivtD)
         elif len(vL) >= 3:  # value
             descripS = vL[2].strip()
             unitL = vL[1].split(",")
@@ -714,11 +716,9 @@ class OutputRST:
         rstS = output.getvalue()
         sys.stdout = old_stdout
         sys.stdout.flush()
-        print("**********", rstS)
         inrstS = ""
         self.restS += ":: " + "\n\n"
         for i in rstS.split("\n"):
-            print("xxxxx", i)
             inrstS = "  " + i
             self.restS += inrstS + "\n"
         self.restS += "\n\n"
@@ -747,7 +747,7 @@ class OutputRST:
             unit1S, unit2S = vaL[2].strip(), vaL[3].strip()
             descripS = vaL[4].strip()
             if not len(varS):
-                valL.append(["---------", " ", " ", " "])  # totals
+                valL.append(["------", "------", "------", "------"])  # totals
                 continue
             val1U = val2U = array(eval(valS))
             if unit1S != "-":
