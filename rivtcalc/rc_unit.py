@@ -78,7 +78,8 @@ MPA = new_unit("MPa", PA * (10 ** 6), "megapascals")
 KPA = new_unit("KPa", PA * (10 ** 3), "kilopascals")
 KN = new_unit("KN", N * (10 ** 3), "kilonewton")
 MN = new_unit("MN", N * (10 ** 6), "meganewton")
-KM = new_unit("M", M * (10 ** 3), "kilometer")
+KM = new_unit("KM", M * (10 ** 3), "kilometer")
+KNCM = new_unit("KNCM", KN / (M ** 3), "kilonewton per cubic meter")
 # imperial--------------------------------------------------------------
 # length
 IN = new_unit("in", M / 39.370079, "inch")

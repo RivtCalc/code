@@ -190,9 +190,10 @@ class OutputRST:
             uS = uS[4:]  # remove indent
             if len(uS) == 0:
                 if len(self.valL) > 0:  # print value table
+                    fltfmtS = ""
                     hdrL = ["variable", "value", "[value]", "description"]
                     alignL = ["left", "right", "right", "left"]
-                    self._vtable(self.valL, hdrL, "rst", alignL)
+                    self._vtable(self.valL, hdrL, "rst", alignL, fltfmtS)
                     self.valL = []
                     self.restS += "\n\n"
                     self.rivtD.update(locals())
@@ -633,6 +634,11 @@ class OutputRST:
         """
 
         locals().update(self.rivtD)
+        rprecS = self.setcmdD["trmrI"]  # trim numbers
+        tprecS = self.setcmdD["trmtI"]
+        fltfmtS = "." + rprecS.strip() + "f"
+        exec("set_printoptions(precision=" + rprecS + ")")
+        exec("Unum.set_format(value_format = '%." + rprecS + "f')")
         if len(vL) <= 2:  # equation
             unitL = vL[1].split(",")
             unit1S, unit2S = unitL[0].strip(), unitL[1].strip()
@@ -647,33 +653,32 @@ class OutputRST:
                     cmdS = varS + "= " + valS
                     exec(cmdS, globals(), locals())
                     valU = eval(varS).cast_unit(eval(unit1S))
-                    val1U = str(valU.number()) + " " + str(valU.unit())  # case=1
+                    valdec = ("%." + str(rprecS) + "f") % valU.number()
+                    val1U = str(valdec) + " " + str(valU.unit())
                     val2U = valU.cast_unit(eval(unit2S))
             rstS = vL[0]
-            spS = "Eq(" + varS + ",(" + valS + "))"  # pretty prnt
-            try:
-                rstS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
-            except:
-                pass
-            self.restS += "\n" + rstS + "\n"
+            spS = "Eq(" + varS + ",(" + valS + "))"  # pretty print
+            symeq = sp.sympify(spS, _clash2, evaluate=False)
+            eqltxS = sp.latex(symeq, mul_symbol="dot")
+            self.restS += "\n.. raw:: latex\n\n" + "  \\vspace{1mm}\n\n"
+            self.restS += "\n.. math:: \n\n" + "  " + eqltxS + "\n\n"
+            self.restS += "\n.. raw:: latex\n\n" + "  \\vspace{1mm}\n\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
-            if self.setcmdD["substB"]:
+            if self.setcmdD["subB"]:
                 self._vsub(vL)
             else:
                 hdrL = []
                 valL = []
                 hdrL.append(varS)
-                hdrL.append("[" + varS + "]")
                 hdrL.append("=")
-                valL.append(str(val1U))
-                valL.append(str(val2U))
+                valL.append(str(val1U) + " : " + str(val2U))
                 valL.append("=")
                 for sym in eqatom:
                     hdrL.append(str(sym))
                     valL.append(eval(str(sym)))
                 alignL = ["center"] * len(valL)
-                self._vtable([valL], hdrL, "rst", alignL)
+                self._vtable([valL], hdrL, "rst", alignL, fltfmtS)
             if self.setcmdD["saveB"] == True:
                 pyS = vL[0] + vL[1] + "  # equation" + "\n"
                 # print(pyS)
@@ -702,22 +707,30 @@ class OutputRST:
                 self.exportS += pyS
         self.rivtD.update(locals())
 
-    def _vtable(self, tbl, hdrL, tblfmt, alignL):
+    def _vtable(self, tbl, hdrL, tblfmt, alignL, fltfmtS):
         """write value table"""
 
         locals().update(self.rivtD)
+        rprecS = self.setcmdD["trmrI"]  # trim numbers
+        tprecS = self.setcmdD["trmtI"]
+        fltfmtS = "." + rprecS.strip() + "f"
         sys.stdout.flush()
         old_stdout = sys.stdout
         output = StringIO()
         tableS = tabulate(
-            tbl, tablefmt=tblfmt, headers=hdrL, showindex=False, colalign=alignL
+            tbl,
+            tablefmt=tblfmt,
+            headers=hdrL,
+            showindex=False,
+            colalign=alignL,
+            floatfmt=fltfmtS,
         )
         output.write(tableS)
         rstS = output.getvalue()
         sys.stdout = old_stdout
         sys.stdout.flush()
         inrstS = ""
-        self.restS += ":: " + "\n\n"
+        self.restS += ":: \n\n"
         for i in rstS.split("\n"):
             inrstS = "  " + i
             self.restS += inrstS + "\n"
@@ -733,6 +746,7 @@ class OutputRST:
 
         locals().update(self.rivtD)
         valL = []
+        fltfmtS = ""
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
         calpS = self.setsectD["fnumS"]
@@ -763,7 +777,7 @@ class OutputRST:
             valL.append([varS, val1U, val2U, descripS])
         hdrL = ["variable", "value", "[value]", "description"]
         alignL = ["left", "right", "right", "left"]
-        self._vtable(valL, hdrL, "rst", alignL)
+        self._vtable(valL, hdrL, "rst", alignL, fltfmtS)
         self.rivtD.update(locals())
 
     def _vdata(self, vL: list):

@@ -293,7 +293,6 @@ _setcmdD = {
     "trmtI": 2,
     "subB": False,
     "saveB": False,
-    "substB": False,
 }
 
 # temp files
@@ -661,7 +660,6 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str, startpageS: str):
         print("INFO  pdf file moved to docs folder", flush=True)
         print("INFO  program complete")
         cmdS = "c:/users/rodhh/rivtcalc/sumatra.exe " + str(docpdfP)
-        print("************", cmdS)
         subprocess.run(cmdS)
 
     elif doctypeS == "tex":

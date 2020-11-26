@@ -612,7 +612,7 @@ class OutputUTF:
             self.calcS += "\n" + utfS + "\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
-            if self.setcmdD["substB"]:
+            if self.setcmdD["subB"]:
                 self._vsub(vL)
             else:
                 hdrL = []
