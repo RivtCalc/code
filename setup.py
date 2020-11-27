@@ -8,6 +8,8 @@ setup(
         "rivtcalc.unum",
         "rivtcalc.unum.units",
         "rivtcalc.unum.units.si",
+        "rivtcalc.scripts",
+        "rivtcalc.docs"
     ],
     version='0.8.2-beta.0',
     python_requires='>=3.7',
