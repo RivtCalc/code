@@ -70,7 +70,7 @@ FAHR = new_unit("degF", K * 9.0 / 5, "degree Fahrenheit")
 # do not modify above =================================================
 
 # temperature conversion is for relative degree size, not offset --------
-# define engineering units below ----------------------------------------
+# define engineering units below ---------------------------------------
 # metric units ----------------------------------------------------------
 G = new_unit("G", 9.80665 * M / S ** 2, "gravity acceleration")
 PA = new_unit("Pa", N / M ** 2, "pascal")
@@ -79,7 +79,8 @@ KPA = new_unit("KPa", PA * (10 ** 3), "kilopascals")
 KN = new_unit("KN", N * (10 ** 3), "kilonewton")
 MN = new_unit("MN", N * (10 ** 6), "meganewton")
 KM = new_unit("KM", M * (10 ** 3), "kilometer")
-KNCM = new_unit("kncm", KN / (M ** 3), "kilonewton per cubic meter")
+KNCM = new_unit("KNcM", KN / (M ** 3), "kilonewton per cubic meter")
+SM = new_unit("sM", M ** 2, "square meter")
 # imperial--------------------------------------------------------------
 # length
 IN = new_unit("in", M / 39.370079, "inch")

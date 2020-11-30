@@ -660,9 +660,7 @@ class OutputRST:
             spS = "Eq(" + varS + ",(" + valS + "))"  # pretty print
             symeq = sp.sympify(spS, _clash2, evaluate=False)
             eqltxS = sp.latex(symeq, mul_symbol="dot")
-            self.restS += "\n.. raw:: latex\n\n" + "  \\vspace{1mm}\n\n"
             self.restS += "\n.. math:: \n\n" + "  " + eqltxS + "\n\n"
-            self.restS += "\n.. raw:: latex\n\n" + "  \\vspace{1mm}\n\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
             if self.setcmdD["subB"]:
