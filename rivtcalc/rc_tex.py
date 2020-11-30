@@ -144,19 +144,19 @@ class OutputRST:
             fnumI = int(self.setsectD["fnumI"]) + 1
             self.setsectD["fnumI"] = fnumI
             refS = self._refs(fnumI, "[ Fig: ") + " ]"
-            uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**"
+            uS = "**" + tagL[0].strip() + "**" + " ?x?hfill " + refS 
         elif tag == "[e]_":  # equation label
             tagL = tagS.strip().split("[e]_")
             enumI = int(self.setsectD["enumI"]) + 1
             self.setsectD["enumI"] = enumI
             refS = self._refs(enumI, "[ Equ: ") + "]"
-            uS = "**" + tagL[0].strip() + " ?x?hfill " + refS + "**"
+            uS = "**" + tagL[0].strip()  + "**" + " ?x?hfill " + refS
         elif tag == "[t]_":  # table label
             tagL = tagS.strip().split("[t]_")
             tnumI = int(self.setsectD["tnumI"]) + 1
             self.setsectD["tnumI"] = tnumI
             refS = self._refs(tnumI, "[Table: ") + "]"
-            uS = "**" + tagL[0].strip() + " ?x?hfill  " + refS + "**"
+            uS = "**" + tagL[0].strip() + "**" + " ?x?hfill  " + refS 
         elif tag == "[foot]_":  # footnote label
             tagS = tagS.strip("[foot]_").strip()
             # ".. target-notes::\n\n"
@@ -433,7 +433,7 @@ class OutputRST:
         Args:
             ipl (list): parameter list
         """
-        alignD = {"s": "", "d": "decimal", "C": "center", "R": "right", "L": "left"}
+        alignD = {"S": "", "D": "decimal", "C": "center", "R": "right", "L": "left"}
         itagL = [
             "[page]_",
             "[line]_",
@@ -511,7 +511,7 @@ class OutputRST:
             if counter > 0:
                 cS = "{" + alignS * (counter + 1) + "}"
                 continue
-        self.restS += "  \\vspace{-.1in}"
+        #self.restS += "  \\vspace{-.1in}"
         self.restS += "  \\begin{tabulary}{1.0\\textwidth}" + cS + "\n"
         inrstS = ""
         for i in rstS.split("\n"):
@@ -669,12 +669,11 @@ class OutputRST:
                 hdrL = []
                 valL = []
                 hdrL.append(varS)
-                hdrL.append("=")
-                valL.append(str(val1U) + " : " + str(val2U))
-                valL.append("=")
+                valL.append(str(val1U) + "  [" + str(val2U) +"]")
                 for sym in eqatom:
                     hdrL.append(str(sym))
-                    valL.append(eval(str(sym)))
+                    symU = eval(str(sym))
+                    valL.append(str(symU.simplify_unit()))
                 alignL = ["center"] * len(valL)
                 self._vtable([valL], hdrL, "rst", alignL, fltfmtS)
             if self.setcmdD["saveB"] == True:
@@ -704,6 +703,7 @@ class OutputRST:
                 # print(pyS)
                 self.exportS += pyS
         self.rivtD.update(locals())
+        #print(self.rivtD)
 
     def _vtable(self, tbl, hdrL, tblfmt, alignL, fltfmtS):
         """write value table"""

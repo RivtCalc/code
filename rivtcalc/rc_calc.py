@@ -367,7 +367,7 @@ class OutputUTF:
         Args:
             ipl (list): parameter list
         """
-        alignD = {"s": "", "d": "decimal", "c": "center", "r": "right", "l": "left"}
+        alignD = {"S": "", "D": "decimal", "C": "center", "R": "right", "L": "left"}
         itagL = [
             "[page]_",
             "[line]_",
@@ -603,27 +603,23 @@ class OutputUTF:
                     val1U = str(valU.number()) + " " + str(valU.unit())  # case=1
                     val2U = valU.cast_unit(eval(unit2S))
             utfS = vL[0]
-            spS = "Eq(" + varS + ",(" + valS + "))"  # pretty prnt
-            try:
-                utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
-            except:
-                pass
-            print("\n" + utfS + "\n")
+            spS = "Eq(" + varS + ",(" + valS + "))"  
+            utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
+            print("\n" + utfS + "\n") # pretty print equation
             self.calcS += "\n" + utfS + "\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
-            if self.setcmdD["subB"]:
+            if self.setcmdD["subB"]:    # substitute into equation
                 self._vsub(vL)
-            else:
+            else:                       # write equation table
                 hdrL = []
                 valL = []
                 hdrL.append(varS)
-                hdrL.append("[" + varS + "]")
-                valL.append(str(val1U))
-                valL.append(str(val2U))
+                valL.append(str(val1U) + "  [" + str(val2U) + "]")
                 for sym in eqatom:
                     hdrL.append(str(sym))
-                    valL.append(eval(str(sym)))
+                    symU = eval(str(sym))
+                    valL.append(str(symU.simplify_unit()))
                 alignL = ["center"] * len(valL)
                 self._vtable([valL], hdrL, "rst", alignL)
             if self.setcmdD["saveB"] == True:

@@ -234,7 +234,7 @@ except:
 if ".py" not in _calcfileS:
     import __main__
 
-    print(dir(__main__))
+    #print(dir(__main__))
     _calcfileS = __main__.__file__
 
 _cwdS = os.getcwd()
@@ -297,7 +297,7 @@ _setcmdD = {
 
 # temp files
 _rbak = Path(_mpath / ".".join((_cnameS, "bak")))
-_logfile = Path(_mpath / ".".join((_cnameS, "log")))
+_logfile = Path(_mpath / ".".join((_cnameS, "logging")))
 _rstfile = Path(_mpath / ".".join((_cnameS, "rst")))
 # logs and checks
 with open(_cfull, "r") as f2:
@@ -637,6 +637,7 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str, startpageS: str):
     #     + """\\listoffigures""",
     # )
 
+    time.sleep(1)
     with open(texfileP, "w", encoding="utf8") as texout:
         texout.write(texf)
 
@@ -645,7 +646,10 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str, startpageS: str):
         dfolderS = str(_setsectD["fnumS"]).replace("c", "d", 1)
         docpdfP = Path(_dpath / dfolderS / ".".join([dnameS, "pdf"]))
         # clean temp files and generate pdf file
-        pdfmkS = "latexmk -pdf -xelatex -quiet -f " + str(texfileP)
+        
+        pdfmkS = ("perl.exe c:/texlive/2020/texmf-dist/scripts/latexmk/latexmk.pl " + 
+                "-pdf -xelatex -quiet -f " + 
+                str(texfileP)) 
         os.chdir(mpath)
         os.system("latexmk -c")
         print("\nINFO  temporary Tex files deleted \n")
@@ -659,7 +663,7 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str, startpageS: str):
         os.chdir(_dpath)
         print("INFO  pdf file moved to docs folder", flush=True)
         print("INFO  program complete")
-        cmdS = "c:/users/rodhh/rivtcalc/sumatra.exe " + str(docpdfP)
+        cmdS = "c:/users/rhh/rivtcalc/sumatrapdf.exe " + str(docpdfP)
         subprocess.run(cmdS)
 
     elif doctypeS == "tex":

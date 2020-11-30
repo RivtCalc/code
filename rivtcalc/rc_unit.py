@@ -28,7 +28,7 @@ Unum.set_format(
     mul_separator=" ",
     div_separator="",
     unit_format="%s",
-    value_format="%.3f",
+    value_format="%.2f",
     unitless="",  # hide empty
     superscript=False,
 )
@@ -40,8 +40,7 @@ UM = new_unit("um", 10 ** -6 * M, "micrometer")
 MM = new_unit("mm", 10 ** -3 * M, "millimeter")
 CM = new_unit("cm", 10 ** -2 * M, "centimeter")
 DM = new_unit("dm", 10 ** -1 * M, "decimeter")
-S = new_unit("s", 0, "second")
-SEC = S
+SEC = S = new_unit("s", 0, "second")
 A = new_unit("A", 0, "ampere")
 MA = new_unit("mA", 10 ** -3 * A, "milliampere")
 K = new_unit("K", 0, "kelvin")
@@ -70,7 +69,7 @@ FAHR = new_unit("degF", K * 9.0 / 5, "degree Fahrenheit")
 # do not modify above =================================================
 
 # temperature conversion is for relative degree size, not offset --------
-# define engineering units below ---------------------------------------
+# define engineering units below ----------------------------------------
 # metric units ----------------------------------------------------------
 G = new_unit("G", 9.80665 * M / S ** 2, "gravity acceleration")
 PA = new_unit("Pa", N / M ** 2, "pascal")
@@ -80,7 +79,7 @@ KN = new_unit("KN", N * (10 ** 3), "kilonewton")
 MN = new_unit("MN", N * (10 ** 6), "meganewton")
 KM = new_unit("KM", M * (10 ** 3), "kilometer")
 KNCM = new_unit("KNcM", KN / (M ** 3), "kilonewton per cubic meter")
-SM = new_unit("sM", M ** 2, "square meter")
+SM = new_unit("sM", (M ** 2), "square meter")
 # imperial--------------------------------------------------------------
 # length
 IN = new_unit("in", M / 39.370079, "inch")
@@ -116,3 +115,5 @@ HR = new_unit("hr", 60 * 60 * S, "hours")
 # velocity
 MPH = new_unit("mph", MILES / HR, "miles per hour")
 FPS = new_unit("fps", FT / SEC, "feet per second")
+
+

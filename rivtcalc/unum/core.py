@@ -70,7 +70,7 @@ class Formatter(object):
     DEFAULT_CONFIG = dict(
         mul_separator=_DOT,
         div_separator='/',
-        unit_format='[%s]',
+        unit_format='%s',
         value_format='%s',
         indent=' ',
         unitless='[-]',
