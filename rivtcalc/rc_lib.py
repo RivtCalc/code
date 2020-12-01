@@ -1,11 +1,10 @@
 #! python
-"""rivtcalc API  
+'''rivtcalc API  
 
-    The API includes eight functions. Input functions take a rivt-string
-    as the single function argument and write formatted utf calculations
-    to the terminal. Ouput functions take a file of rivt-strings (calcs) and
-    write formatted calculations to files in utf-8, pdf and html formats
-    (docs)..
+    The API includes six functions. Input functions take a rivt-string as the
+    single argument and write formatted utf8 calculations to the
+    terminal. Ouput functions take a file of rivt-strings (calc) and write
+    a formatted calculation file (doc) to files in utf8, pdf or html formats.
 
     Example calcs are here:
 
@@ -20,15 +19,15 @@
     []_ and generally format a single line of text. Block tags are
     encapsulated with []__ and operate on indented blocks of text.
 
-    Rivt function - Input -----------------------------------------------------
-    type     API  any text       commands 
-    ======= ===== ========= ===================================================
-    Repo     R()    yes       search, info, keys, text, table, pdf
-    Insert   I()    yes       text, table, image, latex
-    Values   V()    no        =, config, value, data, func, I() commands
-    Table    T()    no        Python simple statements, I() commands  
-    Skip     S()    --        Skip rivt-string evaluation
-
+    Rivt functions ------------------------------------------------------------
+    type       API      any text       commands / arguments
+    ======= ========== ========= ==============================================
+    Repo    rc.R(rivt)    yes      search, info, keys, text, table, pdf
+    Insert  rc.I(rivt)    yes      text, table, image, latex
+    Values  rc.V(rivt)   yes(=)    =, config, value, data, func, I() commands
+    Table   rc.T(rivt)    no       Python simple statements, I() commands  
+    Skip    rc.S(rivt)    --       Skip rivt-string evaluation
+    Write   rc.doc(args)  --       (type, style, title, page)
 
     Rivt tags -----------------------------------------------------------------
        tag                                 description
@@ -45,33 +44,24 @@
     (abc def) [c]_        center text line
     [line]_               draw horizontal line
     [page]_               new doc page
-    (label)|(http://abc.xyz) [link]_    label_ is a clickable link in docs
     [literal]__           literal text block
     [latex]__             LaTeX text block
+    (label)|(http://abc.xyz) [link]_    label_ is a clickable link in docs
 
+rivt Strings ------------------------------------------------------------------
 
-    Rivt function - Output ----------------------------------------------------
-        name                          description
-    ============================ ==============================================
-    write_text()                   write calc to utf8 doc file
-    write_pdf(type, style)         write calc to tex and pdf file
-    write_html(style)              write calc to html file
-    write_report()                 combine pdf docs into pdf report file
-    ============================ ==============================================
-    
-    The first line of each rivt-string includes the string function name and
-    description, which may be tagged as a section. String input, by design,
-    must be indented 4 spaces after the function call line to provide code
-    structure and improve legibility.
+    The first line of each rivt-string includes the string description, which
+    may also be a section title via a tag. String input, by design, must be
+    indented 4 spaces after the function call line to provide code structure
+    and improve legibility.
     
     in the examples below, arguments in parenthesis are provided by the user.
     Either/or argumens are separated by semi-colons. Comments are in braces
     below the arguments.
 
-Input Syntax and commands -----------------------------------------------------
-
 from rivtcalc import rc_lib as rc
-rc.R('''[01]_ The repository-string defines repository and report content
+rc.R(
+    """[01]_ Repository-string defines repository and report content
     
     Repository-strings may include arbitrary text. The first paragraph of the
     calcs specified in the ||search command (see below) becomes part of the
@@ -116,8 +106,10 @@ rc.R('''[01]_ The repository-string defines repository and report content
     || pdf | front | (calccoverfile.pdf) | (title)        
     || pdf | back | functions; docstrings |(title)
     || pdf | back | (appendixfile.pdf) | (title)
-    ''')
-rc.I('''The insert-string contains static text, tables and images.  
+    """
+)
+rc.I(
+    """[02]_ Insert-string defines static text, tables and images.  
     
     Insert-strings include text, static equations and images. The equation tag
     [e]_ auto-increments the equation labels. The [s]_ and [x]_  tags format 
@@ -146,8 +138,10 @@ rc.I('''The insert-string contains static text, tables and images.
     [b] second figure caption  [f]_
 
     (label) | http://wwww.someurl.suffix [link]_ 
-    ''')
-rc.V('''[02]_ The value-string defines active values and equations
+    """
+)
+rc.V(
+    """[02]_ Value-string defines active values and equations
     
     Value-strings include text (excluding equal signs). Lines with equal signs
     define equations and assignments that are numerically evaluated.
@@ -195,14 +189,16 @@ rc.V('''[02]_ The value-string defines active values and equations
     
     || image | x.png | 50
     A figure caption [f]_
-    ''') 
-rc.T('''The table-string defines active tables and plots that use simple Python statements
+    """
+) 
+rc.T(
+    """[04]_ Table-string builds tables and plots and executes statements
     
      Table-strings may include any simple Python statement (single line),
-     and all commands or tags, except value assignments with an = sign.  It may
-     not include 
-    ''')
-"""
+     and any command or tag that does not include an = sign.
+    """
+)
+'''
 import os
 import sys
 import subprocess
@@ -484,7 +480,7 @@ def S(rawS: str):
     pass
 
 
-def gen_text(filepathS: str):
+def gen_utf8(filepathS: str, startpageS: str):
     """write utf-calc and values to files
 
     .txt calc file is written to calc subfolder (default)
@@ -505,6 +501,9 @@ def gen_text(filepathS: str):
         f1.write(utfcalcS.encode("UTF-8"))
     print("INFO  utf calc written to calc folder", flush=True)
     print("INFO  program complete")
+
+    if startpageS.strip() == "1":
+        print(utfcalcS)
 
     os._exit(1)
 
@@ -555,8 +554,105 @@ def gen_pdf():
     os.exit(1)
 
 
+def gen_tex(doctypeS, stylefileS):
+    mpath = _foldD["mpath"]
+    pdfD = {
+        "cpdfP": Path(mpath / ".".join([_cnameS, "pdf"])),
+        "chtml": Path(mpath / ".".join([_cnameS, "html"])),
+        "trst": Path(mpath / ".".join([_cnameS, "rst"])),
+        "ttex1": Path(mpath / ".".join([_cnameS, "tex"])),
+        "auxfile": Path(mpath / ".".join([_cnameS, ".aux"])),
+        "outfile": Path(mpath / ".".join([_cnameS, ".out"])),
+        "texmak2": Path(mpath / ".".join([_cnameS, ".fls"])),
+        "texmak3": Path(mpath / ".".join([_cnameS, ".fdb_latexmk"])),
+    }
+    if stylefileS == "default":
+        stylefileS = "default_style.sty"
+    else:
+        stylefileS == stylefileS.strip()
+    style_path = Path(_dpath / "d0000" / stylefileS)
+    print("INFO  style sheet: " + str(style_path))
+    pythoncallS = "python "
+    if sys.platform == "linux":
+        pythoncallS = "python3 "
+    elif sys.platform == "darwin":
+        pythoncallS = "python3 "
+
+    rst2xeP = Path(rivpath / "scripts" / "rst2xetex.py")
+    texfileP = pdfD["ttex1"]
+    tex1S = "".join(
+        [
+            pythoncallS,
+            str(rst2xeP),
+            " --embed-stylesheet ",
+            " --documentclass=report ",
+            " --documentoptions=12pt,notitle,letterpaper ",
+            " --stylesheet=",
+            str(style_path) + " ",
+            str(_rstfile) + " ",
+            str(texfileP),
+        ]
+    )
+    os.chdir(mpath)
+    os.system(tex1S)
+    print("INFO  tex file written : " + str(texfileP) + "\n")
+
+    # fix escape sequences
+    fnumS = _setsectD["fnumS"]
+    with open(texfileP, "r", encoding="utf-8", errors="ignore") as texin:
+        texf = texin.read()
+        texf = texf.replace("?x?", """\\""")
+        texf = texf.replace(
+            """fancyhead[L]{\leftmark}""",
+            """fancyhead[L]{\\normalsize  """ + calctitleS + "}",
+        )
+        texf = texf.replace("x*x*x", fnumS)
+        texf = texf.replace("""\\begin{tabular}""", "%% ")
+        texf = texf.replace("""\\end{tabular}""", "%% ")
+        texf = texf.replace(
+            """\\begin{document}""",
+            """\\begin{document}\n\\setcounter{page}{""" + startpageS + "}\n",
+        )
+
+        # texf = texf.replace(
+        #     """\\begin{document}""",
+        #     """\\renewcommand{\contentsname}{"""
+        #     + self.calctitle
+        #     + "}\n"
+        #     + """\\begin{document}"""
+        #     + "\n"
+        #     + """\\makeatletter"""
+        #     + """\\renewcommand\@dotsep{10000}"""
+        #     + """\\makeatother"""
+        #     + """\\tableofcontents"""
+        #     + """\\listoftables"""
+        #     + """\\listoffigures"""
+        # )
+
+    with open(texfileP, "w", encoding="utf8") as texout:
+        texout.write(texf)
+
+    if doctypeS == "pdf":
+        gen_pdf()
+
+    os.exit(1)
+
+
 def gen_html(stylefileS):
     pass
+
+
+def gen_rst():
+    _rstflagB = True
+    rstcalcS = """"""
+    with open(_rstfile, "wb") as f1:
+        f1.write(rstcalcS.encode("UTF-8"))
+    print("INFO  rst calc written to tmp folder", flush=True)
+
+    f1 = open(_rstfile, "r", encoding="utf-8", errors="ignore")
+    rstcalcL = f1.readlines()
+    f1.close()
+    print("INFO  rst file read: " + str(_rstfile))
 
 
 def gen_report():
@@ -564,7 +660,7 @@ def gen_report():
     pass
 
 
-def write(
+def doc(
     doctypeS="utf8",
     stylefileS="default",
     calctitleS="RivtCalc Calculation",
@@ -587,7 +683,7 @@ def write(
     print("INFO calc file read: " + str(_cfull))
     indx = 0  # avoid recursion
     for iS in enumerate(utfcalcL):
-        if "write_text" in iS[1]:
+        if "rc.write" in iS[1]:
             indx = int(iS[0])
             break
     rstcalcL = utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1 :]
@@ -602,104 +698,10 @@ def write(
     print("INFO  values file written to calc folder", flush=True)
 
     if doctypeS == "utf8":
-        gen_text(stylefileS)
+        gen_utf8(stylefileS, startpageS)
 
-    elif doctypeS == "tex" or doctypeS == "pdf":
-        _rstflagB = True
-        rstcalcS = """"""
-        with open(_rstfile, "wb") as f1:
-            f1.write(rstcalcS.encode("UTF-8"))
-        print("INFO  rst calc written to tmp folder", flush=True)
-
-        f1 = open(_rstfile, "r", encoding="utf-8", errors="ignore")
-        rstcalcL = f1.readlines()
-        f1.close()
-        print("INFO  rst file read: " + str(_rstfile))
-
-        mpath = _foldD["mpath"]
-        pdfD = {
-            "cpdfP": Path(mpath / ".".join([_cnameS, "pdf"])),
-            "chtml": Path(mpath / ".".join([_cnameS, "html"])),
-            "trst": Path(mpath / ".".join([_cnameS, "rst"])),
-            "ttex1": Path(mpath / ".".join([_cnameS, "tex"])),
-            "auxfile": Path(mpath / ".".join([_cnameS, ".aux"])),
-            "outfile": Path(mpath / ".".join([_cnameS, ".out"])),
-            "texmak2": Path(mpath / ".".join([_cnameS, ".fls"])),
-            "texmak3": Path(mpath / ".".join([_cnameS, ".fdb_latexmk"])),
-        }
-        if stylefileS == "default":
-            stylefileS = "default_style.sty"
-        else:
-            stylefileS == stylefileS.strip()
-        style_path = Path(_dpath / "d0000" / stylefileS)
-        print("INFO  style sheet: " + str(style_path))
-        pythoncallS = "python "
-        if sys.platform == "linux":
-            pythoncallS = "python3 "
-        elif sys.platform == "darwin":
-            pythoncallS = "python3 "
-
-        rst2xeP = Path(rivpath / "scripts" / "rst2xetex.py")
-        texfileP = pdfD["ttex1"]
-        tex1S = "".join(
-            [
-                pythoncallS,
-                str(rst2xeP),
-                " --embed-stylesheet ",
-                " --documentclass=report ",
-                " --documentoptions=12pt,notitle,letterpaper ",
-                " --stylesheet=",
-                str(style_path) + " ",
-                str(_rstfile) + " ",
-                str(texfileP),
-            ]
-        )
-        os.chdir(mpath)  # generate tex file
-        os.system(tex1S)
-        print("INFO  tex file written : " + str(texfileP) + "\n")
-
-        # fix escape sequences
-        fnumS = _setsectD["fnumS"]
-        with open(texfileP, "r", encoding="utf-8", errors="ignore") as texin:
-            texf = texin.read()
-            texf = texf.replace("?x?", """\\""")
-            texf = texf.replace(
-                """fancyhead[L]{\leftmark}""",
-                """fancyhead[L]{\\normalsize  """ + calctitleS + "}",
-            )
-            texf = texf.replace("x*x*x", fnumS)
-            texf = texf.replace("""\\begin{tabular}""", "%% ")
-            texf = texf.replace("""\\end{tabular}""", "%% ")
-            texf = texf.replace(
-                """\\begin{document}""",
-                """\\begin{document}\n\\setcounter{page}{""" + startpageS + "}\n",
-            )
-
-            # texf = texf.replace(
-            #     """\\begin{document}""",
-            #     """\\renewcommand{\contentsname}{"""
-            #     + self.calctitle
-            #     + "}\n"
-            #     + """\\begin{document}"""
-            #     + "\n"
-            #     + """\\makeatletter"""
-            #     + """\\renewcommand\@dotsep{10000}"""
-            #     + """\\makeatother"""
-            #     + """\\tableofcontents"""
-            #     + """\\listoftables"""
-            #     + """\\listoffigures"""
-            # )
-
-        with open(texfileP, "w", encoding="utf8") as texout:
-            texout.write(texf)
-
-        if doctypeS == "pdf":
-            gen_pdf()
-
-        os.exit(1)
-
-    elif doctypeS == "html":
-        gen_html()
+    elif doctypeS == "tex" or doctypeS == "pdf" or doctypeS == "html":
+        gen_rst()
 
     elif doctypeS == "report":
         gen_report()
