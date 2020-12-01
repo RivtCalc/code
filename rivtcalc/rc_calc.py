@@ -603,15 +603,15 @@ class OutputUTF:
                     val1U = str(valU.number()) + " " + str(valU.unit())  # case=1
                     val2U = valU.cast_unit(eval(unit2S))
             utfS = vL[0]
-            spS = "Eq(" + varS + ",(" + valS + "))"  
+            spS = "Eq(" + varS + ",(" + valS + "))"
             utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
-            print("\n" + utfS + "\n") # pretty print equation
+            print("\n" + utfS + "\n")  # pretty print equation
             self.calcS += "\n" + utfS + "\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
-            if self.setcmdD["subB"]:    # substitute into equation
+            if self.setcmdD["subB"]:  # substitute into equation
                 self._vsub(vL)
-            else:                       # write equation table
+            else:  # write equation table
                 hdrL = []
                 valL = []
                 hdrL.append(varS)

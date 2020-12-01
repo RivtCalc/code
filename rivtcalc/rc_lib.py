@@ -234,7 +234,7 @@ except:
 if ".py" not in _calcfileS:
     import __main__
 
-    #print(dir(__main__))
+    # print(dir(__main__))
     _calcfileS = __main__.__file__
 
 _cwdS = os.getcwd()
@@ -484,7 +484,7 @@ def S(rawS: str):
     pass
 
 
-def write_text(filepathS: str):
+def gen_text(filepathS: str):
     """write utf-calc and values to files
 
     .txt calc file is written to calc subfolder (default)
@@ -494,29 +494,9 @@ def write_text(filepathS: str):
     global utfcalcS, _rstflagB
 
     utfcalcS = """"""
-    f1 = open(_cfull, "r")
-    utfcalcL = f1.readlines()
-    f1.close()
-    print("INFO calc file read: " + str(_cfull))
-    indx = 0
-    for iS in enumerate(utfcalcL):
-        if "write_text" in iS[1]:
-            indx = int(iS[0])
-            break
-    utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1 :]  # avoid recursion
-    cmdS = "".join(utfcalcL)
-    exec(cmdS, globals(), locals())
-
     utffile = Path(_cpath / _setsectD("fnumS") / ".".join((_cnameS, "txt")))
-    exprtfile = Path(_cpath / _setsectD("fnumS") / ".".join(_cnameS, "csv"))
 
-    str1 = """header string\n"""  # write values file
-    str1 = str1 + exportS
-    with open(exprtfile, "w") as expF:
-        expF.write(str1)
-    print("INFO  values file written to calc folder", flush=True)
-
-    if filepathS == "defaultpath":  # check calc file write location
+    if filepathS == "default":  # check calc file write location
         utfpthS = Path(utffile)
     else:
         utfpthS = Path(_cpath / filepathS / ".".join((_cnameS, "txt")))
@@ -529,40 +509,15 @@ def write_text(filepathS: str):
     os._exit(1)
 
 
-def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str, startpageS: str):
-    """write rst-calc and values to files
+def gen_pdf():
 
-    .csv value file is written to calc subfolder
-    .rst calc file is written to tmp folder
-    .style file is read from rivtcalc library (default)
-    .tex file is written to tmp folder (default)
-
-    """
-    global rstcalcS, _rstflagB
-
-    _rstflagB = True
-    rstcalcS = """"""
-    f1 = open(_cfull, "r")
-    rstcalcL = f1.readlines()
-    f1.close()
-    print("INFO calc file read: " + str(_cfull))
-
-    indx = 0
-    for iS in enumerate(rstcalcL):  # find write_doc
-        if "write_pdf" in iS[1]:
-            indx = int(iS[0])
-            break
-    rstcalcL = rstcalcL[0:indx] + rstcalcL[indx + 1 :]  # now skip write_doc
-    cmdS = "".join(rstcalcL)
-    exec(cmdS, globals(), locals())
-    with open(_rstfile, "wb") as f1:
-        f1.write(rstcalcS.encode("UTF-8"))
-    print("INFO  rst calc written to tmp folder", flush=True)
-
-    f1 = open(_rstfile, "r", encoding="utf-8", errors="ignore")
-    rstcalcL = f1.readlines()
-    f1.close()
-    print("INFO  rst file read: " + str(_rstfile))
+    time.sleep(1)
+    os.system("latexmk -c")
+    time.sleep(1)
+    dnameS = _cnameS.replace("c", "d", 1)
+    dfolderS = str(_setsectD["fnumS"]).replace("c", "d", 1)
+    docpdfP = Path(_dpath / dfolderS / ".".join([dnameS, "pdf"]))
+    # clean temp files and generate pdf file
 
     mpath = _foldD["mpath"]
     pdfD = {
@@ -576,105 +531,178 @@ def write_pdf(doctypeS: str, stylefileS: str, calctitleS: str, startpageS: str):
         "texmak3": Path(mpath / ".".join([_cnameS, ".fdb_latexmk"])),
     }
 
-    style_path = Path(_dpath / "d0000" / stylefileS)
-    print("INFO  style sheet: " + str(style_path))
-    pythoncallS = "python "
-    if sys.platform == "linux":
-        pythoncallS = "python3 "
-    elif sys.platform == "darwin":
-        pythoncallS = "python3 "
-
-    # generate tex file
-    rst2xeP = Path(rivpath / "scripts" / "rst2xetex.py")
-    texfileP = pdfD["ttex1"]
-    tex1S = "".join(
-        [
-            pythoncallS,
-            str(rst2xeP),
-            " --embed-stylesheet ",
-            " --documentclass=report ",
-            " --documentoptions=12pt,notitle,letterpaper ",
-            " --stylesheet=",
-            str(style_path) + " ",
-            str(_rstfile) + " ",
-            str(texfileP),
-        ]
+    pdfmkS = (
+        "perl.exe d:/texlive/2020/texmf-dist/scripts/latexmk/latexmk.pl "
+        + "-pdf -xelatex -quiet -f "
+        + str(texfileP)
     )
     os.chdir(mpath)
-    # print(tex1S)
-    os.system(tex1S)
-    print("INFO  tex file written : " + str(texfileP) + "\n")
 
-    # fix escape sequences
-    fnumS = _setsectD["fnumS"]
-    with open(texfileP, "r", encoding="utf-8", errors="ignore") as texin:
-        texf = texin.read()
-        texf = texf.replace("?x?", """\\""")
-        texf = texf.replace(
-            """fancyhead[L]{\leftmark}""",
-            """fancyhead[L]{\\normalsize  """ + calctitleS + "}",
-        )
-        texf = texf.replace("x*x*x", fnumS)
-        texf = texf.replace("""\\begin{tabular}""", "%% ")
-        texf = texf.replace("""\\end{tabular}""", "%% ")
-        texf = texf.replace(
-            """\\begin{document}""",
-            """\\begin{document}\n\\setcounter{page}{""" + startpageS + "}\n",
-        )
+    print("\nINFO  temporary Tex files deleted \n")
+    os.system(pdfmkS)
+    print("\nINFO  pdf file written: " + ".".join([_cnameS, "pdf"]))
 
-    # texf = texf.replace(
-    #     """\\begin{document}""",
-    #     """\\renewcommand{\contentsname}{"""
-    #     + self.calctitle
-    #     + "}\n"
-    #     + """\\begin{document}"""
-    #     + "\n"
-    #     + """\\makeatletter"""
-    #     + """\\renewcommand\@dotsep{10000}"""
-    #     + """\\makeatother"""
-    #     + """\\tableofcontents"""
-    #     + """\\listoftables"""
-    #     + """\\listoffigures""",
-    # )
+    time.sleep(1)  # move pdf to doc folder
+    os.chdir(mpath)
+    pdfS = ".".join([_cnameS, "pdf"])
+    shutil.move(pdfS, docpdfP)
+    os.chdir(_dpath)
+    print("INFO  pdf file moved to docs folder", flush=True)
+    print("INFO  program complete")
+    cmdS = "c:/users/rodhh/.rivtcalc/sumatra.exe " + str(docpdfP)
+    subprocess.run(cmdS)
 
-    time.sleep(1)
-    with open(texfileP, "w", encoding="utf8") as texout:
-        texout.write(texf)
-
-    if doctypeS == "pdf":  # generate pdf
-        dnameS = _cnameS.replace("c", "d", 1)
-        dfolderS = str(_setsectD["fnumS"]).replace("c", "d", 1)
-        docpdfP = Path(_dpath / dfolderS / ".".join([dnameS, "pdf"]))
-        # clean temp files and generate pdf file
-        
-        pdfmkS = ("perl.exe c:/texlive/2020/texmf-dist/scripts/latexmk/latexmk.pl " + 
-                "-pdf -xelatex -quiet -f " + 
-                str(texfileP)) 
-        os.chdir(mpath)
-        os.system("latexmk -c")
-        print("\nINFO  temporary Tex files deleted \n")
-        os.system(pdfmkS)
-        print("\nINFO  pdf file written: " + ".".join([_cnameS, "pdf"]))
-
-        # move pdf to specified folder
-        os.chdir(mpath)
-        pdfS = ".".join([_cnameS, "pdf"])
-        shutil.move(pdfS, docpdfP)
-        os.chdir(_dpath)
-        print("INFO  pdf file moved to docs folder", flush=True)
-        print("INFO  program complete")
-        cmdS = "c:/users/rhh/rivtcalc/sumatrapdf.exe " + str(docpdfP)
-        subprocess.run(cmdS)
-
-    elif doctypeS == "tex":
-        pass
-    os._exit(1)
+    os.exit(1)
 
 
-def write_html(stylefileS):
+def gen_html(stylefileS):
     pass
 
 
-def write_report():
+def gen_report():
     """[summary]"""
     pass
+
+
+def write(
+    doctypeS="utf8",
+    stylefileS="default",
+    calctitleS="RivtCalc Calculation",
+    startpageS="1",
+):
+
+    """write rst-calc and values to files
+
+    .csv value file is written to calc subfolder
+    .rst calc file is written to tmp folder
+    .style file is read from rivtcalc library (default)
+    .tex file is written to tmp folder (default)
+
+    """
+    global rstcalcS, _rstflagB
+
+    f1 = open(_cfull, "r")
+    utfcalcL = f1.readlines()
+    f1.close()
+    print("INFO calc file read: " + str(_cfull))
+    indx = 0  # avoid recursion
+    for iS in enumerate(utfcalcL):
+        if "write_text" in iS[1]:
+            indx = int(iS[0])
+            break
+    rstcalcL = utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1 :]
+    cmdS = "".join(utfcalcL)
+    exec(cmdS, globals(), locals())
+
+    exprtfile = Path(_cpath / _setsectD("fnumS") / ".".join(_cnameS, "csv"))
+    str1 = """header string\n"""  # write values file
+    str1 = str1 + exportS
+    with open(exprtfile, "w") as expF:
+        expF.write(str1)
+    print("INFO  values file written to calc folder", flush=True)
+
+    if doctypeS == "utf8":
+        gen_text(stylefileS)
+
+    elif doctypeS == "tex" or doctypeS == "pdf":
+        _rstflagB = True
+        rstcalcS = """"""
+        with open(_rstfile, "wb") as f1:
+            f1.write(rstcalcS.encode("UTF-8"))
+        print("INFO  rst calc written to tmp folder", flush=True)
+
+        f1 = open(_rstfile, "r", encoding="utf-8", errors="ignore")
+        rstcalcL = f1.readlines()
+        f1.close()
+        print("INFO  rst file read: " + str(_rstfile))
+
+        mpath = _foldD["mpath"]
+        pdfD = {
+            "cpdfP": Path(mpath / ".".join([_cnameS, "pdf"])),
+            "chtml": Path(mpath / ".".join([_cnameS, "html"])),
+            "trst": Path(mpath / ".".join([_cnameS, "rst"])),
+            "ttex1": Path(mpath / ".".join([_cnameS, "tex"])),
+            "auxfile": Path(mpath / ".".join([_cnameS, ".aux"])),
+            "outfile": Path(mpath / ".".join([_cnameS, ".out"])),
+            "texmak2": Path(mpath / ".".join([_cnameS, ".fls"])),
+            "texmak3": Path(mpath / ".".join([_cnameS, ".fdb_latexmk"])),
+        }
+        if stylefileS == "default":
+            stylefileS = "default_style.sty"
+        else:
+            stylefileS == stylefileS.strip()
+        style_path = Path(_dpath / "d0000" / stylefileS)
+        print("INFO  style sheet: " + str(style_path))
+        pythoncallS = "python "
+        if sys.platform == "linux":
+            pythoncallS = "python3 "
+        elif sys.platform == "darwin":
+            pythoncallS = "python3 "
+
+        rst2xeP = Path(rivpath / "scripts" / "rst2xetex.py")
+        texfileP = pdfD["ttex1"]
+        tex1S = "".join(
+            [
+                pythoncallS,
+                str(rst2xeP),
+                " --embed-stylesheet ",
+                " --documentclass=report ",
+                " --documentoptions=12pt,notitle,letterpaper ",
+                " --stylesheet=",
+                str(style_path) + " ",
+                str(_rstfile) + " ",
+                str(texfileP),
+            ]
+        )
+        os.chdir(mpath)  # generate tex file
+        os.system(tex1S)
+        print("INFO  tex file written : " + str(texfileP) + "\n")
+
+        # fix escape sequences
+        fnumS = _setsectD["fnumS"]
+        with open(texfileP, "r", encoding="utf-8", errors="ignore") as texin:
+            texf = texin.read()
+            texf = texf.replace("?x?", """\\""")
+            texf = texf.replace(
+                """fancyhead[L]{\leftmark}""",
+                """fancyhead[L]{\\normalsize  """ + calctitleS + "}",
+            )
+            texf = texf.replace("x*x*x", fnumS)
+            texf = texf.replace("""\\begin{tabular}""", "%% ")
+            texf = texf.replace("""\\end{tabular}""", "%% ")
+            texf = texf.replace(
+                """\\begin{document}""",
+                """\\begin{document}\n\\setcounter{page}{""" + startpageS + "}\n",
+            )
+
+            # texf = texf.replace(
+            #     """\\begin{document}""",
+            #     """\\renewcommand{\contentsname}{"""
+            #     + self.calctitle
+            #     + "}\n"
+            #     + """\\begin{document}"""
+            #     + "\n"
+            #     + """\\makeatletter"""
+            #     + """\\renewcommand\@dotsep{10000}"""
+            #     + """\\makeatother"""
+            #     + """\\tableofcontents"""
+            #     + """\\listoftables"""
+            #     + """\\listoffigures"""
+            # )
+
+        with open(texfileP, "w", encoding="utf8") as texout:
+            texout.write(texf)
+
+        if doctypeS == "pdf":
+            gen_pdf()
+
+        os.exit(1)
+
+    elif doctypeS == "html":
+        gen_html()
+
+    elif doctypeS == "report":
+        gen_report()
+
+    else:
+        pass
