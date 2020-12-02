@@ -600,35 +600,35 @@ def gen_tex(doctypeS, stylefileS, calctitleS, startpageS):
     fnumS = _setsectD["fnumS"]
     with open(texfileP, "r", encoding="utf-8", errors="ignore") as texin:
         texf = texin.read()
-        texf = texf.replace("?x?", """\\""")
-        texf = texf.replace(
-            """fancyhead[L]{\leftmark}""",
-            """fancyhead[L]{\\normalsize  """ + calctitleS + "}",
-        )
-        texf = texf.replace("x*x*x", fnumS)
-        texf = texf.replace("""\\begin{tabular}""", "%% ")
-        texf = texf.replace("""\\end{tabular}""", "%% ")
-        texf = texf.replace(
-            """\\begin{document}""",
-            """\\begin{document}\n\\setcounter{page}{""" + startpageS + "}\n",
-        )
+    texf = texf.replace("?x?", """\\""")
+    texf = texf.replace(
+        """fancyhead[L]{\leftmark}""",
+        """fancyhead[L]{\\normalsize  """ + calctitleS + "}",
+    )
+    texf = texf.replace("x*x*x", fnumS)
+    texf = texf.replace("""\\begin{tabular}""", "%% ")
+    texf = texf.replace("""\\end{tabular}""", "%% ")
+    texf = texf.replace(
+        """\\begin{document}""",
+        """\\begin{document}\n\\setcounter{page}{""" + startpageS + "}\n",
+    )
 
-        # texf = texf.replace(
-        #     """\\begin{document}""",
-        #     """\\renewcommand{\contentsname}{"""
-        #     + self.calctitle
-        #     + "}\n"
-        #     + """\\begin{document}"""
-        #     + "\n"
-        #     + """\\makeatletter"""
-        #     + """\\renewcommand\@dotsep{10000}"""
-        #     + """\\makeatother"""
-        #     + """\\tableofcontents"""
-        #     + """\\listoftables"""
-        #     + """\\listoffigures"""
-        # )
+    # texf = texf.replace(
+    #     """\\begin{document}""",
+    #     """\\renewcommand{\contentsname}{"""
+    #     + self.calctitle
+    #     + "}\n"
+    #     + """\\begin{document}"""
+    #     + "\n"
+    #     + """\\makeatletter"""
+    #     + """\\renewcommand\@dotsep{10000}"""
+    #     + """\\makeatother"""
+    #     + """\\tableofcontents"""
+    #     + """\\listoftables"""
+    #     + """\\listoffigures"""
+    # )
 
-    with open(texfileP, "w", encoding="utf8") as texout:
+    with open(texfileP, "w", encoding="utf-8") as texout:
         texout.write(texf)
 
     if doctypeS == "pdf":
