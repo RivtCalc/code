@@ -20,7 +20,7 @@
     encapsulated with []__ and operate on indented blocks of text.
 
     Rivt functions ------------------------------------------------------------
-    type       API      any text       commands / arguments
+    type       API      any text       string commands / arguments
     ======= ========== ========= ==============================================
     Repo    rc.R(rivt)    yes      search, info, keys, text, table, pdf
     Insert  rc.I(rivt)    yes      text, table, image, latex
@@ -30,23 +30,23 @@
     Write   rc.doc(args)  --       (type, style, title, page)
 
     Rivt tags -----------------------------------------------------------------
-       tag                                 description
+      format tag                           description
     ===============  ==========================================================
     [nn]_ (abc def)       string descriptor section number and title
-    (description) [e]_    autoincrement and insert equation number and description
-    (title) [t]_          autoincrement and insert table number and title   
-    (caption) [f]_        autoincrement and insert figure number and caption   
-    [#]_                  autonumbered footnote      
-    (abc def) [foot]_     footnote description
+    (description) [e]_    autoincrement, insert equation number and description
+    (title) [t]_          autoincrement, insert table number and title   
+    (caption) [f]_        autoincrement, insert figure number and caption   
     (s = (b+2)/3) [s]_    format sympy equation
     (\a = c*2^2) [x]_     format LaTeX equation
-    (abc def) [r]_        right justify text line
-    (abc def) [c]_        center text line
+    (abc def) [r]_        right justify line of text
+    (abc def) [c]_        center line of text
+    [#]_                  autonumbered footnote      
+    (abc def) [foot]_     footnote description
     [line]_               draw horizontal line
-    [page]_               new doc page
-    [literal]__           literal text block
-    [latex]__             LaTeX text block
-    (label)|(http://abc.xyz) [link]_    label_ is a clickable link in docs
+    [page]_               start new doc page
+    [literal]__           literal text block (note double underscore)
+    [latex]__             LaTeX text block (note double underscore)
+    [link]_ http://abc.xyz label   where label is a clickable doc link
 
 rivt Strings ------------------------------------------------------------------
 
@@ -222,10 +222,10 @@ import rivtcalc.rc_tex as _rc_tex
 # import rivt.rivt_chk as _rchk
 
 try:
-    print("argv1", sys.argv[1])
+    # print("argv1", sys.argv[1])
     _calcfileS = sys.argv[1]
 except:
-    print("argv0", sys.argv[0])
+    # print("argv0", sys.argv[0])
     _calcfileS = sys.argv[0]
 if ".py" not in _calcfileS:
     import __main__
@@ -480,19 +480,16 @@ def S(rawS: str):
     pass
 
 
-def gen_utf8(filepathS: str, startpageS: str):
-    """write utf-calc and values to files
+def gen_utf8(cmdS: str, filepathS: str, calctitleS: str):
+    """write utf-calc to calc subfolder"""
 
-    .txt calc file is written to calc subfolder (default)
-    .csv value file is written to calc subfolder
-    """
-
-    global utfcalcS, _rstflagB
+    global utfcalcS
 
     utfcalcS = """"""
-    utffile = Path(_cpath / _setsectD("fnumS") / ".".join((_cnameS, "txt")))
+    exec(cmdS, globals(), locals())
 
-    if filepathS == "default":  # check calc file write location
+    utffile = Path(_cpath / _setsectD["fnumS"] / ".".join([_cnameS, "txt"]))
+    if filepathS == "default":  # check file write location
         utfpthS = Path(utffile)
     else:
         utfpthS = Path(_cpath / filepathS / ".".join((_cnameS, "txt")))
@@ -502,13 +499,12 @@ def gen_utf8(filepathS: str, startpageS: str):
     print("INFO  utf calc written to calc folder", flush=True)
     print("INFO  program complete")
 
-    if startpageS.strip() == "1":
-        print(utfcalcS)
-
     os._exit(1)
 
 
 def gen_pdf():
+
+    global rstcalcS, _rstflagB
 
     time.sleep(1)
     os.system("latexmk -c")
@@ -555,6 +551,9 @@ def gen_pdf():
 
 
 def gen_tex(doctypeS, stylefileS):
+
+    global rstcalcS, _rstflagB
+
     mpath = _foldD["mpath"]
     pdfD = {
         "cpdfP": Path(mpath / ".".join([_cnameS, "pdf"])),
@@ -639,12 +638,19 @@ def gen_tex(doctypeS, stylefileS):
 
 
 def gen_html(stylefileS):
+
+    global rstcalcS, _rstflagB
     pass
 
 
-def gen_rst():
+def gen_rst(cmdS, stylefileS, calctitleS, startpageS):
+
+    global rstcalcS, _rstflagB
+
     _rstflagB = True
     rstcalcS = """"""
+    exec(cmdS, globals(), locals())
+
     with open(_rstfile, "wb") as f1:
         f1.write(rstcalcS.encode("UTF-8"))
     print("INFO  rst calc written to tmp folder", flush=True)
@@ -669,28 +675,30 @@ def doc(
 
     """write rst-calc and values to files
 
+    cnnnn_calc.txt file is written to calc subfolder
+    cnnnn_values.csv file is written to calc subfolder
     .csv value file is written to calc subfolder
+    .style files are read from d0000 folder (default)
     .rst calc file is written to tmp folder
-    .style file is read from rivtcalc library (default)
     .tex file is written to tmp folder (default)
 
     """
-    global rstcalcS, _rstflagB
+    global utfcalcS, rstcalcS, _rstflagB
 
     f1 = open(_cfull, "r")
     utfcalcL = f1.readlines()
     f1.close()
     print("INFO calc file read: " + str(_cfull))
+
     indx = 0  # avoid recursion
     for iS in enumerate(utfcalcL):
-        if "rc.write" in iS[1]:
+        if "rc.doc" in iS[1]:
             indx = int(iS[0])
             break
     rstcalcL = utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1 :]
     cmdS = "".join(utfcalcL)
-    exec(cmdS, globals(), locals())
 
-    exprtfile = Path(_cpath / _setsectD("fnumS") / ".".join(_cnameS, "csv"))
+    exprtfile = Path(_cpath / _setsectD["fnumS"] / ".".join([_cnameS, "csv"]))
     str1 = """header string\n"""  # write values file
     str1 = str1 + exportS
     with open(exprtfile, "w") as expF:
@@ -698,10 +706,10 @@ def doc(
     print("INFO  values file written to calc folder", flush=True)
 
     if doctypeS == "utf8":
-        gen_utf8(stylefileS, startpageS)
+        gen_utf8(cmdS, stylefileS, calctitleS)
 
     elif doctypeS == "tex" or doctypeS == "pdf" or doctypeS == "html":
-        gen_rst()
+        gen_rst(cmdS, stylefileS, calctitleS, startpageS)
 
     elif doctypeS == "report":
         gen_report()
