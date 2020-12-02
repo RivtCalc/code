@@ -282,7 +282,7 @@ class OutputRST:
         The command is identical to itable except file is read from docs/info.
 
         """
-        alignD = {"s": "", "d": "decimal", "c": "center", "r": "right", "l": "left"}
+        alignD = {"S": "", "D": "decimal", "C": "center", "R": "right", "L": "left"}
         rtagL = [
             "[page]_",
             "[line]_",
