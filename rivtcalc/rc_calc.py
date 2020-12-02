@@ -338,8 +338,8 @@ class OutputUTF:
             iL (list): text command list
         """
 
-        calP = "c" + self.setsectD["cnumS"]
-        txapath = Path(self.folderD["xpath"] / calP / iL[1].strip())
+        calpS = "c" + self.setsectD["cnumS"]
+        txapath = Path(self.folderD["cpath"] / calpS / iL[1].strip())
         with open(txapath, "r") as txtf1:
             uL = txtf1.readlines()
         if iL[2].strip() == "indent":
