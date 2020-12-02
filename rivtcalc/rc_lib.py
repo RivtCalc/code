@@ -550,6 +550,7 @@ def gen_pdf(texfileP):
         cfgL = f2.readlines()
         cfgS = cfgL[0].split(":")[1].strip()
     cmdS = cfgS + " " + str(docpdfP)
+    print(cmdS)
     subprocess.run(cmdS)
 
     os._exit(1)
