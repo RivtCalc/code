@@ -545,11 +545,11 @@ def gen_pdf(texfileP):
     print("INFO  pdf file moved to docs folder", flush=True)
     print("INFO  program complete")
 
-    cfgP = Path(_dpath / "d0000" / "rc_cfg.txt")
+    cfgP = Path(_dpath / "d0000" / "rc_cfg.txt")  # get pdf program
     with open(cfgP) as f2:
         cfgL = f2.readlines()
-        cfgS = cfgL[0].split(":").strip()[0]
-    cmdS = cfgS + str(docpdfP)
+        cfgS = cfgL[0].split(":").strip()[1]
+    cmdS = cfgS + " " + str(docpdfP)
     subprocess.run(cmdS)
 
     os._exit(1)
