@@ -502,7 +502,7 @@ def gen_utf8(cmdS: str, filepathS: str, calctitleS: str):
     os._exit(1)
 
 
-def gen_pdf():
+def gen_pdf(texfileP):
 
     global rstcalcS, _rstflagB
 
@@ -547,10 +547,10 @@ def gen_pdf():
     cmdS = "c:/users/rodhh/.rivtcalc/sumatra.exe " + str(docpdfP)
     subprocess.run(cmdS)
 
-    os.exit(1)
+    os._exit(1)
 
 
-def gen_tex(doctypeS, stylefileS):
+def gen_tex(doctypeS, stylefileS, calctitleS, startpageS):
 
     global rstcalcS, _rstflagB
 
@@ -566,7 +566,7 @@ def gen_tex(doctypeS, stylefileS):
         "texmak3": Path(mpath / ".".join([_cnameS, ".fdb_latexmk"])),
     }
     if stylefileS == "default":
-        stylefileS = "default_style.sty"
+        stylefileS = "pdf_style.sty"
     else:
         stylefileS == stylefileS.strip()
     style_path = Path(_dpath / "d0000" / stylefileS)
@@ -632,9 +632,9 @@ def gen_tex(doctypeS, stylefileS):
         texout.write(texf)
 
     if doctypeS == "pdf":
-        gen_pdf()
+        gen_pdf(texfileP)
 
-    os.exit(1)
+    os._exit(1)
 
 
 def gen_html(stylefileS):
@@ -643,7 +643,7 @@ def gen_html(stylefileS):
     pass
 
 
-def gen_rst(cmdS, stylefileS, calctitleS, startpageS):
+def gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS):
 
     global rstcalcS, _rstflagB
 
@@ -659,6 +659,15 @@ def gen_rst(cmdS, stylefileS, calctitleS, startpageS):
     rstcalcL = f1.readlines()
     f1.close()
     print("INFO  rst file read: " + str(_rstfile))
+
+    if doctypeS == "tex" or doctypeS == "pdf":
+        gen_tex(doctypeS, stylefileS, calctitleS, startpageS)
+    elif doctypeS == "html":
+        gen_html()
+    else:
+        print("INFO doc type not recognized")
+
+    os._exit(1)
 
 
 def gen_report():
@@ -709,7 +718,7 @@ def doc(
         gen_utf8(cmdS, stylefileS, calctitleS)
 
     elif doctypeS == "tex" or doctypeS == "pdf" or doctypeS == "html":
-        gen_rst(cmdS, stylefileS, calctitleS, startpageS)
+        gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS)
 
     elif doctypeS == "report":
         gen_report()
