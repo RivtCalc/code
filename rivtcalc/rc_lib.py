@@ -548,7 +548,7 @@ def gen_pdf(texfileP):
     cfgP = Path(_dpath / "d0000" / "rc_cfg.txt")  # get pdf program
     with open(cfgP) as f2:
         cfgL = f2.readlines()
-        cfg1S = cfgL[0].split(":")
+        cfg1S = cfgL[0].split("|")
         cfg2S = cfg1S[1].strip()
     cmdS = cfg2S + " " + str(docpdfP)
     print(cmdS)
