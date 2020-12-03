@@ -144,7 +144,7 @@ class OutputRST:
             fnumI = int(self.setsectD["fnumI"]) + 1
             self.setsectD["fnumI"] = fnumI
             refS = self._refs(fnumI, "[ Fig: ") + " ]"
-            uS = "**" + tagL[0].strip() + "**" + " ?x?hfill " + refS
+            uS = "\n\n**" + tagL[0].strip() + "**" + " ?x?hfill " + refS + "\n\n"
         elif tag == "[e]_":  # equation label
             tagL = tagS.strip().split("[e]_")
             enumI = int(self.setsectD["enumI"]) + 1
