@@ -417,7 +417,7 @@ class OutputRST:
             rstS = "".join(rstL)
         elif iL[2].strip() == "literal":
             txtS = " ".join(rstL)
-            rstS = "::\n\n" + txtS + "\n\n"
+            rstS = "\n\n::\n\n" + txtS + "\n\n"
         elif iL[2].strip() == "raw":
             txtS = "".join(rstL)
             rstS = "\n" + txtS
