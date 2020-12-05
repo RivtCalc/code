@@ -242,10 +242,10 @@ class OutputUTF:
                 methL[indxI](uL)
                 continue
 
-            self.rivtD.update(locals())
             if typeS != "table":  # skip table print
                 print(uS)
                 self.calcS += uS.rstrip() + "\n"
+            self.rivtD.update(locals())
 
     def r_utf(self) -> str:
         """parse repository string
@@ -541,7 +541,6 @@ class OutputUTF:
             self._vvalue,
             self._vdata,
             self._vfunc,
-            self._vtable,
             self._itext,
             self._itable,
             self._iimage,
