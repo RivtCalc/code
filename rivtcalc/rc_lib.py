@@ -515,17 +515,6 @@ def gen_pdf(texfileP):
     # clean temp files and generate pdf file
 
     mpath = _foldD["mpath"]
-    pdfD = {
-        "cpdfP": Path(mpath / ".".join([_cnameS, "pdf"])),
-        "chtml": Path(mpath / ".".join([_cnameS, "html"])),
-        "trst": Path(mpath / ".".join([_cnameS, "rst"])),
-        "ttex1": Path(mpath / ".".join([_cnameS, "tex"])),
-        "auxfile": Path(mpath / ".".join([_cnameS, ".aux"])),
-        "outfile": Path(mpath / ".".join([_cnameS, ".out"])),
-        "texmak2": Path(mpath / ".".join([_cnameS, ".fls"])),
-        "texmak3": Path(mpath / ".".join([_cnameS, ".fdb_latexmk"])),
-    }
-
     pdfmkS = (
         "perl.exe d:/texlive/2020/texmf-dist/scripts/latexmk/latexmk.pl "
         + "-pdf -xelatex -quiet -f "
@@ -728,16 +717,26 @@ def doc(
     elif doctypeS == "tex" or doctypeS == "pdf" or doctypeS == "html":
         if clrS == "clr":  # delete temp files
             mpathS = str(_foldD["mpath"])
+            fileL = [
+                Path(mpathS / ".".join([_cnameS, "pdf"])),
+                Path(mpathS / ".".join([_cnameS, "html"])),
+                Path(mpathS / ".".join([_cnameS, "rst"])),
+                Path(mpathS / ".".join([_cnameS, "tex"])),
+                Path(mpathS / ".".join([_cnameS, ".aux"])),
+                Path(mpathS / ".".join([_cnameS, ".out"])),
+                Path(mpathS / ".".join([_cnameS, ".fls"])),
+                Path(mpathS / ".".join([_cnameS, ".fdb_latexmk"])),
+            ]
             os.chdir(mpathS)
             tmpS = os.getcwd()
             if tmpS == mpathS:
-                fileL = [f for f in os.listdir(tmpS)]
-                logconsole.close()
-                time.sleep(1)
                 for f in fileL:
-                    os.remove(os.path.join(mpathS, f))
+                    try:
+                        os.remove(os.path.join(mpathS, f))
+                    except:
+                        pass
                 time.sleep(1)
-        print("INFO  values file written to calc folder", flush=True)
+        print("INFO  files deleted from tmp folder", flush=True)
         gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS)
 
     elif doctypeS == "report":
