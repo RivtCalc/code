@@ -521,8 +521,6 @@ def gen_pdf(texfileP):
         + str(texfileP)
     )
     os.chdir(mpath)
-
-    print("\nINFO  temporary Tex files deleted \n")
     os.system(pdfmkS)
     print("\nINFO  pdf file written: " + ".".join([_cnameS, "pdf"]))
 
@@ -736,7 +734,7 @@ def doc(
                     except:
                         pass
                 time.sleep(1)
-        print("INFO  files deleted from tmp folder", flush=True)
+            print("\nINFO  temporary Tex files deleted \n", flush=True)
         gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS)
 
     elif doctypeS == "report":
