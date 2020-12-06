@@ -732,7 +732,7 @@ def doc(
             if tmpS == mpathS:
                 for f in fileL:
                     try:
-                        os.remove(os.path.join(mpathS, f))
+                        os.remove(f)
                     except:
                         pass
                 time.sleep(1)
