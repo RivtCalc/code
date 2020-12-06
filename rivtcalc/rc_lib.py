@@ -308,11 +308,11 @@ logging.basicConfig(
     filename=_logfile,
     filemode="w",
 )
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
+logconsole = logging.StreamHandler()
+logconsole.setLevel(logging.INFO)
 formatter = logging.Formatter("%(levelname)-8s %(message)s")
-console.setFormatter(formatter)
-logging.getLogger("").addHandler(console)
+logconsole.setFormatter(formatter)
+logging.getLogger("").addHandler(logconsole)
 _rshortP = Path(*Path(_cfull).parts[-3:])
 _bshortP = Path(*Path(_rbak).parts[-4:])
 _lshortP = Path(*Path(_logfile).parts[-4:])
@@ -727,7 +727,7 @@ def doc(
 
     elif doctypeS == "tex" or doctypeS == "pdf" or doctypeS == "html":
         if clrS == "clr":  # delete temp files
-            logging.getLogger().disabled = True
+            logconsole.close()
             mpathS = str(_foldD["mpath"])
             os.chdir(mpathS)
             tmpS = os.getcwd()
@@ -736,7 +736,7 @@ def doc(
                 for f in fileL:
                     os.remove(os.path.join(mpathS, f))
                 time.sleep(1)
-        logging.getLogger().disabled = False
+        print("INFO  values file written to calc folder", flush=True)
         gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS)
 
     elif doctypeS == "report":
