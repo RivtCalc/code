@@ -464,9 +464,9 @@ class OutputUTF:
             fileS = iL[1].split(",")
             file1S = fileS[0].strip()
             file2S = fileS[1].strip()
-            calpS = "c" + self.setsectD["cnumS"]
-            img1S = str(Path(self.folderD["hpath"] / calpS / file1S))
-            img2S = str(Path(self.folderD["hpath"] / calpS / file2S))
+            docpS = "d" + self.setsectD["cnumS"]
+            img1S = str(Path(self.folderD["dpath"] / docpS / file1S))
+            img2S = str(Path(self.folderD["dpath"] / docpS / file2S))
             pshrt1S = str(Path(*Path(img1S).parts[-4:]))
             pshrt2S = str(Path(*Path(img2S).parts[-4:]))
             for fS in [[pshrt1S, img1S], [pshrt2S, img2S]]:
@@ -482,8 +482,8 @@ class OutputUTF:
             self.setcmdD.update({"scale1F": scale1F})
             fileS = iL[1].split(",")
             file1S = fileS[0].strip()
-            calpS = "c" + self.setsectD["cnumS"]
-            img1S = str(Path(self.folderD["hpath"] / calpS / file1S))
+            docpS = "d" + self.setsectD["cnumS"]
+            img1S = str(Path(self.folderD["dpath"] / docpS / file1S))
             pthshort1S = str(Path(*Path(img1S).parts[-4:]))
             utfS += "Figure path: " + pthshort1S + "\n"
             try:

@@ -262,7 +262,6 @@ _foldD = {
     "spath": Path(_cpath, "scripts"),
     "kpath": Path(_cpath, "scripts", "sketches"),
     "hpath": Path(_dpath, "html"),
-    "ipath": Path(_dpath, "info"),
 }
 # section settings
 _setsectD = {
@@ -679,7 +678,7 @@ def doc(
 
     """write rst-calc and values to files
 
-    cnnnn_calc.txt file is written to calc subfolder
+    cnnnn_calc.txt file is written to the calc subfolder
     cnnnn_values.csv file is written to calc subfolder
     .csv value file is written to calc subfolder
     .style files are read from d0000 folder (default)
