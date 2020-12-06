@@ -718,14 +718,14 @@ def doc(
         if clrS == "clr":  # delete temp files
             mpathS = str(_foldD["mpath"])
             fileL = [
-                Path(mpathS / ".".join([_cnameS, "pdf"])),
-                Path(mpathS / ".".join([_cnameS, "html"])),
-                Path(mpathS / ".".join([_cnameS, "rst"])),
-                Path(mpathS / ".".join([_cnameS, "tex"])),
-                Path(mpathS / ".".join([_cnameS, ".aux"])),
-                Path(mpathS / ".".join([_cnameS, ".out"])),
-                Path(mpathS / ".".join([_cnameS, ".fls"])),
-                Path(mpathS / ".".join([_cnameS, ".fdb_latexmk"])),
+                Path(mpathS, ".".join([_cnameS, "pdf"])),
+                Path(mpathS, ".".join([_cnameS, "html"])),
+                Path(mpathS, ".".join([_cnameS, "rst"])),
+                Path(mpathS, ".".join([_cnameS, "tex"])),
+                Path(mpathS, ".".join([_cnameS, ".aux"])),
+                Path(mpathS, ".".join([_cnameS, ".out"])),
+                Path(mpathS, ".".join([_cnameS, ".fls"])),
+                Path(mpathS, ".".join([_cnameS, ".fdb_latexmk"])),
             ]
             os.chdir(mpathS)
             tmpS = os.getcwd()
