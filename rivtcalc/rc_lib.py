@@ -726,8 +726,8 @@ def doc(
         gen_utf8(cmdS, stylefileS, calctitleS)
 
     elif doctypeS == "tex" or doctypeS == "pdf" or doctypeS == "html":
-
         if clrS == "clr":  # delete temp files
+            logging.getLogger().disabled = True
             mpathS = str(_foldD["mpath"])
             os.chdir(mpathS)
             tmpS = os.getcwd()
@@ -735,8 +735,8 @@ def doc(
                 fileL = [f for f in os.listdir(tmpS)]
                 for f in fileL:
                     os.remove(os.path.join(mpathS, f))
-
-        time.sleep(1)
+                time.sleep(1)
+        logging.getLogger().disabled = False
         gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS)
 
     elif doctypeS == "report":
