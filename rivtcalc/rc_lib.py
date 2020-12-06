@@ -30,14 +30,14 @@
     Write   rc.doc(args)  --       (type, style, title, page)
 
     Rivt tags -----------------------------------------------------------------
-      format tag                           description
+      format tag               description (user input)
     ===============  ==========================================================
-    [nn]_ (abc def)       string descriptor section number and title
+    [nn]_ (abc def)       option section number and title / descriptor
     (description) [e]_    autoincrement, insert equation number and description
     (title) [t]_          autoincrement, insert table number and title   
     (caption) [f]_        autoincrement, insert figure number and caption   
-    (s = (b+2)/3) [s]_    format sympy equation
-    (\a = c*2^2) [x]_     format LaTeX equation
+    (sympy eq) [s]_       format sympy equation
+    (latex eq) [x]_       format LaTeX equation
     (abc def) [r]_        right justify line of text
     (abc def) [c]_        center line of text
     [#]_                  autonumbered footnote      
@@ -239,8 +239,8 @@ _cfileS = _cfull.name  # calc file name
 _cnameS = _cfileS.split(".py")[0]  # calc file basename
 _cnumS = _cnameS[0:5]
 _rivpath = Path("rivtcalc.rivt_lib.py").parent  # rivtcalc program path
-_ppath = _cfull.parent.parent  # project folder path
-_cpath = _cfull.parent  # calc folder path
+_cpath = _cfull.parent.parent  # calc folder path
+_ppath = _cfull.parent.parent.parent  # project folder path
 _mpath = Path(_ppath / "tmp")  # tmp folder path
 _dpath = Path(_ppath / "docs")  # doc folder path
 _rstfile = Path(_mpath / ".".join((_cnameS, "rst")))  # rst output
@@ -687,6 +687,7 @@ def doc(
     stylefileS="default",
     calctitleS="RivtCalc Calculation",
     startpageS="1",
+    clrS="clr",
 ):
 
     """write rst-calc and values to files
@@ -725,6 +726,17 @@ def doc(
         gen_utf8(cmdS, stylefileS, calctitleS)
 
     elif doctypeS == "tex" or doctypeS == "pdf" or doctypeS == "html":
+
+        if clrS == "clr":  # delete temp files
+            mpathS = str(_foldD["mpath"])
+            os.chdir(mpathS)
+            tmpS = os.getcwd()
+            if tmpS == mpathS:
+                fileL = [f for f in os.listdir(tmpS)]
+                for f in fileL:
+                    os.remove(os.path.join(mpathS, f))
+
+        time.sleep(1)
         gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS)
 
     elif doctypeS == "report":
