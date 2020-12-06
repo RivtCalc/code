@@ -727,12 +727,12 @@ def doc(
 
     elif doctypeS == "tex" or doctypeS == "pdf" or doctypeS == "html":
         if clrS == "clr":  # delete temp files
-            logconsole.close()
             mpathS = str(_foldD["mpath"])
             os.chdir(mpathS)
             tmpS = os.getcwd()
             if tmpS == mpathS:
                 fileL = [f for f in os.listdir(tmpS)]
+                logconsole.close()
                 for f in fileL:
                     os.remove(os.path.join(mpathS, f))
                 time.sleep(1)
