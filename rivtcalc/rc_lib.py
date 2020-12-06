@@ -733,6 +733,7 @@ def doc(
             if tmpS == mpathS:
                 fileL = [f for f in os.listdir(tmpS)]
                 logconsole.close()
+                time.sleep(1)
                 for f in fileL:
                     os.remove(os.path.join(mpathS, f))
                 time.sleep(1)
