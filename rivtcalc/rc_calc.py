@@ -81,7 +81,7 @@ class OutputUTF:
         objfillS = str(objnumI).zfill(2)
         sfillS = str(self.setsectD["snumS"]).strip().zfill(2)
         cnumSS = str(self.setsectD["cnumS"])
-        refS = typeS + cnumSS + "." + sfillS + "." + objfillS
+        refS = typeS + cnumSS + "." + objfillS
 
         return refS
 
@@ -165,6 +165,10 @@ class OutputUTF:
             spS = "Eq(" + spL[0] + ",(" + spL[1] + "))"
             # sps = sps.encode('unicode-escape').decode()
             uS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
+        elif tag == "[n]_":  # new line
+            tagL = tagS.strip().split("[n]_")
+            tagS = tagL[0]
+            uS = tagS
         else:
             uS = tagS
 
@@ -238,10 +242,10 @@ class OutputUTF:
                 methL[indxI](uL)
                 continue
 
-            self.rivtD.update(locals())
             if typeS != "table":  # skip table print
                 print(uS)
                 self.calcS += uS.rstrip() + "\n"
+            self.rivtD.update(locals())
 
     def r_utf(self) -> str:
         """parse repository string
@@ -250,9 +254,8 @@ class OutputUTF:
              calcS (list): utf formatted calc-string (appended)
              setsectD (dict): section settings
         """
-        rcmdL = ["head", "search", "keys", "info", "table", "text", "pdf"]
+        rcmdL = ["search", "keys", "info", "table", "text", "pdf"]
         rmethL = [
-            self._rhead,
             self._rsearch,
             self._rkeys,
             self._rinfo,
@@ -265,28 +268,6 @@ class OutputUTF:
         self._parseUTF("repository", rcmdL, rmethL, rtagL)
 
         return self.calcS, self.setsectD
-
-    def _rhead(self, rL):
-        """format header information
-
-        Args:
-            rL (list): list of header parameters
-
-        String Parameters:
-            (title): print title at top of each page
-            (date): print date at top of each
-            toc; notoc: print table of contents
-        """
-        if len(rL) < 4:
-            rL += [""] * (4 - len(rL))  # pad parameters
-        if rL[1]:
-            calctitleS = rL[1].strip()
-        if rL[2]:
-            dateS = rL[2].strip()
-        if rL[3] == "toc":
-            pass
-        else:
-            pass
 
     def _rkeys(self, rsL):
         """[summary]
@@ -357,9 +338,9 @@ class OutputUTF:
             iL (list): text command list
         """
 
-        calP = "c" + self.setsectD["cnumS"]
-        txapath = Path(self.folderD["xpath"] / calP / iL[1].strip())
-        with open(txapath, "r") as txtf1:
+        calpS = "c" + self.setsectD["cnumS"]
+        txtP = Path(self.folderD["cpath"] / calpS / iL[1].strip())
+        with open(txtP, "r") as txtf1:
             uL = txtf1.readlines()
         if iL[2].strip() == "indent":
             txtS = "".join(uL)
@@ -377,7 +358,9 @@ class OutputUTF:
 
         self.calcS += uS + "\n"
 
+        print(str(txtP))
         print(uS)
+        self.calcS += str(txtP) + "\n"
         self.calcS += uS + "\n"
 
     def _itable(self, iL: list):
@@ -386,7 +369,7 @@ class OutputUTF:
         Args:
             ipl (list): parameter list
         """
-        alignD = {"s": "", "d": "decimal", "c": "center", "r": "right", "l": "left"}
+        alignD = {"S": "", "D": "decimal", "C": "center", "R": "right", "L": "left"}
         itagL = [
             "[page]_",
             "[line]_",
@@ -406,8 +389,8 @@ class OutputUTF:
         contentL = []
         sumL = []
         fileS = iL[1].strip()
-        calpS = "c" + self.setsectD["cnumS"]
-        tfileS = Path(self.folderD["apath"] / calpS / fileS)
+        calpS = self.setsectD["fnumS"]
+        tfileS = Path(self.folderD["cpath"] / calpS / fileS)
         extS = fileS.split(".")[1]
         if extS == "csv":
             with open(tfileS, "r") as csvfile:  # read csv file
@@ -464,7 +447,9 @@ class OutputUTF:
         utfS = output.getvalue()
         sys.stdout = old_stdout
 
+        print(str(tfileS))
         print(utfS)
+        self.calcS += str(tfileS) + "\n"
         self.calcS += utfS + "\n"
 
     def _iimage(self, iL: list):
@@ -483,15 +468,15 @@ class OutputUTF:
             fileS = iL[1].split(",")
             file1S = fileS[0].strip()
             file2S = fileS[1].strip()
-            calpS = "c" + self.setsectD["cnumS"]
-            img1S = str(Path(self.folderD["hpath"] / calpS / file1S))
-            img2S = str(Path(self.folderD["hpath"] / calpS / file2S))
-            pshrt1S = str(Path(*Path(img1S).parts[-4:]))
-            pshrt2S = str(Path(*Path(img2S).parts[-4:]))
-            for fS in [[pshrt1S, img1S], [pshrt2S, img2S]]:
-                utfS += "Figure path: " + fS[0] + "\n"
+            docpS = "d" + self.setsectD["cnumS"]
+            img1S = str(Path(self.folderD["dpath"] / docpS / file1S))
+            img2S = str(Path(self.folderD["dpath"] / docpS / file2S))
+            # pshrt1S = str(Path(*Path(img1S).parts[-4:]))
+            # pshrt2S = str(Path(*Path(img2S).parts[-4:]))
+            for fS in [img1S, img2S]:
+                utfS += "Figure path: " + fS + "\n"
                 try:
-                    _display(_Image(fS[1]))
+                    _display(_Image(fS))
                 except:
                     pass
                 print(utfS)
@@ -501,10 +486,9 @@ class OutputUTF:
             self.setcmdD.update({"scale1F": scale1F})
             fileS = iL[1].split(",")
             file1S = fileS[0].strip()
-            calpS = "c" + self.setsectD["cnumS"]
-            img1S = str(Path(self.folderD["hpath"] / calpS / file1S))
-            pthshort1S = str(Path(*Path(img1S).parts[-4:]))
-            utfS += "Figure path: " + pthshort1S + "\n"
+            docpS = "d" + self.setsectD["cnumS"]
+            img1S = str(Path(self.folderD["dpath"] / docpS / file1S))
+            utfS += "Figure path: " + img1S + "\n"
             try:
                 _display(_Image(img1S))
             except:
@@ -621,27 +605,23 @@ class OutputUTF:
                     val1U = str(valU.number()) + " " + str(valU.unit())  # case=1
                     val2U = valU.cast_unit(eval(unit2S))
             utfS = vL[0]
-            spS = "Eq(" + varS + ",(" + valS + "))"  # pretty prnt
-            try:
-                utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
-            except:
-                pass
-            print("\n" + utfS + "\n")
+            spS = "Eq(" + varS + ",(" + valS + "))"
+            utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
+            print("\n" + utfS + "\n")  # pretty print equation
             self.calcS += "\n" + utfS + "\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
-            if self.setcmdD["subst"]:
+            if self.setcmdD["subB"]:  # substitute into equation
                 self._vsub(vL)
-            else:
+            else:  # write equation table
                 hdrL = []
                 valL = []
                 hdrL.append(varS)
-                hdrL.append("[" + varS + "]")
-                valL.append(str(val1U))
-                valL.append(str(val2U))
+                valL.append(str(val1U) + "  [" + str(val2U) + "]")
                 for sym in eqatom:
                     hdrL.append(str(sym))
-                    valL.append(eval(str(sym)))
+                    symU = eval(str(sym))
+                    valL.append(str(symU.simplify_unit()))
                 alignL = ["center"] * len(valL)
                 self._vtable([valL], hdrL, "rst", alignL)
             if self.setcmdD["saveB"] == True:
@@ -685,11 +665,9 @@ class OutputUTF:
                 tbl, tablefmt=tblfmt, headers=hdrL, showindex=False, colalign=alignL
             )
         )
-        valS = output.getvalue()
-        sys.stdout = old_stdout
-        sys.stdout.flush()
         utfS = output.getvalue()
         sys.stdout = old_stdout
+        sys.stdout.flush()
         print(utfS)
         self.calcS += utfS + "\n"
         self.rivtD.update(locals())
@@ -706,7 +684,7 @@ class OutputUTF:
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
         calpS = "c" + self.setsectD["cnumS"]
-        vfileS = Path(self.folderD["apath"] / calpS / vL[1].strip())
+        vfileS = Path(self.folderD["cpath"] / calpS / vL[1].strip())
         with open(vfileS, "r") as csvfile:
             readL = list(csv.reader(csvfile))
         for vaL in readL[1:]:
@@ -748,7 +726,7 @@ class OutputUTF:
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
         valL.append(["variable", "values"])
-        vfileS = Path(self.folderD["apath"] / vL[2].strip())
+        vfileS = Path(self.folderD["cpath"] / vL[2].strip())
         vecL = eval(vL[3].strip())
         with open(vfileS, "r") as csvF:
             reader = csv.reader(csvF)
