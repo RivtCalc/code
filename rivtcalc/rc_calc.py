@@ -339,8 +339,8 @@ class OutputUTF:
         """
 
         calpS = "c" + self.setsectD["cnumS"]
-        txapath = Path(self.folderD["cpath"] / calpS / iL[1].strip())
-        with open(txapath, "r") as txtf1:
+        txtP = Path(self.folderD["cpath"] / calpS / iL[1].strip())
+        with open(txtP, "r") as txtf1:
             uL = txtf1.readlines()
         if iL[2].strip() == "indent":
             txtS = "".join(uL)
@@ -358,7 +358,9 @@ class OutputUTF:
 
         self.calcS += uS + "\n"
 
+        print(str(txtP))
         print(uS)
+        self.calcS += str(txtP) + "\n"
         self.calcS += uS + "\n"
 
     def _itable(self, iL: list):
@@ -445,7 +447,9 @@ class OutputUTF:
         utfS = output.getvalue()
         sys.stdout = old_stdout
 
+        print(str(tfileS))
         print(utfS)
+        self.calcS += str(tfileS) + "\n"
         self.calcS += utfS + "\n"
 
     def _iimage(self, iL: list):
