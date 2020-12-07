@@ -467,9 +467,11 @@ class OutputUTF:
             docpS = "d" + self.setsectD["cnumS"]
             img1S = str(Path(self.folderD["dpath"] / docpS / file1S))
             img2S = str(Path(self.folderD["dpath"] / docpS / file2S))
-            pshrt1S = str(Path(*Path(img1S).parts[-4:]))
-            pshrt2S = str(Path(*Path(img2S).parts[-4:]))
-            for fS in [[pshrt1S, img1S], [pshrt2S, img2S]]:
+            # pshrt1S = str(Path(*Path(img1S).parts[-4:]))
+            # pshrt2S = str(Path(*Path(img2S).parts[-4:]))
+            pth1S = str(Path(*Path(img1S)))
+            pth2S = str(Path(*Path(img2S)))
+            for fS in [[pth1S, img1S], [pth2S, img2S]]:
                 utfS += "Figure path: " + fS[0] + "\n"
                 try:
                     _display(_Image(fS[1]))
@@ -484,8 +486,8 @@ class OutputUTF:
             file1S = fileS[0].strip()
             docpS = "d" + self.setsectD["cnumS"]
             img1S = str(Path(self.folderD["dpath"] / docpS / file1S))
-            pthshort1S = str(Path(*Path(img1S).parts[-4:]))
-            utfS += "Figure path: " + pthshort1S + "\n"
+            pth1S = str(Path(*Path(img1S)))
+            utfS += "Figure path: " + pth1S + "\n"
             try:
                 _display(_Image(img1S))
             except:
