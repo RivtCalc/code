@@ -407,7 +407,7 @@ class OutputRST:
         """
         calpS = "c" + self.setsectD["cnumS"]
         txapath = Path(self.folderD["cpath"] / calpS / iL[1].strip())
-        with open(txapath, "r") as txtf1:
+        with open(txapath, "r", encoding="utf-8") as txtf1:
             rstL = txtf1.readlines()
         if iL[2].strip() == "indent":
             txtS = "".join(rstL)
@@ -636,8 +636,8 @@ class OutputRST:
         """
 
         locals().update(self.rivtD)
-        rprecS = self.setcmdD["trmrI"]  # trim numbers
-        tprecS = self.setcmdD["trmtI"]
+        rprecS = str(self.setcmdD["trmrI"])  # trim numbers
+        tprecS = str(self.setcmdD["trmtI"])
         fltfmtS = "." + rprecS.strip() + "f"
         exec("set_printoptions(precision=" + rprecS + ")")
         exec("Unum.set_format(value_format = '%." + rprecS + "f')")
@@ -726,8 +726,8 @@ class OutputRST:
         """write value table"""
 
         locals().update(self.rivtD)
-        rprecS = self.setcmdD["trmrI"]  # trim numbers
-        tprecS = self.setcmdD["trmtI"]
+        rprecS = str(self.setcmdD["trmrI"])  # trim numbers
+        tprecS = str(self.setcmdD["trmtI"])
         fltfmtS = "." + rprecS.strip() + "f"
         sys.stdout.flush()
         old_stdout = sys.stdout
