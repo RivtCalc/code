@@ -655,6 +655,14 @@ class OutputRST:
                     valdec = ("%." + str(rprecS) + "f") % valU.number()
                     val1U = str(valdec) + " " + str(valU.unit())
                     val2U = valU.cast_unit(eval(unit2S))
+            else:
+                cmdS = varS + "= " + "unum.as_unum(" + valS + ")"
+                exec(cmdS, globals(), locals())
+                # valU = eval(varS).cast_unit(eval(unit1S))
+                # valdec = ("%." + str(rprecS) + "f") % valU.number()
+                # val1U = str(valdec) + " " + str(valU.unit())
+                val1U = eval(varS)
+                val2U = val1U
             rstS = vL[0]
             spS = "Eq(" + varS + ",(" + valS + "))"  # pretty print
             symeq = sp.sympify(spS, _clash2, evaluate=False)
@@ -694,8 +702,15 @@ class OutputRST:
                     cmdS = varS + "= " + valS + "*" + unit1S
                     exec(cmdS, globals(), locals())
                     valU = eval(varS)
-                    val1U = str(valU.number()) + " " + str(valU.unit())  # case=1
+                    val1U = str(valU.number()) + " " + str(valU.unit())
                     val2U = valU.cast_unit(eval(unit2S))
+            else:
+                cmdS = varS + "= " + "unum.as_unum(" + valS + ")"
+                print(f"{cmdS=}")
+                exec(cmdS, globals(), locals())
+                valU = eval(varS)
+                # val1U = str(valU.number()) + " " + str(valU.unit())
+                val2U = valU
             self.valL.append([varS, val1U, val2U, descripS])
             if self.setcmdD["saveB"] == True:
                 pyS = vL[0] + vL[1] + vL[2] + "\n"

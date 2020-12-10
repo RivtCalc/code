@@ -515,7 +515,7 @@ def gen_pdf(texfileP):
 
     mpath = _foldD["mpath"]
     pdfmkS = (
-        "perl.exe d:/texlive/2020/texmf-dist/scripts/latexmk/latexmk.pl "
+        "perl.exe c:/texlive/2020/texmf-dist/scripts/latexmk/latexmk.pl "
         + "-pdf -xelatex -quiet -f "
         + str(texfileP)
     )

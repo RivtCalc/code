@@ -340,7 +340,7 @@ class OutputUTF:
 
         calpS = "c" + self.setsectD["cnumS"]
         txtP = Path(self.folderD["cpath"] / calpS / iL[1].strip())
-        with open(txtP, "r") as txtf1:
+        with open(txtP, "r", encoding="utf-8") as txtf1:
             uL = txtf1.readlines()
         if iL[2].strip() == "indent":
             txtS = "".join(uL)
@@ -586,8 +586,12 @@ class OutputUTF:
         Args:
             vL (list): list of assignments
         """
-
         locals().update(self.rivtD)
+        rprecS = str(self.setcmdD["trmrI"])  # trim numbers
+        tprecS = str(self.setcmdD["trmtI"])
+        fltfmtS = "." + rprecS.strip() + "f"
+        exec("set_printoptions(precision=" + rprecS + ")")
+        exec("Unum.set_format(value_format = '%." + rprecS + "f')")
         if len(vL) <= 2:  # equation
             unitL = vL[1].split(",")
             unit1S, unit2S = unitL[0].strip(), unitL[1].strip()
@@ -602,8 +606,17 @@ class OutputUTF:
                     cmdS = varS + "= " + valS
                     exec(cmdS, globals(), locals())
                     valU = eval(varS).cast_unit(eval(unit1S))
-                    val1U = str(valU.number()) + " " + str(valU.unit())  # case=1
+                    valdec = ("%." + str(rprecS) + "f") % valU.number()
+                    val1U = str(valdec) + " " + str(valU.unit())
                     val2U = valU.cast_unit(eval(unit2S))
+            else:
+                cmdS = varS + "= " + "unum.as_unum(" + valS + ")"
+                exec(cmdS, globals(), locals())
+                # valU = eval(varS).cast_unit(eval(unit1S))
+                # valdec = ("%." + str(rprecS) + "f") % valU.number()
+                # val1U = str(valdec) + " " + str(valU.unit())
+                val1U = eval(varS)
+                val2U = val1U
             utfS = vL[0]
             spS = "Eq(" + varS + ",(" + valS + "))"
             utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
@@ -644,8 +657,14 @@ class OutputUTF:
                     cmdS = varS + "= " + valS + "*" + unit1S
                     exec(cmdS, globals(), locals())
                     valU = eval(varS)
-                    val1U = str(valU.number()) + " " + str(valU.unit())  # case=1
+                    val1U = str(valU.number()) + " " + str(valU.unit())
                     val2U = valU.cast_unit(eval(unit2S))
+            else:
+                cmdS = varS + "= " + "unum.as_unum(" + valS + ")"
+                exec(cmdS, globals(), locals())
+                valU = eval(varS)
+                # val1U = str(valU.number()) + " " + str(valU.unit())
+                val2U = valU
             self.valL.append([varS, val1U, val2U, descripS])
             if self.setcmdD["saveB"] == True:
                 pyS = vL[0] + vL[1] + vL[2] + "\n"
@@ -804,7 +823,7 @@ class OutputUTF:
                     continue
                 else:
                     if _cnt > 1:
-                        out3 = out3.replace("-" * _cnt, u"\u2014" * _cnt)
+                        out3 = out3.replace("-" * _cnt, "\u2014" * _cnt)
                     _cnt = 0
             # print('out3b \n', out3)
             self._write_text(out3, 1, 0)  # print substituted form
