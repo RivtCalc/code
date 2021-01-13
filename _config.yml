@@ -1,1 +1,5 @@
-x
+theme: jekyll-theme-minimal
+title: RivtCalc source code
+logo: images/riv008d.png
+description: RivtCalc examples for repl.it
+show_downloads: false
