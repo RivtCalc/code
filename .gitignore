@@ -35,3 +35,6 @@
 .spyproject
 settings.json
 
+# folders #
+######################
+**/out
