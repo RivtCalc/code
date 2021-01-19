@@ -1,4 +1,4 @@
-### RivtCalc source code
+### Rivtlib source code
 
 OnceXchange is a collection of searchable lists containing links to GitHub repositories of example engineering calculations and models.  Each list contains links to example text files (not binary) for a particular engineering software i.e. Matlab, SAP2000, OpenSees, Python, RivtCalc etc.  Currently there are about two dozen lists that are supported and edited by the community. Each example repository is released under the GPL3 license, which means it will always remain available as open source.
 
