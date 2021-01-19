@@ -7,7 +7,7 @@ OnceXchange is a collection of searchable lists containing links to GitHub repos
 Each software example list includes numbered repository entries, ordered from most recent to oldest.  The repository link is provided in the first line followed by a few lines of example description and key words.  Clicking on the link takes you to the repository where you can further review and download the files.
 
 Example list
-```markdown
+```
 1. https://github.com/account_name/repo_name
     aslkfas dflas   asdflkas dflasdf asdf aslkfas  
     asdfklas dfasl dfasdf asdfklas dfasl dfasdf 
