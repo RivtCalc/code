@@ -53,9 +53,10 @@ where dd is the division and folder number and ddnn is the calc number.  The tw
 
 A **rivt** project is started by copying the folder structure from a similar existing project.  The calcs folder will always be available.  The docs folder can be copied and derived from the calcs folder..  In summary, **rivtlib** reads string functions in a .py file as input and outputs a plain text calculation to the calcs folder.  Options are available to write pdf or html files and reports to the docs folder   Functions are available to assemble complete project reports from pdf files.
 
-Example project folder structure 
+Example project folder tree
 
 ::
+
 
   rivtproject_name 
      calcs
