@@ -53,7 +53,7 @@ A **rivt** project is started by copying the folder structure from a similar exi
 
 Example project folder tree:
 
-..code ::
+::
 
     rivtproject_name 
        calcs
