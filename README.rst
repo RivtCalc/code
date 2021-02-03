@@ -164,7 +164,7 @@ documented in the **Rivt User Manual**. When working in VSCode the models
 can be written and evaluated step by step and graphics can be output inline.  Other
 options include Pyzo and Spyder.
 
-.. _Rivt User Manual: http://www.rivtdocs.net/
+'Rivt User Manual <http://www.rivtdocs.net>'
 
 Learning Curve
 --------------
