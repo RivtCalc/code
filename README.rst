@@ -51,46 +51,46 @@ where dd is the division and folder number and ddnn is the calc number.  The tw
 
 A **rivt** project is started by copying the folder structure from a similar existing project.  The calcs folder will always be available.  The docs folder can be copied and derived from the calcs folder..  In summary, **rivtlib** reads string functions in a .py file as input and outputs a plain text calculation to the calcs folder.  Options are available to write pdf or html files and reports to the docs folder   Functions are available to assemble complete project reports from pdf files.
 
-Example project folder tree
+Example project folder tree:
 
 ..code ::
 
-  rivtproject_name 
-     calcs
-        c00 (config data)
-           units.py
-        c01_loads
-           c0101_gravity.py
-           c0102_wind.py 
-           c0101_gravity.txt     
-           c0102_wind.txt
-        c02_beams
-           c0201_floor.py
-           c0202_roof.py
-           c0201_floor.txt
-           c0202_roof.txt
-     docs
-        d00 (project/config data)
-           pdf_style.sty
-           config.txt
-           project_data.xlsx    
-        d01_loads
-           image1.jpg
-           d0101_gravity.pdf
-           d0102_wind.pdf      
-        d02_beams
-           image2.jpg
-           attachment.pdf
-           d0201_floor.pdf
-           d0202_roof.pdf
-        html
-           resources 
-              image3.png
-           index.html
-           d0101_gravity.html
-           d0102_wind.html
-           d0201_gravity.html
-           d0202_wind.html
+    rivtproject_name 
+       calcs
+          c00 (config data)
+             units.py
+          c01_loads
+             c0101_gravity.py
+             c0102_wind.py 
+             c0101_gravity.txt     
+             c0102_wind.txt
+          c02_beams
+             c0201_floor.py
+             c0202_roof.py
+             c0201_floor.txt
+             c0202_roof.txt
+       docs
+          d00 (project/config data)
+             pdf_style.sty
+             config.txt
+             project_data.xlsx    
+          d01_loads
+             image1.jpg
+             d0101_gravity.pdf
+             d0102_wind.pdf      
+          d02_beams
+             image2.jpg
+             attachment.pdf
+             d0201_floor.pdf
+             d0202_roof.pdf
+          html
+             resources 
+                image3.png
+             index.html
+             d0101_gravity.html
+             d0102_wind.html
+             d0201_gravity.html
+             d0202_wind.html
 
 
 Minimum Setup and Execution
