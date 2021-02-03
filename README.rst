@@ -160,15 +160,17 @@ Efficient IDE's
 
 By far the most efficient way to write **rivt** models is to use a full
 featured code editor or IDE like Microsoft VSCode. Use of VSCode is extensibly
-documented in the **RivtCalc User Manual**. When working in VSCode the models
+documented in the **Rivt User Manual**. When working in VSCode the models
 can be written and evaluated step by step and graphics can be output inline.  Other
 options include Pyzo and Spyder.
+
+.. _Rivt User Manual: http://www.rivtdocs.net/
 
 Learning Curve
 --------------
 
 The estimated time to set up **RivtCalc** and begin producing calculations is
-about one hour for people familiar with Python, and about four hours for those
+about 15 minutes for portable program, one hour for people familiar with Python, and about four hours for those
 starting from scratch.
 
 
