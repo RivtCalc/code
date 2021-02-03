@@ -96,22 +96,22 @@ Example project folder tree:
 Minimum Setup and Execution
 ---------------------------
 
-The minimum working version of **RivtCalc** on a PC workstation includes a
-Python installation with about a dozen Python science libraries
-(https://github.com/rivtcalcs/rivt-code/requirements.txt) and a text editor.
-In this case the input model is run from the command line as::
+**RivtCalc** refers to the complete framework for writing calculations. The minimum 
+working version of **RivtCalc** on a PC workstation includes a
+Python installation with a dozen Python science libraries
+(https://github.com/rivtcalcs/rivt-code/requirements.txt) and a text 
+editor.  In this case the input model is run from the command line as::
 
-  python -m rivtcalc ddss_modelname.py 
+  python -m rivtlib cddnn_filename.py 
 
 If a LaTeX distribution is installed, formatted PDF documents and reports can
 be generated. If an IDE or full-featured code editor is used the calculations
-can be executed interactively and in stages by tagging the API functions as
+can be executed interactively and in stages by tagging (# %%) the API functions as
 cells. Execution steps include::
 
                      /--------------------------------\                    
-                     |     Edit and run RivtCalc      |
-                     |     model file or              | 
-                     |     interactive cells.         |                   
+                     |     Edit and run rivt file     |
+                     |     or interactive cells.      |                   
                      |                                |
                      |    cell or function types:     |                    
                      |       R(), I(), V(), T()       |                    
@@ -123,8 +123,8 @@ cells. Execution steps include::
   |   terminal    <--+ YES                         NO +-->             |   
   +------+--------+  +--------------------------------+  +------+------+   
          |           +================================+         |          
-         |           |    Write utf-8 and reST calc   |         |          
-         +===========>    to file on function call    <=========+            
+         |           |    Write utf-8, reST, TeX      |         |          
+         +===========>    calc to file                <=========+            
                      |================================|                    
                      +===============||===============+                    
                                      \/
@@ -145,23 +145,24 @@ cells. Execution steps include::
                      +================================+    
                      
                      
-**rivtCalc** may be installed by:
+**RivtCalc** may be installed by:
 
 - Locally installing and configuring the individual open source components.
-- Locally downloading and unzipping a pre-configured installation (Windows only).
+- Download and unzipping a pre-configured installation (Windows only).
 - Remotely installing as a cloud service in a container. 
 
 Pre-installed cloud installations (**RvetCloud.net**) that run through a
 broswer are available with paid support. Refer to the **RivtCalc User Manual**
 for details.
 
-Efficient IDE Development
--------------------------
+Efficient IDE's
+---------------
 
 By far the most efficient way to write **rivt** models is to use a full
 featured code editor or IDE like Microsoft VSCode. Use of VSCode is extensibly
 documented in the **RivtCalc User Manual**. When working in VSCode the models
-can be written and evaluated step by step and graphics can be output inline.
+can be written and evaluated step by step and graphics can be output inline.  Other
+options include Pyzo and Spyder.
 
 Learning Curve
 --------------
