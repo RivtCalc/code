@@ -1,26 +1,17 @@
 Program Structure
 ----------------- 
 
-**rivtcalc** is an open source document generator and databbase for engineering
-calculations. It simplifies writing, checking and sharing calculations, and 
-runs on all desktop, mobile and server platforms. It is implemented as 
-a Python library that produces calculation
+**rivtlib** is an open source Python library for producing engineering calculation 
+documents. It simplifies writing, checking and sharing calculations and 
+runs on all desktop, mobile and server platforms. It produces calculation
 documents and reports in UTF8, HTML and PDF file formats from plain text input.
-Calculations are written in **rivt**, a light-weight, procedural markup
+Calculations are written in **RivtText**, a light-weight, procedural markup
 language. The language includes commands and tags, and incorporates a
 subset of reStructuredText.
 
-A **rivtcalc** file is a Python file that imports *rivtcalc.rc_lib as rc* and
-calls functions on **rivt-strings**. A **rivt-string** contains text,
-commands and tags defining the calculation. A function call is of the form::
-
-  rc.V(''' several line rivt-string ''')
-
-Input file names (models) have the form *rddss_modelname.py*. Corresponding
-output files (calcs, docs and reports) have the names *rddss_calcname.txt*,
-*rddss_calcname.html*, or *rddcc_calcname.pdf*; where *ddss* is the calculation
-number made up of the division (*dd*) and sequence (*ss*) numbers which are
-used to organize PDF documents into collated reports.
+A **rivt** file is a Python file that imports *rivtlib.rv_lib as rv* and
+calls functions on **rivt-strings** which are plain text and include
+commands and tags defining the calculation. 
 
 Files
 =====
@@ -33,80 +24,76 @@ doc (.pdf or .html)   formatted HTML or PDF calc output, written to file
 report (.pdf)         formatted and collated PDF doc, written to a file
 ===================  =====================================================       
 
-The **RivtCalc** API consists of four functions that take a **rivt-string** as
-input and four functions that control the output format.
+The **rivtlib** API consists of five functions that take a **rivt-string** as
+input (only four produce output) and a function that controls the output format.
+A function call is of the form::
+
+  rc.V(''' several line rivt-string ''')
+
+
 
 API Functions
 =============
 ================ =======================================================
  API              Description
 ================ =======================================================
-  R()            repository, report and calc summary information
-  I()            insert descriptive text, tables, figures and equations
-  V()            define and import values, equations and functions 
-  T()            define and import tables and plots   
-write_textcalc()  write utf calc to file
-write_pdfdoc()   write pdf doc to file (includes images)
-write_htmldoc()  write html doc to file (includes images) 
-write_report()   compile pdf docs into a report
+  rv.R()            repository, report and calc summary information
+  rv.I()            insert descriptive text, tables, figures and equations
+  rv.V()            define and import values, equations and functions 
+  rv.T()            define and import tables and plots   
+  rv.S()            skip processing of string (used for calc debugging)
+  rv.D()            controls document output type and format
 ================ =======================================================
 
-All calculation and supporting files are stored in a structured project tree.
-UTF-8 model input and output are stored in the *calcs* folder. Docs are written
-to their respective folders in PDF or HTML formts. PDF reports are written to
-the *reports* folder. Binary image files used in docs and reports are stored in
-the *html* folder. The user initially starts a project by copying a complete
-folder tree from a prior project or template.
+Reuse and sharing is simplified by standardizing the file and folder structure for a calculation project.  Each rivt file is stored in a rivt project folder and identified with a name that starts with a four digit calc number of the form:
 
-Project Folder Tree
-=================== 
+cddnn_filename.py
+
+where dd is the division and folder number and ddnn is the calc number.  The two subfolders under the project folder are calcs and docs. The calcs folder includes all of the plain text input files and output calc files (.txt and .tex). The docs folder includes all of the binary inputs (i.e. images) and  calc documents (.pdf and .html).  The calcs folder contains only plain text files.  This division of file types makes it easy to share and impose version control on the primary calculation inputs. rivtlib includes functions that automate sharing to GitHub. 
+
+A **rivt** project is started by copying the folder structure from a similar existing project.  The calcs folder will always be available.  The docs folder can be copied and derived from the calcs folder..  In summary, **rivtlib** reads string functions in a .py file as input and outputs a plain text calculation to the calcs folder.  Options are available to write pdf or html files and reports to the docs folder   Functions are available to assemble complete project reports from pdf files.
+
+Example project folder structure 
+
 ::
 
-  Project_Name (chosen by user)
-      |- calcs
-          |- data
-          |- scripts
-          |- sketches
-          |- text
-          |- temp
-      |- docs
-          |- html
-      |- reports
-          |- attachments
+  rivtproject_name 
+     calcs
+        c00 (config data)
+           units.py
+        c01_loads
+           c0101_gravity.py
+           c0102_wind.py 
+           c0101_gravity.txt     
+           c0102_wind.txt
+        c02_beams
+           c0201_floor.py
+           c0202_roof.py
+           c0201_floor.txt
+           c0202_roof.txt
+     docs
+        d00 (project/config data)
+           pdf_style.sty
+           config.txt
+           project_data.xlsx    
+        d01_loads
+           image1.jpg
+           d0101_gravity.pdf
+           d0102_wind.pdf      
+        d02_beams
+           image2.jpg
+           attachment.pdf
+           d0201_floor.pdf
+           d0202_roof.pdf
+        html
+           resources 
+              image3.png
+           index.html
+           d0101_gravity.html
+           d0102_wind.html
+           d0201_gravity.html
+           d0202_wind.html
 
-Reuse and sharing
------------------
-
-File types are categorized into folders to facilitate calc organization,
-version control and sharing. The *calcs* folder and sub-folders contain only
-UTF-8 or ASCII files. Binary files, including image and PDF files, are stored
-in the *docs* and *reports* folders. A shared project or calc includes the full
-project tree containing only text (ASCII, UTF-8) files. The calcs folder is
-typically fully populated and the *docs* and *reports* folders contain only
-config files. A shared template on Github has the following form:
-
-Shared Project Template Tree
-============================ 
-::
-
-  rivtCalcTemplate_nnnn (nnnn is a unique three digit number)
-      |- calcs
-          |- sketches
-          |- scripts
-          |- tables
-          |- text
-          |- temp
-      |- docs (config file only)
-          |- html (config file only)
-      |- reports (config file only)
-          |- attachments (config file only)
-
-**RivtCalcTemplate_nnnn** is the standard Github repository name where nnnn is
-a unique four digit number. This shared common name across Github accounts and
-repositories facilitates searches. Each account may contain many repositories
-(templates). **RivtCalc** templates may be cloned, downloaded as a zip file, or
-run directly on Digital Ocean, Gitpod or repl.it with the addition of a few
-setup files.
 
 Minimum Setup and Execution
 ---------------------------
