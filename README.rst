@@ -151,9 +151,11 @@ cells. Execution steps include::
 - Download and unzipping a pre-configured installation (Windows only).
 - Remotely installing as a cloud service in a container. 
 
-Pre-installed cloud installations (**RvetCloud.net**) that run through a
+Pre-installed cloud installations (**RivtConnect**) that are run through a
 broswer are available with paid support. Refer to the **RivtCalc User Manual**
 for details.
+
+Rivt User Manual <http://www.rivtdocs.net>
 
 Efficient IDE's
 ---------------
@@ -163,8 +165,6 @@ featured code editor or IDE like Microsoft VSCode. Use of VSCode is extensibly
 documented in the **Rivt User Manual**. When working in VSCode the models
 can be written and evaluated step by step and graphics can be output inline.  Other
 options include Pyzo and Spyder.
-
-Rivt User Manual <http://www.rivtdocs.net>
 
 Learning Curve
 --------------
