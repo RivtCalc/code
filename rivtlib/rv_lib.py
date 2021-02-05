@@ -22,12 +22,12 @@
     Rivt functions ------------------------------------------------------------
     type       API      any text       string commands / arguments
     ======= ========== ========= ==============================================
-    Repo    rc.R(rivt)    yes      search, info, keys, text, table, pdf
-    Insert  rc.I(rivt)    yes      text, table, image, latex
-    Values  rc.V(rivt)   yes(=)    =, config, value, data, func, I() commands
-    Table   rc.T(rivt)    no       Python simple statements, I() commands  
-    Skip    rc.S(rivt)    --       Skip rivt-string evaluation
-    Write   rc.doc(args)  --       (type, style, title, page)
+    Repo    rv.R(rivt)    yes      search, info, keys, text, table, pdf
+    Insert  rv.I(rivt)    yes      text, table, image, latex
+    Values  rv.V(rivt)   yes(=)    =, config, value, data, func, I() commands
+    Table   rv.T(rivt)    no       Python simple statements, I() commands  
+    Skip    rv.S(rivt)    --       Skip rivt-string evaluation
+    Write   rv.doc(args)  --       (type, style, title, page)
 
     Rivt tags -----------------------------------------------------------------
       format tag               description (user input)
@@ -59,7 +59,7 @@ rivt Strings ------------------------------------------------------------------
     Either/or argumens are separated by semi-colons. Comments are in braces
     below the arguments.
 
-from rivtcalc import rc_lib as rc
+from rivtcalc import rv_lib as rc
 rc.R(
     """[01]_ Repository-string defines repository and report content
     
@@ -335,7 +335,8 @@ def _init_utf(rawS: str):
     sectS, strS = rawS.split("\n", 1)
     _section(sectS)
     strL = strS.split("\n")
-    ucalc = _rc_calc.OutputUTF(strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
+    ucalc = _rc_calc.OutputUTF(
+        strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
     return ucalc
 
 
@@ -351,7 +352,8 @@ def _init_rst(rawS: str):
     sectS, strS = rawS.split("\n", 1)
     _section(sectS)
     strL = strS.split("\n")
-    rstcalc = _rc_tex.OutputRST(strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
+    rstcalc = _rc_tex.OutputRST(
+        strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
     return rstcalc
 
 
@@ -365,8 +367,8 @@ def _section(hdrS: str):
 
     _rgx = r"\[\d\d\]"
     if re.search(_rgx, hdrS):
-        nameSS = _setsectD["snameS"] = hdrS[hdrS.find("]") + 2 :].strip()
-        snumSS = _setsectD["snumS"] = hdrS[hdrS.find("[") + 1 : hdrS.find("]")]
+        nameSS = _setsectD["snameS"] = hdrS[hdrS.find("]") + 2:].strip()
+        snumSS = _setsectD["snumS"] = hdrS[hdrS.find("[") + 1: hdrS.find("]")]
         cnumSS = str(_setsectD["cnumS"])
         widthI = int(_setsectD["swidthI"])
     if _rstflagB:
@@ -390,7 +392,8 @@ def _section(hdrS: str):
         headS = (
             " "
             + nameSS
-            + (cnumSS + " - " + ("[" + snumSS + "]")).rjust(widthI - len(nameSS) - 1)
+            + (cnumSS + " - " + ("[" + snumSS + "]")
+               ).rjust(widthI - len(nameSS) - 1)
         )
         bordrS = widthI * "_"
         utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS + "\n"
@@ -675,7 +678,6 @@ def doc(
     startpageS="1",
     clrS="clr",
 ):
-
     """write rst-calc and values to files
 
     cnnnn_calc.txt file is written to the calc subfolder
@@ -698,7 +700,7 @@ def doc(
         if "rc.doc" in iS[1]:
             indx = int(iS[0])
             break
-    rstcalcL = utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1 :]
+    rstcalcL = utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1:]
     cmdS = "".join(utfcalcL)
 
     exprtfile = Path(_cpath / _setsectD["fnumS"] / ".".join([_cnameS, "csv"]))
