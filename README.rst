@@ -18,20 +18,29 @@ Files
 ===================  =====================================================
 File type             File description                                      
 ===================  =====================================================
-model (.py)           input model written in **rivt**                      
-calc (.txt)           formatted UTF-8 output, written to screen (and file) 
-doc (.pdf or .html)   formatted HTML or PDF calc output, written to file                  
-report (.pdf)         formatted and collated PDF doc, written to a file
+rivt file (.py)       input model written in **RivtText**                      
+calc (.txt)           formatted UTF-8 output, written to screen and file 
+doc (.pdf or .html)   formatted HTML or PDF calc output written to a file                  
+report (.pdf)         collated PDF docs written to a file
 ===================  =====================================================       
-
-The **rivtlib** API consists of five functions that take a **rivt-string** as
-input (only four produce output) and a function that controls the output format.
-A function call is of the form::
-
-  rc.V(''' several line rivt-string ''')
 
 API Functions
 =============
+
+The **rivtlib** API consists of five functions that take a **rivt-string** as
+input (only four produce output) and a function that controls the output format.
+The library is imported with
+
+.. code::
+
+    from rivtlib import rivt_lib as rv
+
+A rist streing function call is of the form::
+
+.. code::
+
+    rV.V(''' several lines of rivt-strings ''')
+
 ================ =======================================================
  API              Description
 ================ =======================================================
