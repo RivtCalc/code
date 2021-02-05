@@ -29,19 +29,13 @@ API Functions
 
 The **rivtlib** API consists of five functions that take a **rivt-string** as
 input (only four produce output) and a function that controls the output format.
-The library is imported with
-
-.. code::
+The library is imported with::
 
     from rivtlib import rivt_lib as rv
 
-
-A rivt string function call is of the form:
-
-.. code::
+A rivt string function call is of the form::
 
     rV.V(''' several lines of rivt-strings ''')
-
 
 ================ =======================================================
  API              Description
@@ -54,9 +48,9 @@ A rivt string function call is of the form:
   rv.D()            controls document output type and format
 ================ =======================================================
 
-Reuse and sharing is simplified by standardizing the file and folder structure for a calculation project.  Each rivt file is stored in a rivt project folder and identified with a name that starts with a four digit calc number of the form:
+Reuse and sharing is simplified by standardizing the file and folder structure for a calculation project.  Each rivt file is stored in a rivt project folder and identified with a name that starts with a four digit calc number of the form::
 
-cddnn_filename.py
+    cddnn_filename.py
 
 where dd is the division and folder number and ddnn is the calc number.  The two subfolders under the project folder are calcs and docs. The calcs folder includes all of the plain text input files and output calc files (.txt and .tex). The docs folder includes all of the binary inputs (i.e. images) and  calc documents (.pdf and .html).  The calcs folder contains only plain text files.  This division of file types makes it easy to share and impose version control on the primary calculation inputs. rivtlib includes functions that automate sharing to GitHub. 
 
