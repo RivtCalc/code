@@ -60,7 +60,7 @@ rivt Strings ------------------------------------------------------------------
     below the arguments.
 
 from rivtcalc import rv_lib as rc
-rc.R(
+ rv.R(
     """[01]_ Repository-string defines repository and report content
     
     Repository-strings may include arbitrary text. The first paragraph of the
@@ -108,7 +108,7 @@ rc.R(
     || pdf | back | (appendixfile.pdf) | (title)
     """
 )
-rc.I(
+ rv.I(
     """[02]_ Insert-string defines static text, tables and images.  
     
     Insert-strings include text, static equations and images. The equation tag
@@ -140,7 +140,7 @@ rc.I(
     (label) | http://wwww.someurl.suffix [link]_ 
     """
 )
-rc.V(
+ rv.V(
     """[02]_ Value-string defines active values and equations
     
     Value-strings include text (excluding equal signs). Lines with equal signs
@@ -191,7 +191,7 @@ rc.V(
     A figure caption [f]_
     """
 ) 
-rc.T(
+ rv.T(
     """[04]_ Table-string builds tables and plots and executes statements
     
      Table-strings may include any simple Python statement (single line),
@@ -697,7 +697,7 @@ def doc(
 
     indx = 0  # avoid recursion
     for iS in enumerate(utfcalcL):
-        if "rc.doc" in iS[1]:
+        if " rv.doc" in iS[1]:
             indx = int(iS[0])
             break
     rstcalcL = utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1:]
