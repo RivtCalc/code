@@ -9,9 +9,10 @@ Calculations are written in **RivtText**, a light-weight, procedural markup
 language. The language includes commands and tags, and incorporates a
 subset of reStructuredText.
 
-A **rivt** file is a Python file that imports *rivtlib.rv_lib as rv* and
-calls functions on **rivt-strings** which are plain text and include
-commands and tags defining the calculation. 
+A **rivt** file is a Python file that imports **rivtlib** and
+calls functions on **rivt-strings**.  Rivt-strings are free-form plain 
+text strings enclosed in triple quotes that may include commands and tags 
+defining the calculation. 
 
 Files
 =====
