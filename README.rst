@@ -104,21 +104,21 @@ Example project folder tree:
              d0202_wind.html
 
 
-Minimum Setup and Execution
----------------------------
+Minimum RivtCalc Setup and Execution
+-----------------------------------
 
-**RivtCalc** refers to the complete framework for writing calculations. The minimum 
+**RivtCalc** refers to the open source framework for writing calculations. The minimum 
 working version of **RivtCalc** on a PC workstation includes a
 Python installation with a dozen Python science libraries
-(https://github.com/rivtcalcs/rivt-code/requirements.txt) and a text 
+(https://github.com/rivtcalcs/rivt-code/requirements.txt) and a simple text 
 editor.  In this case the input model is run from the command line as::
 
   python -m rivtlib cddnn_filename.py 
 
 If a LaTeX distribution is installed, formatted PDF documents and reports can
-be generated. If an IDE or full-featured code editor is used the calculations
-can be executed interactively and in stages by tagging (# %%) the API functions as
-cells. Execution steps include::
+be generated. Calculation writing is dramatically improved if a full-featured code editor or 
+IDE (i.e. VSCode) is used the calculations can be executed interactively and in 
+stages by tagging (# %%) the API functions as cells. Execution steps include::
 
                      /--------------------------------\                    
                      |     Edit and run rivt file     |
