@@ -36,7 +36,7 @@ The library is imported with
     from rivtlib import rivt_lib as rv
 
 
-A rivt string function call is of the form::
+A rivt string function call is of the form:
 
 .. code::
 
