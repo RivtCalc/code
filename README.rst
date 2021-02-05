@@ -157,26 +157,27 @@ stages by tagging (# %%) the API functions as cells. Execution steps include::
 - Download and unzipping a pre-configured installation (Windows only).
 - Remotely installing as a cloud service in a container. 
 
-Pre-installed cloud installations (**RivtConnect**) that are run through a
-broswer are available with paid support. Refer to the **RivtCalc User Manual**
-for details.
+RivtCalc may also be installed on a remote server and run in a 
+broswer. **RivtConnect** is the remote server framework and it is also available 
+as a paid service Refer to the **RivtCalc User Manual** for details.
 
 Rivt User Manual <http://www.rivtdocs.net>
 
 Efficient IDE's
 ---------------
 
-By far the most efficient way to write **rivt** models is to use a full
-featured code editor or IDE like Microsoft VSCode. Use of VSCode is extensibly
-documented in the **Rivt User Manual**. When working in VSCode the models
-can be written and evaluated step by step and graphics can be output inline.  Other
-options include Pyzo and Spyder.
+By far the most efficient way to write rivt files is with a full
+featured code editor or IDE like Microsoft VSCode. Use of VSCode is
+documented in the **Rivt User Manual**. When working in VSCode the rivt functions
+can be written and evaluated step by step and graphics can be output inline.  Other 
+effective editors include Pyzo and Spyder.
 
 Learning Curve
 --------------
 
 The estimated time to set up **RivtCalc** and begin producing calculations is
-about 15 minutes for portable program, one hour for people familiar with Python, and about four hours for those
-starting from scratch.
+about 15 minutes for the portable program.  If the components are installed separately 
+it will take about one hour for people familiar with Python, and three to four hours for those
+not familiar with open source software. 
 
 
