@@ -302,7 +302,7 @@ class Rivt2rSt:
         contentL = []
         sumL = []
         fileS = rL[1].strip()
-        tfileS = Path(self.folderD["dpath"] / "d0000" / fileS)
+        tfileS = Path(self.folderD["dpath0"] / fileS)
         extS = fileS.split(".")[1]
         if extS == "csv":
             with open(tfileS, "r") as csvfile:  # read csv file
@@ -405,7 +405,7 @@ class Rivt2rSt:
             iL (list): text command list
         """
         calpS = "c" + self.setsectD["cnumS"]
-        txapath = Path(self.folderD["cpath"] / calpS / iL[1].strip())
+        txapath = Path(self.folderD["cpathcur"] / iL[1].strip())
         with open(txapath, "r", encoding="utf-8") as txtf1:
             rstL = txtf1.readlines()
         if iL[2].strip() == "indent":
@@ -456,7 +456,7 @@ class Rivt2rSt:
         sumL = []
         fileS = iL[1].strip()
         calpS = self.setsectD["fnumS"]
-        tfileS = Path(self.folderD["cpath"] / calpS / fileS)
+        tfileS = Path(self.folderD["cpathcur"] / fileS)
         extS = fileS.split(".")[1]
         if extS == "csv":
             with open(tfileS, "r") as csvfile:  # read csv file

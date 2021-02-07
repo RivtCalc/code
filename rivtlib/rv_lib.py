@@ -237,7 +237,6 @@ _cpath = _cfull.parent.parent  # calc folder path
 _ppath = _cfull.parent.parent.parent  # project folder path
 _dpath = Path(_ppath / "docs")  # doc folder path
 _dpath0 = Path(_dpath / "d00")  # doc config folder
-_rstfile = Path(_dpath0 / ".".join((_cnameS, "rst")))  # rst output
 _pdffile = Path(_dpath / ".".join((_cnameS, "pdf")))  # pdf output
 
 utfcalcS = """"""  # utf calc string
@@ -257,8 +256,9 @@ for root, dir, file in os.walk(_dpath):
         if _cfileS[1:3] == i[1:3]:
             _docdirS = i
 
-_dpathcur = Path(_ppath / "docs" / _docdirS)  # doc folder path
-_cpathcur = Path(_cpath / "calcs" / _calcdirS)  # calc folder path
+_rstfile = Path(_dpath0 / ".".join((_cnameS, "rst")))  # rst output
+_dpathcur = Path(_ppath / _docdirS)  # doc folder path
+_cpathcur = Path(_cpath / _calcdirS)  # calc folder path
 
 print("INFO: calc directory is ", _cpathcur)
 print("INFO: doc directory is ", _dpathcur)
@@ -304,9 +304,9 @@ _setcmdD = {
 }
 
 # temp files
-_rvbak = Path(_mpath / ".".join((_cnameS, "bak")))
-_logfile = Path(_mpath / ".".join((_cnameS, "logging")))
-_rstfile = Path(_mpath / ".".join((_cnameS, "rst")))
+_rvbak = Path(_cpathcur / ".".join((_cnameS, "bak")))
+_logfile = Path(_dpath0 / ".".join((_cnameS, "logging")))
+_rstfile = Path(_cpathcur / ".".join((_cnameS, "rst")))
 # logs and checks
 with open(_cfull, "r") as f2:
     calcbak = f2.read()
@@ -326,7 +326,7 @@ formatter = logging.Formatter("%(levelname)-8s %(message)s")
 logconsole.setFormatter(formatter)
 logging.getLogger("").addHandler(logconsole)
 _rshortP = Path(*Path(_cfull).parts[-3:])
-_bshortP = Path(*Path(_rbak).parts[-4:])
+_bshortP = Path(*Path(_rvbak).parts[-4:])
 _lshortP = Path(*Path(_logfile).parts[-4:])
 logging.info(f"""calc: {_rshortP}""")
 logging.info(f"""backup: {_bshortP}""")
@@ -538,27 +538,26 @@ def gen_pdf(texfileP):
 
     dnameS = _cnameS.replace("c", "d", 1)
     dfolderS = str(_setsectD["fnumS"]).replace("c", "d", 1)
-    docpdfP = Path(_dpath / dfolderS / ".".join([dnameS, "pdf"]))
+    docpdfP = Path(_dpathcur / ".".join([dnameS, "pdf"]))
 
-    mpath = _foldD["mpath"]
     pdfmkS = (
         "perl.exe c:/texlive/2020/texmf-dist/scripts/latexmk/latexmk.pl "
         + "-pdf -xelatex -quiet -f "
         + str(texfileP)
     )
-    os.chdir(mpath)
+    os.chdir(_dpath0)
     os.system(pdfmkS)
     print("\nINFO  pdf file written: " + ".".join([_cnameS, "pdf"]))
 
     time.sleep(1)  # move pdf to doc folder
-    os.chdir(mpath)
+    os.chdir(_dpath0)
     pdfS = ".".join([_cnameS, "pdf"])
     shutil.move(pdfS, docpdfP)
     os.chdir(_dpath)
     print("INFO  pdf file moved to docs folder", flush=True)
     print("INFO  program complete")
 
-    cfgP = Path(_dpath / "d00" / "rc_cfg.txt")  # get pdf program
+    cfgP = Path(_dpath0 / "rc_cfg.txt")  # read pdf display program
     with open(cfgP) as f2:
         cfgL = f2.readlines()
         cfg1S = cfgL[0].split("|")
@@ -580,22 +579,21 @@ def gen_tex(doctypeS, stylefileS, calctitleS, startpageS):
 
     global rstcalcS, _rstflagB
 
-    mpath = _foldD["mpath"]
     pdfD = {
-        "cpdfP": Path(mpath / ".".join([_cnameS, "pdf"])),
-        "chtml": Path(mpath / ".".join([_cnameS, "html"])),
-        "trst": Path(mpath / ".".join([_cnameS, "rst"])),
-        "ttex1": Path(mpath / ".".join([_cnameS, "tex"])),
-        "auxfile": Path(mpath / ".".join([_cnameS, ".aux"])),
-        "outfile": Path(mpath / ".".join([_cnameS, ".out"])),
-        "texmak2": Path(mpath / ".".join([_cnameS, ".fls"])),
-        "texmak3": Path(mpath / ".".join([_cnameS, ".fdb_latexmk"])),
+        "cpdfP": Path(_dpath0 / ".".join([_cnameS, "pdf"])),
+        "chtml": Path(_dpath0 / ".".join([_cnameS, "html"])),
+        "trst": Path(_dpath0 / ".".join([_cnameS, "rst"])),
+        "ttex1": Path(_dpath0 / ".".join([_cnameS, "tex"])),
+        "auxfile": Path(_dpath0 / ".".join([_cnameS, ".aux"])),
+        "outfile": Path(_dpath0 / ".".join([_cnameS, ".out"])),
+        "texmak2": Path(_dpath0 / ".".join([_cnameS, ".fls"])),
+        "texmak3": Path(_dpath0 / ".".join([_cnameS, ".fdb_latexmk"])),
     }
     if stylefileS == "default":
         stylefileS = "pdf_style.sty"
     else:
         stylefileS == stylefileS.strip()
-    style_path = Path(_dpath / "d0000" / stylefileS)
+    style_path = Path(_dpath0 / stylefileS)
     print("INFO  style sheet: " + str(style_path))
     pythoncallS = "python "
     if sys.platform == "linux":
@@ -618,7 +616,7 @@ def gen_tex(doctypeS, stylefileS, calctitleS, startpageS):
             str(texfileP),
         ]
     )
-    os.chdir(mpath)
+    os.chdir(_dpath0)
     os.system(tex1S)
     print("INFO  tex file written : " + str(texfileP) + "\n")
 
@@ -740,13 +738,13 @@ def D(
 
     indx = 0  # skip D() in calc list - avoid recursion
     for iS in enumerate(utfcalcL):
-        if " rv.D(" in iS[1]:
+        if "rv.D" in iS[1]:
             indx = int(iS[0])
             break
     rstcalcL = utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1:]
     cmdS = "".join(utfcalcL)
 
-    exprtfile = Path(_cpath / _setsectD["fnumS"] / ".".join([_cnameS, "csv"]))
+    exprtfile = Path(_cpathcur / ".".join([_cnameS, "csv"]))
     str1 = """header string\n"""  # write values file
     str1 = str1 + exportS
     with open(exprtfile, "w") as expF:
@@ -758,7 +756,6 @@ def D(
 
     elif doctypeS == "tex" or doctypeS == "pdf" or doctypeS == "html":
         if clrS == "clr":  # delete temp files
-            mpathS = str(_foldD["mpath"])
             fileL = [
                 Path(_dpath0, ".".join([_cnameS, "pdf"])),
                 Path(_dpath0, ".".join([_cnameS, "html"])),
@@ -771,7 +768,7 @@ def D(
             ]
             os.chdir(_dpath0)
             tmpS = os.getcwd()
-            if tmpS == mpathS:
+            if tmpS == str(_dpath0):
                 for f in fileL:
                     try:
                         os.remove(f)
