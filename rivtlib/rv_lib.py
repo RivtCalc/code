@@ -1,5 +1,5 @@
 #! python
-'''rivtcalc API  
+'''rivtlib API  
 
     The API includes six functions. Input functions take a rivt-string as the
     single argument and write formatted utf8 calculations to the
@@ -27,7 +27,7 @@
     Values  rv.V(rivt)   yes(=)    =, config, value, data, func, I() commands
     Table   rv.T(rivt)    no       Python simple statements, I() commands  
     Skip    rv.S(rivt)    --       Skip rivt-string evaluation
-    Write   rv.doc(args)  --       (type, style, title, page)
+    Write   rv.D(args)    --       (type, style, title, page)
 
     Rivt tags -----------------------------------------------------------------
       format tag               description (user input)
@@ -55,13 +55,13 @@ rivt Strings ------------------------------------------------------------------
     indented 4 spaces after the function call line to provide code structure
     and improve legibility.
     
-    in the examples below, arguments in parenthesis are provided by the user.
+    In the examples below, arguments in parenthesis are provided by the user.
     Either/or argumens are separated by semi-colons. Comments are in braces
     below the arguments.
 
-from rivtcalc import rv_lib as rc
- rv.R(
-    """[01]_ Repository-string defines repository and report content
+from rivtlib import rv_lib as rv
+rv.D("none")
+rv.R("""[01]_ Repository-string defines repository and report content
     
     Repository-strings may include arbitrary text. The first paragraph of the
     calcs specified in the ||search command (see below) becomes part of the
@@ -70,33 +70,30 @@ from rivtcalc import rv_lib as rc
     used provided. Otherwise they are literal. Parameter options are separated
     by semicolons.
     
-    || search | (calc num), (calc num), (calc num) ...
-
-    The || search command generates a README and specifies a list of calc
-    numbers that are searched against a master category list for terms to be
-    included in the README. Because the search command is executed at the
-    project level across multiple calcs, it is usually included in the first
-    project calc. The command overwrites any existing README file.
-
-    The calc number list is also used for the ||keys command. The ||keys
-    command is a list of keywords included in the README that describe the
-    scope of the calc, with up to six calcs per command.
+    The || search | command specifies a list of calc numbers that are searched against
+    a master list of terms to be included in the README. Because the search
+    command is executed at the project level across multiple calcs, it is
+    usually included in the first project calc (c0101). It generates a README
+    file that overwrites any existing file. The command may also provide
+    a list of user specified keywords that are appended to the README. 
     
-    || keys | (discipline), (object), (purpose), (assembly), (component)
+    || search | (calc num), (calc num), (calc num) ...
+    || search | (keyword), (keyword), (keyword) ...
 
-    The || info command is similar to the the ||table and ||text commands with
-    differences in file location and use. See those commands for details.
-    ||info files are used for project specific information (clients, addresses,
-    etc) and are read from the docs/info folder which is not shared. Also, the
-    info command is only written to docs, and not to utf-calcs. This keeps
-    confidential project information separated from the shareable calc
-    information contained in the calcs folder. || info tables do not contain
-    titles and should not be numbered.
+    The || info | command is similar to the || table | and || text | commands
+    with differences in file location and use. See those commands for details.
+    || info | files are used for project specific information (clients,
+    addresses, etc) and are read from the docs/d00 folder which is not shared.
+    In addition the info command data is only written to doc output (PDF, HTML)
+    under the docs folder, and not to utf-calcs stored in the calcs folder.
+    This keeps confidential project information separated from shared exaple calc
+    information contained in the calcs folder. || info | tables do not include
+    titles and should not be numbered with a tag.
 
     || info | (project.txt) | literal; indent
-    || info | (project.csv or .xlsx) | ([1,2,3] or [:]
+    || info | (project.csv or .xlsx) | ([col list]) or [:]
     
-    The || pdf command attaches existing pdf documents, stored in the
+    The || pdf | command attaches existing pdf documents, stored in the
     docs/attach folder, to the front or back  of the calc doc. The *functions*
     or *docstrings* arguments determine whether the complete function code or
     just the docstrings of functions used with the ||func commmand are appended
@@ -104,12 +101,11 @@ from rivtcalc import rv_lib as rc
     in the calcs.
     
     || pdf | front | (calccoverfile.pdf) | (title)        
-    || pdf | back | functions; docstrings |(title)
     || pdf | back | (appendixfile.pdf) | (title)
+    || pdf | back | functions; docstrings |(title)
     """
 )
- rv.I(
-    """[02]_ Insert-string defines static text, tables and images.  
+rv.I("""[02]_ Insert-string defines static text, tables and images.  
     
     Insert-strings include text, static equations and images. The equation tag
     [e]_ auto-increments the equation labels. The [s]_ and [x]_  tags format 
@@ -140,8 +136,7 @@ from rivtcalc import rv_lib as rc
     (label) | http://wwww.someurl.suffix [link]_ 
     """
 )
- rv.V(
-    """[02]_ Value-string defines active values and equations
+rv.V("""[02]_ Value-string defines active values and equations
     
     Value-strings include text (excluding equal signs). Lines with equal signs
     define equations and assignments that are numerically evaluated.
@@ -191,11 +186,10 @@ from rivtcalc import rv_lib as rc
     A figure caption [f]_
     """
 ) 
- rv.T(
-    """[04]_ Table-string builds tables and plots and executes statements
+rv.T("""[04]_ Table-string builds tables and plots and executes statements
     
      Table-strings may include any simple Python statement (single line),
-     and any command or tag that does not include an = sign.
+     and any command or tag.  Any other line of text are ignored.
     """
 )
 '''
@@ -215,8 +209,8 @@ from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
 from contextlib import suppress
 from rivtcalc.rc_unit import *
-import rivtcalc.rc_calc as _rc_calc
-import rivtcalc.rc_tex as _rc_tex
+import rivtlib.rv_calc as _rv_calc
+import rivtlib.rv_tex as _rv_tex
 
 # import rivt.rivt_reprt as _reprt
 # import rivt.rivt_chk as _rchk
@@ -238,27 +232,46 @@ _cfull = Path(_calcfileS)  # calc file full path
 _cfileS = _cfull.name  # calc file name
 _cnameS = _cfileS.split(".py")[0]  # calc file basename
 _cnumS = _cnameS[0:5]
-_rivpath = Path("rivtcalc.rivt_lib.py").parent  # rivtcalc program path
+_rivpath = Path("rivtcalc.rivt_lib.py").parent  # rivtlib program path
 _cpath = _cfull.parent.parent  # calc folder path
 _ppath = _cfull.parent.parent.parent  # project folder path
-_mpath = Path(_ppath / "tmp")  # tmp folder path
 _dpath = Path(_ppath / "docs")  # doc folder path
-_rstfile = Path(_mpath / ".".join((_cnameS, "rst")))  # rst output
+_dpath0 = Path(_dpath / "d00")  # doc config folder
+_rstfile = Path(_dpath0 / ".".join((_cnameS, "rst")))  # rst output
 _pdffile = Path(_dpath / ".".join((_cnameS, "pdf")))  # pdf output
 
-# global variables and dictionaries
 utfcalcS = """"""  # utf calc string
 rstcalcS = """"""  # reST calc string
 exportS = """"""  # values string exports
 rivtcalcD = {}  # values dictonary
 _rstflagB = False  # reST generation flag
+
+_calcdirS = ""
+_docdirS = ""
+for root, dir, file in os.walk(_cpath):
+    for i in dir:
+        if _cfileS[0:5] == i[0:5]:
+            _calcdirS = i
+for root, dir, file in os.walk(_dpath):
+    for i in dir:
+        if _cfileS[1:3] == i[1:3]:
+            _docdirS = i
+
+_dpathcur = Path(_ppath / "docs" / _docdirS)  # doc folder path
+_cpathcur = Path(_cpath / "calcs" / _calcdirS)  # calc folder path
+
+print("INFO: calc directory is ", _cpathcur)
+print("INFO: doc directory is ", _dpathcur)
+
 # folder paths
 _foldD = {
     "ppath": _ppath,
     "docpath": _dpath,
     "cpath": Path(_ppath, "calcs"),
+    "cpathcur": _cpathcur,
     "dpath": Path(_ppath, "docs"),
-    "mpath": Path(_ppath, "tmp"),
+    "dpath0": Path(_ppath, "docs", "d00"),
+    "dpathcur": _dpathcur,
     "spath": Path(_cpath, "scripts"),
     "kpath": Path(_cpath, "scripts", "sketches"),
     "hpath": Path(_dpath, "html"),
@@ -291,13 +304,13 @@ _setcmdD = {
 }
 
 # temp files
-_rbak = Path(_mpath / ".".join((_cnameS, "bak")))
+_rvbak = Path(_mpath / ".".join((_cnameS, "bak")))
 _logfile = Path(_mpath / ".".join((_cnameS, "logging")))
 _rstfile = Path(_mpath / ".".join((_cnameS, "rst")))
 # logs and checks
 with open(_cfull, "r") as f2:
     calcbak = f2.read()
-with open(_rbak, "w") as f3:
+with open(_rvbak, "w") as f3:
     f3.write(calcbak)  # write backup
 warnings.filterwarnings("ignore")
 logging.basicConfig(
@@ -352,7 +365,7 @@ def _init_rst(rawS: str):
     sectS, strS = rawS.split("\n", 1)
     _section(sectS)
     strL = strS.split("\n")
-    rstcalc = _rc_tex.OutputRST(
+    rstcalc = _rv_tex.Rivt2rSt(
         strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
     return rstcalc
 
@@ -483,7 +496,13 @@ def S(rawS: str):
 
 
 def gen_utf8(cmdS: str, filepathS: str, calctitleS: str):
-    """write utf-calc to calc subfolder"""
+    """write utf-calc to numbered calc folder and exit
+
+    Args:
+        cmdS (str): rivt file
+        filepathS (str): write path (default to read path)
+        calctitleS (str): calculation title
+    """
 
     global utfcalcS
 
@@ -505,16 +524,21 @@ def gen_utf8(cmdS: str, filepathS: str, calctitleS: str):
 
 
 def gen_pdf(texfileP):
+    """write pdf calc to file
+
+    Args:
+        texfileP (path): calc division folder
+    """
 
     global rstcalcS, _rstflagB
 
-    time.sleep(1)
+    time.sleep(1)  # cleanup tex files
     os.system("latexmk -c")
     time.sleep(1)
+
     dnameS = _cnameS.replace("c", "d", 1)
     dfolderS = str(_setsectD["fnumS"]).replace("c", "d", 1)
     docpdfP = Path(_dpath / dfolderS / ".".join([dnameS, "pdf"]))
-    # clean temp files and generate pdf file
 
     mpath = _foldD["mpath"]
     pdfmkS = (
@@ -534,7 +558,7 @@ def gen_pdf(texfileP):
     print("INFO  pdf file moved to docs folder", flush=True)
     print("INFO  program complete")
 
-    cfgP = Path(_dpath / "d0000" / "rc_cfg.txt")  # get pdf program
+    cfgP = Path(_dpath / "d00" / "rc_cfg.txt")  # get pdf program
     with open(cfgP) as f2:
         cfgL = f2.readlines()
         cfg1S = cfgL[0].split("|")
@@ -544,6 +568,12 @@ def gen_pdf(texfileP):
     subprocess.run(cmdS)
 
     os._exit(1)
+
+
+def gen_html(stylefileS):
+
+    global rstcalcS, _rstflagB
+    pass
 
 
 def gen_tex(doctypeS, stylefileS, calctitleS, startpageS):
@@ -633,13 +663,16 @@ def gen_tex(doctypeS, stylefileS, calctitleS, startpageS):
     os._exit(1)
 
 
-def gen_html(stylefileS):
-
-    global rstcalcS, _rstflagB
-    pass
-
-
 def gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS):
+    """write calc rSt to d00 folder
+
+    Args:
+        cmdS (str): [description]
+        doctypeS ([type]): [description]
+        stylefileS ([type]): [description]
+        calctitleS ([type]): [description]
+        startpageS ([type]): [description]
+    """
 
     global rstcalcS, _rstflagB
 
@@ -654,14 +687,14 @@ def gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS):
     f1 = open(_rstfile, "r", encoding="utf-8", errors="ignore")
     rstcalcL = f1.readlines()
     f1.close()
-    print("INFO  rst file read: " + str(_rstfile))
+    print("INFO:  rst file read: " + str(_rstfile))
 
     if doctypeS == "tex" or doctypeS == "pdf":
         gen_tex(doctypeS, stylefileS, calctitleS, startpageS)
     elif doctypeS == "html":
         gen_html()
     else:
-        print("INFO doc type not recognized")
+        print("INFO: doc type not recognized")
 
     os._exit(1)
 
@@ -671,33 +704,43 @@ def gen_report():
     pass
 
 
-def doc(
-    doctypeS="utf8",
+def D(
+    doctypeS="default",
     stylefileS="default",
     calctitleS="RivtCalc Calculation",
     startpageS="1",
     clrS="clr",
 ):
-    """write rst-calc and values to files
+    """write plain text calcs and values to calc files
 
-    cnnnn_calc.txt file is written to the calc subfolder
-    cnnnn_values.csv file is written to calc subfolder
-    .csv value file is written to calc subfolder
-    .style files are read from d0000 folder (default)
-    .rst calc file is written to tmp folder
-    .tex file is written to tmp folder (default)
+    Default skips writing any calc files.
+    Doc options include: utf8, html, pdf.
+    They write the following files to the calc file:
+
+    cddnn_calcname.txt file is written to the calc subfolder
+    cdnnn_values.csv file is written to calc subfolder
+    cddnn_calcname.rst calc file is written to calc subfolder
+    cddnn_calcname.tex file is written to calc subfolder
+
+    .style files are read from d00 folder (default)
+
+    pdf option writes PDF doc to the doc division folder.
+    html option writes HTML files to the html folder.
 
     """
     global utfcalcS, rstcalcS, _rstflagB
+
+    if doctypeS == "default":
+        return
 
     f1 = open(_cfull, "r")
     utfcalcL = f1.readlines()
     f1.close()
     print("INFO calc file read: " + str(_cfull))
 
-    indx = 0  # avoid recursion
+    indx = 0  # skip D() in calc list - avoid recursion
     for iS in enumerate(utfcalcL):
-        if " rv.doc" in iS[1]:
+        if " rv.D(" in iS[1]:
             indx = int(iS[0])
             break
     rstcalcL = utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1:]
@@ -717,16 +760,16 @@ def doc(
         if clrS == "clr":  # delete temp files
             mpathS = str(_foldD["mpath"])
             fileL = [
-                Path(mpathS, ".".join([_cnameS, "pdf"])),
-                Path(mpathS, ".".join([_cnameS, "html"])),
-                Path(mpathS, ".".join([_cnameS, "rst"])),
-                Path(mpathS, ".".join([_cnameS, "tex"])),
-                Path(mpathS, ".".join([_cnameS, ".aux"])),
-                Path(mpathS, ".".join([_cnameS, ".out"])),
-                Path(mpathS, ".".join([_cnameS, ".fls"])),
-                Path(mpathS, ".".join([_cnameS, ".fdb_latexmk"])),
+                Path(_dpath0, ".".join([_cnameS, "pdf"])),
+                Path(_dpath0, ".".join([_cnameS, "html"])),
+                Path(_dpath0, ".".join([_cnameS, "rst"])),
+                Path(_dpath0, ".".join([_cnameS, "tex"])),
+                Path(_dpath0, ".".join([_cnameS, ".aux"])),
+                Path(_dpath0, ".".join([_cnameS, ".out"])),
+                Path(_dpath0, ".".join([_cnameS, ".fls"])),
+                Path(_dpath0, ".".join([_cnameS, ".fdb_latexmk"])),
             ]
-            os.chdir(mpathS)
+            os.chdir(_dpath0)
             tmpS = os.getcwd()
             if tmpS == mpathS:
                 for f in fileL:

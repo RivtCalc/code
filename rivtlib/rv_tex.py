@@ -1,8 +1,8 @@
 #!python
 """converts rivt-strings to reST-strings
 
-The OutputRST class converts rivt-strings to intermediate reST-strings which
-may then be converted to pdf or html docs. """
+The  Rivt2rSt class converts rivt-strings to intermediate rSt-strings which
+may then be converted to TeX and PDF or HTML docs. """
 
 import os
 import sys
@@ -11,13 +11,13 @@ import textwrap
 import subprocess
 import tempfile
 import re
-import io
 import logging
 import numpy.linalg as la
 import pandas as pd
 import sympy as sp
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from numpy import *
 from IPython.display import display as _display
 from IPython.display import Image as _Image
 from io import StringIO
@@ -26,7 +26,6 @@ from sympy.abc import _clash2
 from sympy.core.alphabets import greeks
 from tabulate import tabulate
 from pathlib import Path
-from numpy import *
 from IPython.display import display as _display
 from IPython.display import Image as _Image
 
@@ -40,7 +39,7 @@ from rivtcalc.rc_unit import *
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 
 
-class OutputRST:
+class Rivt2rSt:
     """convert rivt-strings to reST strings"""
 
     def __init__(
