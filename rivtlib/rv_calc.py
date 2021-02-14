@@ -18,6 +18,7 @@ import pandas as pd
 import sympy as sp
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import html2text as htm
 from IPython.display import display as _display
 from IPython.display import Image as _Image
 from io import StringIO
@@ -44,7 +45,6 @@ class OutputUTF:
         rivtD: dict,
         exportS: str,
     ):
-
         """process rivt-string to UTF8 calc-string
 
         The OutputUTF class converts rivt-strings to calc-strings.
@@ -336,10 +336,12 @@ class OutputUTF:
 
         Args:
             iL (list): text command list
+
+        || text | (file.txt) | literal; indent; html
+
         """
 
-        calpS = "c" + self.setsectD["cnumS"]
-        txtP = Path(self.folderD["cpath"] / calpS / iL[1].strip())
+        txtP = Path(self.folderD["cpathcur"] / iL[1].strip())
         with open(txtP, "r", encoding="utf-8") as txtf1:
             uL = txtf1.readlines()
         if iL[2].strip() == "indent":
@@ -352,6 +354,21 @@ class OutputUTF:
         elif iL[2].strip() == "literal":
             txtS = "  ".join(uL)
             uS = "\n" + txtS
+        elif iL[2].strip() == "html":
+            txtS = ""
+            flg = 0
+            for iS in uL:
+                if "src=" in iS:
+                    flg = 1
+                    continue
+                if flg == 1 and '"' in iS:
+                    flg = 0
+                    continue
+                if flg == 1:
+                    continue
+                txtS += iS
+            txtS = htm.html2text(txtS)
+            uS = txtS
         else:
             txtS = "".join(uL)
             uS = "\n" + txtS
@@ -369,7 +386,8 @@ class OutputUTF:
         Args:
             ipl (list): parameter list
         """
-        alignD = {"S": "", "D": "decimal", "C": "center", "R": "right", "L": "left"}
+        alignD = {"S": "", "D": "decimal",
+                  "C": "center", "R": "right", "L": "left"}
         itagL = [
             "[page]_",
             "[line]_",

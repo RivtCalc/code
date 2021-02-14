@@ -347,7 +347,7 @@ def _init_utf(rawS: str):
     sectS, strS = rawS.split("\n", 1)
     _section(sectS)
     strL = strS.split("\n")
-    ucalc = _rc_calc.OutputUTF(
+    ucalc = _rv_calc.OutputUTF(
         strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
     return ucalc
 
@@ -378,6 +378,10 @@ def _section(hdrS: str):
     global utfcalcS, _setsectD, rstcalcS
 
     _rgx = r"\[\d\d\]"
+    nameSS = hdrS
+    snumSS = ""
+    cnumSS = ""
+    widthI = int(_setsectD["swidthI"])
     if re.search(_rgx, hdrS):
         nameSS = _setsectD["snameS"] = hdrS[hdrS.find("]") + 2:].strip()
         snumSS = _setsectD["snumS"] = hdrS[hdrS.find("[") + 1: hdrS.find("]")]
