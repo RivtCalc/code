@@ -368,16 +368,14 @@ class OutputUTF:
                     continue
                 txtS += iS
             txtS = htm.html2text(txtS)
-            uS = txtS
+            uS = txtS.replace("\n    \n", "")
         else:
             txtS = "".join(uL)
             uS = "\n" + txtS
 
-        self.calcS += uS + "\n"
-
-        print(str(txtP))
+        # print(str(txtP))
+        #self.calcS += str(txtP) + "\n"
         print(uS)
-        self.calcS += str(txtP) + "\n"
         self.calcS += uS + "\n"
 
     def _itable(self, iL: list):

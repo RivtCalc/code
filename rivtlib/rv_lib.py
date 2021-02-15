@@ -382,39 +382,40 @@ def _section(hdrS: str):
     snumSS = ""
     cnumSS = ""
     widthI = int(_setsectD["swidthI"])
+    headS = hdrS
     if re.search(_rgx, hdrS):
         nameSS = _setsectD["snameS"] = hdrS[hdrS.find("]") + 2:].strip()
         snumSS = _setsectD["snumS"] = hdrS[hdrS.find("[") + 1: hdrS.find("]")]
         cnumSS = str(_setsectD["cnumS"])
         widthI = int(_setsectD["swidthI"])
-    if _rstflagB:
-        # draw horizontal line
-        headS = (
-            ".. raw:: latex"
-            + "\n\n"
-            + "   ?x?vspace{.2in}"
-            + "   ?x?textbf{"
-            + nameSS
-            + "}"
-            + "   ?x?hfill?x?textbf{SECTION "
-            + snumSS
-            + "}\n"
-            + "   ?x?newline"
-            + "   ?x?vspace{.05in}   {?x?color{black}?x?hrulefill}"
-            + "\n\n"
-        )
-        rstcalcS += headS
-    else:
-        headS = (
-            " "
-            + nameSS
-            + (cnumSS + " - " + ("[" + snumSS + "]")
-               ).rjust(widthI - len(nameSS) - 1)
-        )
-        bordrS = widthI * "_"
-        utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS + "\n"
-        print(utfS)
-        utfcalcS += utfS
+        if _rstflagB:
+            # draw horizontal line
+            headS = (
+                ".. raw:: latex"
+                + "\n\n"
+                + "   ?x?vspace{.2in}"
+                + "   ?x?textbf{"
+                + nameSS
+                + "}"
+                + "   ?x?hfill?x?textbf{SECTION "
+                + snumSS
+                + "}\n"
+                + "   ?x?newline"
+                + "   ?x?vspace{.05in}   {?x?color{black}?x?hrulefill}"
+                + "\n\n"
+            )
+            rstcalcS += headS
+        else:
+            headS = (
+                " "
+                + nameSS
+                + (cnumSS + " - " + ("[" + snumSS + "]")
+                   ).rjust(widthI - len(nameSS) - 1)
+            )
+    bordrS = widthI * "_"
+    utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS + "\n"
+    print(utfS)
+    utfcalcS += utfS
 
 
 def R(rawS: str):

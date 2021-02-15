@@ -418,9 +418,10 @@ class Rivt2rSt:
         elif iL[2].strip() == "literal":
             txtS = " ".join(rstL)
             rstS = "\n\n::\n\n" + txtS + "\n\n"
-        elif iL[2].strip() == "raw":
-            txtS = "".join(rstL)
-            rstS = "\n" + txtS
+        elif iL[2].strip() == "html":
+            txtS = ".. raw:: html" + "\n\n"
+            txtS += "".join(rstL)
+            rstS = "\n" + txtS + "\n"
         else:
             txtS = "".join(rstL)
             rstS = "\n" + txtS
