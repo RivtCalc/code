@@ -145,34 +145,32 @@ rv.V("""[02]_ Value-string defines active values and equations
     values and the number pair specifies decimals in the result and terms.
     ||config | sub; nosub | 2,2
 
-    Assign values to variables.  A blank line ends the value block and a table
-    is output.
-
-    (x1 = 10.1)    | (unit, alt unit | description
-    (y1 = 12.1)    | (unit, alt unit | description ||
+    Assign values to variables.  A blank line ends the value block.
+    x1 = 10.1    | unit, alt unit | description
+    y1 = 12.1    | unit, alt unit | description ||
                             {save to value file if trailing ||}
 
-
-    || values | (file.csv or .xlxs)
-
-    Import values from a csv or xlxs file, starting with the second row. The
-    first row is a descriptive heading. For a value file the csv or xlsx file
+    Import values from a csv or xlxs file, starting with the second row. 
+    || values | file.csv or .xlxs
+    
+    The first row is a descriptive heading. For a value file the csv or xlsx file
     must have the structure:
-
     [literal]__
         variable name, value, primary unit, secondary unit, description
 
 
+    Import a list of values from rows of a csv or xlsx file. 
     || data | file.csv | [1:4] {rows to import}
 
-    Import a list of values from rows of a csv or xlsx file. For a data file
-    the csv file must have the structure:
+
+    For a data file the csv file must have the structure:
     [literal]__
         variable name, value1, value2, value3, ....
 
 
     an equation [e]_
     v1 = x + 4*M  | unit, alt unit
+    
     save an equation result to the values file by appending double bars [e]_
     y1 = v1 / 4   | unit, alt unit ||
 
@@ -208,7 +206,7 @@ from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
 from contextlib import suppress
-from rivtcalc.rc_unit import *
+from rivtlib.rv_unit import *
 import rivtlib.rv_calc as _rv_calc
 import rivtlib.rv_tex as _rv_tex
 
@@ -289,6 +287,7 @@ _setsectD = {
     "tnumI": 0,
     "fnumI": 0,
     "ftqueL": deque([1]),
+    "counter": 0
 }
 # command settings
 _setcmdD = {
@@ -412,10 +411,10 @@ def _section(hdrS: str):
                 + (cnumSS + " - " + ("[" + snumSS + "]")
                    ).rjust(widthI - len(nameSS) - 1)
             )
-    bordrS = widthI * "_"
-    utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS + "\n"
-    print(utfS)
-    utfcalcS += utfS
+            bordrS = widthI * "_"
+            utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS + "\n"
+            print(utfS)
+            utfcalcS += utfS
 
 
 def R(rawS: str):
@@ -559,7 +558,7 @@ def gen_pdf(texfileP):
     print("INFO: pdf file moved to docs folder", flush=True)
     print("INFO: program complete")
 
-    cfgP = Path(_dpath0 / "rc_cfg.txt")  # read pdf display program
+    cfgP = Path(_dpath0 / "rv_cfg.txt")  # read pdf display program
     with open(cfgP) as f2:
         cfgL = f2.readlines()
         cfg1S = cfgL[0].split("|")
@@ -733,7 +732,7 @@ def D(
     """
     global utfcalcS, rstcalcS, _rstflagB
 
-    if doctypeS == "default":
+    if doctypeS == "default" or doctypeS == "dev":
         return
 
     f1 = open(_cfull, "r")

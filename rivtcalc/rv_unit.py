@@ -3,12 +3,18 @@
     Add new units at end of this file
 """
 
+from unum.utils import *
+from unum.exceptions import *
+from unum.core import *
+from unum import uarray
+from unum import Unum
+import unum
 import os
 import sys
 from pathlib import Path, PurePath
 import importlib.util
 
-path1 = importlib.util.find_spec("rivtcalc")
+path1 = importlib.util.find_spec("rivtlib")
 rivpath = Path(path1.origin).parent
 file_path = Path(rivpath / "unum" / "__init__.py")
 module_name = "unum"
@@ -17,12 +23,6 @@ module = importlib.util.module_from_spec(spec)
 sys.modules[module_name] = module
 spec.loader.exec_module(module)  # load unum from rivt directory
 
-import unum
-from unum import Unum
-from unum import uarray
-from unum.core import *
-from unum.exceptions import *
-from unum.utils import *
 
 Unum.set_format(
     mul_separator=" ",
@@ -115,5 +115,3 @@ HR = new_unit("hr", 60 * 60 * S, "hours")
 # velocity
 MPH = new_unit("mph", MILES / HR, "miles per hour")
 FPS = new_unit("fps", FT / SEC, "feet per second")
-
-

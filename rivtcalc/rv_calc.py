@@ -1,8 +1,8 @@
-#!python
-"""converts rivt-strings to reST-strings
+#! python
+"""converts rivt-strings to utf-strings
 
-The  Rivt2rSt class converts rivt-strings to intermediate rSt-strings which
-may then be converted to TeX and PDF or HTML docs. """
+The OutputUTF class converts rivt-strings to utf-strings and prints results to
+the terminal."""
 
 import os
 import sys
@@ -11,36 +11,30 @@ import textwrap
 import subprocess
 import tempfile
 import re
+import io
 import logging
 import numpy.linalg as la
 import pandas as pd
 import sympy as sp
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from numpy import *
+import html2text as htm
 from IPython.display import display as _display
 from IPython.display import Image as _Image
 from io import StringIO
 from sympy.parsing.latex import parse_latex
 from sympy.abc import _clash2
-from sympy.core.alphabets import greeks
 from tabulate import tabulate
 from pathlib import Path
-from IPython.display import display as _display
-from IPython.display import Image as _Image
-
-try:
-    from PIL import Image as PImage
-    from PIL import ImageOps as PImageOps
-except:
-    pass
-from rivtcalc.rc_unit import *
+from numpy import *
+from rivtlib.rv_unit import *
 
 logging.getLogger("numexpr").setLevel(logging.WARNING)
+# tabulate.PRESERVE_WHITESPACE = True
 
 
-class Rivt2rSt:
-    """convert rivt-strings to reST strings"""
+class OutputUTF:
+    """convert rivt-string to UTF8 calc and write to terminal"""
 
     def __init__(
         self,
@@ -51,36 +45,37 @@ class Rivt2rSt:
         rivtD: dict,
         exportS: str,
     ):
-        """convert rivt-strings to reST-strings
+        """process rivt-string to UTF8 calc-string
+
+        The OutputUTF class converts rivt-strings to calc-strings.
 
         Args:
-            exportS (str): stores values that are written to file
-            strL (list): calc rivt-strings
+            strL (list): calc lines
             folderD (dict): folder paths
             setcmdD (dict): command settings
             setsectD (dict): section settings
             rivtD (dict): global rivt dictionary
+            exportS (str): stores values that are written to file
         """
 
-        self.restS = """"""  # restructured text string
-        self.exportS = exportS  # value export string
-        self.strL = strL  # rivt-string list
-        self.valL = []  # value blocklist
+        self.calcS = """"""  # utf calc string
+        self.exportS = exportS
+        self.strL = strL
         self.folderD = folderD
         self.setsectD = setsectD
         self.setcmdD = setcmdD
         self.rivtD = rivtD
+        self.valL = []  # value list
 
     def _refs(self, objnumI: int, typeS: str) -> str:
         """reference label for equations, tables and figures
 
         Args:
-            objnumI (int): equation, table or figure numbers
-            setsectD (dict): section dictionary
+            objnumI (int): equation, table or figure section number
             typeS (str): label type
 
         Returns:
-            str: [description]
+            refS (str): reference label
         """
 
         objfillS = str(objnumI).zfill(2)
@@ -99,13 +94,12 @@ class Rivt2rSt:
             setsectD (dict): section dictionary
 
         Return:
-            rstS (str): restructured text string
-            setsectD (dict): updated section dictionary
+            uS (str): utf string
         """
 
         tagS = tagS.rstrip()
         uS = ""
-        swidthI = self.setsectD["swidthI"] - 1
+        swidthII = self.setsectD["swidthI"] - 1
         try:
             tag = list(set(tagL).intersection(tagS.split()))[0]
         except:
@@ -113,64 +107,75 @@ class Rivt2rSt:
             return uS
 
         if tag == "[#]_":  # auto increment footnote mark
-            uS = tagS + "\n"
+            ftnumII = self.setsectD["ftqueL"][-1] + 1
+            self.setsectD["ftqueL"].append(ftnumII)
+            uS = tagS.replace("[x]_", "[" + str(ftnumII) + "]")
+        elif tag == "[foot]_":  # footnote label
+            tagS = tagS.strip("[foot]_").strip()
+            uS = self.setsectD["ftqueL"].popleft() + tagS
         elif tag == "[page]_":  # new page
-            uS = ".. raw:: latex \n\n ?x?newpage \n"
+            uS = int(self.setsectD["swidthI"]) * "."
         elif tag == "[line]_":  # horizontal line
             uS = int(self.setsectD["swidthI"]) * "-"
         elif tag == "[link]_":  # url link
             tgS = tagS.strip("[link]_").strip()
             tgL = tgS.split("|")
-            uS = ".. _" + tgL[0].strip() + ": " + tgL[1].strip()
+            uS = tgL[0].strip() + " : " + tgL[1].strip()
+        elif tag == "[literal]_":  # literal text
+            uS = "\n"
+        elif tag == "[latex]_":  # literal text
+            uS = "\n"
         elif tag == "[r]_":  # right adjust text
             tagL = tagS.strip().split("[r]_")
-            uS = "?x?hfill " + tagL[0].strip()
+            uS = (tagL[0].strip()).rjust(swidthII)
         elif tag == "[c]_":  # center text
             tagL = tagS.strip().split("[c]_")
-            uS = "?x?begin{center} " + tagL[0].strip() + "?x?end{center}"
-        elif tag == "[x]_":  # format tex
-            tagL = tagS.strip().split("[x]_")
-            txS = tagL[0].strip()
-            uS = ".. raw:: math\n\n   " + txS + "\n"
-        elif tag == "[s]_":  # format sympy
-            tagL = tagS.strip().split("[s]_")
-            spS = tagL[0].strip()
-            txS = sp.latex(S(spS))
-            uS = ".. raw:: math\n\n   " + txS + "\n"
+            uS = (tagL[0].strip()).rjust(swidthII)
         elif tag == "[f]_":  # figure caption
             tagL = tagS.strip().split("[f]_")
             fnumI = int(self.setsectD["fnumI"]) + 1
             self.setsectD["fnumI"] = fnumI
             refS = self._refs(fnumI, "[ Fig: ") + " ]"
-            uS = "\n\n**" + tagL[0].strip() + "**" + \
-                " ?x?hfill " + refS + "\n\n"
+            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
+            uS = tagL[0].strip() + " " * spcI + refS
         elif tag == "[e]_":  # equation label
             tagL = tagS.strip().split("[e]_")
             enumI = int(self.setsectD["enumI"]) + 1
             self.setsectD["enumI"] = enumI
-            refS = self._refs(enumI, "[ Equ: ") + "]"
-            uS = "**" + tagL[0].strip() + "**" + " ?x?hfill " + refS
+            refS = self._refs(enumI, "[ Equ: ") + " ]"
+            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
+            uS = tagL[0].strip() + " " * spcI + refS
         elif tag == "[t]_":  # table label
             tagL = tagS.strip().split("[t]_")
             tnumI = int(self.setsectD["tnumI"]) + 1
             self.setsectD["tnumI"] = tnumI
-            refS = self._refs(tnumI, "[Table: ") + "]"
-            uS = "**" + tagL[0].strip() + "**" + " ?x?hfill  " + refS
-        elif tag == "[foot]_":  # footnote label
-            tagS = tagS.strip("[foot]_").strip()
-            # ".. target-notes::\n\n"
-            uS = ".. [*] " + tagS
+            refS = self._refs(tnumI, "[Table: ") + " ]"
+            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
+            uS = tagL[0].strip() + " " * spcI + refS
+        elif tag == "[x]_":  # format tex
+            tagL = tagS.strip().split("[x]_")
+            txS = tagL[0].strip()
+            # txS = txs.encode('unicode-escape').decode()
+            ptxS = parse_latex(txS)
+            uS = sp.pretty(sp.sympify(ptxS, _clash2, evaluate=False))
+        elif tag == "[s]_":  # format sympy
+            tagL = tagS.strip().split("[s]_")
+            spS = tagL[0].strip()
+            spL = spS.split("=")
+            spS = "Eq(" + spL[0] + ",(" + spL[1] + "))"
+            # sps = sps.encode('unicode-escape').decode()
+            uS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
         elif tag == "[n]_":  # new line
             tagL = tagS.strip().split("[n]_")
-            tagS = tagL[0] + "\n"
+            tagS = tagL[0]
             uS = tagS
         else:
             uS = tagS
 
         return uS
 
-    def _parseRST(self, typeS: str, cmdL: list, methL: list, tagL: list):
-        """parse rivt-string to reST
+    def _parseUTF(self, typeS: str, cmdL: list, methL: list, tagL: list):
+        """parse rivt-string to UTF
 
         Args:
             typeS (str): rivt-string type
@@ -185,185 +190,116 @@ class Rivt2rSt:
 
         for uS in self.strL:
             if uS[0:2] == "##":
-                continue  # remove comment
+                continue  # remove review comment
             uS = uS[4:]  # remove indent
             if len(uS) == 0:
                 if len(self.valL) > 0:  # print value table
-                    fltfmtS = ""
                     hdrL = ["variable", "value", "[value]", "description"]
                     alignL = ["left", "right", "right", "left"]
-                    self._vtable(self.valL, hdrL, "rst", alignL, fltfmtS)
+                    self._vtable(self.valL, hdrL, "rst", alignL)
                     self.valL = []
-                    self.restS += "\n\n"
+                    print(uS.rstrip(" "))
+                    self.calcS += " \n"
                     self.rivtD.update(locals())
                     continue
                 else:
-                    # self.restS += "?x?vspace{7pt}"
-                    self.restS += "\n"
+                    print(" ")
+                    self.calcS += "\n"
                     continue
             try:
                 if uS[0] == "#":
                     continue  # remove comment
             except:
-                self.restS += "\n"
-                continue
-            if uS.strip() == "[literal]_":
+                print(" ")  # if uS[0] throws error
+                self.calcS += "\n"
                 continue
             if re.search(_rgx, uS):  # check for tag
                 utgS = self._tags(uS, tagL)
-                self.restS += utgS.rstrip() + "\n"
+                print(utgS.rstrip())
+                self.calcS += utgS.rstrip() + "\n"
                 continue
-            if typeS == "values":  # chk for values
+            if typeS == "values":
                 self.setcmdD["saveB"] = False
-                if "=" in uS and uS.strip()[-2] == "||":  # value to file
+                if "=" in uS and uS.strip()[-2] == "||":  # set save flag
                     uS = uS.replace("||", " ")
                     self.setcmdD["saveB"] = True
-                if "=" in uS:  # assign value
+                if "=" in uS:  # just assign value
                     uL = uS.split("|")
                     self._vassign(uL)
                     continue
-            if typeS == "table":  # check for table
-                if uS[0:2] == "||":
+            if typeS == "table":
+                if uS[0:2] == "||":  # check for command
                     uL = uS[2:].split("|")
                     indxI = cmdL.index(uL[0].strip())
                     methL[indxI](uL)
                     continue
                 else:
-                    exec(uS)  # exec table code
+                    exec(uS)  # otherwise exec Python code
                     continue
-            if uS[0:2] == "||":  # check for cmd
-                # print(f"{cmdL=}")
+            if uS[0:2] == "||":  # check for command
                 uL = uS[2:].split("|")
                 indxI = cmdL.index(uL[0].strip())
                 methL[indxI](uL)
-                continue  # call any cmd
+                continue
 
+            if typeS != "table":  # skip table print
+                print(uS)
+                self.calcS += uS.rstrip() + "\n"
             self.rivtD.update(locals())
-            if typeS != "table":  # skip table prnt
-                self.restS += uS.rstrip() + "\n"
 
-    def r_rst(self) -> str:
+    def r_utf(self) -> str:
         """parse repository string
 
         Returns:
-             rstS (list): utf formatted calc-string (appended)
+             calcS (list): utf formatted calc-string (appended)
              setsectD (dict): section settings
         """
-
-        rcmdL = ["search", "keys", "info", "text", "table", "pdf"]
+        rcmdL = ["search", "keys", "info", "table", "text", "pdf"]
         rmethL = [
             self._rsearch,
             self._rkeys,
             self._rinfo,
-            self._itext,
             self._itable,
+            self._itext,
             self._rpdf,
         ]
         rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
 
-        self._parseRST("repository", rcmdL, rmethL, rtagL)
+        self._parseUTF("repository", rcmdL, rmethL, rtagL)
 
-        return self.restS, self.setsectD
-
-    def _rsearch(self, rsL):
-        a = 4
+        return self.calcS, self.setsectD
 
     def _rkeys(self, rsL):
+        """[summary]
+
+        Args:
+            rsL ([type]): [description]
+        """
+        a = 4
+
+    def _rsearch(self, rsL):
+        """[summary]
+
+        Args:
+            rsL ([type]): [description]
+        """
         a = 4
 
     def _rinfo(self, rL):
-        """insert tables or text from csv, xlsx or txt file
+        """skip info command for utf calcs
+
+        Command is executed only for docs in order to
+        separate protected information for shareable calcs.
 
         Args:
             rL (list): parameter list
-
-        Files are read from /docs/docfolder
-        The command is identical to itable except file is read from docs/info.
-
         """
-        alignD = {"S": "", "D": "decimal",
-                  "C": "center", "R": "right", "L": "left"}
-        rtagL = [
-            "[page]_",
-            "[line]_",
-            "[link]_",
-            "[literal]_",
-            "[foot]_",
-            "[r]_",
-            "[c]_",
-            "[e]_",
-            "[t]_",
-            "[f]_",
-            "[#]_",
-        ]
-        if len(rL) < 4:
-            rL += [""] * (4 - len(rL))  # pad parameters
-        rstS = ""
-        contentL = []
-        sumL = []
-        fileS = rL[1].strip()
-        tfileS = Path(self.folderD["dpath0"] / fileS)
-        extS = fileS.split(".")[1]
-        if extS == "csv":
-            with open(tfileS, "r") as csvfile:  # read csv file
-                readL = list(csv.reader(csvfile))
-        elif extS == "xlsx":
-            xDF = pd.read_excel(tfileS, header=None)
-            readL = xDF.values.tolist()
-        else:
-            return
-        incl_colL = list(range(len(readL[0])))
-        widthI = self.setcmdD["cwidthI"]
-        alignS = self.setcmdD["calignS"]
-        saS = alignD[alignS]
-        if rL[2].strip():
-            widthL = rL[2].split(",")  # new max col width
-            widthI = int(widthL[0].strip())
-            alignS = widthL[1].strip()
-            saS = alignD[alignS]  # new alignment
-            self.setcmdD.update({"cwidthI": widthI})
-            self.setcmdD.update({"calignS": alignS})
-        totalL = [""] * len(incl_colL)
-        if rL[3].strip():  # columns
-            if rL[3].strip() == "[:]":
-                totalL = [""] * len(incl_colL)
-            else:
-                incl_colL = eval(rL[3].strip())
-                totalL = [""] * len(incl_colL)
-        ttitleS = readL[0][0].strip() + " [t]_"
-        rstgS = self._tags(ttitleS, rtagL)
-        self.restS += rstgS.rstrip() + "\n\n"
-        for row in readL[1:]:
-            contentL.append([row[i] for i in incl_colL])
-        wcontentL = []
-        for rowL in contentL:
-            wrowL = []
-            for iS in rowL:
-                templist = textwrap.wrap(str(iS), int(widthI))
-                templist = [i.replace("""\\n""", """\n""") for i in templist]
-                wrowL.append("""\n""".join(templist))
-            wcontentL.append(wrowL)
-        sys.stdout.flush()
-        old_stdout = sys.stdout
-        output = StringIO()
-        output.write(
-            tabulate(
-                wcontentL,
-                tablefmt="rst",
-                headers="firstrow",
-                numalign="decimal",
-                stralign=saS,
-            )
-        )
-        rstS = output.getvalue()
-        sys.stdout = old_stdout
-
-        self.restS += rstS + "\n"
+        pass
 
     def _rpdf(self, rsL):
         b = 5
 
-    def i_rst(self) -> tuple:
+    def i_utf(self) -> tuple:
         """parse insert-string
 
         Returns:
@@ -373,17 +309,14 @@ class Rivt2rSt:
         """
 
         icmdL = ["text", "table", "image"]
-        imethL = [
-            self._itext,
-            self._itable,
-            self._iimage,
-        ]
+        imethL = [self._itext, self._itable, self._iimage]
         itagL = [
             "[page]_",
             "[line]_",
             "[link]_",
             "[literal]_",
             "[foot]_",
+            "[latex]_",
             "[s]_",
             "[x]_",
             "[r]_",
@@ -394,39 +327,61 @@ class Rivt2rSt:
             "[#]_",
         ]
 
-        self._parseRST("insert", icmdL, imethL, itagL)
+        self._parseUTF("insert", icmdL, imethL, itagL)
 
-        return self.restS, self.setsectD, self.setcmdD
+        return self.calcS, self.setsectD, self.setcmdD
 
     def _itext(self, iL: list):
         """insert text from file
 
         Args:
             iL (list): text command list
+
+        || text | (file.txt) | literal; indent; html
+
         """
-        calpS = "c" + self.setsectD["cnumS"]
-        txapath = Path(self.folderD["cpathcur"] / iL[1].strip())
-        with open(txapath, "r", encoding="utf-8") as txtf1:
-            rstL = txtf1.readlines()
+
+        txtP = Path(self.folderD["cpathcur"] / iL[1].strip())
+        with open(txtP, "r", encoding="utf-8") as txtf1:
+            uL = txtf1.readlines()
         if iL[2].strip() == "indent":
-            txtS = "".join(rstL)
+            txtS = "".join(uL)
             widthI = self.setcmdD["cwidth"]
             inS = " " * 4
-            rstL = textwrap.wrap(txtS, width=widthI)
-            rstL = [inS + S1 + "\n" for S1 in rstL]
-            rstS = "".join(rstL)
+            uL = textwrap.wrap(txtS, width=widthI)
+            uL = [inS + S1 + "\n" for S1 in uL]
+            uS = "".join(uL)
         elif iL[2].strip() == "literal":
-            txtS = " ".join(rstL)
-            rstS = "\n\n::\n\n" + txtS + "\n\n"
+            txtS = "  ".join(uL)
+            uS = "\n" + txtS
+        elif iL[2].strip() == "literalindent":
+            txtS = "\n\n::\n\n"
+            for iS in uL:
+                txtS += "   " + iS
+            uS = txtS + "\n\n"
         elif iL[2].strip() == "html":
-            txtS = ".. raw:: html" + "\n\n"
-            txtS += "".join(rstL)
-            rstS = "\n" + txtS + "\n"
+            txtS = ""
+            flg = 0
+            for iS in uL:
+                if "src=" in iS:
+                    flg = 1
+                    continue
+                if flg == 1 and '"' in iS:
+                    flg = 0
+                    continue
+                if flg == 1:
+                    continue
+                txtS += iS
+            txtS = htm.html2text(txtS)
+            uS = txtS.replace("\n    \n", "")
         else:
-            txtS = "".join(rstL)
-            rstS = "\n" + txtS
+            txtS = "".join(uL)
+            uS = "\n" + txtS
 
-        self.restS += rstS + "\n"
+        # print(str(txtP))
+        #self.calcS += str(txtP) + "\n"
+        print(uS)
+        self.calcS += uS + "\n"
 
     def _itable(self, iL: list):
         """insert table from csv or xlsx file
@@ -448,7 +403,6 @@ class Rivt2rSt:
             "[t]_",
             "[f]_",
             "[#]_",
-            "[n]_",
         ]
         if len(iL) < 4:
             iL += [""] * (4 - len(iL))  # pad parameters
@@ -463,8 +417,8 @@ class Rivt2rSt:
             with open(tfileS, "r") as csvfile:  # read csv file
                 readL = list(csv.reader(csvfile))
         elif extS == "xlsx":
-            tDF1 = pd.read_excel(tfileS, header=None)
-            readL = tDF1.values.tolist()
+            pDF1 = pd.read_excel(tfileS, header=None)
+            readL = pDF1.values.tolist()
         else:
             return
         incl_colL = list(range(len(readL[1])))
@@ -475,9 +429,9 @@ class Rivt2rSt:
             widthL = iL[2].split(",")  # new max col width
             widthI = int(widthL[0].strip())
             alignS = widthL[1].strip()
+            saS = alignD[alignS]  # new align
             self.setcmdD.update({"cwidthI": widthI})
             self.setcmdD.update({"calignS": alignS})
-            saS = alignD[alignS]  # new align
         totalL = [""] * len(incl_colL)
         if iL[3].strip():  # columns
             if iL[3].strip() == "[:]":
@@ -487,93 +441,113 @@ class Rivt2rSt:
                 totalL = [""] * len(incl_colL)
         ttitleS = readL[0][0].strip() + " [t]_"
         utgS = self._tags(ttitleS, itagL)
-        self.restS += utgS.rstrip() + "\n\n"
+        print(utgS.rstrip() + "\n")
+        self.calcS += utgS.rstrip() + "\n\n"
         for row in readL[1:]:
             contentL.append([row[i] for i in incl_colL])
+        wcontentL = []
+        for rowL in contentL:  # wrap columns
+            wrowL = []
+            for iS in rowL:
+                templist = textwrap.wrap(str(iS), int(widthI))
+                templist = [i.replace("""\\n""", """\n""") for i in templist]
+                wrowL.append("""\n""".join(templist))
+            wcontentL.append(wrowL)
         sys.stdout.flush()
         old_stdout = sys.stdout
         output = StringIO()
         output.write(
             tabulate(
-                contentL,
-                tablefmt="latex",
+                wcontentL,
+                tablefmt="rst",
                 headers="firstrow",
                 numalign="decimal",
                 stralign=saS,
             )
         )
-        rstS = output.getvalue()
+        utfS = output.getvalue()
         sys.stdout = old_stdout
 
-        # print(rstS)
-        cS = 0
-        self.restS += ".. raw:: latex" + "\n\n"
-        for i in rstS.split("\n"):
-            counter = i.count("&")
-            if counter > 0:
-                cS = "{" + alignS * (counter + 1) + "}"
-                continue
-        # self.restS += "  \\vspace{-.1in}"
-        self.restS += "  \\begin{tabulary}{1.0\\textwidth}" + cS + "\n"
-        inrstS = ""
-        for i in rstS.split("\n"):
-            inrstS += "  " + i + "\n"
-        self.restS += inrstS
-        self.restS += "  \\end{tabulary}\n"
-        self.restS += "  \\vspace{.15in}\n"
+        print(str(tfileS))
+        print(utfS)
+        self.calcS += str(tfileS) + "\n"
+        self.calcS += utfS + "\n"
 
     def _iimage(self, iL: list):
         """insert one or two images from file
 
         Args:
-            il (list): image parameters
+            iL (list): image parameters
         """
-        rstS = ""
-        dfoldS = "d" + self.setsectD["cnumS"]
-        fileS = iL[1].split(",")
-        file1S = fileS[0].strip()
-        fileS = iL[1].split(",")
-        file1S = fileS[0].strip()
-        img1S = str(Path(self.folderD["docpath"], dfoldS, file1S).as_posix())
-        scaleF = iL[2].split(",")
-        scale1S = str(float(scaleF[0])) + " %"
-        self.setcmdD.update({"scale1F": scale1S})
+        utfS = ""
         if "," in iL[1]:  # two images
-            scale2S = str(float(scaleF[1])) + " %"
-            self.setcmdD.update({"scale2F": scale2S})
+            scaleF = iL[2].split(",")
+            scale1F = float(scaleF[0])
+            scale2F = float(scaleF[1])
+            self.setcmdD.update({"scale1F": scale1F})
+            self.setcmdD.update({"scale2F": scale2F})
+            fileS = iL[1].split(",")
+            file1S = fileS[0].strip()
             file2S = fileS[1].strip()
-            img2S = str(
-                Path(self.folderD["docpath"] / dfoldS / file2S).as_posix())
-            rstS += (
-                "|pic1|  |pic2| "
-                + "\n\n"
-                + ".. |pic1| image:: "
-                + img1S
-                + "\n"
-                + "   :width: "
-                + scale1S
-                + "\n\n"
-                + ".. |pic2| image:: "
-                + img2S
-                + "\n"
-                + "   :width: "
-                + scale2S
-                + "\n"
-            )
+            docpS = "d" + self.setsectD["cnumS"]
+            img1S = str(Path(self.folderD["dpathcur"] / file1S))
+            img2S = str(Path(self.folderD["dpathcur"] / file2S))
+            # pshrt1S = str(Path(*Path(img1S).parts[-4:]))
+            # pshrt2S = str(Path(*Path(img2S).parts[-4:]))
+            for fS in [img1S, img2S]:
+                utfS += "Figure path: " + fS + "\n"
+                try:
+                    _display(_Image(fS))
+                except:
+                    pass
+            print(utfS)
+            self.calcS += utfS + "\n"
         else:  # one image
-            rstS += (
-                ".. image:: "
-                + img1S
-                + "\n"
-                + "   :width: "
-                + scale1S
-                + "\n"
-                + "   :align: left \n"
-            )
+            scale1F = float(iL[2])
+            self.setcmdD.update({"scale1F": scale1F})
+            fileS = iL[1].split(",")
+            file1S = fileS[0].strip()
+            docpS = "d" + self.setsectD["cnumS"]
+            img1S = str(Path(self.folderD["dpathcur"] / file1S))
+            utfS += "Figure path: " + img1S + "\n"
+            try:
+                _display(_Image(img1S))
+            except:
+                pass
+            print(utfS)
+            self.calcS += utfS + "\n"
 
-        self.restS += rstS + "\n"
+    def _ilatex(self, iL: list):
+        """insert latex text from file
 
-    def v_rst(self) -> tuple:
+        Args:
+            iL (list): text command list
+        """
+
+        calP = "c" + self.setsectD["cnumS"]
+        txapath = Path(self.folderD["dpath0"] / iL[1].strip())
+        with open(txapath, "r") as txtf1:
+            uL = txtf1.readlines()
+        if iL[2].strip() == "indent":
+            txtS = "".join(uL)
+            widthI = self.setcmdD["cwidth"]
+            inS = " " * 4
+            uL = textwrap.wrap(txtS, width=widthI)
+            uL = [inS + S1 + "\n" for S1 in uL]
+            uS = "".join(uL)
+        elif iL[2].strip() == "literal":
+            txtS = "  ".join(uL)
+            uS = "\n" + txtS
+        else:
+            txtS = "".join(uL)
+            uS = "\n" + txtS
+
+        self.calcS += uS + "\n"
+
+        print(uS)
+        self.calcS += uS + "\n"
+
+    def v_utf(self) -> tuple:
         """parse value-string and set method
 
         Return:
@@ -595,13 +569,13 @@ class Rivt2rSt:
             self._itable,
             self._iimage,
         ]
-
         vtagL = [
             "[page]_",
             "[line]_",
             "[link]_",
             "[literal]_",
             "[foot]_",
+            "[latex]_",
             "[s]_",
             "[x]_",
             "[r]_",
@@ -612,9 +586,9 @@ class Rivt2rSt:
             "[#]_",
         ]
 
-        self._parseRST("values", vcmdL, vmethL, vtagL)
+        self._parseUTF("values", vcmdL, vmethL, vtagL)
         self.rivtD.update(locals())
-        return self.restS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
+        return self.calcS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
 
     def _vconfig(self, vL: list):
         """update dictionary format values
@@ -622,7 +596,6 @@ class Rivt2rSt:
         Args:
             vL (list): configuration parameters
         """
-
         if vL[1].strip() == "sub":
             self.setcmdD["subB"] = True
         self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
@@ -634,7 +607,6 @@ class Rivt2rSt:
         Args:
             vL (list): list of assignments
         """
-
         locals().update(self.rivtD)
         rprecS = str(self.setcmdD["trmrI"])  # trim numbers
         tprecS = str(self.setcmdD["trmtI"])
@@ -642,12 +614,12 @@ class Rivt2rSt:
         exec("set_printoptions(precision=" + rprecS + ")")
         exec("Unum.set_format(value_format = '%." + rprecS + "f')")
         if len(vL) <= 2:  # equation
-            unitL = vL[1].split(",")
-            unit1S, unit2S = unitL[0].strip(), unitL[1].strip()
             varS = vL[0].split("=")[0].strip()
             valS = vL[0].split("=")[1].strip()
-            val1U = val2U = array(eval(valS))
-            if unit1S != "-":
+            if vL[1].strip() != "DC" and vL[1].strip() != "":
+                unitL = vL[1].split(",")
+                unit1S, unit2S = unitL[0].strip(), unitL[1].strip()
+                val1U = val2U = array(eval(valS))
                 if type(eval(valS)) == list:
                     val1U = array(eval(valS)) * eval(unit1S)
                     val2U = [q.cast_unit(eval(unit2S)) for q in val1U]
@@ -658,24 +630,25 @@ class Rivt2rSt:
                     valdec = ("%." + str(rprecS) + "f") % valU.number()
                     val1U = str(valdec) + " " + str(valU.unit())
                     val2U = valU.cast_unit(eval(unit2S))
-            else:
+            else:  # no units
                 cmdS = varS + "= " + "unum.as_unum(" + valS + ")"
                 exec(cmdS, globals(), locals())
                 # valU = eval(varS).cast_unit(eval(unit1S))
                 # valdec = ("%." + str(rprecS) + "f") % valU.number()
                 # val1U = str(valdec) + " " + str(valU.unit())
                 val1U = eval(varS)
+                val1U = val1U.simplify_unit()
                 val2U = val1U
-            rstS = vL[0]
-            spS = "Eq(" + varS + ",(" + valS + "))"  # pretty print
-            symeq = sp.sympify(spS, _clash2, evaluate=False)
-            eqltxS = sp.latex(symeq, mul_symbol="dot")
-            self.restS += "\n.. math:: \n\n" + "  " + eqltxS + "\n\n"
+            utfS = vL[0]
+            spS = "Eq(" + varS + ",(" + valS + "))"
+            utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
+            print("\n" + utfS + "\n")  # pretty print equation
+            self.calcS += "\n" + utfS + "\n"
             eqS = sp.sympify(valS)
             eqatom = eqS.atoms(sp.Symbol)
-            if self.setcmdD["subB"]:
+            if self.setcmdD["subB"]:  # substitute into equation
                 self._vsub(vL)
-            else:
+            else:  # write equation table
                 hdrL = []
                 valL = []
                 hdrL.append(varS)
@@ -685,19 +658,20 @@ class Rivt2rSt:
                     symU = eval(str(sym))
                     valL.append(str(symU.simplify_unit()))
                 alignL = ["center"] * len(valL)
-                self._vtable([valL], hdrL, "rst", alignL, fltfmtS)
+                self._vtable([valL], hdrL, "rst", alignL)
             if self.setcmdD["saveB"] == True:
                 pyS = vL[0] + vL[1] + "  # equation" + "\n"
                 # print(pyS)
                 self.exportS += pyS
+            locals().update(self.rivtD)
         elif len(vL) >= 3:  # value
             descripS = vL[2].strip()
-            unitL = vL[1].split(",")
-            unit1S, unit2S = unitL[0].strip(), unitL[1].strip()
             varS = vL[0].split("=")[0].strip()
             valS = vL[0].split("=")[1].strip()
             val1U = val2U = array(eval(valS))
-            if unit1S != "-":
+            if vL[1].strip() != "" and vL[1].strip() != "-":
+                unitL = vL[1].split(",")
+                unit1S, unit2S = unitL[0].strip(), unitL[1].strip()
                 if type(eval(valS)) == list:
                     val1U = array(eval(valS)) * eval(unit1S)
                     val2U = [q.cast_unit(eval(unit2S)) for q in val1U]
@@ -709,7 +683,6 @@ class Rivt2rSt:
                     val2U = valU.cast_unit(eval(unit2S))
             else:
                 cmdS = varS + "= " + "unum.as_unum(" + valS + ")"
-                print(f"{cmdS=}")
                 exec(cmdS, globals(), locals())
                 valU = eval(varS)
                 # val1U = str(valU.number()) + " " + str(valU.unit())
@@ -720,36 +693,24 @@ class Rivt2rSt:
                 # print(pyS)
                 self.exportS += pyS
         self.rivtD.update(locals())
-        # print(self.rivtD)
 
-    def _vtable(self, tbl, hdrL, tblfmt, alignL, fltfmtS):
+    def _vtable(self, tbl, hdrL, tblfmt, alignL):
         """write value table"""
 
         locals().update(self.rivtD)
-        rprecS = str(self.setcmdD["trmrI"])  # trim numbers
-        tprecS = str(self.setcmdD["trmtI"])
-        fltfmtS = "." + rprecS.strip() + "f"
         sys.stdout.flush()
         old_stdout = sys.stdout
         output = StringIO()
-        tableS = tabulate(
-            tbl,
-            tablefmt=tblfmt,
-            headers=hdrL,
-            showindex=False,
-            colalign=alignL,
-            floatfmt=fltfmtS,
+        output.write(
+            tabulate(
+                tbl, tablefmt=tblfmt, headers=hdrL, showindex=False, colalign=alignL
+            )
         )
-        output.write(tableS)
-        rstS = output.getvalue()
+        utfS = output.getvalue()
         sys.stdout = old_stdout
         sys.stdout.flush()
-        inrstS = ""
-        self.restS += ":: \n\n"
-        for i in rstS.split("\n"):
-            inrstS = "  " + i
-            self.restS += inrstS + "\n"
-        self.restS += "\n\n"
+        print(utfS)
+        self.calcS += utfS + "\n"
         self.rivtD.update(locals())
 
     def _vvalue(self, vL: list):
@@ -761,11 +722,10 @@ class Rivt2rSt:
 
         locals().update(self.rivtD)
         valL = []
-        fltfmtS = ""
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
-        calpS = self.setsectD["fnumS"]
-        vfileS = Path(self.folderD["cpath"] / calpS / vL[1].strip())
+        calpS = "c" + self.setsectD["cnumS"]
+        vfileS = Path(self.folderD["cpathcur"] / vL[1].strip())
         with open(vfileS, "r") as csvfile:
             readL = list(csv.reader(csvfile))
         for vaL in readL[1:]:
@@ -776,7 +736,7 @@ class Rivt2rSt:
             unit1S, unit2S = vaL[2].strip(), vaL[3].strip()
             descripS = vaL[4].strip()
             if not len(varS):
-                valL.append(["------", "------", "------", "------"])  # totals
+                valL.append(["---------", " ", " ", " "])  # totals
                 continue
             val1U = val2U = array(eval(valS))
             if unit1S != "-":
@@ -792,7 +752,7 @@ class Rivt2rSt:
             valL.append([varS, val1U, val2U, descripS])
         hdrL = ["variable", "value", "[value]", "description"]
         alignL = ["left", "right", "right", "left"]
-        self._vtable(valL, hdrL, "rst", alignL, fltfmtS)
+        self._vtable(valL, hdrL, "rst", alignL)
         self.rivtD.update(locals())
 
     def _vdata(self, vL: list):
@@ -807,7 +767,7 @@ class Rivt2rSt:
         if len(vL) < 5:
             vL += [""] * (5 - len(vL))  # pad command
         valL.append(["variable", "values"])
-        vfileS = Path(self.folderD["apath"] / vL[2].strip())
+        vfileS = Path(self.folderD["cpath"] / vL[2].strip())
         vecL = eval(vL[3].strip())
         with open(vfileS, "r") as csvF:
             reader = csv.reader(csvF)
@@ -845,8 +805,10 @@ class Rivt2rSt:
             eqS = "Eq(" + eqL[0] + ",(" + eqL[1] + "))"
             # sps = sps.encode('unicode-escape').decode()
             utfs = sp.pretty(sp.sympify(eqS, _clash2, evaluate=False))
+            print(utfs)
             self.calcl.append(utfs)
         except:
+            print(utfs)
             self.calcl.append(utfs)
         try:
             symeq = sp.sympify(eqS.strip())  # substitute
@@ -885,13 +847,16 @@ class Rivt2rSt:
                     if _cnt > 1:
                         out3 = out3.replace("-" * _cnt, "\u2014" * _cnt)
                     _cnt = 0
+            # print('out3b \n', out3)
+            self._write_text(out3, 1, 0)  # print substituted form
+            self._write_text(" ", 0, 0)
         except:
             pass
 
     def _vfunc(self, vL: list):
         pass
 
-    def t_rst(self) -> tuple:
+    def t_utf(self) -> tuple:
         """parse table-strings
 
         Return:
@@ -901,14 +866,15 @@ class Rivt2rSt:
             rivtD (list): calculation values
         """
 
-        tcmdL = ["text", "table", "image"]
-        tmethL = [self._itext, self._itable, self._iimage]
+        tcmdL = ["text", "table", "image", "latex"]
+        tmethL = [self._itext, self._itable, self._iimage, self.ilatex]
         ttagL = [
             "[page]_",
             "[line]_",
             "[link]_",
             "[literal]_",
             "[foot]_",
+            "[latex]_",
             "[s]",
             "[x]",
             "[r]_",
