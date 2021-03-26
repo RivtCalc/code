@@ -206,9 +206,9 @@ from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
 from contextlib import suppress
-from rivtlib.rv_unit import *
-import rivtlib.rv_calc as _rv_calc
-import rivtlib.rv_tex as _rv_tex
+from rivtcalc.rv_unit import *
+import rivtcalc.rv_utf as _rv_utf
+import rivtcalc.rv_tex as _rv_tex
 
 # import rivt.rivt_reprt as _reprt
 # import rivt.rivt_chk as _rchk
@@ -346,7 +346,7 @@ def _init_utf(rawS: str):
     sectS, strS = rawS.split("\n", 1)
     _section(sectS)
     strL = strS.split("\n")
-    ucalc = _rv_calc.OutputUTF(
+    ucalc = _rv_utf.OutputUTF(
         strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
     return ucalc
 
