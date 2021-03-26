@@ -1,890 +1,789 @@
 #! python
-"""converts rivt-strings to utf-strings
+'''rivtlib API
 
-The OutputUTF class converts rivt-strings to utf-strings and prints results to
-the terminal."""
+    The API includes six functions. Input functions take a rivt-string as the
+    single argument and write formatted utf8 calculations to the
+    terminal. Ouput functions take a file of rivt-strings (calc) and write
+    a formatted calculation file (doc) to files in utf8, pdf or html formats.
 
+    Example calcs are here:
+
+
+    and interactive calcs are here:
+
+
+    Rivt-strings are written in rivt-markup which includes unicode,
+    reStructuredText, rivt commands, rivt tags and Python code. Valid markup
+    depends on the rivt function (R,I,V or T). Commands generally operate on
+    files and start in the first column with ||. Tags are encapsulated with
+    []_ and generally format a single line of text. Block tags are
+    encapsulated with []__ and operate on indented blocks of text.
+
+    Rivt functions ------------------------------------------------------------
+    type       API      any text       string commands / arguments
+    ======= ========== ========= ==============================================
+    Repo    rv.R(rivt)    yes      search, info, keys, text, table, pdf
+    Insert  rv.I(rivt)    yes      text, table, image, latex
+    Values  rv.V(rivt)   yes(=)    =, config, value, data, func, I() commands
+    Table   rv.T(rivt)    no       Python simple statements, I() commands
+    Skip    rv.S(rivt)    --       Skip rivt-string evaluation
+    Write   rv.D(args)    --       (type, style, title, page)
+
+    Rivt tags -----------------------------------------------------------------
+      format tag               description (user input)
+    ===============  ==========================================================
+    [nn]_ (abc def)       option section number and title / descriptor
+    (description) [e]_    autoincrement, insert equation number and description
+    (title) [t]_          autoincrement, insert table number and title
+    (caption) [f]_        autoincrement, insert figure number and caption
+    (sympy eq) [s]_       format sympy equation
+    (latex eq) [x]_       format LaTeX equation
+    (abc def) [r]_        right justify line of text
+    (abc def) [c]_        center line of text
+    [#]_                  autonumbered footnote
+    (abc def) [foot]_     footnote description
+    [line]_               draw horizontal line
+    [page]_               start new doc page
+    [literal]__           literal text block (note double underscore)
+    [latex]__             LaTeX text block (note double underscore)
+    [link]_ http://abc.xyz label   where label is a clickable doc link
+
+rivt Strings ------------------------------------------------------------------
+
+    The first line of each rivt-string includes the string description, which
+    may also be a section title via a tag. String input, by design, must be
+    indented 4 spaces after the function call line to provide code structure
+    and improve legibility.
+
+    In the examples below, arguments in parenthesis are provided by the user.
+    Either/or argumens are separated by semi-colons. Comments are in braces
+    below the arguments.
+
+from rivtlib import rv_lib as rv
+rv.D("none")
+rv.R("""[01]_ Repository-string defines repository and report content
+
+    Repository-strings may include arbitrary text. The first paragraph of the
+    calcs specified in the ||search command (see below) becomes part of the
+    README.rst file for the project. The README is used in various repository
+    search functions (i.e. Github). Arguments to commands in parenthesis are
+    used provided. Otherwise they are literal. Parameter options are separated
+    by semicolons.
+
+    The || search | command specifies a list of calc numbers that are searched against
+    a master list of terms to be included in the README. Because the search
+    command is executed at the project level across multiple calcs, it is
+    usually included in the first project calc (c0101). It generates a README
+    file that overwrites any existing file. The command may also provide
+    a list of user specified keywords that are appended to the README.
+
+    || search | (calc num), (calc num), (calc num) ...
+    || search | (keyword), (keyword), (keyword) ...
+
+    The || info | command is similar to the || table | and || text | commands
+    with differences in file location and use. See those commands for details.
+    || info | files are used for project specific information (clients,
+    addresses, etc) and are read from the docs/d00 folder which is not shared.
+    In addition the info command data is only written to doc output (PDF, HTML)
+    under the docs folder, and not to utf-calcs stored in the calcs folder.
+    This keeps confidential project information separated from shared exaple calc
+    information contained in the calcs folder. || info | tables do not include
+    titles and should not be numbered with a tag.
+
+    || info | (project.txt) | literal; indent
+    || info | (project.csv or .xlsx) | ([col list]) or [:]
+
+    The || pdf | command attaches existing pdf documents, stored in the
+    docs/attach folder, to the front or back  of the calc doc. The *functions*
+    or *docstrings* arguments determine whether the complete function code or
+    just the docstrings of functions used with the ||func commmand are appended
+    to the calc. The title is written to a cover page that can be referred to
+    in the calcs.
+
+    || pdf | front | (calccoverfile.pdf) | (title)
+    || pdf | back | (appendixfile.pdf) | (title)
+    || pdf | back | functions; docstrings |(title)
+    """
+)
+rv.I("""[02]_ Insert-string defines static text, tables and images.
+
+    Insert-strings include text, static equations and images. The equation tag
+    [e]_ auto-increments the equation labels. The [s]_ and [x]_  tags format
+    LaTeX and sympy equations respectively.
+
+    latex equation  [e]_
+    \gamma = \frac{5}{x+y} + 3  [x]_
+
+    sympy equation  [e]_
+    x = 32 + (y/2)  [s]_
+
+    || text | (file.txt) | literal; indent
+
+    || latex | (file.txt)
+
+    table title  [t]_
+    || table | (file.csv or .xlst) | (60,c) | title; notitle | (2,1,4; :)
+
+    || image | (file.png) | (50)
+                        {scale as percent of page wdith}
+    figure caption [f]_
+
+    Insert two images side by side using the following:
+    || image | f1.png, f2.jpg | (45,45)
+    [a] first figure caption  [f]_
+    [b] second figure caption  [f]_
+
+    (label) | http://wwww.someurl.suffix [link]_
+    """
+)
+rv.V("""[02]_ Value-string defines active values and equations
+
+    Value-strings include text (excluding equal signs). Lines with equal signs
+    define equations and assignments that are numerically evaluated.
+
+    Set value parameters where sub means to render equations with substited
+    values and the number pair specifies decimals in the result and terms.
+    ||config | sub; nosub | 2,2
+
+    Assign values to variables.  A blank line ends the value block.
+    x1 = 10.1    | unit, alt unit | description
+    y1 = 12.1    | unit, alt unit | description ||
+                            {save to value file if trailing ||}
+
+    Import values from a csv or xlxs file, starting with the second row. 
+    || values | file.csv or .xlxs
+    
+    The first row is a descriptive heading. For a value file the csv or xlsx file
+    must have the structure:
+    [literal]__
+        variable name, value, primary unit, secondary unit, description
+
+
+    Import a list of values from rows of a csv or xlsx file. 
+    || data | file.csv | [1:4] {rows to import}
+
+
+    For a data file the csv file must have the structure:
+    [literal]__
+        variable name, value1, value2, value3, ....
+
+
+    an equation [e]_
+    v1 = x + 4*M  | unit, alt unit
+    
+    save an equation result to the values file by appending double bars [e]_
+    y1 = v1 / 4   | unit, alt unit ||
+
+    Functions may be defined in a table-string or imported from a file.
+    || func | (function_file.py) | (function_name) |
+
+    A table title [t]_
+    || table | x.csv | 60
+
+    || image | x.png | 50
+    A figure caption [f]_
+    """
+)
+rv.T("""[04]_ Table-string builds tables and plots and executes statements
+
+     Table-strings may include any simple Python statement (single line),
+     and any command or tag.  Any other line of text are ignored.
+    """
+)
+'''
 import os
 import sys
-import csv
-import textwrap
 import subprocess
-import tempfile
-import re
-import io
+import time
+import textwrap
 import logging
-import numpy.linalg as la
-import pandas as pd
-import sympy as sp
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import html2text as htm
-from IPython.display import display as _display
-from IPython.display import Image as _Image
-from io import StringIO
-from sympy.parsing.latex import parse_latex
-from sympy.abc import _clash2
-from tabulate import tabulate
+import warnings
+import re
+import importlib.util
+import shutil
+import numpy as np
 from pathlib import Path
-from numpy import *
+from collections import deque
+from typing import List, Set, Dict, Tuple, Optional
+from contextlib import suppress
 from rivtlib.rv_unit import *
+import rivtlib.rv_calc as _rv_calc
+import rivtlib.rv_tex as _rv_tex
 
-logging.getLogger("numexpr").setLevel(logging.WARNING)
-# tabulate.PRESERVE_WHITESPACE = True
+# import rivt.rivt_reprt as _reprt
+# import rivt.rivt_chk as _rchk
+
+try:
+    # print("argv1", sys.argv[1])
+    _calcfileS = sys.argv[1]
+except:
+    # print("argv0", sys.argv[0])
+    _calcfileS = sys.argv[0]
+if ".py" not in _calcfileS:
+    import __main__
+
+    # print(dir(__main__))
+    _calcfileS = __main__.__file__
+
+_cwdS = os.getcwd()
+_cfull = Path(_calcfileS)  # calc file full path
+_cfileS = _cfull.name  # calc file name
+_cnameS = _cfileS.split(".py")[0]  # calc file basename
+_cnumS = _cnameS[0:5]
+_rivpath = Path("rivtcalc.rivt_lib.py").parent  # rivtlib program path
+_cpath = _cfull.parent.parent  # calc folder path
+_ppath = _cfull.parent.parent.parent  # project folder path
+_dpath = Path(_ppath / "docs")  # doc folder path
+_dpath0 = Path(_dpath / "d00")  # doc config folder
+_pdffile = Path(_dpath / ".".join((_cnameS, "pdf")))  # pdf output
+
+utfcalcS = """"""  # utf calc string
+rstcalcS = """"""  # reST calc string
+exportS = """"""  # values string exports
+rivtcalcD = {}  # values dictonary
+_rstflagB = False  # reST generation flag
+
+_calcdirS = ""
+_docdirS = ""
+for root, dir, file in os.walk(_cpath):
+    for i in dir:
+        if _cfileS[0:5] == i[0:5]:
+            _calcdirS = i
+for root, dir, file in os.walk(_dpath):
+    for i in dir:
+        if _cfileS[1:3] == i[1:3]:
+            _docdirS = i
+
+_rstfile = Path(_dpath0 / ".".join((_cnameS, "rst")))  # rst output
+_dpathcur = Path(_ppath / "docs" / _docdirS)  # doc folder path
+_cpathcur = Path(_cpath / _calcdirS)  # calc folder path
+
+print("INFO: calc directory is ", _cpathcur)
+print("INFO: doc directory is ", _dpathcur)
+
+# folder paths
+_foldD = {
+    "ppath": _ppath,
+    "docpath": _dpath,
+    "cpath": Path(_ppath, "calcs"),
+    "cpathcur": _cpathcur,
+    "dpath": Path(_ppath, "docs"),
+    "dpath0": Path(_ppath, "docs", "d00"),
+    "dpathcur": _dpathcur,
+    "spath": Path(_cpath, "scripts"),
+    "kpath": Path(_cpath, "scripts", "sketches"),
+    "hpath": Path(_dpath, "html"),
+}
+# section settings
+_setsectD = {
+    "fnumS": _cnameS[0:5],
+    "cnumS": _cnameS[1:5],
+    "dnumS": _cnameS[1:3],
+    "sdnumS": _cnameS[3:5],
+    "snameS": "",
+    "snumS": "",
+    "swidthI": 80,
+    "enumI": 0,
+    "tnumI": 0,
+    "fnumI": 0,
+    "ftqueL": deque([1]),
+    "counter": 0
+}
+# command settings
+_setcmdD = {
+    "cwidthI": 30,
+    "calignS": "C",
+    "writeS": "table",
+    "scale1F": 1.0,
+    "scale2F": 1.0,
+    "trmrI": 2,
+    "trmtI": 2,
+    "subB": False,
+    "saveB": False,
+}
+
+# temp files
+_rvbak = Path(_cpathcur / ".".join((_cnameS, "bak")))
+_logfile = Path(_dpath0 / ".".join((_cnameS, "logging")))
+# logs and checks
+with open(_cfull, "r") as f2:
+    calcbak = f2.read()
+with open(_rvbak, "w") as f3:
+    f3.write(calcbak)  # write backup
+warnings.filterwarnings("ignore")
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+    datefmt="%m-%d %H:%M",
+    filename=_logfile,
+    filemode="w",
+)
+logconsole = logging.StreamHandler()
+logconsole.setLevel(logging.INFO)
+formatter = logging.Formatter("%(levelname)-8s %(message)s")
+logconsole.setFormatter(formatter)
+logging.getLogger("").addHandler(logconsole)
+_rshortP = Path(*Path(_cfull).parts[-3:])
+_bshortP = Path(*Path(_rvbak).parts[-4:])
+_lshortP = Path(*Path(_logfile).parts[-4:])
+logging.info(f"""calc: {_rshortP}""")
+logging.info(f"""backup: {_bshortP}""")
+logging.info(f"""logging: {_lshortP}""")
+print(" ")
+# todo: check folder structure
+# todo: check for units file in c0000, supplement default units
 
 
-class OutputUTF:
-    """convert rivt-string to UTF8 calc and write to terminal"""
+def _init_utf(rawS: str):
+    """return rivt-string utf class instance
 
-    def __init__(
-        self,
-        strL: list,
-        folderD: dict,
-        setcmdD: dict,
-        setsectD: dict,
-        rivtD: dict,
-        exportS: str,
-    ):
-        """process rivt-string to UTF8 calc-string
+    Args:
+        rawS (str): rivt-string
 
-        The OutputUTF class converts rivt-strings to calc-strings.
+    Returns:
+        class instance: utf string-type instance
+    """
+    sectS, strS = rawS.split("\n", 1)
+    _section(sectS)
+    strL = strS.split("\n")
+    ucalc = _rv_calc.OutputUTF(
+        strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
+    return ucalc
 
-        Args:
-            strL (list): calc lines
-            folderD (dict): folder paths
-            setcmdD (dict): command settings
-            setsectD (dict): section settings
-            rivtD (dict): global rivt dictionary
-            exportS (str): stores values that are written to file
-        """
 
-        self.calcS = """"""  # utf calc string
-        self.exportS = exportS
-        self.strL = strL
-        self.folderD = folderD
-        self.setsectD = setsectD
-        self.setcmdD = setcmdD
-        self.rivtD = rivtD
-        self.valL = []  # value list
+def _init_rst(rawS: str):
+    """return rivt-string reST class
 
-    def _refs(self, objnumI: int, typeS: str) -> str:
-        """reference label for equations, tables and figures
+    Args:
+        rawstr (str): rivt-string
 
-        Args:
-            objnumI (int): equation, table or figure section number
-            typeS (str): label type
+    Returns:
+        class instance: reST string-type instance
+    """
+    sectS, strS = rawS.split("\n", 1)
+    _section(sectS)
+    strL = strS.split("\n")
+    rstcalc = _rv_tex.Rivt2rSt(
+        strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
+    return rstcalc
 
-        Returns:
-            refS (str): reference label
-        """
 
-        objfillS = str(objnumI).zfill(2)
-        sfillS = str(self.setsectD["snumS"]).strip().zfill(2)
-        cnumSS = str(self.setsectD["cnumS"])
-        refS = typeS + cnumSS + "." + objfillS
+def _section(hdrS: str):
+    """format section headings and settings
 
-        return refS
+    Args:
+        hdrS (str): section heading line
+    """
+    global utfcalcS, _setsectD, rstcalcS
 
-    def _tags(self, tagS: str, tagL: list) -> tuple:
-        """parse tag
-
-        Args:
-            tagS (str): rivt-string with tag
-            tagL (list): list of tag parameters
-            setsectD (dict): section dictionary
-
-        Return:
-            uS (str): utf string
-        """
-
-        tagS = tagS.rstrip()
-        uS = ""
-        swidthII = self.setsectD["swidthI"] - 1
-        try:
-            tag = list(set(tagL).intersection(tagS.split()))[0]
-        except:
-            uS = tagS
-            return uS
-
-        if tag == "[#]_":  # auto increment footnote mark
-            ftnumII = self.setsectD["ftqueL"][-1] + 1
-            self.setsectD["ftqueL"].append(ftnumII)
-            uS = tagS.replace("[x]_", "[" + str(ftnumII) + "]")
-        elif tag == "[foot]_":  # footnote label
-            tagS = tagS.strip("[foot]_").strip()
-            uS = self.setsectD["ftqueL"].popleft() + tagS
-        elif tag == "[page]_":  # new page
-            uS = int(self.setsectD["swidthI"]) * "."
-        elif tag == "[line]_":  # horizontal line
-            uS = int(self.setsectD["swidthI"]) * "-"
-        elif tag == "[link]_":  # url link
-            tgS = tagS.strip("[link]_").strip()
-            tgL = tgS.split("|")
-            uS = tgL[0].strip() + " : " + tgL[1].strip()
-        elif tag == "[literal]_":  # literal text
-            uS = "\n"
-        elif tag == "[latex]_":  # literal text
-            uS = "\n"
-        elif tag == "[r]_":  # right adjust text
-            tagL = tagS.strip().split("[r]_")
-            uS = (tagL[0].strip()).rjust(swidthII)
-        elif tag == "[c]_":  # center text
-            tagL = tagS.strip().split("[c]_")
-            uS = (tagL[0].strip()).rjust(swidthII)
-        elif tag == "[f]_":  # figure caption
-            tagL = tagS.strip().split("[f]_")
-            fnumI = int(self.setsectD["fnumI"]) + 1
-            self.setsectD["fnumI"] = fnumI
-            refS = self._refs(fnumI, "[ Fig: ") + " ]"
-            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
-            uS = tagL[0].strip() + " " * spcI + refS
-        elif tag == "[e]_":  # equation label
-            tagL = tagS.strip().split("[e]_")
-            enumI = int(self.setsectD["enumI"]) + 1
-            self.setsectD["enumI"] = enumI
-            refS = self._refs(enumI, "[ Equ: ") + " ]"
-            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
-            uS = tagL[0].strip() + " " * spcI + refS
-        elif tag == "[t]_":  # table label
-            tagL = tagS.strip().split("[t]_")
-            tnumI = int(self.setsectD["tnumI"]) + 1
-            self.setsectD["tnumI"] = tnumI
-            refS = self._refs(tnumI, "[Table: ") + " ]"
-            spcI = self.setsectD["swidthI"] - len(refS) - len(tagL[0].strip())
-            uS = tagL[0].strip() + " " * spcI + refS
-        elif tag == "[x]_":  # format tex
-            tagL = tagS.strip().split("[x]_")
-            txS = tagL[0].strip()
-            # txS = txs.encode('unicode-escape').decode()
-            ptxS = parse_latex(txS)
-            uS = sp.pretty(sp.sympify(ptxS, _clash2, evaluate=False))
-        elif tag == "[s]_":  # format sympy
-            tagL = tagS.strip().split("[s]_")
-            spS = tagL[0].strip()
-            spL = spS.split("=")
-            spS = "Eq(" + spL[0] + ",(" + spL[1] + "))"
-            # sps = sps.encode('unicode-escape').decode()
-            uS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
-        elif tag == "[n]_":  # new line
-            tagL = tagS.strip().split("[n]_")
-            tagS = tagL[0]
-            uS = tagS
-        else:
-            uS = tagS
-
-        return uS
-
-    def _parseUTF(self, typeS: str, cmdL: list, methL: list, tagL: list):
-        """parse rivt-string to UTF
-
-        Args:
-            typeS (str): rivt-string type
-            cmdL (list): command list
-            methL (list): method list
-            tagL (list): tag list
-        """
-        locals().update(self.rivtD)
-        uL = []  # command arguments
-        indxI = -1  # method index
-        _rgx = r"\[([^\]]+)]_"  # find tags
-
-        for uS in self.strL:
-            if uS[0:2] == "##":
-                continue  # remove review comment
-            uS = uS[4:]  # remove indent
-            if len(uS) == 0:
-                if len(self.valL) > 0:  # print value table
-                    hdrL = ["variable", "value", "[value]", "description"]
-                    alignL = ["left", "right", "right", "left"]
-                    self._vtable(self.valL, hdrL, "rst", alignL)
-                    self.valL = []
-                    print(uS.rstrip(" "))
-                    self.calcS += " \n"
-                    self.rivtD.update(locals())
-                    continue
-                else:
-                    print(" ")
-                    self.calcS += "\n"
-                    continue
-            try:
-                if uS[0] == "#":
-                    continue  # remove comment
-            except:
-                print(" ")  # if uS[0] throws error
-                self.calcS += "\n"
-                continue
-            if re.search(_rgx, uS):  # check for tag
-                utgS = self._tags(uS, tagL)
-                print(utgS.rstrip())
-                self.calcS += utgS.rstrip() + "\n"
-                continue
-            if typeS == "values":
-                self.setcmdD["saveB"] = False
-                if "=" in uS and uS.strip()[-2] == "||":  # set save flag
-                    uS = uS.replace("||", " ")
-                    self.setcmdD["saveB"] = True
-                if "=" in uS:  # just assign value
-                    uL = uS.split("|")
-                    self._vassign(uL)
-                    continue
-            if typeS == "table":
-                if uS[0:2] == "||":  # check for command
-                    uL = uS[2:].split("|")
-                    indxI = cmdL.index(uL[0].strip())
-                    methL[indxI](uL)
-                    continue
-                else:
-                    exec(uS)  # otherwise exec Python code
-                    continue
-            if uS[0:2] == "||":  # check for command
-                uL = uS[2:].split("|")
-                indxI = cmdL.index(uL[0].strip())
-                methL[indxI](uL)
-                continue
-
-            if typeS != "table":  # skip table print
-                print(uS)
-                self.calcS += uS.rstrip() + "\n"
-            self.rivtD.update(locals())
-
-    def r_utf(self) -> str:
-        """parse repository string
-
-        Returns:
-             calcS (list): utf formatted calc-string (appended)
-             setsectD (dict): section settings
-        """
-        rcmdL = ["search", "keys", "info", "table", "text", "pdf"]
-        rmethL = [
-            self._rsearch,
-            self._rkeys,
-            self._rinfo,
-            self._itable,
-            self._itext,
-            self._rpdf,
-        ]
-        rtagL = ["[links]_", "[literal]_", "[foot]_", "[#]__"]
-
-        self._parseUTF("repository", rcmdL, rmethL, rtagL)
-
-        return self.calcS, self.setsectD
-
-    def _rkeys(self, rsL):
-        """[summary]
-
-        Args:
-            rsL ([type]): [description]
-        """
-        a = 4
-
-    def _rsearch(self, rsL):
-        """[summary]
-
-        Args:
-            rsL ([type]): [description]
-        """
-        a = 4
-
-    def _rinfo(self, rL):
-        """skip info command for utf calcs
-
-        Command is executed only for docs in order to
-        separate protected information for shareable calcs.
-
-        Args:
-            rL (list): parameter list
-        """
-        pass
-
-    def _rpdf(self, rsL):
-        b = 5
-
-    def i_utf(self) -> tuple:
-        """parse insert-string
-
-        Returns:
-            calcS (list): utf formatted calc-string (appended)
-            setsectD (dict): section settings
-            setcmdD (dict): command settings
-        """
-
-        icmdL = ["text", "table", "image"]
-        imethL = [self._itext, self._itable, self._iimage]
-        itagL = [
-            "[page]_",
-            "[line]_",
-            "[link]_",
-            "[literal]_",
-            "[foot]_",
-            "[latex]_",
-            "[s]_",
-            "[x]_",
-            "[r]_",
-            "[c]_",
-            "[e]_",
-            "[t]_",
-            "[f]_",
-            "[#]_",
-        ]
-
-        self._parseUTF("insert", icmdL, imethL, itagL)
-
-        return self.calcS, self.setsectD, self.setcmdD
-
-    def _itext(self, iL: list):
-        """insert text from file
-
-        Args:
-            iL (list): text command list
-
-        || text | (file.txt) | literal; indent; html
-
-        """
-
-        txtP = Path(self.folderD["cpathcur"] / iL[1].strip())
-        with open(txtP, "r", encoding="utf-8") as txtf1:
-            uL = txtf1.readlines()
-        if iL[2].strip() == "indent":
-            txtS = "".join(uL)
-            widthI = self.setcmdD["cwidth"]
-            inS = " " * 4
-            uL = textwrap.wrap(txtS, width=widthI)
-            uL = [inS + S1 + "\n" for S1 in uL]
-            uS = "".join(uL)
-        elif iL[2].strip() == "literal":
-            txtS = "  ".join(uL)
-            uS = "\n" + txtS
-        elif iL[2].strip() == "literalindent":
-            txtS = "\n\n::\n\n"
-            for iS in uL:
-                txtS += "   " + iS
-            uS = txtS + "\n\n"
-        elif iL[2].strip() == "html":
-            txtS = ""
-            flg = 0
-            for iS in uL:
-                if "src=" in iS:
-                    flg = 1
-                    continue
-                if flg == 1 and '"' in iS:
-                    flg = 0
-                    continue
-                if flg == 1:
-                    continue
-                txtS += iS
-            txtS = htm.html2text(txtS)
-            uS = txtS.replace("\n    \n", "")
-        else:
-            txtS = "".join(uL)
-            uS = "\n" + txtS
-
-        # print(str(txtP))
-        #self.calcS += str(txtP) + "\n"
-        print(uS)
-        self.calcS += uS + "\n"
-
-    def _itable(self, iL: list):
-        """insert table from csv or xlsx file
-
-        Args:
-            ipl (list): parameter list
-        """
-        alignD = {"S": "", "D": "decimal",
-                  "C": "center", "R": "right", "L": "left"}
-        itagL = [
-            "[page]_",
-            "[line]_",
-            "[link]_",
-            "[literal]_",
-            "[foot]_",
-            "[r]_",
-            "[c]_",
-            "[e]_",
-            "[t]_",
-            "[f]_",
-            "[#]_",
-        ]
-        if len(iL) < 4:
-            iL += [""] * (4 - len(iL))  # pad parameters
-        utfS = ""
-        contentL = []
-        sumL = []
-        fileS = iL[1].strip()
-        calpS = self.setsectD["fnumS"]
-        tfileS = Path(self.folderD["cpathcur"] / fileS)
-        extS = fileS.split(".")[1]
-        if extS == "csv":
-            with open(tfileS, "r") as csvfile:  # read csv file
-                readL = list(csv.reader(csvfile))
-        elif extS == "xlsx":
-            pDF1 = pd.read_excel(tfileS, header=None)
-            readL = pDF1.values.tolist()
-        else:
-            return
-        incl_colL = list(range(len(readL[1])))
-        widthI = self.setcmdD["cwidthI"]
-        alignS = self.setcmdD["calignS"]
-        saS = alignD[alignS]
-        if iL[2].strip():
-            widthL = iL[2].split(",")  # new max col width
-            widthI = int(widthL[0].strip())
-            alignS = widthL[1].strip()
-            saS = alignD[alignS]  # new align
-            self.setcmdD.update({"cwidthI": widthI})
-            self.setcmdD.update({"calignS": alignS})
-        totalL = [""] * len(incl_colL)
-        if iL[3].strip():  # columns
-            if iL[3].strip() == "[:]":
-                totalL = [""] * len(incl_colL)
-            else:
-                incl_colL = eval(iL[3].strip())
-                totalL = [""] * len(incl_colL)
-        ttitleS = readL[0][0].strip() + " [t]_"
-        utgS = self._tags(ttitleS, itagL)
-        print(utgS.rstrip() + "\n")
-        self.calcS += utgS.rstrip() + "\n\n"
-        for row in readL[1:]:
-            contentL.append([row[i] for i in incl_colL])
-        wcontentL = []
-        for rowL in contentL:  # wrap columns
-            wrowL = []
-            for iS in rowL:
-                templist = textwrap.wrap(str(iS), int(widthI))
-                templist = [i.replace("""\\n""", """\n""") for i in templist]
-                wrowL.append("""\n""".join(templist))
-            wcontentL.append(wrowL)
-        sys.stdout.flush()
-        old_stdout = sys.stdout
-        output = StringIO()
-        output.write(
-            tabulate(
-                wcontentL,
-                tablefmt="rst",
-                headers="firstrow",
-                numalign="decimal",
-                stralign=saS,
+    _rgx = r"\[\d\d\]"
+    nameSS = hdrS
+    snumSS = ""
+    cnumSS = ""
+    widthI = int(_setsectD["swidthI"])
+    headS = hdrS
+    if re.search(_rgx, hdrS):
+        nameSS = _setsectD["snameS"] = hdrS[hdrS.find("]") + 2:].strip()
+        snumSS = _setsectD["snumS"] = hdrS[hdrS.find("[") + 1: hdrS.find("]")]
+        cnumSS = str(_setsectD["cnumS"])
+        widthI = int(_setsectD["swidthI"])
+        if _rstflagB:
+            # draw horizontal line
+            headS = (
+                ".. raw:: latex"
+                + "\n\n"
+                + "   ?x?vspace{.2in}"
+                + "   ?x?textbf{"
+                + nameSS
+                + "}"
+                + "   ?x?hfill?x?textbf{SECTION "
+                + snumSS
+                + "}\n"
+                + "   ?x?newline"
+                + "   ?x?vspace{.05in}   {?x?color{black}?x?hrulefill}"
+                + "\n\n"
             )
-        )
-        utfS = output.getvalue()
-        sys.stdout = old_stdout
-
-        print(str(tfileS))
-        print(utfS)
-        self.calcS += str(tfileS) + "\n"
-        self.calcS += utfS + "\n"
-
-    def _iimage(self, iL: list):
-        """insert one or two images from file
-
-        Args:
-            iL (list): image parameters
-        """
-        utfS = ""
-        if "," in iL[1]:  # two images
-            scaleF = iL[2].split(",")
-            scale1F = float(scaleF[0])
-            scale2F = float(scaleF[1])
-            self.setcmdD.update({"scale1F": scale1F})
-            self.setcmdD.update({"scale2F": scale2F})
-            fileS = iL[1].split(",")
-            file1S = fileS[0].strip()
-            file2S = fileS[1].strip()
-            docpS = "d" + self.setsectD["cnumS"]
-            img1S = str(Path(self.folderD["dpathcur"] / file1S))
-            img2S = str(Path(self.folderD["dpathcur"] / file2S))
-            # pshrt1S = str(Path(*Path(img1S).parts[-4:]))
-            # pshrt2S = str(Path(*Path(img2S).parts[-4:]))
-            for fS in [img1S, img2S]:
-                utfS += "Figure path: " + fS + "\n"
-                try:
-                    _display(_Image(fS))
-                except:
-                    pass
-            print(utfS)
-            self.calcS += utfS + "\n"
-        else:  # one image
-            scale1F = float(iL[2])
-            self.setcmdD.update({"scale1F": scale1F})
-            fileS = iL[1].split(",")
-            file1S = fileS[0].strip()
-            docpS = "d" + self.setsectD["cnumS"]
-            img1S = str(Path(self.folderD["dpathcur"] / file1S))
-            utfS += "Figure path: " + img1S + "\n"
-            try:
-                _display(_Image(img1S))
-            except:
-                pass
-            print(utfS)
-            self.calcS += utfS + "\n"
-
-    def _ilatex(self, iL: list):
-        """insert latex text from file
-
-        Args:
-            iL (list): text command list
-        """
-
-        calP = "c" + self.setsectD["cnumS"]
-        txapath = Path(self.folderD["dpath0"] / iL[1].strip())
-        with open(txapath, "r") as txtf1:
-            uL = txtf1.readlines()
-        if iL[2].strip() == "indent":
-            txtS = "".join(uL)
-            widthI = self.setcmdD["cwidth"]
-            inS = " " * 4
-            uL = textwrap.wrap(txtS, width=widthI)
-            uL = [inS + S1 + "\n" for S1 in uL]
-            uS = "".join(uL)
-        elif iL[2].strip() == "literal":
-            txtS = "  ".join(uL)
-            uS = "\n" + txtS
+            rstcalcS += headS
         else:
-            txtS = "".join(uL)
-            uS = "\n" + txtS
-
-        self.calcS += uS + "\n"
-
-        print(uS)
-        self.calcS += uS + "\n"
-
-    def v_utf(self) -> tuple:
-        """parse value-string and set method
-
-        Return:
-            calcS (list): utf formatted calc-string (appended)
-            setsectD (dict): section settings
-            setcmdD (dict): command settings
-            rivtD (list): calculation results
-            exportS (list): value strings for export
-        """
-
-        locals().update(self.rivtD)
-        vcmdL = ["config", "value", "data", "func", "text", "table", "image"]
-        vmethL = [
-            self._vconfig,
-            self._vvalue,
-            self._vdata,
-            self._vfunc,
-            self._itext,
-            self._itable,
-            self._iimage,
-        ]
-        vtagL = [
-            "[page]_",
-            "[line]_",
-            "[link]_",
-            "[literal]_",
-            "[foot]_",
-            "[latex]_",
-            "[s]_",
-            "[x]_",
-            "[r]_",
-            "[c]_",
-            "[e]_",
-            "[t]_",
-            "[f]_",
-            "[#]_",
-        ]
-
-        self._parseUTF("values", vcmdL, vmethL, vtagL)
-        self.rivtD.update(locals())
-        return self.calcS, self.setsectD, self.setcmdD, self.rivtD, self.exportS
-
-    def _vconfig(self, vL: list):
-        """update dictionary format values
-
-        Args:
-            vL (list): configuration parameters
-        """
-        if vL[1].strip() == "sub":
-            self.setcmdD["subB"] = True
-        self.setcmdD["trmrI"] = vL[2].split(",")[0].strip()
-        self.setcmdD["trmtI"] = vL[2].split(",")[1].strip()
-
-    def _vassign(self, vL: list):
-        """assign values to variables and equations
-
-        Args:
-            vL (list): list of assignments
-        """
-        locals().update(self.rivtD)
-        rprecS = str(self.setcmdD["trmrI"])  # trim numbers
-        tprecS = str(self.setcmdD["trmtI"])
-        fltfmtS = "." + rprecS.strip() + "f"
-        exec("set_printoptions(precision=" + rprecS + ")")
-        exec("Unum.set_format(value_format = '%." + rprecS + "f')")
-        if len(vL) <= 2:  # equation
-            varS = vL[0].split("=")[0].strip()
-            valS = vL[0].split("=")[1].strip()
-            if vL[1].strip() != "DC" and vL[1].strip() != "":
-                unitL = vL[1].split(",")
-                unit1S, unit2S = unitL[0].strip(), unitL[1].strip()
-                val1U = val2U = array(eval(valS))
-                if type(eval(valS)) == list:
-                    val1U = array(eval(valS)) * eval(unit1S)
-                    val2U = [q.cast_unit(eval(unit2S)) for q in val1U]
-                else:
-                    cmdS = varS + "= " + valS
-                    exec(cmdS, globals(), locals())
-                    valU = eval(varS).cast_unit(eval(unit1S))
-                    valdec = ("%." + str(rprecS) + "f") % valU.number()
-                    val1U = str(valdec) + " " + str(valU.unit())
-                    val2U = valU.cast_unit(eval(unit2S))
-            else:  # no units
-                cmdS = varS + "= " + "unum.as_unum(" + valS + ")"
-                exec(cmdS, globals(), locals())
-                # valU = eval(varS).cast_unit(eval(unit1S))
-                # valdec = ("%." + str(rprecS) + "f") % valU.number()
-                # val1U = str(valdec) + " " + str(valU.unit())
-                val1U = eval(varS)
-                val1U = val1U.simplify_unit()
-                val2U = val1U
-            utfS = vL[0]
-            spS = "Eq(" + varS + ",(" + valS + "))"
-            utfS = sp.pretty(sp.sympify(spS, _clash2, evaluate=False))
-            print("\n" + utfS + "\n")  # pretty print equation
-            self.calcS += "\n" + utfS + "\n"
-            eqS = sp.sympify(valS)
-            eqatom = eqS.atoms(sp.Symbol)
-            if self.setcmdD["subB"]:  # substitute into equation
-                self._vsub(vL)
-            else:  # write equation table
-                hdrL = []
-                valL = []
-                hdrL.append(varS)
-                valL.append(str(val1U) + "  [" + str(val2U) + "]")
-                for sym in eqatom:
-                    hdrL.append(str(sym))
-                    symU = eval(str(sym))
-                    valL.append(str(symU.simplify_unit()))
-                alignL = ["center"] * len(valL)
-                self._vtable([valL], hdrL, "rst", alignL)
-            if self.setcmdD["saveB"] == True:
-                pyS = vL[0] + vL[1] + "  # equation" + "\n"
-                # print(pyS)
-                self.exportS += pyS
-            locals().update(self.rivtD)
-        elif len(vL) >= 3:  # value
-            descripS = vL[2].strip()
-            varS = vL[0].split("=")[0].strip()
-            valS = vL[0].split("=")[1].strip()
-            val1U = val2U = array(eval(valS))
-            if vL[1].strip() != "" and vL[1].strip() != "-":
-                unitL = vL[1].split(",")
-                unit1S, unit2S = unitL[0].strip(), unitL[1].strip()
-                if type(eval(valS)) == list:
-                    val1U = array(eval(valS)) * eval(unit1S)
-                    val2U = [q.cast_unit(eval(unit2S)) for q in val1U]
-                else:
-                    cmdS = varS + "= " + valS + "*" + unit1S
-                    exec(cmdS, globals(), locals())
-                    valU = eval(varS)
-                    val1U = str(valU.number()) + " " + str(valU.unit())
-                    val2U = valU.cast_unit(eval(unit2S))
-            else:
-                cmdS = varS + "= " + "unum.as_unum(" + valS + ")"
-                exec(cmdS, globals(), locals())
-                valU = eval(varS)
-                # val1U = str(valU.number()) + " " + str(valU.unit())
-                val2U = valU
-            self.valL.append([varS, val1U, val2U, descripS])
-            if self.setcmdD["saveB"] == True:
-                pyS = vL[0] + vL[1] + vL[2] + "\n"
-                # print(pyS)
-                self.exportS += pyS
-        self.rivtD.update(locals())
-
-    def _vtable(self, tbl, hdrL, tblfmt, alignL):
-        """write value table"""
-
-        locals().update(self.rivtD)
-        sys.stdout.flush()
-        old_stdout = sys.stdout
-        output = StringIO()
-        output.write(
-            tabulate(
-                tbl, tablefmt=tblfmt, headers=hdrL, showindex=False, colalign=alignL
+            headS = (
+                " "
+                + nameSS
+                + (cnumSS + " - " + ("[" + snumSS + "]")
+                   ).rjust(widthI - len(nameSS) - 1)
             )
-        )
-        utfS = output.getvalue()
-        sys.stdout = old_stdout
-        sys.stdout.flush()
-        print(utfS)
-        self.calcS += utfS + "\n"
-        self.rivtD.update(locals())
+            bordrS = widthI * "_"
+            utfS = "\n" + bordrS + "\n\n" + headS + "\n" + bordrS + "\n"
+            print(utfS)
+            utfcalcS += utfS
 
-    def _vvalue(self, vL: list):
-        """import values from files
 
-        Args:
-            vL (list): value command arguments
-        """
+def R(rawS: str):
+    """repository-string to utf-string
 
-        locals().update(self.rivtD)
-        valL = []
-        if len(vL) < 5:
-            vL += [""] * (5 - len(vL))  # pad command
-        calpS = "c" + self.setsectD["cnumS"]
-        vfileS = Path(self.folderD["cpathcur"] / vL[1].strip())
-        with open(vfileS, "r") as csvfile:
-            readL = list(csv.reader(csvfile))
-        for vaL in readL[1:]:
-            if len(vaL) < 5:
-                vaL += [""] * (5 - len(vL))  # pad values
-            varS = vaL[0].strip()
-            valS = vaL[1].strip()
-            unit1S, unit2S = vaL[2].strip(), vaL[3].strip()
-            descripS = vaL[4].strip()
-            if not len(varS):
-                valL.append(["---------", " ", " ", " "])  # totals
-                continue
-            val1U = val2U = array(eval(valS))
-            if unit1S != "-":
-                if type(eval(valS)) == list:
-                    val1U = array(eval(valS)) * eval(unit1S)
-                    val2U = [q.cast_unit(eval(unit2S)) for q in val1U]
-                else:
-                    cmdS = varS + "= " + valS + "*" + unit1S
-                    exec(cmdS, globals(), locals())
-                    valU = eval(varS)
-                    val1U = str(valU.number()) + " " + str(valU.unit())
-                    val2U = valU.cast_unit(eval(unit2S))
-            valL.append([varS, val1U, val2U, descripS])
-        hdrL = ["variable", "value", "[value]", "description"]
-        alignL = ["left", "right", "right", "left"]
-        self._vtable(valL, hdrL, "rst", alignL)
-        self.rivtD.update(locals())
+    Args:
+        rawstrS (str): repository-string
+    """
+    global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
 
-    def _vdata(self, vL: list):
-        """import data from files
+    if _rstflagB:
+        rcalc = _init_rst(rawS)
+        rcalcS, _setsectD = rcalc.r_rst()
+        rstcalcS += rcalcS
+    else:
+        rcalc = _init_utf(rawS)
+        rcalcS, _setsectD = rcalc.r_utf()
+        utfcalcS += rcalcS
 
-        Args:
-            vL (list): data command arguments
-        """
 
-        locals().update(self.rivtD)
-        valL = []
-        if len(vL) < 5:
-            vL += [""] * (5 - len(vL))  # pad command
-        valL.append(["variable", "values"])
-        vfileS = Path(self.folderD["cpath"] / vL[2].strip())
-        vecL = eval(vL[3].strip())
-        with open(vfileS, "r") as csvF:
-            reader = csv.reader(csvF)
-        vL = list(reader)
-        for i in vL:
-            varS = i[0]
-            varL = array(i[1:])
-            cmdS = varS + "=" + str(varL)
-            exec(cmdS, globals(), locals())
-            if len(varL) > 4:
-                varL = str((varL[:2]).append(["..."]))
-            valL.append([varS, varL])
-        hdrL = ["variable", "values"]
-        alignL = ["left", "right"]
-        self._vtable(valL, hdrL, "rst", alignL)
-        self.rivtD.update(locals())
+def I(rawS: str):
+    """insert-string to utf-string
 
-    def _vsub(self, eqL: list, eqS: str):
-        """substitute numbers for variables in printed output
+    Args:
+        rawstrS (str): insert-string
+    """
+    global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
 
-        Args:
-            epL (list): equation and units
-            epS (str): [description]
-        """
+    if _rstflagB:
+        rcalc = _init_rst(rawS)
+        rcalcS, _setsectD, _setcmdD = rcalc.i_rst()
+        rstcalcS += rcalcS
+    else:
+        icalc = _init_utf(rawS)
+        icalcS, _setsectD, _setcmdD = icalc.i_utf()
+        utfcalcS += icalcS
 
-        locals().update(self.rivtd)
 
-        eformat = ""
-        utfS = eqL[0].strip()
-        descripS = eqL[3]
-        parD = dict(eqL[1])
-        varS = utfS.split("=")
-        resultS = vars[0].strip() + " = " + str(eval(vars[1]))
-        try:
-            eqS = "Eq(" + eqL[0] + ",(" + eqL[1] + "))"
-            # sps = sps.encode('unicode-escape').decode()
-            utfs = sp.pretty(sp.sympify(eqS, _clash2, evaluate=False))
-            print(utfs)
-            self.calcl.append(utfs)
-        except:
-            print(utfs)
-            self.calcl.append(utfs)
-        try:
-            symeq = sp.sympify(eqS.strip())  # substitute
-            symat = symeq.atoms(sp.Symbol)
-            for _n2 in symat:
-                evlen = len((eval(_n2.__str__())).__str__())  # get var length
-                new_var = str(_n2).rjust(evlen, "~")
-                new_var = new_var.replace("_", "|")
-                symeq1 = symeq.subs(_n2, sp.Symbols(new_var))
-            out2 = sp.pretty(symeq1, wrap_line=False)
-            # print('out2a\n', out2)
-            symat1 = symeq1.atoms(sp.Symbol)  # adjust character length
-            for _n1 in symat1:
-                orig_var = str(_n1).replace("~", "")
-                orig_var = orig_var.replace("|", "_")
-                try:
-                    expr = eval((self.odict[orig_var][1]).split("=")[1])
-                    if type(expr) == float:
-                        form = "{:." + eformat + "f}"
-                        symeval1 = form.format(eval(str(expr)))
-                    else:
-                        symeval1 = eval(orig_var.__str__()).__str__()
-                except:
-                    symeval1 = eval(orig_var.__str__()).__str__()
-                out2 = out2.replace(_n1.__str__(), symeval1)
-            # print('out2b\n', out2)
-            out3 = out2  # clean up unicode
-            out3.replace("*", "\\u22C5")
-            # print('out3a\n', out3)
-            _cnt = 0
-            for _m in out3:
-                if _m == "-":
-                    _cnt += 1
-                    continue
-                else:
-                    if _cnt > 1:
-                        out3 = out3.replace("-" * _cnt, "\u2014" * _cnt)
-                    _cnt = 0
-            # print('out3b \n', out3)
-            self._write_text(out3, 1, 0)  # print substituted form
-            self._write_text(" ", 0, 0)
-        except:
-            pass
+def V(rawS: str):
+    """value-string to utf-string
 
-    def _vfunc(self, vL: list):
-        pass
+    Args:
+        rawstr (str): value-string
+    """
+    global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
 
-    def t_utf(self) -> tuple:
-        """parse table-strings
+    if _rstflagB:
+        rcalc = _init_rst(rawS)
+        rcalcS, _setsectD, _setcmdD, rivtcalcD, exportS = rcalc.v_rst()
+        rstcalcS += rcalcS
+    else:
+        vcalc = _init_utf(rawS)
+        vcalcS, _setsectD, _setcmdD, rivtcalcD, exportS = vcalc.v_utf()
+        utfcalcS += vcalcS
 
-        Return:
-            calcS (list): utf formatted calc-string (appended)
-            setsectD (dict): section settings
-            setcmdD (dict): command settings
-            rivtD (list): calculation values
-        """
 
-        tcmdL = ["text", "table", "image", "latex"]
-        tmethL = [self._itext, self._itable, self._iimage, self.ilatex]
-        ttagL = [
-            "[page]_",
-            "[line]_",
-            "[link]_",
-            "[literal]_",
-            "[foot]_",
-            "[latex]_",
-            "[s]",
-            "[x]",
-            "[r]_",
-            "[c]_",
-            "[e]_",
-            "[t]_",
-            "[f]_",
-            "[#]_",
+def T(rawS: str):
+    """table-string to utf-string
+
+    Args:
+       rawstr (str): table-string
+    """
+    global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
+
+    if _rstflagB:
+        rcalc = _init_rst(rawS)
+        rcalcS, _setsectD = rcalc.t_rst()
+        rstcalcS += rcalcS
+    else:
+        tcalc = _init_utf(rawS)
+        tcalcS, _setsectD, _setcmdD, rivtcalcD = tcalc.t_utf()
+        utfcalcS += tcalcS
+
+
+def S(rawS: str):
+    """skip string
+
+    Args:
+       rawstr (str): any string to exclude
+    """
+    pass
+
+
+def gen_utf8(cmdS: str, filepathS: str, calctitleS: str):
+    """write utf-calc to numbered calc folder and exit
+
+    Args:
+        cmdS (str): rivt file
+        filepathS (str): write path (default to read path)
+        calctitleS (str): calculation title
+    """
+
+    global utfcalcS
+
+    utfcalcS = """"""
+    exec(cmdS, globals(), locals())
+
+    utffile = Path(_cpath / _setsectD["fnumS"] / ".".join([_cnameS, "txt"]))
+    if filepathS == "default":  # check file write location
+        utfpthS = Path(utffile)
+    else:
+        utfpthS = Path(_cpath / filepathS / ".".join((_cnameS, "txt")))
+
+    with open(utfpthS, "wb") as f1:
+        f1.write(utfcalcS.encode("UTF-8"))
+    print("INFO: utf calc written to calc folder", flush=True)
+    print("INFO: program complete")
+
+    os._exit(1)
+
+
+def gen_pdf(texfileP):
+    """write pdf calc to doc folder and open
+
+    Args:
+        texfileP (path): doc config folder
+    """
+
+    global rstcalcS, _rstflagB
+
+    os.chdir(_dpath0)
+    time.sleep(1)  # cleanup tex files
+    os.system("latexmk -c")
+    time.sleep(1)
+
+    pdfmkS = (
+        "perl.exe c:/texlive/2020/texmf-dist/scripts/latexmk/latexmk.pl "
+        + "-pdf -xelatex -quiet -f "
+        + str(texfileP)
+    )
+
+    os.system(pdfmkS)
+    print("\nINFO: pdf file written: " + ".".join([_cnameS, "pdf"]))
+
+    dnameS = _cnameS.replace("c", "d", 1)
+    docpdfP = Path(_dpath / ".".join([dnameS, "pdf"]))
+    doclocalP = Path(_dpath0 / ".".join([_cnameS, "pdf"]))
+    time.sleep(2)  # move pdf to doc folder
+    shutil.move(doclocalP, docpdfP)
+    os.chdir(_dpathcur)
+    print("INFO: pdf file moved to docs folder", flush=True)
+    print("INFO: program complete")
+
+    cfgP = Path(_dpath0 / "rv_cfg.txt")  # read pdf display program
+    with open(cfgP) as f2:
+        cfgL = f2.readlines()
+        cfg1S = cfgL[0].split("|")
+        cfg2S = cfg1S[1].strip()
+    cmdS = cfg2S + " " + str(Path(_dpath) / ".".join([dnameS, "pdf"]))
+    # print(cmdS)
+    subprocess.run(cmdS)
+
+    os._exit(1)
+
+
+def gen_html(stylefileS):
+
+    global rstcalcS, _rstflagB
+    pass
+
+
+def gen_tex(doctypeS, stylefileS, calctitleS, startpageS):
+
+    global rstcalcS, _rstflagB
+
+    pdfD = {
+        "cpdfP": Path(_dpath0 / ".".join([_cnameS, "pdf"])),
+        "chtml": Path(_dpath0 / ".".join([_cnameS, "html"])),
+        "trst": Path(_dpath0 / ".".join([_cnameS, "rst"])),
+        "ttex1": Path(_dpath0 / ".".join([_cnameS, "tex"])),
+        "auxfile": Path(_dpath0 / ".".join([_cnameS, ".aux"])),
+        "outfile": Path(_dpath0 / ".".join([_cnameS, ".out"])),
+        "texmak2": Path(_dpath0 / ".".join([_cnameS, ".fls"])),
+        "texmak3": Path(_dpath0 / ".".join([_cnameS, ".fdb_latexmk"])),
+    }
+    if stylefileS == "default":
+        stylefileS = "pdf_style.sty"
+    else:
+        stylefileS == stylefileS.strip()
+    style_path = Path(_dpath0 / stylefileS)
+    print("INFO: style sheet " + str(style_path))
+    pythoncallS = "python "
+    if sys.platform == "linux":
+        pythoncallS = "python3 "
+    elif sys.platform == "darwin":
+        pythoncallS = "python3 "
+
+    rst2xeP = Path(rivpath / "scripts" / "rst2xetex.py")
+    texfileP = pdfD["ttex1"]
+    tex1S = "".join(
+        [
+            pythoncallS,
+            str(rst2xeP),
+            " --embed-stylesheet ",
+            " --documentclass=report ",
+            " --documentoptions=12pt,notitle,letterpaper ",
+            " --stylesheet=",
+            str(style_path) + " ",
+            str(_rstfile) + " ",
+            str(texfileP),
         ]
+    )
 
-        self._parseUTF("table", tcmdL, tmethL, ttagL)
+    os.chdir(_dpath0)
+    os.system(tex1S)
+    print("INFO: tex file written " + str(texfileP))
 
-        return self.calcS, self.setsectD, self.setcmdD, self.rivtD
+    # fix escape sequences
+    fnumS = _setsectD["fnumS"]
+    with open(texfileP, "r", encoding="utf-8", errors="ignore") as texin:
+        texf = texin.read()
+    texf = texf.replace("?x?", """\\""")
+    texf = texf.replace(
+        """fancyhead[L]{\leftmark}""",
+        """fancyhead[L]{\\normalsize  """ + calctitleS + "}",
+    )
+    texf = texf.replace("x*x*x", fnumS)
+    texf = texf.replace("""\\begin{tabular}""", "%% ")
+    texf = texf.replace("""\\end{tabular}""", "%% ")
+    texf = texf.replace(
+        """\\begin{document}""",
+        """\\begin{document}\n\\setcounter{page}{""" + startpageS + "}\n",
+    )
+
+    # texf = texf.replace(
+    #     """\\begin{document}""",
+    #     """\\renewcommand{\contentsname}{"""
+    #     + self.calctitle
+    #     + "}\n"
+    #     + """\\begin{document}"""
+    #     + "\n"
+    #     + """\\makeatletter"""
+    #     + """\\renewcommand\@dotsep{10000}"""
+    #     + """\\makeatother"""
+    #     + """\\tableofcontents"""
+    #     + """\\listoftables"""
+    #     + """\\listoffigures"""
+    # )
+
+    time.sleep(1)
+    with open(texfileP, "w", encoding="utf-8") as texout:
+        texout.write(texf)
+    print("INFO: tex file updated")
+
+    if doctypeS == "pdf":
+        gen_pdf(texfileP)
+
+    os._exit(1)
+
+
+def gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS):
+    """write calc rSt file to d00 folder
+
+    Args:
+        cmdS (str): [description]
+        doctypeS ([type]): [description]
+        stylefileS ([type]): [description]
+        calctitleS ([type]): [description]
+        startpageS ([type]): [description]
+    """
+
+    global rstcalcS, _rstflagB
+
+    _rstflagB = True
+    rstcalcS = """"""
+    exec(cmdS, globals(), locals())
+    docdir = os.getcwd()
+    with open(_rstfile, "wb") as f1:
+        f1.write(rstcalcS.encode("UTF-8"))
+    print("INFO: rst calc written ", docdir, flush=True)
+
+    f1 = open(_rstfile, "r", encoding="utf-8", errors="ignore")
+    rstcalcL = f1.readlines()
+    f1.close()
+    print("INFO: rst file read: " + str(_rstfile))
+
+    if doctypeS == "tex" or doctypeS == "pdf":
+        gen_tex(doctypeS, stylefileS, calctitleS, startpageS)
+    elif doctypeS == "html":
+        gen_html()
+    else:
+        print("INFO: doc type not recognized")
+
+    os._exit(1)
+
+
+def gen_report():
+    """[summary]"""
+    pass
+
+
+def D(
+    doctypeS="default",
+    stylefileS="default",
+    calctitleS="RivtCalc Calculation",
+    startpageS="1",
+    clrS="clr",
+):
+    """write plain text calcs and values to calc files
+
+    Default skips writing any calc files.
+    Doc options include: utf8, html, pdf.
+    They write the following files to the calc file:
+
+    cddnn_calcname.txt file is written to the calc subfolder
+    cdnnn_values.csv file is written to calc subfolder
+    cddnn_calcname.rst calc file is written to calc subfolder
+    cddnn_calcname.tex file is written to calc subfolder
+
+    .style files are read from d00 folder (default)
+
+    pdf option writes PDF doc to the doc division folder.
+    html option writes HTML files to the html folder.
+
+    """
+    global utfcalcS, rstcalcS, _rstflagB
+
+    if doctypeS == "default" or doctypeS == "dev":
+        return
+
+    f1 = open(_cfull, "r")
+    utfcalcL = f1.readlines()
+    f1.close()
+    print("INFO calc file read: " + str(_cfull))
+
+    indx = 0  # skip D() in calc list - avoid recursion
+    for iS in enumerate(utfcalcL):
+        if "rv.D" in iS[1]:
+            indx = int(iS[0])
+            break
+    rstcalcL = utfcalcL = utfcalcL[0:indx] + utfcalcL[indx + 1:]
+    cmdS = "".join(utfcalcL)
+
+    exprtfile = Path(_cpathcur / ".".join([_cnameS, "csv"]))
+    str1 = """header string\n"""  # write values file
+    str1 = str1 + exportS
+    with open(exprtfile, "w") as expF:
+        expF.write(str1)
+    print("INFO  values file written to calc folder", flush=True)
+
+    if doctypeS == "utf8":
+        gen_utf8(cmdS, stylefileS, calctitleS)
+
+    elif doctypeS == "tex" or doctypeS == "pdf" or doctypeS == "html":
+        if clrS == "clr":  # delete temp files
+            fileL = [
+                Path(_dpath0, ".".join([_cnameS, "pdf"])),
+                Path(_dpath0, ".".join([_cnameS, "html"])),
+                Path(_dpath0, ".".join([_cnameS, "rst"])),
+                Path(_dpath0, ".".join([_cnameS, "tex"])),
+                Path(_dpath0, ".".join([_cnameS, ".aux"])),
+                Path(_dpath0, ".".join([_cnameS, ".out"])),
+                Path(_dpath0, ".".join([_cnameS, ".fls"])),
+                Path(_dpath0, ".".join([_cnameS, ".fdb_latexmk"])),
+            ]
+            os.chdir(_dpath0)
+            tmpS = os.getcwd()
+            if tmpS == str(_dpath0):
+                for f in fileL:
+                    try:
+                        os.remove(f)
+                    except:
+                        pass
+                time.sleep(1)
+            print("INFO: temporary Tex files deleted \n", flush=True)
+        gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS)
+
+    elif doctypeS == "report":
+        gen_report()
+
+    else:
+        pass
