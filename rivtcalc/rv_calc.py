@@ -716,7 +716,7 @@ def D(
     startpageS="1",
     clrS="clr",
 ):
-    """write plain text calcs and values to calc files
+    """write RivtText to calc and doc files
 
     Default skips writing any calc files.
     Doc options include: utf8, html, pdf.
