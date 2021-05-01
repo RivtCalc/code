@@ -1,5 +1,5 @@
 #! python
-'''rivtlib API
+'''rivtcalc API
 
     The API includes six functions. Input functions take a rivt-string as the
     single argument and write formatted utf8 calculations to the
@@ -59,16 +59,19 @@ rivt Strings ------------------------------------------------------------------
     Either/or argumens are separated by semi-colons. Comments are in braces
     below the arguments.
 
-from rivtlib import rv_lib as rv
+    The first line of each calculation imports the rivtcalc API.  The second line
+    specifies the type of output document, followed by rivtcalc sections.
+
+from rivtcalc import rv_calc as rv
 rv.D("none")
+
 rv.R("""[01]_ Repository-string defines repository and report content
 
     Repository-strings may include arbitrary text. The first paragraph of the
     calcs specified in the ||search command (see below) becomes part of the
-    README.rst file for the project. The README is used in various repository
-    search functions (i.e. Github). Arguments to commands in parenthesis are
-    used provided. Otherwise they are literal. Parameter options are separated
-    by semicolons.
+    README.rst file used in various repository search functions (i.e. Github).
+    Arguments to commands in parenthesis are used provided. Otherwise they are
+    literal. Parameter options are separated by semicolons.
 
     The || search | command specifies a list of calc numbers that are searched against
     a master list of terms to be included in the README. Because the search
@@ -168,10 +171,10 @@ rv.V("""[02]_ Value-string defines active values and equations
         variable name, value1, value2, value3, ....
 
 
-    an equation [e]_
+    An equation [e]_
     v1 = x + 4*M  | unit, alt unit
     
-    save an equation result to the values file by appending double bars [e]_
+    Save an equation result to the values file by appending double bars [e]_
     y1 = v1 / 4   | unit, alt unit ||
 
     Functions may be defined in a table-string or imported from a file.
@@ -187,7 +190,7 @@ rv.V("""[02]_ Value-string defines active values and equations
 rv.T("""[04]_ Table-string builds tables and plots and executes statements
 
      Table-strings may include any simple Python statement (single line),
-     and any command or tag.  Any other line of text are ignored.
+     and any command or tag.  Other lines of text are filtered out.
     """
 )
 '''
@@ -239,9 +242,9 @@ _pdffile = Path(_dpath / ".".join((_cnameS, "pdf")))  # pdf output
 
 utfcalcS = """"""  # utf calc string
 rstcalcS = """"""  # reST calc string
-exportS = """"""  # values string exports
-rivtcalcD = {}  # values dictonary
+exportS = """"""  # values string export
 _rstflagB = False  # reST generation flag
+rivtcalcD = {}  # values dictonary
 
 _calcdirS = ""
 _docdirS = ""
@@ -330,7 +333,7 @@ logging.info(f"""calc: {_rshortP}""")
 logging.info(f"""backup: {_bshortP}""")
 logging.info(f"""logging: {_lshortP}""")
 print(" ")
-# todo: check folder structure
+# todo: write check code on folder structure
 # todo: check for units file in c0000, supplement default units
 
 

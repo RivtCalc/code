@@ -1,4 +1,4 @@
-"""Unum units for rivt
+"""Unum units for rivtcalc
 
     Add new units at end of this file
 """
