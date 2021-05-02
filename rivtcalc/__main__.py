@@ -1,16 +1,19 @@
 """
-***rivtcalc** may be run interactively from an editor or IDE one cell (#%%) or
-string function at a time, or from the command line. If run from the command
-line:
+***rivtcalc** may be run interactively from an editor or IDE, one cell or
+string function at a time (cell defined by (#%%)). It may also be run from the
+command line. If run from the command line the form is:
 
-    python -m rivtcalc rddss_calcfile.py 
+    python -m rivtcalc cddss_calcfile.py 
 
-and the calc is written to the calc folder. The calc number ddss is used for
-document and report organization, where dd is a two digit division number and
-ss is a two digit subdivision number. UTF calcs are always printed to to the
-terminal when the a calc file or interactive cell is run. If a file output
-function (write_text, write_pdf write_html) is specified in the calc, the entire
-calc is processed and the calc file is written to the calc folder."""
+and the calc is output to the folder. The calc number ddss is used for document
+and report organization, where dd is a two digit division number and ss is a
+two digit subdivision number. UTF calcs are always printed to the terminal when
+a calc file or interactive cell is run. If the file output function rv.D() is
+specified in the calc, the entire calc is processed and the calc file is
+written to the calc folder. If the report collating function rv.C() is
+specified in a calc the report is collated and the calculation is stopped at
+that point. Typically rv.C() is contained in its own file. See doc string in
+rv_calc.py for further details."""
 
 import os
 import sys
@@ -37,14 +40,14 @@ def _cmdlinehelp():
     """command line help """
     print()
     print("Run rivtcalc at the command line in the 'calc' folder with:")
-    print("     python  -m rivtcalc rddcc_calcfilename.py")
-    print("where rddcc_ calcname.py is the model file in the folder")
-    print("and **ddcc** is the model number")
+    print("     python  -m rivtcalc cddss_calcfilename.py")
+    print("where cddcc_ calcname.py is the calc file in the folder")
+    print("and **ddss** is the calc number")
     print()
     print("Specified output is written to the 'calcs' or 'docs' folder:")
-    print("     rddcc_calcfilename.txt")
-    print("     rddcc_calcfilename.html")
-    print("     rddcc_calcfilename.pdf")
+    print("     dddss_calcfilename.txt")
+    print("     dddss_calcfilename.html")
+    print("     dddss_calcfilename.pdf")
     print("Logs and other intermediate files are written to the tmp folder.")
     print()
     print("Program and documentation are here: http://rivtcalc.github.io.")

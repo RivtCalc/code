@@ -1,36 +1,35 @@
 #! python
 '''rivtcalc API
 
-    The API includes seven functions. The five input functions take a RivtText
-    string as the single argument and write formatted utf8 calculations to the
-    terminal. The two ouput functions write a formatted calculation file (doc)
-    to files in utf8, pdf or html formats and collate the documents into
-    reports.
+    The API includes seven functions. Five input functions (R,I,V or T) take a
+    RivtText string as the single argument and write formatted utf8
+    calculations to the terminal. The two ouput functions generate formatted
+    calculation dcoument files (docs) in utf8, pdf or html formats and collate
+    pdf docs into reports.
 
     Example calcs are here:
 
 
-    and interactive calcs are here:
-
-
-    RivtText strings (rxstring) are written in rivt-markup which includes
-    unicode, reStructuredText, rivt commands, rivt tags and Python code. Valid
-    markup depends on the rivt function (R,I,V or T). Commands generally
-    operate on files and start in the first column with ||. Tags are
-    encapsulated with []_ and generally format a single line of text. Block
-    tags are encapsulated with []__ and operate on indented blocks of text.
+    RivtText strings (rxstring) are light-weight markup that include
+    unicode, reStructuredText, commands, tags and Python code. Valid
+    markup varies with function as summarized below. 
 
     Rivt functions -------------------------------------------------------------
-    type       API      any text       string commands / arguments
+    type       API         any text       string commands / arguments
     ======= ============== ========= ===========================================
-    Repo    rv.R(rxstring)   yes     search, info, keys, text, table, pdf
+    Report  rv.R(rxstring)   yes     info, text, table, pdf
     Insert  rv.I(rxstring)   yes     text, table, image, latex
     Values  rv.V(rxstring) except =  =, format, value, data, func, and I()
     Tables  rv.T(rxstring)   no      Python simple statements, and I()
-    Skip    rv.S(rxstring)   yes     Skip rivt-string evaluation
+    Skip    rv.S(rxstring)   yes     skip rxstring evaluation
+    Write   rv.D(args)       --      write a doc (type, style, title, start page)    
+    Collate rv.C(rxstring)   no     cover, include, toc, batch, search      
 
-    Write   rv.D(args)      --       Write doc (type, style, title, start page)    
-    Collate rv.C(rxstring)   yes      cover, include, toc, append, batch      
+
+    Commands generally operate on files and start in the first column with ||.
+    Tags are encapsulated with []_ and typically format a single line of text.
+    Where tags operate on blocks of text they are are encapsulated with []__.
+
 
     Rivt tags -----------------------------------------------------------------
       format tag               description (user input)
@@ -49,69 +48,53 @@
     [page]_               start new doc page
     [literal]__           literal text block (note double underscore)
     [latex]__             LaTeX text block (note double underscore)
-    [link]_ http://abc.xyz label   where label is a clickable doc link
+    [link]_ http://abc label   where label is a clickable doc link
 
-rivt Strings ------------------------------------------------------------------
+RivtText Strings ---------------------------------------------------------------
 
-    The first line of each rivt-string includes the string description, which
-    may also be a section title via a tag. String input, by design, must be
-    indented 4 spaces after the function call line to provide code structure
-    and improve legibility.
+    The first line of each rxstring includes the string description, which may
+    also be a section title via a tag. String input, by design, must be
+    indented 4 spaces after the function call line to provide code structure,
+    folding and improved legibility.
 
     In the examples below, arguments in parenthesis are provided by the user.
     Either/or argumens are separated by semi-colons. Comments are in braces
     below the arguments.
 
-    The first line of each calculation imports the rivtcalc API. The second
-    line specifies the type of output document, followed by rivtcalc sections.
+    The calculation must import the rivtcalc API, followed by the output
+    document function which is followed by rivtcalc sections.
 
 from rivtcalc import rv_calc as rv
 rv.D("none")
 
-rv.R("""[01]_ Repository-string defines repository and report content
+rv.R("""[01]_ The report-string processes general doc information.
 
-    Repository-strings may include arbitrary text. The first paragraph of the
-    calcs specified in the ||search command (see below) becomes part of the
-    README.rst file used in various repository search functions (i.e. Github).
-    Arguments to commands in parenthesis are used provided. Otherwise they are
-    literal. Parameter options are separated by semicolons.
-
-    The || search | command specifies a list of calc numbers that are searched
-    against a master list of terms to be included in the README. Because the
-    search command is executed at the project level across multiple calcs, it
-    is usually included in the first project calc (c0101). It generates a
-    README file that overwrites any existing file. The command may also provide
-    a list of user specified keywords that are appended to the README.
-
-    || search | (calc num), (calc num), (calc num) ...
-    || search | (keyword), (keyword), (keyword) ...
-
-    The || info | command is similar to the || table | and || text | commands
-    with differences in file location and use. See those commands for details.
-    || info | files are used for project specific information (clients,
-    addresses, etc) and are read from the docs/d00 folder which is not shared.
-    In addition the info command data is only written to doc output (PDF, HTML)
-    under the docs folder, and not to utf-calcs stored in the calcs folder.
-    This keeps confidential project information separated from shared exaple
-    calc information contained in the calcs folder. || info | tables do not
-    include titles and should not be numbered with a tag.
+    Repository-strings may include arbitrary text. 
+    
+    The || info | command inserts project specific information from table files
+    into docs. || info | files are read from the unshared folder docs/d00_docs.
+    In addition the info data is only written to doc files (PDF, HTML) under
+    the docs folder, and not to utf-calcs stored in the calcs folder. This
+    keeps confidential project information separated from shareable calc
+    information contained in the calcs folder. 
 
     || info | (project.txt) | literal; indent
     || info | (project.csv or .xlsx) | ([col list]) or [:]
 
-    The || pdf | command attaches existing pdf documents, stored in the
-    docs/attach folder, to the front or back  of the calc doc. The *functions*
-    or *docstrings* arguments determine whether the complete function code or
-    just the docstrings of functions used with the ||func commmand are appended
-    to the calc. The title is written to a cover page that can be referred to
-    in the calcs.
+    The || pdf | command does several things. It attaches existing pdf
+    documents that are stored in the corresponding docs folder to the front or
+    back of the doc. The optional title generates an Appendix cover page. It
+    generates pages describing functions used in the calc. The level of detail
+    is determined by the *functions* or *docstrings* arguments. It merges a
+    title block page template with each page of the calc.
 
-    || pdf | front | (calccoverfile.pdf) | (title)
+    || pdf | front | (calccoverfile.pdf)
+    || pdf | block | (blockfile.pdf) 
+    || pdf | back | functions; docstrings 
     || pdf | back | (appendixfile.pdf) | (title)
-    || pdf | back | functions; docstrings |(title)
     """
 )
-rv.I("""[02]_ Insert-string defines static text, tables and images.
+rv.I("""[02]_ The insert-string defines static text, tables and images.
 
     Insert-strings include text, static equations and images. The equation tag
     [e]_ auto-increments the equation labels. The [s]_ and [x]_  tags format
@@ -142,7 +125,7 @@ rv.I("""[02]_ Insert-string defines static text, tables and images.
     (label) | http://wwww.someurl.suffix [link]_
     """
 )
-rv.V("""[02]_ Value-string defines active values and equations
+rv.V("""[02]_ The value-string defines active values and equations
 
     Value-strings include text (excluding equal signs). Lines with equal signs
     define equations and assignments that are numerically evaluated.
@@ -190,12 +173,29 @@ rv.V("""[02]_ Value-string defines active values and equations
     A figure caption [f]_
     """
 )
-rv.T("""[04]_ Table-string builds tables and plots and executes statements
+rv.T("""[04]_ The table-string generates tables and plots and executes statements
 
      Table-strings may include any simple Python statement (single line),
      and any command or tag.  Other lines of text are filtered out.
     """
 )
+
+rv.C() The collate-string
+
+    The || search | command specifies a list of calc numbers that are searched
+    against a master list of terms. Terms found are included in the README.
+    Because the search command is executed at the project level across multiple
+    calcs, it is usually included in the report.py calc (c0000_calcs). It
+    generates a README file that overwrites any existing file. The command may
+    also provide a list of user specified keywords that are appended to the
+    README.
+
+    || search | (calc num), (calc num), (calc num) ...
+    || search | (keyword), (keyword), (keyword) ...
+
+rv.D() The document command 
+
+
 '''
 import os
 import sys
@@ -239,7 +239,7 @@ _rivpath = Path("rivtcalc.rivt_lib.py").parent  # rivtlib program path
 _cpath = _cfull.parent.parent  # calc folder path
 _ppath = _cfull.parent.parent.parent  # project folder path
 _dpath = Path(_ppath / "docs")  # doc folder path
-_dpath0 = Path(_dpath / "d00")  # doc config folder
+_dpath0 = Path(_dpath / "d00_docs")  # doc config folder
 _pdffile = Path(_dpath / ".".join((_cnameS, "pdf")))  # pdf output
 
 utfcalcS = """"""  # utf calc string
@@ -273,7 +273,7 @@ _foldD = {
     "cpath": Path(_ppath, "calcs"),
     "cpathcur": _cpathcur,
     "dpath": Path(_ppath, "docs"),
-    "dpath0": Path(_ppath, "docs", "d00"),
+    "dpath0": Path(_ppath, "docs", "d00_docs"),
     "dpathcur": _dpathcur,
     "spath": Path(_cpath, "scripts"),
     "kpath": Path(_cpath, "scripts", "sketches"),
@@ -336,7 +336,7 @@ logging.info(f"""backup: {_bshortP}""")
 logging.info(f"""logging: {_lshortP}""")
 print(" ")
 # todo: write check code on folder structure
-# todo: check for units file in c0000, supplement default units
+# todo: check for units file in c0000_calcs, supplement default units
 
 
 def _init_utf(rxS: str):
@@ -681,7 +681,7 @@ def gen_tex(doctypeS, stylefileS, calctitleS, startpageS):
 
 
 def gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS):
-    """write calc rSt file to d00 folder
+    """write calc rSt file to d00_docs folder
 
     Args:
         cmdS (str): [description]
@@ -766,7 +766,7 @@ def D(
     cddnn_calcname.rst calc file is written to calc subfolder
     cddnn_calcname.tex file is written to calc subfolder
 
-    .style files are read from d00 folder (default)
+    .style files are read from d00_docs folder (default)
 
     pdf option writes PDF doc to the doc division folder.
     html option writes HTML files to the html folder.
