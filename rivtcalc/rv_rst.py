@@ -422,7 +422,7 @@ class Rivt2rSt:
             rstS = "\n\n::\n\n" + txtS + "\n\n"
         elif iL[2].strip() == "literalindent":
             txtS = "\n\n::\n\n"
-            for iS in uL:
+            for iS in iL:
                 txtS += "   " + iS
             rstS = txtS + "\n\n"
         elif iL[2].strip() == "html":

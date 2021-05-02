@@ -23,9 +23,7 @@ import numpy as np
 from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
-
-import rivtcalc.rc_lib as rc
-import rivtcalc.rc_calc as _rc_calc
+import rivtcalc.rv_calc as _rc_calc
 
 __version__ = "0.8.1-beta.1"
 __author__ = "rholland@structurelabs.com"
