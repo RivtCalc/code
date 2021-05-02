@@ -8,7 +8,6 @@ from unum.exceptions import *
 from unum.core import *
 from unum import uarray
 from unum import Unum
-import unum
 import os
 import sys
 from pathlib import Path, PurePath
@@ -68,7 +67,7 @@ celsius = CELSIUS = new_unit("deg C", K, "degree Celsius")
 FAHR = new_unit("degF", K * 9.0 / 5, "degree Fahrenheit")
 # do not modify above =================================================
 
-# temperature conversion is for relative degree size, not offset --------
+# temperature conversion is relative degree size, not offset --------
 # define engineering units below ----------------------------------------
 # metric units ----------------------------------------------------------
 G = new_unit("G", 9.80665 * M / S ** 2, "gravity acceleration")

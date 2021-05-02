@@ -30,7 +30,7 @@
     Skip    rv.S(rxstring)   yes     Skip rivt-string evaluation
 
     Write   rv.D(args)      --       Write doc (type, style, title, start page)    
-    Collate rv.C(rxstring)   yes      cover, titleblock, contents, appendix      
+    Collate rv.C(rxstring)   yes      cover, include, toc, append, batch      
 
     Rivt tags -----------------------------------------------------------------
       format tag               description (user input)
@@ -214,7 +214,7 @@ from typing import List, Set, Dict, Tuple, Optional
 from contextlib import suppress
 from rivtcalc.rv_unit import *
 import rivtcalc.rv_utf as _rv_utf
-import rivtcalc.rv_tex as _rv_tex
+import rivtcalc.rv_rst as _rv_rst
 
 # import rivt.rivt_reprt as _reprt
 # import rivt.rivt_chk as _rchk
@@ -339,16 +339,16 @@ print(" ")
 # todo: check for units file in c0000, supplement default units
 
 
-def _init_utf(rawS: str):
+def _init_utf(rxS: str):
     """return rivt-string utf class instance
 
     Args:
-        rawS (str): rivt-string
+        rxS (str): rivt-string
 
     Returns:
         class instance: utf string-type instance
     """
-    sectS, strS = rawS.split("\n", 1)
+    sectS, strS = rxS.split("\n", 1)
     _section(sectS)
     strL = strS.split("\n")
     ucalc = _rv_utf.OutputUTF(
@@ -356,19 +356,19 @@ def _init_utf(rawS: str):
     return ucalc
 
 
-def _init_rst(rawS: str):
+def _init_rst(rxS: str):
     """return rivt-string reST class
 
     Args:
-        rawstr (str): rivt-string
+        rxStr (str): rivt-string
 
     Returns:
         class instance: reST string-type instance
     """
-    sectS, strS = rawS.split("\n", 1)
+    sectS, strS = rxS.split("\n", 1)
     _section(sectS)
     strL = strS.split("\n")
-    rstcalc = _rv_tex.Rivt2rSt(
+    rstcalc = _rv_rst.Rivt2rSt(
         strL, _foldD, _setcmdD, _setsectD, rivtcalcD, exportS)
     return rstcalc
 
@@ -422,84 +422,94 @@ def _section(hdrS: str):
             utfcalcS += utfS
 
 
-def R(rawS: str):
+def R(rxS: str):
     """repository-string to utf-string
 
     Args:
-        rawstrS (str): repository-string
+        rxStrS (str): repository-string
     """
     global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
 
     if _rstflagB:
-        rcalc = _init_rst(rawS)
+        rcalc = _init_rst(rxS)
         rcalcS, _setsectD = rcalc.r_rst()
         rstcalcS += rcalcS
     else:
-        rcalc = _init_utf(rawS)
+        rcalc = _init_utf(rxS)
         rcalcS, _setsectD = rcalc.r_utf()
         utfcalcS += rcalcS
 
 
-def I(rawS: str):
+def I(rxS: str):
     """insert-string to utf-string
 
     Args:
-        rawstrS (str): insert-string
+        rxStrS (str): insert-string
     """
     global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
 
     if _rstflagB:
-        rcalc = _init_rst(rawS)
+        rcalc = _init_rst(rxS)
         rcalcS, _setsectD, _setcmdD = rcalc.i_rst()
         rstcalcS += rcalcS
     else:
-        icalc = _init_utf(rawS)
+        icalc = _init_utf(rxS)
         icalcS, _setsectD, _setcmdD = icalc.i_utf()
         utfcalcS += icalcS
 
 
-def V(rawS: str):
+def V(rxS: str):
     """value-string to utf-string
 
     Args:
-        rawstr (str): value-string
+        rxStr (str): value-string
     """
     global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD, exportS
 
     if _rstflagB:
-        rcalc = _init_rst(rawS)
+        rcalc = _init_rst(rxS)
         rcalcS, _setsectD, _setcmdD, rivtcalcD, exportS = rcalc.v_rst()
         rstcalcS += rcalcS
     else:
-        vcalc = _init_utf(rawS)
+        vcalc = _init_utf(rxS)
         vcalcS, _setsectD, _setcmdD, rivtcalcD, exportS = vcalc.v_utf()
         utfcalcS += vcalcS
 
 
-def T(rawS: str):
+def T(rxS: str):
     """table-string to utf-string
 
     Args:
-       rawstr (str): table-string
+       rxStr (str): table-string
     """
     global utfcalcS, rstcalcS, _rstflagB, _foldD, _setsectD, _setcmdD, rivtcalcD
 
     if _rstflagB:
-        rcalc = _init_rst(rawS)
+        rcalc = _init_rst(rxS)
         rcalcS, _setsectD = rcalc.t_rst()
         rstcalcS += rcalcS
     else:
-        tcalc = _init_utf(rawS)
+        tcalc = _init_utf(rxS)
         tcalcS, _setsectD, _setcmdD, rivtcalcD = tcalc.t_utf()
         utfcalcS += tcalcS
 
 
-def S(rawS: str):
-    """skip string
+def S(rxS: str):
+    """skip procssing of rxstring
 
     Args:
-       rawstr (str): any string to exclude
+       rxS (str): rxstring
     """
+    pass
+
+
+def C(rxS: str):
+    """collate report
+
+    Args:
+       rxS (str): rxstring
+    """
+    # gen_report()
     pass
 
 
@@ -708,7 +718,34 @@ def gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS):
 
 def gen_report():
     """[summary]"""
-    pass
+
+    """ 
+    try:
+        filen1 = os.path.join(self.rpath, "reportmerge.txt")
+        print(filen1)
+        file1 = open(filen1, 'r')
+        mergelist = file1.readlines()
+        file1.close()
+        mergelist2 = mergelist[:]
+    except OSError:
+        print('< reportmerge.txt file not found in reprt folder >')
+        return
+    calnum1 = self.pdffile[0:5]
+    file2 = open(filen1, 'w')
+    newstr1 = 'c | ' + self.pdffile + ' | ' + self.calctitle
+    for itm1 in mergelist:
+        if calnum1 in itm1:
+            indx1 = mergelist2.index(itm1)
+            mergelist2[indx1] = newstr1
+            for j1 in mergelist2:
+                file2.write(j1)
+            file2.close()
+            return
+    mergelist2.append("\n" + newstr1)
+    for j1 in mergelist2:
+        file2.write(j1)
+    file2.close()
+    return """
 
 
 def D(
