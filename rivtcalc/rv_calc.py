@@ -1,10 +1,11 @@
 #! python
 '''rivtcalc API
 
-    The API includes six functions. Input functions take a rivt-string as the
-    single argument and write formatted utf8 calculations to the
-    terminal. Ouput functions take a file of rivt-strings (calc) and write
-    a formatted calculation file (doc) to files in utf8, pdf or html formats.
+    The API includes seven functions. The five input functions take a RivtText
+    string as the single argument and write formatted utf8 calculations to the
+    terminal. The two ouput functions write a formatted calculation file (doc)
+    to files in utf8, pdf or html formats and collate the documents into
+    reports.
 
     Example calcs are here:
 
@@ -12,22 +13,24 @@
     and interactive calcs are here:
 
 
-    Rivt-strings are written in rivt-markup which includes unicode,
-    reStructuredText, rivt commands, rivt tags and Python code. Valid markup
-    depends on the rivt function (R,I,V or T). Commands generally operate on
-    files and start in the first column with ||. Tags are encapsulated with
-    []_ and generally format a single line of text. Block tags are
-    encapsulated with []__ and operate on indented blocks of text.
+    RivtText strings (rxstring) are written in rivt-markup which includes
+    unicode, reStructuredText, rivt commands, rivt tags and Python code. Valid
+    markup depends on the rivt function (R,I,V or T). Commands generally
+    operate on files and start in the first column with ||. Tags are
+    encapsulated with []_ and generally format a single line of text. Block
+    tags are encapsulated with []__ and operate on indented blocks of text.
 
-    Rivt functions ------------------------------------------------------------
+    Rivt functions -------------------------------------------------------------
     type       API      any text       string commands / arguments
-    ======= ========== ========= ==============================================
-    Repo    rv.R(rivt)    yes      search, info, keys, text, table, pdf
-    Insert  rv.I(rivt)    yes      text, table, image, latex
-    Values  rv.V(rivt)   yes(=)    =, config, value, data, func, I() commands
-    Table   rv.T(rivt)    no       Python simple statements, I() commands
-    Skip    rv.S(rivt)    --       Skip rivt-string evaluation
-    Write   rv.D(args)    --       (type, style, title, page)
+    ======= ============== ========= ===========================================
+    Repo    rv.R(rxstring)   yes     search, info, keys, text, table, pdf
+    Insert  rv.I(rxstring)   yes     text, table, image, latex
+    Values  rv.V(rxstring) except =  =, format, value, data, func, and I()
+    Tables  rv.T(rxstring)   no      Python simple statements, and I()
+    Skip    rv.S(rxstring)   yes     Skip rivt-string evaluation
+
+    Write   rv.D(args)      --       Write doc (type, style, title, start page)    
+    Collate rv.C(rxstring)   yes      cover, titleblock, contents, appendix      
 
     Rivt tags -----------------------------------------------------------------
       format tag               description (user input)
@@ -59,8 +62,8 @@ rivt Strings ------------------------------------------------------------------
     Either/or argumens are separated by semi-colons. Comments are in braces
     below the arguments.
 
-    The first line of each calculation imports the rivtcalc API.  The second line
-    specifies the type of output document, followed by rivtcalc sections.
+    The first line of each calculation imports the rivtcalc API. The second
+    line specifies the type of output document, followed by rivtcalc sections.
 
 from rivtcalc import rv_calc as rv
 rv.D("none")
@@ -73,11 +76,11 @@ rv.R("""[01]_ Repository-string defines repository and report content
     Arguments to commands in parenthesis are used provided. Otherwise they are
     literal. Parameter options are separated by semicolons.
 
-    The || search | command specifies a list of calc numbers that are searched against
-    a master list of terms to be included in the README. Because the search
-    command is executed at the project level across multiple calcs, it is
-    usually included in the first project calc (c0101). It generates a README
-    file that overwrites any existing file. The command may also provide
+    The || search | command specifies a list of calc numbers that are searched
+    against a master list of terms to be included in the README. Because the
+    search command is executed at the project level across multiple calcs, it
+    is usually included in the first project calc (c0101). It generates a
+    README file that overwrites any existing file. The command may also provide
     a list of user specified keywords that are appended to the README.
 
     || search | (calc num), (calc num), (calc num) ...
@@ -89,9 +92,9 @@ rv.R("""[01]_ Repository-string defines repository and report content
     addresses, etc) and are read from the docs/d00 folder which is not shared.
     In addition the info command data is only written to doc output (PDF, HTML)
     under the docs folder, and not to utf-calcs stored in the calcs folder.
-    This keeps confidential project information separated from shared exaple calc
-    information contained in the calcs folder. || info | tables do not include
-    titles and should not be numbered with a tag.
+    This keeps confidential project information separated from shared exaple
+    calc information contained in the calcs folder. || info | tables do not
+    include titles and should not be numbered with a tag.
 
     || info | (project.txt) | literal; indent
     || info | (project.csv or .xlsx) | ([col list]) or [:]
@@ -224,7 +227,6 @@ except:
     _calcfileS = sys.argv[0]
 if ".py" not in _calcfileS:
     import __main__
-
     # print(dir(__main__))
     _calcfileS = __main__.__file__
 
