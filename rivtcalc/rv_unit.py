@@ -2,27 +2,20 @@
 
     Add new units at end of this file
 """
-"""
-from unum.utils import *
-from unum.exceptions import *
-from unum.core import *
-from unum import uarray
-from unum import Unum
-"""
 
-import os
-import sys
+from importlib.util import module_from_spec
 from pathlib import Path, PurePath
 import importlib.util
-path1 = importlib.util.find_spec("rivtcalc")
-rivpath = Path(path1.origin).parent
-file_path = Path(rivpath / "unum" / "__init__.py")
-module_name = "unum"
-spec = importlib.util.spec_from_file_location(module_name, file_path)
-module = importlib.util.module_from_spec(spec)
-sys.modules[module_name] = module
-spec.loader.exec_module(module)  # load unum from rivtcalc directory
-
+import types
+import sys
+import os
+if 1 == 1:
+    path1 = importlib.util.find_spec("rivtcalc")
+    rivpath = Path(path1.origin).parent
+    sys.path.append(rivpath)
+    from unum import *
+    from unum import uarray
+    from unum import Unum
 
 Unum.set_format(
     mul_separator=" ",

@@ -1,29 +1,30 @@
 #! python
 '''rivtcalc API
 
-    The API includes seven functions. Five input functions (R,I,V or T) take a
-    RivtText string as the single argument and write formatted utf8
-    calculations to the terminal. The two ouput functions generate formatted
-    calculation dcoument files (docs) in utf8, pdf or html formats and collate
-    pdf docs into reports.
+    The API includes eight functions. Six input functions (R,I,V,T and S,L)
+    take a RivtText string (rxstring) as the argument and write formatted utf8
+    calculations to the terminal. The two ouput functions (D,C) generate
+    formatted calculation dcoument files (docs) in utf8, pdf or html formats
+    and collate pdf docs into reports.
 
     Example calcs are here:
 
 
-    RivtText strings (rxstring) are light-weight markup that include
-    unicode, reStructuredText, commands, tags and Python code. Valid
-    markup varies with function as summarized below. 
+    A RivtText string is markup that includes unicode, reStructuredText,
+    commands, tags and Python code. Valid markup varies the with function, as
+    summarized below.
 
     Rivt functions -------------------------------------------------------------
     type       API         any text       string commands / arguments
-    ======= ============== ========= ===========================================
-    Report  rv.R(rxstring)   yes     info, text, table, pdf
-    Insert  rv.I(rxstring)   yes     text, table, image, latex
-    Values  rv.V(rxstring) except =  =, format, value, data, func, and I()
-    Tables  rv.T(rxstring)   no      Python simple statements, and I()
-    Skip    rv.S(rxstring)   yes     skip rxstring evaluation
-    Write   rv.D(args)       --      write a doc (type, style, title, start page)    
-    Collate rv.C(rxstring)   no     cover, include, toc, batch, search      
+    ======= ============== ======== ===========================================
+    Report  rv.R(rxstring)   yes    info, text, table, pdf
+    Insert  rv.I(rxstring)   yes    text, table, image, latex
+    Values  rv.V(rxstring)   no     =, format, value, data, func, and I()
+    Tables  rv.T(rxstring)   no     Python simple statements, and I()
+    Skip    rv.S(rxstring)   yes    skip rxstring evaluation
+    Write   rv.D(args)       args   write a doc (type, style, title, start page)    
+    Collate rv.C(rxstring)   yes    cover, include, toc, batch, search
+    List    rv.L(rxstring)   no     list, row, endrow, ----, and I()      
 
 
     Commands generally operate on files and start in the first column with ||.
@@ -53,9 +54,9 @@
 RivtText Strings ---------------------------------------------------------------
 
     The first line of each rxstring includes the string description, which may
-    also be a section title via a tag. String input, by design, must be
-    indented 4 spaces after the function call line to provide code structure,
-    folding and improved legibility.
+    include a section tag and title. Rxstring input, by design, must be indented
+    4 spaces after the function call line to provide code structure, folding
+    and improved legibility.
 
     In the examples below, arguments in parenthesis are provided by the user.
     Either/or argumens are separated by semi-colons. Comments are in braces
@@ -202,6 +203,7 @@ import sys
 import subprocess
 import time
 import textwrap
+import texttable
 import logging
 import warnings
 import re
