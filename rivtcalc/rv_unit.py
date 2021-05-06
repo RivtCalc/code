@@ -3,19 +3,21 @@
     Add new units at end of this file
 """
 
-from importlib.util import module_from_spec
-from pathlib import Path, PurePath
-import importlib.util
-import types
-import sys
+
 import os
+import sys
+import importlib.util
+from pathlib import Path, PurePath
 if 1 == 1:
     path1 = importlib.util.find_spec("rivtcalc")
     rivpath = Path(path1.origin).parent
-    sys.path.append(rivpath)
+    unumpath = Path(rivpath, "unum")
+    sys.path.append(str(rivpath))
+    sys.path.append(str(unumpath))
     from unum import *
-    from unum import uarray
     from unum import Unum
+    from unum import uarray
+print(sys.path)
 
 Unum.set_format(
     mul_separator=" ",

@@ -24,8 +24,6 @@
     Skip    rv.S(rxstring)   yes    skip rxstring evaluation
     Write   rv.D(args)       args   write a doc (type, style, title, start page)    
     Collate rv.C(rxstring)   yes    cover, include, toc, batch, search
-    List    rv.L(rxstring)   no     list, row, endrow, ----, and I()      
-
 
     Commands generally operate on files and start in the first column with ||.
     Tags are encapsulated with []_ and typically format a single line of text.
@@ -181,7 +179,7 @@ rv.T("""[04]_ The table-string generates tables and plots and executes statement
     """
 )
 
-rv.C() The collate-string
+rv.C(""" The collate-string assembles reports
 
     The || search | command specifies a list of calc numbers that are searched
     against a master list of terms. Terms found are included in the README.
@@ -194,7 +192,9 @@ rv.C() The collate-string
     || search | (calc num), (calc num), (calc num) ...
     || search | (keyword), (keyword), (keyword) ...
 
-rv.D() The document command 
+    """)
+
+rv.D(args) 
 
 
 '''
@@ -203,7 +203,6 @@ import sys
 import subprocess
 import time
 import textwrap
-import texttable
 import logging
 import warnings
 import re
@@ -214,7 +213,7 @@ from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
 from contextlib import suppress
-from rivtcalc.rv_unit import *
+import rivtcalc.rv_unit
 import rivtcalc.rv_utf as _rv_utf
 import rivtcalc.rv_rst as _rv_rst
 
@@ -751,7 +750,7 @@ def gen_report():
 
 
 def D(
-    doctypeS="default",
+    doctypeS="dev",
     stylefileS="default",
     calctitleS="RivtCalc Calculation",
     startpageS="1",
@@ -776,7 +775,7 @@ def D(
     """
     global utfcalcS, rstcalcS, _rstflagB
 
-    if doctypeS == "default" or doctypeS == "dev":
+    if doctypeS == "dev":
         return
 
     f1 = open(_cfull, "r")
