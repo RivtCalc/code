@@ -213,7 +213,6 @@ from pathlib import Path
 from collections import deque
 from typing import List, Set, Dict, Tuple, Optional
 from contextlib import suppress
-import rivtcalc.rv_unit
 import rivtcalc.rv_utf as _rv_utf
 import rivtcalc.rv_rst as _rv_rst
 
