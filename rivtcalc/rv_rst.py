@@ -36,7 +36,7 @@ try:
     from PIL import ImageOps as PImageOps
 except:
     pass
-from rivtlib.rv_unit import *
+import rivtcalc.rv_unit
 
 logging.getLogger("numexpr").setLevel(logging.WARNING)
 

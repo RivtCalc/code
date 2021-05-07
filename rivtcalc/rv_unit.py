@@ -14,9 +14,10 @@ if 1 == 1:
     unumpath = Path(rivpath, "unum")
     sys.path.append(str(rivpath))
     sys.path.append(str(unumpath))
-    from unum import *
-    from unum import Unum
-    from unum import uarray
+    from unum.core import *
+    from unum.utils import *
+    from unum.core import Unum
+    from unum.utils import uarray
 print(sys.path)
 
 Unum.set_format(
@@ -28,7 +29,11 @@ Unum.set_format(
     superscript=False,
 )
 
+print(dir())
 # standard SI units - do not modify bewtween double lines ======================
+K = new_unit("K", 0, "kelvin")
+CELSIUS = new_unit("deg C", K, "degree Celsius")
+FAHR = new_unit("degF", K * 9.0 / 5, "degree Fahrenheit")
 M = new_unit("m", 0, "meter")
 NM = new_unit("nm", 10 ** -9 * M, "nanometer")
 UM = new_unit("um", 10 ** -6 * M, "micrometer")
@@ -38,7 +43,6 @@ DM = new_unit("dm", 10 ** -1 * M, "decimeter")
 SEC = S = new_unit("s", 0, "second")
 A = new_unit("A", 0, "ampere")
 MA = new_unit("mA", 10 ** -3 * A, "milliampere")
-K = new_unit("K", 0, "kelvin")
 MOL = new_unit("mol", 0, "mole")
 KG = new_unit("kg", 0, "kilogram")
 GRAM = new_unit("gram", 10 ** -3 * KG, "gram")
@@ -59,8 +63,6 @@ HENRY = new_unit("H", WB / A, "henry")
 CD = new_unit("cd", 0, "candela")
 LM = new_unit("lm", CD * SR, "lumen")
 LX = new_unit("lx", LM / M ** 2, "lux")
-celsius = CELSIUS = new_unit("deg C", K, "degree Celsius")
-FAHR = new_unit("degF", K * 9.0 / 5, "degree Fahrenheit")
 # do not modify above =================================================
 
 # temperature conversion is relative degree size, not offset --------

@@ -8,7 +8,8 @@ from .exceptions import *
 
 BASIC_UNIT = 0
 
-UnitDefinition = collections.namedtuple('UnitDefinition', ['definition', 'level', 'name'])
+UnitDefinition = collections.namedtuple(
+    'UnitDefinition', ['definition', 'level', 'name'])
 
 
 class UnitTable(dict):
@@ -88,7 +89,8 @@ class Formatter(object):
         not_allowed_keywords = set(kwargs) - set(self._config)
 
         if not_allowed_keywords:
-            raise TypeError("Not allowed keywords: %s" % ', '.join(not_allowed_keywords))
+            raise TypeError("Not allowed keywords: %s" %
+                            ', '.join(not_allowed_keywords))
 
         self._config.update(kwargs)
 
@@ -117,8 +119,10 @@ class Formatter(object):
 
     def _format_with_div_separator(self, units):
         return self['div_separator'].join([
-            self['mul_separator'].join(self._format_exponent(u, exp) for u, exp in units if exp > 0) or '1',
-            self['mul_separator'].join(self._format_exponent(u, -exp) for u, exp in units if exp < 0)
+            self['mul_separator'].join(self._format_exponent(
+                u, exp) for u, exp in units if exp > 0) or '1',
+            self['mul_separator'].join(self._format_exponent(
+                u, -exp) for u, exp in units if exp < 0)
         ]).rstrip(self['div_separator'] + '1')
 
     def _format_exponent(self, symbol, exp):
@@ -126,7 +130,8 @@ class Formatter(object):
             exp_text = six.text_type(exp)
 
             if self['superscript']:
-                exp_text = ''.join([_SUPERSCRIPT_NUMBERS.get(c, c) for c in exp_text])
+                exp_text = ''.join([_SUPERSCRIPT_NUMBERS.get(c, c)
+                                    for c in exp_text])
         else:
             exp_text = ''
 
@@ -282,10 +287,12 @@ class Unum(object):
             for subst_dict, subst_unum in subst_unums:
                 for symbol, exponent in subst_unum._derived_units():
                     new_subst_dict = subst_dict.copy()
-                    new_subst_dict[symbol] = exponent + new_subst_dict.get(symbol, 0)
+                    new_subst_dict[symbol] = exponent + \
+                        new_subst_dict.get(symbol, 0)
 
                     if all(new_subst_dict != subst_dict2 for subst_dict2, subst_unum2 in new_subst_unums):
-                        reduced = subst_unum.replaced(symbol, UNIT_TABLE.get_definition(symbol)) # replace by definition
+                        reduced = subst_unum.replaced(
+                            symbol, UNIT_TABLE.get_definition(symbol))  # replace by definition
                         new_subst_unums.append((new_subst_dict, reduced))
 
                         new_length = len(reduced._unit)
@@ -303,7 +310,8 @@ class Unum(object):
         """
 
         if self._unit:
-            raise ShouldBeUnitlessError(self)  # TODO consider other way to signalize it
+            # TODO consider other way to signalize it
+            raise ShouldBeUnitlessError(self)
 
     def max_level(self):
         """
