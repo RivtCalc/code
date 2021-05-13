@@ -234,11 +234,13 @@ _cwdS = os.getcwd()
 _cfull = Path(_calcfileS)  # calc file full path
 _cfileS = _cfull.name  # calc file name
 _cnameS = _cfileS.split(".py")[0]  # calc file basename
-_cnumS = _cnameS[0:5]
+_cnumS = _cnameS[1:5]
 _rivpath = Path("rivtcalc.rivt_lib.py").parent  # rivtlib program path
-_cpath = _cfull.parent.parent  # calc folder path
 _ppath = _cfull.parent.parent.parent  # project folder path
+_cpath = Path(_ppath / "calcs")  # calc folder path
 _dpath = Path(_ppath / "docs")  # doc folder path
+_manpath = Path(_ppath / "manage")   # manage folder path
+_reppath = Path(_ppath / "reports")  # reports folder path
 _dpath0 = Path(_dpath / "d00_docs")  # doc config folder
 _pdffile = Path(_dpath / ".".join((_cnameS, "pdf")))  # pdf output
 
@@ -250,21 +252,35 @@ rivtcalcD = {}  # values dictonary
 
 _calcdirS = ""
 _docdirS = ""
-for root, dir, file in os.walk(_cpath):
+_mandirS = ""
+_repdirS = ""
+for root, dir, file in os.walk(_cpath):  # set calc directory
     for i in dir:
         if _cfileS[0:5] == i[0:5]:
             _calcdirS = i
-for root, dir, file in os.walk(_dpath):
+for root, dir, file in os.walk(_dpath):  # set doc directory
     for i in dir:
         if _cfileS[1:3] == i[1:3]:
             _docdirS = i
+for root, dir, file in os.walk(_manpath):  # set manage directory
+    for i in dir:
+        if _cfileS[1:3] == i[1:3]:
+            _mandirS = i
+for root, dir, file in os.walk(_reppath):  # set report directory
+    for i in dir:
+        if _cfileS[1:3] == i[1:3]:
+            _repdirS = i
+
 
 _rstfile = Path(_dpath0 / ".".join((_cnameS, "rst")))  # rst output
-_dpathcur = Path(_ppath / "docs" / _docdirS)  # doc folder path
 _cpathcur = Path(_cpath / _calcdirS)  # calc folder path
+_dpathcur = Path(_dpath / _docdirS)  # doc folder path
+_manpathcur = Path(_manpath / _mandirS)  # manage folder path
 
 print("INFO: calc directory is ", _cpathcur)
 print("INFO: doc directory is ", _dpathcur)
+print("INFO: manage directory is ", _cpathcur)
+print("INFO: report directory is ", _dpathcur)
 
 # folder paths
 _foldD = {
