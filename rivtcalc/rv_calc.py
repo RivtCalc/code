@@ -22,7 +22,7 @@
     Values  rv.V(rxstring)   no     =, format, value, data, func, and I()
     Tables  rv.T(rxstring)   no     Python simple statements, and I()
     Skip    rv.S(rxstring)   yes    skip rxstring evaluation
-    Write   rv.D(args)       args   write a doc (type, style, title, start page)    
+    Write   rv.D(args)       args   write a doc (type, style, title, start page)
     Collate rv.C(rxstring)   yes    cover, include, toc, batch, search
 
     Commands generally operate on files and start in the first column with ||.
@@ -68,14 +68,14 @@ rv.D("none")
 
 rv.R("""[01]_ The report-string processes general doc information.
 
-    Repository-strings may include arbitrary text. 
-    
+    Repository-strings may include arbitrary text.
+
     The || info | command inserts project specific information from table files
     into docs. || info | files are read from the unshared folder docs/d00_docs.
     In addition the info data is only written to doc files (PDF, HTML) under
     the docs folder, and not to utf-calcs stored in the calcs folder. This
     keeps confidential project information separated from shareable calc
-    information contained in the calcs folder. 
+    information contained in the calcs folder.
 
     || info | (project.txt) | literal; indent
     || info | (project.csv or .xlsx) | ([col list]) or [:]
@@ -88,8 +88,8 @@ rv.R("""[01]_ The report-string processes general doc information.
     title block page template with each page of the calc.
 
     || pdf | front | (calccoverfile.pdf)
-    || pdf | block | (blockfile.pdf) 
-    || pdf | back | functions; docstrings 
+    || pdf | block | (blockfile.pdf)
+    || pdf | back | functions; docstrings
     || pdf | back | (appendixfile.pdf) | (title)
     """
 )
@@ -138,16 +138,16 @@ rv.V("""[02]_ The value-string defines active values and equations
     y1 = 12.1    | unit, alt unit | description ||
                             {save to value file if trailing ||}
 
-    Import values from a csv or xlxs file, starting with the second row. 
+    Import values from a csv or xlxs file, starting with the second row.
     || values | file.csv or .xlxs
-    
+
     The first row is a descriptive heading. For a value file the csv or xlsx file
     must have the structure:
     [literal]__
         variable name, value, primary unit, secondary unit, description
 
 
-    Import a list of values from rows of a csv or xlsx file. 
+    Import a list of values from rows of a csv or xlsx file.
     || data | file.csv | [1:4] {rows to import}
 
 
@@ -158,7 +158,7 @@ rv.V("""[02]_ The value-string defines active values and equations
 
     An equation [e]_
     v1 = x + 4*M  | unit, alt unit
-    
+
     Save an equation result to the values file by appending double bars [e]_
     y1 = v1 / 4   | unit, alt unit ||
 
@@ -194,7 +194,7 @@ rv.C(""" The collate-string assembles reports
 
     """)
 
-rv.D(args) 
+rv.D(args)
 
 
 '''
@@ -243,13 +243,11 @@ _manpath = Path(_ppath / "manage")   # manage folder path
 _reppath = Path(_ppath / "reports")  # reports folder path
 _dpath0 = Path(_dpath / "d00_docs")  # doc config folder
 _pdffile = Path(_dpath / ".".join((_cnameS, "pdf")))  # pdf output
-
 utfcalcS = """"""  # utf calc string
 rstcalcS = """"""  # reST calc string
 exportS = """"""  # values string export
-_rstflagB = False  # reST generation flag
 rivtcalcD = {}  # values dictonary
-
+_rstflagB = False  # reST generation flag
 _calcdirS = ""
 _docdirS = ""
 _mandirS = ""
@@ -258,29 +256,29 @@ for root, dir, file in os.walk(_cpath):  # set calc directory
     for i in dir:
         if _cfileS[0:5] == i[0:5]:
             _calcdirS = i
-for root, dir, file in os.walk(_dpath):  # set doc directory
-    for i in dir:
-        if _cfileS[1:3] == i[1:3]:
-            _docdirS = i
+            for root, dir, file in os.walk(_dpath):  # set doc directory
+                for i in dir:
+                    print(i)
+                    if "".join(["d", _cfileS[1:3]]) == i[0:3]:
+                        _docdirS = i
 for root, dir, file in os.walk(_manpath):  # set manage directory
     for i in dir:
-        if _cfileS[1:3] == i[1:3]:
+        if "".join(["m", _cfileS[1:3]]) == i[0:3]:
             _mandirS = i
-for root, dir, file in os.walk(_reppath):  # set report directory
-    for i in dir:
-        if _cfileS[1:3] == i[1:3]:
-            _repdirS = i
-
+            for root, dir, file in os.walk(_reppath):  # set report directory
+                for i in dir:
+                    if "".join(["r", _cfileS[1:3]]) == i[0:3]:
+                        _repdirS = i
 
 _rstfile = Path(_dpath0 / ".".join((_cnameS, "rst")))  # rst output
 _cpathcur = Path(_cpath / _calcdirS)  # calc folder path
 _dpathcur = Path(_dpath / _docdirS)  # doc folder path
 _manpathcur = Path(_manpath / _mandirS)  # manage folder path
-
+_reppathcur = Path(_reppath / _repdirS)  # report folder path
 print("INFO: calc directory is ", _cpathcur)
 print("INFO: doc directory is ", _dpathcur)
-print("INFO: manage directory is ", _cpathcur)
-print("INFO: report directory is ", _dpathcur)
+print("INFO: manage directory is ", _manpathcur)
+print("INFO: report directory is ", _reppathcur)
 
 # folder paths
 _foldD = {
@@ -735,7 +733,7 @@ def gen_rst(cmdS, doctypeS, stylefileS, calctitleS, startpageS):
 def gen_report():
     """[summary]"""
 
-    """ 
+    """
     try:
         filen1 = os.path.join(self.rpath, "reportmerge.txt")
         print(filen1)
